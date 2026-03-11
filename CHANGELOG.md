@@ -1,10 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0] — 2026-03-12
 
 ### Changed
 - **Migrate `Mid()` → `String.Middle()` in Framework parsers**: `Mid()` is a legacy 1-based VB function. The modern Xojo API (`String.Middle`) is 0-based and aligns directly with `IndexOf`, arrays, and all other Xojo 2025 indexing. Updated `FormParser` and `QueryParser` to use `String.Middle` throughout; loop bounds simplified to `i = 0` / `While i < s.Length`.
-- **Fix `QueryParser` `?` stripping bug**: `qs.Mid(1)` (1-based) returned the full string including `?`. Fixed to `qs.Middle(1)` (0-based index 1 = second character, correctly skips the `?`).
 
 ### Fixed
 - **Router path parameter extraction bug**: `ParsePath` used `pp.Mid(2)` to strip the `:` prefix from named segments (e.g., `:id`). Due to Xojo's 1-based `Mid`, `Mid(2)` returns everything from position 2 onward — which is correct for a 2-char string like `":id"` but wrong for the mental model. Replaced with `pp.Right(pp.Length - 1)` which is index-agnostic. This caused all path-param-dependent routes to silently fail:
@@ -13,12 +12,19 @@
   - `POST /notes/:id` — `UPDATE WHERE id = 0` matched nothing
   - `POST /notes/:id/delete` — `DELETE WHERE id = 0` matched nothing
 
-- **FormParser mixed-indexing bugs** (caused Create and Edit to silently discard form data):
-  - `pair.Mid(eqPos + 1)` used `IndexOf`'s 0-based result with `Mid`'s 1-based position, causing the extracted value to include the leading `=` character. Fixed to `pair.Mid(eqPos + 2)`.
-  - `DecodeURIComponent` loop `While i < s.Length` with 0-based counter `i` and 1-based `Mid` caused the last character of every key and value to be dropped (e.g., `"title"` → `"titl"`), so `HasKey("title")` always returned `False`. Fixed to `While i <= s.Length`.
-  - Same loop's percent-decode guard `i + 2 < s.Length` prevented decoding `%XX` sequences at the end of a string. Fixed to `i + 2 <= s.Length`.
+- **QueryParser `?` stripping bug**: `qs.Mid(1)` (1-based) returned the full string including the leading `?`, so it was never stripped. Fixed to `qs.Middle(1)` (0-based index 1 = second character).
 
-- **FormParser UTF-8 multi-byte decoding bug** (Thai and other non-ASCII characters saved as mojibake): `DecodeURIComponent` called `Chr(code)` on each decoded byte individually. `Chr()` maps integers to Unicode code points, so UTF-8 multi-byte sequences like `%E0%B8%97` (Thai `ท`) were converted to three separate wrong characters instead of one. Fixed by collecting all decoded bytes into a `MemoryBlock` and calling `DefineEncoding(..., Encodings.UTF8)` at the end, so the entire byte sequence is interpreted as UTF-8 correctly.
+- **FormParser mixed-indexing bugs** (caused Create and Edit to silently discard form data):
+  - `pair.Mid(eqPos + 1)` used `IndexOf`'s 0-based result with `Mid`'s 1-based position, causing the extracted value to include the leading `=` character.
+  - `DecodeURIComponent` loop `While i < s.Length` with 0-based counter and 1-based `Mid` dropped the last character of every key/value (e.g., `"title"` → `"titl"`), so `HasKey("title")` always returned `False`.
+  - Same loop's percent-decode guard `i + 2 < s.Length` prevented decoding `%XX` sequences at the end of a string.
+
+- **FormParser UTF-8 multi-byte decoding bug** (Thai and other non-ASCII characters saved as mojibake): `DecodeURIComponent` called `Chr(code)` on each decoded byte individually. `Chr()` maps integers to Unicode code points, so UTF-8 multi-byte sequences like `%E0%B8%97` (Thai `ท`) were converted to three separate wrong characters. Fixed by collecting all decoded bytes into a `MemoryBlock` and calling `DefineEncoding(..., Encodings.UTF8)` at the end.
+
+### Confirmed working (after parser fixes)
+- Full Notes CRUD: List, New/Create, View, Edit/Update, Delete
+- Required field validation: empty title redirects back with flash error message
+- Thai, emoji, and all Unicode input stored and displayed correctly
 
 ---
 

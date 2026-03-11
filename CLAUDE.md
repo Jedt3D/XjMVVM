@@ -48,13 +48,13 @@ data/           → SQLite database (auto-created at startup)
 
 ## Current State
 
-**Phase 2 complete** — Full Notes CRUD is implemented and running.
+**v0.3.0** — All CRUD operations confirmed working with Unicode input and required field validation.
 
-- `Framework/` — Router, BaseViewModel, FormParser (UTF-8-correct), QueryParser, RouteDefinition
+- `Framework/` — Router, BaseViewModel, FormParser (UTF-8 correct, 0-based), QueryParser, RouteDefinition
 - `Models/NoteModel.xojo_code` — SQLite CRUD returning Dictionary objects
-- `ViewModels/Notes/` — 7 ViewModels covering full Notes CRUD
+- `ViewModels/Notes/` — 7 ViewModels, full CRUD with required-field validation and flash messages
 - `templates/` — layouts/base.html, notes/*, errors/404.html, errors/500.html
-- Flash messages via Session, POST/Redirect/GET throughout, error pages
+- Thai, emoji, all Unicode input/storage works correctly
 
 **Next:** Phase 3 — additional models, authentication, more resource types.
 

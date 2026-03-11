@@ -108,14 +108,17 @@ data/
 
 ## Current Status
 
-**Phase 2 complete** — Full Notes CRUD is implemented and working.
+**v0.3.0** — All CRUD operations confirmed working, including Unicode input and form validation.
 
-- Core framework (Router, BaseViewModel, FormParser, QueryParser)
-- JinjaX template engine integrated (full source under `JinjaXLib/`)
-- SQLite-backed NoteModel with GetAll, GetByID, Create, Update, Delete
-- Flash message system via Session
-- POST/Redirect/GET pattern throughout
-- Error pages (404, 500)
+| Feature | Status |
+|---|---|
+| Notes List / Detail / New / Edit forms | ✓ Working |
+| Create / Update / Delete (POST) | ✓ Working |
+| Required field validation (flash + redirect) | ✓ Working |
+| Thai, emoji, full Unicode input/storage | ✓ Working |
+| POST/Redirect/GET pattern | ✓ Working |
+| Flash messages (success / error) | ✓ Working |
+| 404 / 500 error pages | ✓ Working |
 
 **Next:** Phase 3 — additional models, authentication, more resource types.
 
