@@ -35,23 +35,28 @@ Browser → HandleURL → Router → ViewModel → Model → Database
 ### Per-request objects (created fresh, thread-safe):
 - `ViewModel` instances, `CompiledTemplate`, `JinjaContext`
 
-## Planned Project Structure
+## Project Structure
 
 ```
-Framework/      → Router, BaseViewModel, FormParser, QueryParser
+Framework/      → Router, BaseViewModel, FormParser, QueryParser, RouteDefinition
 ViewModels/     → One ViewModel per route (inherits BaseViewModel)
 Models/         → Data access classes returning Dictionary objects
 templates/      → JinjaX HTML files (layouts/, errors/, feature folders)
+JinjaXLib/      → Full JinjaX source (Jinja2-compatible engine, pure Xojo)
+data/           → SQLite database (auto-created at startup)
 ```
 
 ## Current State
 
-The project is in early Phase 1 (core framework). Only scaffolding files exist:
-- `App.xojo_code` — empty WebApplication shell
-- `Session.xojo_code` — default WebSession
-- `WebPage1.xojo_code` — placeholder (to be removed)
-- `MVVM_Architecture_Proposal.md` — full architecture spec and implementation roadmap
-- `MVVM_Knowledge_Base.md` — MVVM pattern reference
+**Phase 2 complete** — Full Notes CRUD is implemented and running.
+
+- `Framework/` — Router, BaseViewModel, FormParser (UTF-8-correct), QueryParser, RouteDefinition
+- `Models/NoteModel.xojo_code` — SQLite CRUD returning Dictionary objects
+- `ViewModels/Notes/` — 7 ViewModels covering full Notes CRUD
+- `templates/` — layouts/base.html, notes/*, errors/404.html, errors/500.html
+- Flash messages via Session, POST/Redirect/GET throughout, error pages
+
+**Next:** Phase 3 — additional models, authentication, more resource types.
 
 ## Development
 
@@ -62,6 +67,50 @@ When editing `.xojo_code` files directly:
 - Methods use `#tag Method` / `#tag EndMethod` with metadata attributes
 - Events use `#tag Event` / `#tag EndEvent`
 - WebPages have a layout section (`Begin WebPage ... End`) followed by `#tag WindowCode`
+
+## String Indexing Gotchas (CRITICAL)
+
+Xojo 2025 has a **mixed-indexing trap** — `IndexOf` is 0-based, `Mid` is 1-based. They cannot be used together without an offset correction.
+
+| Method | Base | Trap |
+|--------|------|------|
+| `String.IndexOf("x")` | **0-based** | Returns `0` for the very first character |
+| `String.Mid(pos, len)` | **1-based** | Position `1` = first char; `Mid(0, 1)` = `""` |
+| `String.Left(n)` / `Right(n)` | count-based | Index-agnostic — always safe |
+
+```vb
+// WRONG: eqPos=5 (0-based), Mid(6) = "=hello" (includes the delimiter)
+Var value As String = pair.Mid(eqPos + 1)
+
+// CORRECT: add 2 to skip the base difference AND the delimiter char
+Var value As String = pair.Mid(eqPos + 2)
+
+// SAFEST: prefer Left/Right which have no base ambiguity
+Var key As String = pair.Left(eqPos)   // always correct
+```
+
+Counter loops with `Mid` must start at `1` and use `<= s.Length`:
+
+```vb
+Var i As Integer = 1
+While i <= s.Length
+  Var ch As String = s.Mid(i, 1)   // correct: reads chars 1..Length
+  i = i + 1
+Wend
+```
+
+## UTF-8 / Percent-Decoding
+
+**Never use `Chr(code)` per decoded byte.** `Chr()` maps integers to Unicode code points — `Chr(0xE0)` is `à`, not the UTF-8 byte `0xE0`. This corrupts any multi-byte character (Thai, emoji, etc.).
+
+Correct pattern — collect raw bytes in a `MemoryBlock`, then `DefineEncoding(..., Encodings.UTF8)`:
+
+```vb
+mb.Byte(byteCount) = Integer.FromHex(hex)
+byteCount = byteCount + 1
+// after loop:
+Return DefineEncoding(mb.StringValue(0, byteCount), Encodings.UTF8)
+```
 
 ## JinjaX Template Reference
 

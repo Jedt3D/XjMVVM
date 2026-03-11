@@ -87,8 +87,8 @@ Protected Class Router
 		    Var ap As String = actualParts(i)
 
 		    If pp.Left(1) = ":" Then
-		      // Parameter segment — capture it (Mid is 0-based; skip ':' at index 0)
-		      Var paramName As String = pp.Mid(1)
+		      // Parameter segment — strip leading ':' and capture
+		      Var paramName As String = pp.Right(pp.Length - 1)
 		      params.Value(paramName) = ap
 		    ElseIf pp <> ap Then
 		      // Literal segment doesn't match

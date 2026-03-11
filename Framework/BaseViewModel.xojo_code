@@ -69,7 +69,7 @@ Protected Class BaseViewModel
 		  Response.Status = statusCode
 		  Response.Header("Location") = url
 		  Response.Header("Content-Type") = "text/html; charset=utf-8"
-		  Response.Write("<html><body>Redirecting to <a href=""" + url + """>" + url + "</a></body></html>")
+		  Response.Write("<html><head><meta http-equiv=""refresh"" content=""0;url=" + url + """></head><body>Redirecting to <a href=""" + url + """>" + url + "</a></body></html>")
 		End Sub
 	#tag EndMethod
 

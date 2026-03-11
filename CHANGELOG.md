@@ -3,11 +3,18 @@
 ## [Unreleased]
 
 ### Fixed
-- **Router path parameter extraction bug**: `ParsePath` used `pp.Mid(2)` (0-based) to strip the `:` prefix from named segments (e.g., `:id`), which extracted only the last character (`"d"` from `":id"`) instead of the full name (`"id"`). Changed to `pp.Mid(1)`. This caused all path-param-dependent routes to silently fail:
-  - `GET /notes/:id` — showed 404 for all notes (id resolved to 0)
-  - `GET /notes/:id/edit` — same; edit form never loaded
-  - `POST /notes/:id` — `UPDATE WHERE id = 0` matched nothing; data never updated
-  - `POST /notes/:id/delete` — `DELETE WHERE id = 0` matched nothing; note never deleted
+- **Router path parameter extraction bug**: `ParsePath` used `pp.Mid(2)` to strip the `:` prefix from named segments (e.g., `:id`). Due to Xojo's 1-based `Mid`, `Mid(2)` returns everything from position 2 onward — which is correct for a 2-char string like `":id"` but wrong for the mental model. Replaced with `pp.Right(pp.Length - 1)` which is index-agnostic. This caused all path-param-dependent routes to silently fail:
+  - `GET /notes/:id` — showed 404 for all notes
+  - `GET /notes/:id/edit` — edit form never loaded
+  - `POST /notes/:id` — `UPDATE WHERE id = 0` matched nothing
+  - `POST /notes/:id/delete` — `DELETE WHERE id = 0` matched nothing
+
+- **FormParser mixed-indexing bugs** (caused Create and Edit to silently discard form data):
+  - `pair.Mid(eqPos + 1)` used `IndexOf`'s 0-based result with `Mid`'s 1-based position, causing the extracted value to include the leading `=` character. Fixed to `pair.Mid(eqPos + 2)`.
+  - `DecodeURIComponent` loop `While i < s.Length` with 0-based counter `i` and 1-based `Mid` caused the last character of every key and value to be dropped (e.g., `"title"` → `"titl"`), so `HasKey("title")` always returned `False`. Fixed to `While i <= s.Length`.
+  - Same loop's percent-decode guard `i + 2 < s.Length` prevented decoding `%XX` sequences at the end of a string. Fixed to `i + 2 <= s.Length`.
+
+- **FormParser UTF-8 multi-byte decoding bug** (Thai and other non-ASCII characters saved as mojibake): `DecodeURIComponent` called `Chr(code)` on each decoded byte individually. `Chr()` maps integers to Unicode code points, so UTF-8 multi-byte sequences like `%E0%B8%97` (Thai `ท`) were converted to three separate wrong characters instead of one. Fixed by collecting all decoded bytes into a `MemoryBlock` and calling `DefineEncoding(..., Encodings.UTF8)` at the end, so the entire byte sequence is interpreted as UTF-8 correctly.
 
 ---
 

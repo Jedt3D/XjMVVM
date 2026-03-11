@@ -13,7 +13,7 @@ Protected Module FormParser
 
 		    If eqPos >= 0 Then
 		      Var key As String = DecodeURIComponent(pair.Left(eqPos))
-		      Var value As String = DecodeURIComponent(pair.Mid(eqPos + 1))
+		      Var value As String = DecodeURIComponent(pair.Mid(eqPos + 2))
 		      result.Value(key) = value
 		    ElseIf pair.Length > 0 Then
 		      result.Value(DecodeURIComponent(pair)) = ""
@@ -29,28 +29,35 @@ Protected Module FormParser
 		  // Replace + with space first
 		  Var s As String = encoded.ReplaceAll("+", " ")
 
-		  // Decode percent-encoded characters
-		  Var result As String = ""
-		  Var i As Integer = 0
-		  While i < s.Length
+		  If s.Length = 0 Then Return ""
+
+		  // Collect raw bytes, then decode as UTF-8 so multi-byte sequences (Thai, etc.) work
+		  Var mb As New MemoryBlock(s.Length)
+		  Var byteCount As Integer = 0
+		  Var i As Integer = 1  // 1-based for Mid
+
+		  While i <= s.Length
 		    Var ch As String = s.Mid(i, 1)
-		    If ch = "%" And i + 2 < s.Length Then
+		    If ch = "%" And i + 2 <= s.Length Then
 		      Var hex As String = s.Mid(i + 1, 2)
 		      Try
-		        Var code As Integer = Integer.FromHex(hex)
-		        result = result + Chr(code)
+		        mb.Byte(byteCount) = Integer.FromHex(hex)
+		        byteCount = byteCount + 1
 		        i = i + 3
 		      Catch
-		        result = result + ch
+		        mb.Byte(byteCount) = Asc(ch)
+		        byteCount = byteCount + 1
 		        i = i + 1
 		      End Try
 		    Else
-		      result = result + ch
+		      mb.Byte(byteCount) = Asc(ch)
+		      byteCount = byteCount + 1
 		      i = i + 1
 		    End If
 		  Wend
 
-		  Return result
+		  Var result As String = mb.StringValue(0, byteCount)
+		  Return DefineEncoding(result, Encodings.UTF8)
 		End Function
 	#tag EndMethod
 
