@@ -126,5 +126,5 @@ data/
 - **JinjaX as source**: The `.xojo_library` binary format cannot be referenced in Xojo text project format. The full JinjaX source tree is included under `JinjaXLib/` instead.
 - **Template path**: `FileSystemLoader(FolderItem)` with an absolute path to `templates/` is used for debug runs, since the debug build output directory differs from the project directory.
 - **DB path**: Currently hardcoded to the project `data/` directory for development. Production builds should use `SpecialFolder.ApplicationData`.
-- **String indexing mismatch**: `String.IndexOf()` is **0-based** but `String.Mid()` is **1-based** — they cannot be used together without an offset correction. `Left(n)` and `Right(n)` are count-based (index-agnostic) and are safer when possible.
+- **String indexing**: Xojo 2025 strings and arrays are fully **0-based** with the modern API. `Mid()` is a legacy 1-based VB function — never use it. Use `String.Middle()` (0-based, aligns with `IndexOf`). `Left(n)` and `Right(n)` are count-based (index-agnostic).
 - **UTF-8 percent-decoding**: Use `MemoryBlock` + `DefineEncoding(..., Encodings.UTF8)` to decode URL-encoded bodies. `Chr(code)` per byte corrupts any multi-byte character (Thai, emoji, etc.).

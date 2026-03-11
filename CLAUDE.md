@@ -68,33 +68,30 @@ When editing `.xojo_code` files directly:
 - Events use `#tag Event` / `#tag EndEvent`
 - WebPages have a layout section (`Begin WebPage ... End`) followed by `#tag WindowCode`
 
-## String Indexing Gotchas (CRITICAL)
+## String Indexing (CRITICAL)
 
-Xojo 2025 has a **mixed-indexing trap** — `IndexOf` is 0-based, `Mid` is 1-based. They cannot be used together without an offset correction.
+Xojo 2025 strings and arrays are **fully 0-based** with the modern API. `Mid()` is a legacy 1-based VB function — never use it. Use `String.Middle()`.
 
-| Method | Base | Trap |
-|--------|------|------|
-| `String.IndexOf("x")` | **0-based** | Returns `0` for the very first character |
-| `String.Mid(pos, len)` | **1-based** | Position `1` = first char; `Mid(0, 1)` = `""` |
+| Method | Base | Notes |
+|--------|------|-------|
+| `String.IndexOf("x")` | **0-based** | Returns `0` for first character |
+| `String.Middle(index, len)` | **0-based** | Aligns with `IndexOf` naturally |
 | `String.Left(n)` / `Right(n)` | count-based | Index-agnostic — always safe |
 
 ```vb
-// WRONG: eqPos=5 (0-based), Mid(6) = "=hello" (includes the delimiter)
+// WRONG: Mid() is 1-based legacy — silently wrong when used with IndexOf
 Var value As String = pair.Mid(eqPos + 1)
 
-// CORRECT: add 2 to skip the base difference AND the delimiter char
-Var value As String = pair.Mid(eqPos + 2)
-
-// SAFEST: prefer Left/Right which have no base ambiguity
-Var key As String = pair.Left(eqPos)   // always correct
+// CORRECT: Middle() is 0-based — eqPos+1 skips past the '=' cleanly
+Var value As String = pair.Middle(eqPos + 1)
 ```
 
-Counter loops with `Mid` must start at `1` and use `<= s.Length`:
+Counter loops use 0-based `Middle` with `i < s.Length`:
 
 ```vb
-Var i As Integer = 1
-While i <= s.Length
-  Var ch As String = s.Mid(i, 1)   // correct: reads chars 1..Length
+Var i As Integer = 0
+While i < s.Length
+  Var ch As String = s.Middle(i, 1)
   i = i + 1
 Wend
 ```

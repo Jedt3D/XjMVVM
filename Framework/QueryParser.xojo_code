@@ -6,7 +6,7 @@ Protected Module QueryParser
 
 		  // Strip leading ? if present
 		  If qs.Left(1) = "?" Then
-		    qs = qs.Mid(1)
+		    qs = qs.Middle(1)
 		  End If
 
 		  // Reuse FormParser since query strings use the same encoding

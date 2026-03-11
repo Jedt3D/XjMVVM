@@ -13,7 +13,7 @@ Protected Module FormParser
 
 		    If eqPos >= 0 Then
 		      Var key As String = DecodeURIComponent(pair.Left(eqPos))
-		      Var value As String = DecodeURIComponent(pair.Mid(eqPos + 2))
+		      Var value As String = DecodeURIComponent(pair.Middle(eqPos + 1))
 		      result.Value(key) = value
 		    ElseIf pair.Length > 0 Then
 		      result.Value(DecodeURIComponent(pair)) = ""
@@ -34,12 +34,12 @@ Protected Module FormParser
 		  // Collect raw bytes, then decode as UTF-8 so multi-byte sequences (Thai, etc.) work
 		  Var mb As New MemoryBlock(s.Length)
 		  Var byteCount As Integer = 0
-		  Var i As Integer = 1  // 1-based for Mid
+		  Var i As Integer = 0
 
-		  While i <= s.Length
-		    Var ch As String = s.Mid(i, 1)
-		    If ch = "%" And i + 2 <= s.Length Then
-		      Var hex As String = s.Mid(i + 1, 2)
+		  While i < s.Length
+		    Var ch As String = s.Middle(i, 1)
+		    If ch = "%" And i + 2 < s.Length Then
+		      Var hex As String = s.Middle(i + 1, 2)
 		      Try
 		        mb.Byte(byteCount) = Integer.FromHex(hex)
 		        byteCount = byteCount + 1

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+- **Migrate `Mid()` → `String.Middle()` in Framework parsers**: `Mid()` is a legacy 1-based VB function. The modern Xojo API (`String.Middle`) is 0-based and aligns directly with `IndexOf`, arrays, and all other Xojo 2025 indexing. Updated `FormParser` and `QueryParser` to use `String.Middle` throughout; loop bounds simplified to `i = 0` / `While i < s.Length`.
+- **Fix `QueryParser` `?` stripping bug**: `qs.Mid(1)` (1-based) returned the full string including `?`. Fixed to `qs.Middle(1)` (0-based index 1 = second character, correctly skips the `?`).
+
 ### Fixed
 - **Router path parameter extraction bug**: `ParsePath` used `pp.Mid(2)` to strip the `:` prefix from named segments (e.g., `:id`). Due to Xojo's 1-based `Mid`, `Mid(2)` returns everything from position 2 onward — which is correct for a 2-char string like `":id"` but wrong for the mental model. Replaced with `pp.Right(pp.Length - 1)` which is index-agnostic. This caused all path-param-dependent routes to silently fail:
   - `GET /notes/:id` — showed 404 for all notes
