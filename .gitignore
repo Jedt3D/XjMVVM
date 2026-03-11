@@ -1,0 +1,18 @@
+# Xojo build output
+Builds/
+
+# Xojo IDE user files
+*.xojo_user
+*.xojo_uistate
+
+# macOS
+.DS_Store
+
+# Development artifacts
+errors.txt
+analyze.sh
+*.skill
+ziqBWdba
+
+# Database (exclude data dir from version control; keep structure via .gitkeep)
+data/*.sqlite

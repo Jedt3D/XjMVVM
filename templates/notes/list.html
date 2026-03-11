@@ -1,0 +1,36 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Notes{% endblock %}
+
+{% block content %}
+<h1>Notes</h1>
+<p><a href="/notes/new" class="btn btn-primary">New Note</a></p>
+
+{% if notes %}
+<table style="width:100%; border-collapse:collapse;">
+  <thead>
+    <tr style="border-bottom:2px solid #ddd; text-align:left;">
+      <th style="padding:8px;">Title</th>
+      <th style="padding:8px;">Updated</th>
+      <th style="padding:8px;">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for note in notes %}
+    <tr style="border-bottom:1px solid #eee;">
+      <td style="padding:8px;"><a href="/notes/{{ note.id }}">{{ note.title }}</a></td>
+      <td style="padding:8px;">{{ note.updated_at }}</td>
+      <td style="padding:8px;">
+        <a href="/notes/{{ note.id }}/edit" class="btn btn-sm">Edit</a>
+        <form method="post" action="/notes/{{ note.id }}/delete" style="display:inline;">
+          <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this note?')">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No notes yet. Create your first one!</p>
+{% endif %}
+{% endblock %}

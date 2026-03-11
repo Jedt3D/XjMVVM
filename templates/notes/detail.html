@@ -1,0 +1,18 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ note.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ note.title }}</h1>
+<p style="color:#666; font-size:14px;">Created: {{ note.created_at }} | Updated: {{ note.updated_at }}</p>
+
+<div style="white-space:pre-wrap; margin:20px 0;">{{ note.body }}</div>
+
+<p>
+  <a href="/notes/{{ note.id }}/edit" class="btn btn-primary">Edit</a>
+  <form method="post" action="/notes/{{ note.id }}/delete" style="display:inline;">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this note?')">Delete</button>
+  </form>
+  <a href="/notes" class="btn">Back to List</a>
+</p>
+{% endblock %}

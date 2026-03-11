@@ -1,0 +1,9 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ status_code }} — Server Error{% endblock %}
+
+{% block content %}
+<h1>{{ status_code }}</h1>
+<p>Something went wrong. Please try again later.</p>
+<p><a href="/">Go Home</a></p>
+{% endblock %}
