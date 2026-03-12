@@ -327,21 +327,14 @@ def build_page(item, nav, flat_pages, env, lang_code, lang_dist):
     output_path  = slug_to_output_path(item["slug"], lang_dist)
     root_prefix  = relative_root(output_path, lang_dist)
 
-    # Language switcher links (absolute paths from site root)
+    # Language switcher links — always go to each language's index
     lang_links = []
     for lc, linfo in LANGUAGES.items():
-        slug = item["slug"]
-        if slug == "index":
-            href = f"/{lc}/"
-        elif slug.endswith("/index"):
-            href = f"/{lc}/{slug.replace('/index', '/')}"
-        else:
-            href = f"/{lc}/{slug}.html"
         lang_links.append({
             "code":   lc,
             "label":  linfo["label"],
             "flag":   linfo["flag"],
-            "href":   href,
+            "href":   f"/dist/{lc}/index.html",
             "active": lc == lang_code,
         })
 
