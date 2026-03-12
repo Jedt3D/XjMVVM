@@ -1,21 +1,21 @@
 ---
 title: "สถาปัตยกรรมการกำหนดเส้นทาง"
-description: วิธีการไหลของคำขอ HTTP ผ่าน HandleURL เมื่อใดที่ Xojo ครอบครองการควบคุม และวิธีการข้ามไปมาระหว่างระบบ SSR และการควบคุม WebPage ของ Xojo
+description: วิธีการไหลของคำขอ HTTP ผ่าน HandleURL เมื่อ Xojo เข้ามาทำงาน และวิธีการข้ามอย่างปลอดภัยระหว่างโลก SSR และตัวควบคุม WebPage ของ Xojo
 ---
 
 # สถาปัตยกรรมการกำหนดเส้นทาง
 
-## สองโลกภายในแอปพลิเคชันเดียว
+## สองโลกข้างในแอปพลิเคชันเดียว
 
-แอปพลิเคชัน Xojo Web 2 โฮสต์ระบบจัดการคำขอ HTTP ที่แตกต่างกันโดยพื้นฐานสองระบบพร้อมกัน ทุกคำขอ HTTP เข้ามาผ่าน `HandleURL` และค่าที่ส่งคืนจะตัดสินใจว่าโลกใดจะจัดการกับมัน
+แอปพลิเคชัน Xojo Web 2 โฮสต์ระบบจัดการคำขอสองระบบที่แตกต่างกันโดยพื้นฐาน พร้อมกันทั้งสอง ทุกคำขอ HTTP เข้ามาผ่าน `HandleURL` และค่าที่ส่งคืนจะตัดสินใจว่าโลกใดจะจัดการมัน
 
 | โลก | จุดเข้า | การตอบสนอง |
 |-------|-------------|----------|
-| **MVVM (SSR)** | `HandleURL` → Router → ViewModel → JinjaX | HTTP ธรรมดา HTML ไร้สถานะ |
-| **Xojo WebPage** | Bootstrap HTML → WebSocket → Session → controls | การควบคุม UI ที่มีสถานะและเหตุการณ์ |
+| **MVVM (SSR)** | `HandleURL` → Router → ViewModel → JinjaX | Plain HTTP, stateless HTML |
+| **Xojo WebPage** | Bootstrap HTML → WebSocket → Session → controls | Stateful, event-driven UI |
 
-- `Return True` — แอปพลิเคชันนี้จัดการแล้ว Xojo ไม่ทำอะไรเพิ่มเติม
-- `Return False` — Xojo จัดการ (ให้บริการ bootstrap HTML ไฟล์กรอบงาน JS หรือข้อความ WebSocket)
+- `Return True` — แอปนี้จัดการแล้ว Xojo ไม่ทำอะไรต่อไป
+- `Return False` — Xojo จัดการ (ให้บริการ bootstrap HTML, ไฟล์ JS framework หรือข้อความ WebSocket)
 
 <!-- diagram -->
 <!-- nomnoml
@@ -45,9 +45,9 @@ App.HandleURL
 
 ---
 
-## แผนภาพการตัดสินใจ HandleURL
+## ต้นไม้การตัดสินใจ HandleURL
 
-`HandleURL` ใช้ลำดับการตรวจสอบที่คงที่ก่อนส่งคำขอใด ๆ การปกติของเส้นทางมาก่อน — ทุกการเปรียบเทียบขึ้นอยู่กับมัน
+`HandleURL` ใช้ลำดับการตรวจสอบที่ตายตัวก่อนส่งคำขอใดๆ ปกติการเส้นทาง path มาก่อน — ทุกการเปรียบเทียบขึ้นอยู่กับมัน
 
 <!-- diagram -->
 <!-- nomnoml
@@ -87,12 +87,12 @@ Normalize: prepend "/" if missing, strip trailing "/"
 -->
 <!-- /diagram -->
 
-### ความแปลกประหลาดของ `request.Path`
+### เอกลักษณ์ `request.Path`
 
 !!! warning
-    Xojo Web 2 ละเว้น `/` นำหน้าจาก `request.Path` คำขอไปที่ `/notes` มาถึงพร้อม `request.Path = "notes"` ไม่ใช่ `"/notes"` ทุกการเปรียบเทียบเส้นทางล้มเหลวเงียบ ๆ หากไม่มีการปกติ
+    Xojo Web 2 ละเว้น `/` นำหน้าจาก `request.Path` คำขอไป `/notes` มาถึงพร้อม `request.Path = "notes"` ไม่ใช่ `"/notes"` ทุกการเปรียบเทียบเส้นทางล้มเหลวเงียบๆ โดยไม่มีการปกติ
 
-ปกติเสมอก่อนการตรวจสอบเส้นทาง:
+ปกติเสมอก่อนการตรวจสอบเส้นทางใดๆ:
 
 ```xojo
 Var p As String = request.Path
@@ -100,13 +100,13 @@ If p.Left(1) <> "/" Then p = "/" + p
 If p.Length > 1 And p.Right(1) = "/" Then p = p.Left(p.Length - 1)
 ```
 
-หากไม่มีนี้ `"notes" <> "/notes"` ประเมินผล `True` โดยไม่มีข้อผิดพลาด — ทุกการจับคู่เส้นทางล้มเหลวอย่างเงียบ ๆ
+โดยไม่มีสิ่งนี้ `"notes" <> "/notes"` ประเมินเป็น `True` โดยไม่มีข้อผิดพลาด — ทุกการจับคู่เส้นทางล้มเหลว
 
 ---
 
-## ท่อประมวลผลคำขอ MVVM
+## ท่อ MVVM Request
 
-สำหรับเส้นทาง SSR ที่จับคู่ได้ ท่อประมวลผลทั้งหมดจาก `HandleURL` ไปยังการตอบสนอง HTML:
+สำหรับเส้นทาง SSR ที่จับคู่ได้ ท่อ pipeline เต็มรูปแบบจาก `HandleURL` ไปยังการตอบสนอง HTML:
 
 <!-- diagram -->
 <!-- nomnoml
@@ -127,31 +127,31 @@ If p.Length > 1 And p.Right(1) = "/" Then p = p.Left(p.Length - 1)
 <!-- ascii
 HandleURL  →  normalize path, match route
 Router     →  factory.Invoke()  →  new ViewModel
- ViewModel  →  OnGet() / OnPost()
+ViewModel  →  OnGet() / OnPost()
 Model      →  returns Dictionary / Variant() of Dictionary
- ViewModel  →  builds context Dictionary
+ViewModel  →  builds context Dictionary
 JinjaX     →  CompiledTemplate.Render(context)  →  HTML string
 response.Write(html)  →  Return True  →  Browser
 -->
 <!-- /diagram -->
 
-เนื่องจากเส้นทาง SSR ส่งคืน `True` Xojo ไม่เคยสร้าง WebSocket session สำหรับพวกเขา ซึ่งหมายความว่าการควบคุม WebPage ของ Xojo (`WebLabel` `WebListBox` ฯลฯ) ไม่สามารถใช้จาก ViewModel ได้ และไม่มีการกดจากเซิร์ฟเวอร์ไปยังเบราว์เซอร์แบบเรียลไทม์หากไม่เพิ่ม Server-Sent Events หรือการโพล JS แยกต่างหาก
+เพราะว่าเส้นทาง SSR ส่งกลับ `True` Xojo จึงไม่มีวาระสร้าง WebSocket session สำหรับมัน นี่หมายความว่าตัวควบคุม Xojo WebPage (`WebLabel` `WebListBox` เป็นต้น) ไม่สามารถใช้จาก ViewModel ได้ และไม่มีการ push แบบเรียลไทม์จากเซิร์ฟเวอร์ไปยังเบราว์เซอร์โดยไม่เพิ่ม Server-Sent Events หรือ JS polling แยกต่างหาก
 
 ---
 
-## ขั้นตอนการเปลี่ยนเส้นทาง `/tests`
+## การเปลี่ยนเส้นทาง `/tests`
 
-Test runner (`XojoUnitTestPage`) คือ Xojo WebPage — ต้องการ WebSocket session ที่ใช้งานได้ การเข้าถึงที่นั่นจากลิงก์ MVVM ต้องใช้ขั้นตอนสามขั้น
+โปรแกรมรันเทส (`XojoUnitTestPage`) คือ Xojo WebPage — ต้องการ WebSocket session ที่ใช้งานอยู่ การไปถึงที่นั่นจากลิงก์ MVVM ต้องการลำดับการเต้นรำสามขั้น
 
-### เหตุที่ไม่สามารถแค่ `Return False` ที่ `/tests`
+### เหตุใดคุณจึงไม่สามารถใช้ `Return False` ที่ `/tests` ได้
 
-Xojo ให้บริการ bootstrap HTML ของตัวเองที่ **เส้นทางราก** `/` เท่านั้น สำหรับเส้นทางใด ๆ อื่น ๆ การส่งคืน `False` จะสร้าง 404 ของเบราว์เซอร์ที่เปล่า — ไม่ใช่เทมเพลต 404 ของ MVVM เพียงแค่หน้าข้อผิดพลาดของเบราว์เซอร์
+Xojo เสิร์ฟ bootstrap HTML ของมัน ที่ **เส้นทางราก** `/` เท่านั้น สำหรับเส้นทางอื่นๆ การส่งกลับ `False` จะสร้างเบราว์เซอร์ 404 เปล่า — ไม่ใช่เทมเพลต MVVM 404 เพียงเพจข้อผิดพลาดเบราว์เซอร์
 
-### เหตุที่ `DefaultWindow=XojoUnitTestPage` ขัดข้อง
+### เหตุใด `DefaultWindow=XojoUnitTestPage` ทำให้เกิด Crash
 
-การตั้งค่า `DefaultWindow=XojoUnitTestPage` ในโครงการทำให้ Xojo สร้างมันเป็น WebPage แรกเมื่อ session เชื่อมต่อ แต่ `XojoUnitTestPage.Opening` เรียกใช้การตั้งค่า toolbar และการลงทะเบียน test — โค้ดที่ต้องการให้หน้าและ session มีการเชื่อมต่ออย่างเต็มที่ ในเวลา bootstrap พวกเขาไม่ได้ ผลลัพธ์: การขัดข้องที่รันไทม์
+การตั้งค่า `DefaultWindow=XojoUnitTestPage` ในโครงการทำให้ Xojo สร้าง instance มันเป็น WebPage แรกเมื่อเซสชันเชื่อมต่อ แต่ `XojoUnitTestPage.Opening` เรียกใช้การตั้งค่าแถบเครื่องมือและการลงทะเบียนเทส — โค้ดที่ต้องการให้เพจและเซสชันมีเส้นลวดเต็ม ในเวลา bootstrap มันไม่มี ผลลัพธ์: crash ในเวลาทำงาน
 
-### สิ่งที่ใช้งานจริง ๆ
+### สิ่งที่ใช้ได้จริง
 
 <!-- diagram -->
 <!-- nomnoml
@@ -190,7 +190,7 @@ Browser: XojoUnit test runner UI (via WebSocket)
 -->
 <!-- /diagram -->
 
-หน้า `Default` คือ `WebPage` ที่ว่างเปล่าอย่างชาญฉลาด เหตุการณ์ `Shown` ของมันเกิดขึ้นหลังจาก session ได้รับการตั้งค่าอย่างเต็มที่ — จุดที่ปลอดภัยที่สุดในการแสดง `XojoUnitTestPage`:
+เพจ `Default` คือ WebPage เปล่าธรรมดา เหตุการณ์ `Shown` ของมันเกิดขึ้นหลังจากสร้างเซสชันเต็ม — จุดนิรภัยสูงสุดแรกเพื่อแสดง `XojoUnitTestPage`:
 
 ```xojo
 // Default.xojo_code — Shown event
@@ -200,17 +200,17 @@ Sub Shown()
 End Sub
 ```
 
-`XojoUnitTestPage` มี `ImplicitInstance=False` ดังนั้น `New XojoUnitTestPage` จำเป็น — `XojoUnitTestPage.Show()` โดยตรงจะเป็นข้อผิดพลาดในการรวบรวม
+`XojoUnitTestPage` มี `ImplicitInstance=False` ดังนั้น `New XojoUnitTestPage` จึงจำเป็น — `XojoUnitTestPage.Show()` โดยตรงจะเป็นข้อผิดพลาดการรวบรวม
 
-### เหตุใด `/?_xojo=1` ไม่ใช่เพียง `/`?
+### เหตุใด `/?_xojo=1` และไม่เพียงแค่ `/`
 
-`/` คือเส้นทาง MVVM ที่ลงทะเบียน Router จะจับคู่มันและส่งคืน `True` ให้หน้า MVVM — ไม่เคยเข้าถึง `Return False` พารามิเตอร์ query `_xojo=1` คือเซนทิเนลที่บอก `HandleURL` ให้ข้าม Router เบราว์เซอร์ปกติที่ไปยัง `/` ไม่เคยส่ง `_xojo=1` ดังนั้นหน้าแรกจึงไม่ได้รับผลกระทบ
+`/` เป็นเส้นทาง MVVM ที่ลงทะเบียน Router จะจับคู่มันและส่งกลับ `True` ให้บริการเพจ MVVM หลัก — ไม่เคยถึง `Return False` พารามิเตอร์การสอบถาม `_xojo=1` คือ sentinel ที่บอก `HandleURL` ให้ข้ามตัว Router ปกติ browser ที่เยี่ยมชม `/` ไม่เคยส่ง `_xojo=1` ดังนั้นเพจหลักจึงไม่ได้รับผลกระทบ
 
 ---
 
-## การลิงก์ย้อนกลับ: Xojo WebPage → MVVM
+## การเชื่อมโยงกลับ: Xojo WebPage → MVVM
 
-เพื่อนำทางจาก Xojo WebPage กลับไปยังเส้นทาง MVVM ให้ใช้ `Session.GoToURL()` สิ่งนี้ส่งคำแนะนำการนำทางระดับเบราว์เซอร์ออกจาก WebSocket session ทั้งหมด
+หากต้องการนำทางจาก Xojo WebPage กลับไปยังเส้นทาง MVVM ให้ใช้ `Session.GoToURL()` สิ่งนี้ส่งคำแนะนำการนำทางระดับเบราว์เซอร์ โดยแตกออกจากเซสชัน WebSocket ทั้งหมด
 
 ```xojo
 // XojoUnitTestPage — WebToolbar Pressed event
@@ -223,22 +223,22 @@ End Sub
 ```
 
 !!! warning
-    ภายในเหตุการณ์ `WebToolbar.Pressed` `Me` หมายถึง `WebToolbar` เอง ไม่ใช่หน้า `Me.Session` ไม่มีอยู่ใน `WebToolbar` ใช้ global `Session` ที่ใช้เธรดทั่วไป โดยตรง
+    ภายในเหตุการณ์ `WebToolbar.Pressed` `Me` หมายถึง `WebToolbar` เอง ไม่ใช่เพจ `Me.Session` ไม่มีอยู่บน `WebToolbar` ใช้ thread-local global `Session` โดยตรง
 
-### API การนำทาง
+### API นำทาง
 
-| จาก | ไป | วิธี | หมายเหตุ |
+| จาก | ถึง | วิธี | หมายเหตุ |
 |------|----|--------|-------|
-| MVVM template | MVVM route | `<a href="/notes">` | Anchor HTML มาตรฐาน |
-| MVVM template | Xojo WebPage | `<a href="/tests">` | ขั้นตอนการเปลี่ยนเส้นทางทำให้เกิด |
-| Xojo WebPage | MVVM route | `Session.GoToURL("/")` | นำทางระดับเบราว์เซอร์ หยุด WebSocket |
-| Xojo WebPage | Xojo WebPage | `page.Show()` | ภายใน WebSocket ไม่เปลี่ยน URL |
+| MVVM template | MVVM route | `<a href="/notes">` | HTML anchor มาตรฐาน |
+| MVVM template | Xojo WebPage | `<a href="/tests">` | ปลิดทริกเกอร์เต้นรำเปลี่ยนเส้นทาง |
+| Xojo WebPage | MVVM route | `Session.GoToURL("/")` | นำทางระดับเบราว์เซอร์ ปล่อย WebSocket |
+| Xojo WebPage | Xojo WebPage | `page.Show()` | ภายใน WebSocket ไม่มีการเปลี่ยน URL |
 
 ---
 
-## Router ส่งคืนบูลีน
+## Router ส่งคืนค่า Boolean
 
-`Router.Route()` คือ `Function As Boolean` ไม่ใช่ `Sub` เมื่อไม่มีเส้นทาง MVVM ที่ตรงกัน (เช่น `/framework/Xojo.js` `/websocket`) มันส่งคืน `False` `HandleURL` ขยายผล `False` นั้นไปยังตัวจัดการของ Xojo เซลฟ์ซึ่งให้บริการไฟล์
+`Router.Route()` คือ `Function As Boolean` ไม่ใช่ `Sub` เมื่อไม่มีเส้นทาง MVVM ตรงกัน (เช่น `/framework/Xojo.js` `/websocket`) จะส่งคืน `False` `HandleURL` ส่งต่อ `False` นั้นไปยัง handler ของ Xojo เอง ซึ่งให้บริการไฟล์
 
 ```xojo
 // HandleURL — simplified
@@ -247,7 +247,7 @@ Return mRouter.Route(request, response, session, mJinja)
 // → Xojo serves Xojo.js, WebSocket frames, etc.
 ```
 
-หากส่วนประกอบ `Route()` ส่งคืน `True` เสมอ ไฟล์ JS และ CSS ของ Xojo จะถูกปิดกั้น WebSocket session จะไม่เคยสร้างขึ้น และโฟลว์ `/tests` จะขาดทั้งหมด
+ถ้า `Route()` ส่งกลับ `True` เสมอ ไฟล์ JS และ CSS ของ Xojo เองจะถูกบล็อก เซสชัน WebSocket จะไม่มีวาระสร้าง และการไหลของ `/tests` จะแตก
 
 ---
 
@@ -255,8 +255,8 @@ Return mRouter.Route(request, response, session, mJinja)
 
 | ไฟล์ | บทบาท |
 |------|------|
-| `App.xojo_code` | `HandleURL` — การปกติของเส้นทาง `/tests` redirect `/?_xojo=1` passthrough Router dispatch |
-| `Framework/Router.xojo_code` | ลงทะเบียนเส้นทาง (`Get` `Post` `Any`) การจับคู่เส้นทาง (`ParsePath`) dispatch หน้าข้อผิดพลาด |
-| `Default.xojo_code` | Trampoline `WebPage` — เหตุการณ์ `Shown` สร้างอินสแตนซ์ `XojoUnitTestPage` หลังจาก session พร้อม |
+| `App.xojo_code` | `HandleURL` — ปกติเส้นทาง การปลี่ยนเส้นทาง `/tests` การผ่าน `/?_xojo=1` การส่งตัว Router |
+| `Framework/Router.xojo_code` | การลงทะเบียนเส้นทาง (`Get` `Post` `Any`) การจับคู่เส้นทาง (`ParsePath`) การส่งตัว หน้าข้อผิดพลาด |
+| `Default.xojo_code` | Trampoline `WebPage` — เหตุการณ์ `Shown` สร้าง instance `XojoUnitTestPage` หลังจากเซสชันพร้อม |
 | `mvvm.xojo_project` | `DefaultWindow=Default` — ต้องเป็น `Default` ไม่ใช่ `XojoUnitTestPage` |
-| `XojoUnit/XojoUnitTestPage.xojo_code` | Test runner ปุ่ม XjMVVM toolbar เรียก `Session.GoToURL("/")` |
+| `XojoUnit/XojoUnitTestPage.xojo_code` | ตัวรันเทส ปุ่ม XjMVVM แถบเครื่องมือเรียก `Session.GoToURL("/")` |

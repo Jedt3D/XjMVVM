@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>แท็ก & Many-to-Many — MVVM Docs</title>
-  <meta name="description" content="วิธีการเพิ่มทรัพยากรที่สอง (แท็ก) เชื่อมต่อตารางฟังก์ชันที่เชื่อมต่อหลายต่อหลาย และสอบถาม across the relationship" />
+  <title>แท็ก & ความสัมพันธ์แบบ Many-to-Many — MVVM Docs</title>
+  <meta name="description" content="วิธีการเพิ่มทรัพยากร (Tags) ที่สอง สร้างตารางจุดเชื่อม many-to-many และสอบถามข้อมูลข้ามความสัมพันธ์" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,14 +343,14 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">แท็ก & Many-to-Many</h1>
-          <p class="page-description">วิธีการเพิ่มทรัพยากรที่สอง (แท็ก) เชื่อมต่อตารางฟังก์ชันที่เชื่อมต่อหลายต่อหลาย และสอบถาม across the relationship</p>
+          <h1 class="page-title">แท็ก & ความสัมพันธ์แบบ Many-to-Many</h1>
+          <p class="page-description">วิธีการเพิ่มทรัพยากร (Tags) ที่สอง สร้างตารางจุดเชื่อม many-to-many และสอบถามข้อมูลข้ามความสัมพันธ์</p>
         </div>
 
-        <h1 id="many-to-many">แท็ก &amp; Many-to-Many<a class="headerlink" href="#many-to-many" title="Permanent link">&para;</a></h1>
-<p>การเพิ่มแท็กแนะนำสองสิ่งพร้อมกัน: <strong>ทรัพยากรที่สมบูรณ์ที่สอง</strong> (พิสูจน์ว่ารูปแบบ CRUD ทั่วไปหลายทั่ว Notes) และ <strong>ความสัมพันธ์แบบหลายต่อหลาย</strong> ระหว่าง Notes และ Tags ผ่านตารางฟังก์ชัน</p>
+        <h1 id="many-to-many">แท็ก &amp; ความสัมพันธ์แบบ Many-to-Many<a class="headerlink" href="#many-to-many" title="Permanent link">&para;</a></h1>
+<p>การเพิ่ม Tags นำเสนออสองสิ่งไปพร้อมกัน: <strong>ทรัพยากรเต็มตัวอันที่สอง</strong> (พิสูจน์ว่ารูปแบบ CRUD ขยายไปไกลกว่า Notes) และ <strong>ความสัมพันธ์แบบ many-to-many</strong> ระหว่าง Notes และ Tags ผ่านตารางจุดเชื่อม</p>
 <h2 id="tag">ทรัพยากร Tag<a class="headerlink" href="#tag" title="Permanent link">&para;</a></h2>
-<p><code>TagModel</code> ตามรูปแบบสามชั้นเดียวกับ <code>NoteModel</code></p>
+<p><code>TagModel</code> ปฏิบัติตามรูปแบบสามชั้นเดียวกับ <code>NoteModel</code> อย่างแม่นยำ</p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -491,7 +491,7 @@ Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
 <span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
-<p>สคีมาลงทะเบียนใน <code>DBAdapter.InitDB()</code>:</p>
+<p>โครงการถูกลงทะเบียนใน <code>DBAdapter.InitDB()</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;id          INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;name        TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
@@ -500,14 +500,14 @@ Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
 
 <hr />
 <h2 id="tags">เส้นทาง Tags<a class="headerlink" href="#tags" title="Permanent link">&para;</a></h2>
-<p>เจ็ดเส้นทางลงทะเบียนใน <code>App.Opening</code> โดยสะท้อนรูปแบบ Notes:</p>
+<p>เจ็ดเส้นทางลงทะเบียนใน <code>App.Opening</code> สะท้อนรูปแบบ Notes:</p>
 <table>
 <thead>
 <tr>
-<th>วิธี</th>
-<th>เส้นทาง</th>
+<th>Method</th>
+<th>Path</th>
 <th>ViewModel</th>
-<th>การกระทำ</th>
+<th>Action</th>
 </tr>
 </thead>
 <tbody>
@@ -515,13 +515,13 @@ Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
 <td><code>GET</code></td>
 <td><code>/tags</code></td>
 <td><code>TagsListVM</code></td>
-<td>รายการแท็กทั้งหมด</td>
+<td>แสดงรายชื่อแท็กทั้งหมด</td>
 </tr>
 <tr>
 <td><code>GET</code></td>
 <td><code>/tags/new</code></td>
 <td><code>TagsNewVM</code></td>
-<td>ฟอร์มแท็กใหม่</td>
+<td>แบบฟอร์มแท็กใหม่</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -539,13 +539,13 @@ Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
 <td><code>GET</code></td>
 <td><code>/tags/:id/edit</code></td>
 <td><code>TagsEditVM</code></td>
-<td>แก้ไขฟอร์ม</td>
+<td>แบบฟอร์มแก้ไข</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
 <td><code>/tags/:id</code></td>
 <td><code>TagsUpdateVM</code></td>
-<td>อัพเดตแท็ก</td>
+<td>อัปเดตแท็ก</td>
 </tr>
 <tr>
 <td><code>POST</code></td>
@@ -556,8 +556,8 @@ Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
 </tbody>
 </table>
 <hr />
-<h2 id="many-to-many-note_tags">Many-to-many: note_tags<a class="headerlink" href="#many-to-many-note_tags" title="Permanent link">&para;</a></h2>
-<p>Notes และ Tags มีความสัมพันธ์แบบหลายต่อหลาย โน้ตหนึ่งสามารถมีแท็กจำนวนมาก แท็กหนึ่งสามารถปรากฏในหลายโน้ต สิ่งนี้มีโมเดลด้วย <strong>ตารางฟังก์ชัน</strong> — ไม่มีคอลัมน์ foreign key ในตาราง notes หรือ tags</p>
+<h2 id="many-to-many-note_tags">Many-to-Many: note_tags<a class="headerlink" href="#many-to-many-note_tags" title="Permanent link">&para;</a></h2>
+<p>Notes และ Tags มีความสัมพันธ์แบบ many-to-many ไปมา บันทึกหนึ่งสามารถมีแท็กจำนวนมากได้ แท็กหนึ่งสามารถปรากฏบนบันทึกจำนวนมากได้ โดยแสดงผลด้วย <strong>ตารางจุดเชื่อม</strong> — ไม่มีคอลัมน์กุญแจต่างประเทศใน notes หรือ tags table</p>
 <div class="diagram-tabs" id="diag2">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
@@ -674,17 +674,17 @@ A tag can appear on zero or many notes.</code></pre>
   </div>
 </div>
 
-<p>สคีมา:</p>
+<p>โครงการ:</p>
 <div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS note_tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;note_id  INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;tag_id   INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;PRIMARY KEY (note_id, tag_id))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p>คีย์หลักแบบ composite <code>(note_id, tag_id)</code> บังคับความเป็นเอกลักษณ์ที่ระดับฐานข้อมูล — โน้ตไม่สามารถเชื่อมโยงกับแท็กเดียวกันได้สองครั้ง</p>
+<p>คีย์หลักแบบประสม <code>(note_id, tag_id)</code> บังคับใช้ความไม่ซ้ำกันในระดับฐานข้อมูล — บันทึกไม่สามารถเชื่อมโยงกับแท็กเดียวกันสองครั้งได้</p>
 <hr />
-<h2 id="_1">การอ่านแท็กสำหรับโน้ต<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p><code>NoteModel.GetTagsForNote()</code> ค้นหาตารางฟังก์ชันด้วย <code>JOIN</code>:</p>
+<h2 id="_1">การอ่านแท็กสำหรับบันทึก<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><code>NoteModel.GetTagsForNote()</code> สอบถามตารางจุดเชื่อมด้วย <code>JOIN</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">GetTagsForNote</span><span class="p">(</span><span class="n">noteID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">results</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
@@ -706,9 +706,9 @@ A tag can appear on zero or many notes.</code></pre>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ค่าที่ส่งคืนคือ <code>Variant()</code> ของ <code>Dictionary</code> — เข้ากันได้อย่างเต็มที่กับเทมเพลต JinjaX และ JSON API</p>
+<p>ค่าที่ส่งคืนคือ <code>Variant()</code> ของ <code>Dictionary</code> — สอดคล้องเต็มที่กับเทมเพลต JinjaX และ JSON API</p>
 <hr />
-<h2 id="_2">การเขียนแท็กสำหรับโน้ต<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="_2">การเขียนแท็กสำหรับบันทึก<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p><code>NoteModel.SetTagsForNote()</code> ใช้รูปแบบ <strong>delete-then-insert</strong> เพื่อแทนที่ชุดแท็กทั้งหมดแบบอะตอมิก:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">SetTagsForNote</span><span class="p">(</span><span class="n">noteID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">tagIDs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
@@ -722,24 +722,24 @@ A tag can appear on zero or many notes.</code></pre>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>INSERT OR IGNORE</code> ได้ตั้งใจแล้ว คีย์หลักแบบ composite ป้องกันซ้ำที่ระดับฐานข้อมูล หาก <code>tagID</code> เดียวกันปรากฏในอาร์เรย์มากกว่าหนึ่งครั้ง <code>INSERT OR IGNORE</code> ข้ามบันทึกซ้ำเงียบ ๆ แทนที่จะเพิ่มข้อผิดพลาดข้อ จำกัด</p>
+<p><code>INSERT OR IGNORE</code> มีจุดประสงค์ คีย์หลักแบบประสมป้องกันการซ้ำกันในระดับฐานข้อมูล หากเกิด <code>tagID</code> เดียวกันปรากฏในอาร์เรย์มากกว่าหนึ่งครั้ง <code>INSERT OR IGNORE</code> จะข้ามการซ้ำกันแบบเงียบ ๆ แทนการยกเว้นข้อผิดพลาดข้อจำกัด</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>รูปแบบ delete-then-insert ปฏิบัติต่อชุดแท็กทั้งหมด — มันไม่ได้ diff ชุดเก่าเทียบกับชุดใหม่ นี่ง่ายกว่าและถูกต้องสำหรับกรณีการใช้งานส่วนใหญ่ หากคุณต้องการรักษาข้อมูลเมตาในการเชื่อมโยงแต่ละรายการ (เช่น timestamps ต่อมอบหมายแท็ก) วิธี diff จะต้องแทนที่</p>
+<p>รูปแบบ delete-then-insert ถือว่าชุดแท็กเป็นทั้งหมด — ไม่เปรียบเทียบชุดเก่ากับชุดใหม่ วิธีนี้ง่ายกว่าและถูกต้องสำหรับกรณีการใช้งานส่วนใหญ่ หากคุณต้องการเก็บรักษาข้อมูลเมตาบนการเชื่อมโยงแต่ละรายการ (เช่น เวลาต่อการกำหนดแท็ก) จะต้องใช้วิธี diff แทน</p>
 </div>
 <hr />
-<h2 id="_3">การเพิ่มความสัมพันธ์แบบหลายต่อหลายใหม่<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>เพื่อเพิ่ม junction ที่สอง (เช่น Note ↔ Category):</p>
-<p><strong>1.</strong> เพิ่มตารางฟังก์ชันใน <code>DBAdapter.InitDB()</code>:</p>
+<h2 id="many-to-many_1">การเพิ่มความสัมพันธ์แบบ many-to-many ใหม่<a class="headerlink" href="#many-to-many_1" title="Permanent link">&para;</a></h2>
+<p>เพื่อเพิ่มจุดเชื่อมอื่น (เช่น Note ↔ Category):</p>
+<p><strong>1.</strong> เพิ่มตารางจุดเชื่อมใน <code>DBAdapter.InitDB()</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS note_categories (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;note_id      INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;category_id  INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;PRIMARY KEY (note_id, category_id))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><strong>2.</strong> เพิ่ม <code>GetCategoriesForNote()</code> และ <code>SetCategoriesForNote()</code> ให้กับรูปแบบที่เกี่ยวข้องโดยใช้รูปแบบ JOIN และ delete-then-insert เดียวกัน</p>
-<p><strong>3.</strong> ใน ViewModel ที่แสดงรายละเอียดโน้ตหรือแก้ไขฟอร์ม ให้เรียกใช้วิธีทั้งสองและรวมผลลัพธ์เข้าในดิกชันนารีบริบท</p>
+<p><strong>2.</strong> เพิ่ม <code>GetCategoriesForNote()</code> และ <code>SetCategoriesForNote()</code> ไปยังโมเดลที่เกี่ยวข้องโดยใช้รูปแบบ JOIN และ delete-then-insert เดียวกัน</p>
+<p><strong>3.</strong> ใน ViewModel ที่แสดงรายละเอียดบันทึกหรือแบบฟอร์มแก้ไข ให้เรียกใช้ทั้งสองวิธี และรวมผลลัพธ์เข้าในพจนานุกรมบริบท</p>
 
         <!-- Prev / Next navigation -->
         
@@ -781,19 +781,19 @@ A tag can appear on zero or many notes.</code></pre>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#many-to-many-note_tags">Many-to-many: note_tags</a>
+            <a class="toc-link" href="#many-to-many-note_tags">Many-to-Many: note_tags</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การอานแทกสำหรบโนต">การอ่านแท็กสำหรับโน้ต</a>
+            <a class="toc-link" href="#การอานแทกสำหรบบนทก">การอ่านแท็กสำหรับบันทึก</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การเขยนแทกสำหรบโนต">การเขียนแท็กสำหรับโน้ต</a>
+            <a class="toc-link" href="#การเขยนแทกสำหรบบนทก">การเขียนแท็กสำหรับบันทึก</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การเพมความสมพนธแบบหลายตอหลายใหม">การเพิ่มความสัมพันธ์แบบหลายต่อหลายใหม่</a>
+            <a class="toc-link" href="#การเพมความสมพนธแบบ-many-to-many-ใหม">การเพิ่มความสัมพันธ์แบบ many-to-many ใหม่</a>
           </li>
           
         </ul>

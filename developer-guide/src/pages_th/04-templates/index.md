@@ -1,56 +1,56 @@
 ---
-title: ภาพรวม JinjaX
-description: JinjaX คืออะไร วิธีการที่มันพอดีกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()
+title: JinjaX Overview
+description: JinjaX คืออะไร วิธีที่มันทำงานกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()
 ---
 
-# JinjaX และเทมเพลต
+# JinjaX & Templates
 
-JinjaX เป็นการใช้งานเอนจิน Jinja2 ของ Python ที่เขียนด้วย Xojo แบบบริสุทธิ์ ทำให้คุณสามารถเขียนเทมเพลต HTML ด้วยไวยากรณ์ที่เข้ากันได้กับ Jinja2 ของ Python — เอนจินเดียวกันที่ใช้โดย Flask และ Django
+JinjaX เป็นการนำเสนอ Jinja2 template engine ที่เขียนด้วย Xojo แบบบริสุทธิ์ มันให้คุณเขียน HTML templates ด้วยไวยากรณ์ที่เข้ากันได้กับ Jinja2 ของ Python — เอนจิ้นเดียวกับที่ใช้โดย Flask และ Django
 
-## JinjaX มอบให้สิ่งใด
+## JinjaX มอบอะไรให้
 
-- **การสืบทอดเทมเพลต** — `{% extends "layouts/base.html" %}` ด้วย `{% block %}` overrides
-- **รวมเทมเพลต** — `{% include "partials/nav.html" %}`
-- **เอาต์พุตตัวแปร** — `{{ variable }}` ด้วยการหลีกเลี่ยง HTML อัตโนมัติ
-- **โฟลว์ควบคุม** — `{% if %}`, `{% for %}`, `{% else %}`, `{% elif %}`
-- **ตัวกรอง** — `{{ value | upper }}`, `{{ value | length }}`, ตัวกรองแบบกำหนดเอง
-- **Autoescape** — การป้องกัน XSS เปิดใช้งานโดยค่าเริ่มต้น
+- **Template inheritance** — `{% extends "layouts/base.html" %}` พร้อม `{% block %}` overrides
+- **Template includes** — `{% include "partials/nav.html" %}`
+- **Variable output** — `{{ variable }}` พร้อม HTML escaping อัตโนมัติ
+- **Control flow** — `{% if %}`, `{% for %}`, `{% else %}`, `{% elif %}`
+- **Filters** — `{{ value | upper }}`, `{{ value | length }}`, custom filters
+- **Autoescape** — ป้องกัน XSS โดยเปิดใช้งานตามค่าเริ่มต้น
 
-## ต้นไม้ต้นฉบับโครงการ
+## ที่มาของโปรเจกต์
 
-JinjaX อาศัยอยู่ใต้ `JinjaXLib/` ในรูตของโครงการ มีรวมอยู่เป็นต้นฉบับ Xojo เต็มรูปแบบแทนไลบรารีที่รวบรวม ดังนั้นจึงใช้งานได้กับไฟล์โครงการรูปแบบข้อความ `.xojo_code` และสามารถตรวจสอบหรือดีบัตได้หากจำเป็น
+JinjaX อยู่ใต้ `JinjaXLib/` ในรากโปรเจกต์ มันรวมอยู่เป็นซอร์สโค้ด Xojo เต็มรูปแบบแทนที่จะเป็นไลบรารีที่คอมไพล์แล้ว ดังนั้นจึงทำงานได้กับไฟล์โปรเจกต์ `.xojo_code` รูปแบบข้อความและสามารถตรวจสอบหรือดีบักได้หากจำเป็น
 
-อย่าแก้ไข `JinjaXLib/` เว้นแต่จะตั้งใจอัปเกรดหรือแพทช์ JinjaX
+อย่าแก้ไข `JinjaXLib/` เว้นแต่ว่าคุณต้องการปรับปรุงหรือแพตช์ JinjaX
 
 ## การตั้งค่าใน App.Opening()
 
-`JinjaEnvironment` ถูกเริ่มต้นเพียงครั้งเดียวเมื่อแอปพลิเคชันเริ่มต้นและเก็บไว้บน `App` เป็นซิงเกิลตันที่ใช้ร่วมกัน มันเป็นแบบอ่านเท่านั้นหลังจาก `Opening()` เสร็จสิ้น ซึ่งทำให้มันปลอดภัยเธรด:
+`JinjaEnvironment` ถูกเตรียมใช้งานเพียงครั้งเดียวเมื่อแอปพลิเคชันเริ่มต้นและเก็บไว้บน `App` เป็น singleton ที่แชร์กันได้ มันเป็นแบบอ่านเท่านั้นหลังจาก `Opening()` เสร็จสิ้น ซึ่งทำให้มันปลอดภัยสำหรับการใช้งานหลายเธรด:
 
 ```xojo
-// ใน App.Opening()
+// In App.Opening()
 
-// 1. สร้างสภาพแวดล้อม
+// 1. Create the environment
 mJinja = New JinjaX.JinjaEnvironment()
 
-// 2. ชี้ไปที่โฟลเดอร์เทมเพลตของคุณ
-//    ใช้เส้นทางสัมบูรณ์เพื่อให้มันใช้งานได้จากตำแหน่งเอาต์พุตดีบัต IDE
+// 2. Point it at your templates folder
+//    Use an absolute path so it works from any IDE debug output location
 Var projectDir As New FolderItem("/path/to/mvvm", FolderItem.PathModes.Native)
 Var templatesDir As FolderItem = projectDir.Child("templates")
 mJinja.Loader = New JinjaX.FileSystemLoader(templatesDir)
 
-// 3. เปิด autoescape (ป้องกัน XSS — เสมออยู่)
+// 3. Enable autoescape (protects against XSS — always on)
 mJinja.Autoescape = True
 
-// 4. ลงทะเบียนตัวกรองแบบกำหนดเอง
+// 4. Register custom filters
 mJinja.RegisterFilter("truncate80", AddressOf TruncateFilter)
 ```
 
-## การลงทะเบียนตัวกรองแบบกำหนดเอง
+## การลงทะเบียน custom filter
 
-ตัวกรองคือเมธอด Xojo ที่ใช้ `Variant` และส่งคืน `Variant` ลงทะเบียนด้วยชื่อสตริงที่เทมเพลตใช้กับตัวดำเนินการ pipe `|`:
+filter คือเมธอด Xojo ที่รับ `Variant` และคืนค่า `Variant` ลงทะเบียนด้วยชื่อสตริงที่ templates ใช้กับตัวดำเนิน pipe `|`:
 
 ```xojo
-// ใน App.xojo_code (หรือโมดูล Filters)
+// In App.xojo_code (or a Filters module)
 Function TruncateFilter(value As Variant) As Variant
   Var s As String = value.StringValue
   If s.Length > 80 Then
@@ -59,7 +59,7 @@ Function TruncateFilter(value As Variant) As Variant
   Return s
 End Function
 
-// ลงทะเบียนใน Opening():
+// Register in Opening():
 mJinja.RegisterFilter("truncate80", AddressOf TruncateFilter)
 ```
 
@@ -69,23 +69,23 @@ mJinja.RegisterFilter("truncate80", AddressOf TruncateFilter)
 {{ note.body | truncate80 }}
 ```
 
-## การเข้าถึงสภาพแวดล้อมจาก ViewModel
+## การเข้าถึง environment จาก ViewModel
 
-`JinjaEnvironment` ถูกส่งผ่านจาก Router ไปยัง ViewModel แต่ละอันก่อนที่ `Handle()` จะถูกเรียก `BaseViewModel` เก็บไว้เป็นคุณสมบัติ `Jinja` คุณไม่เคยเข้าถึงมันโดยตรง — เพียงเรียก `Render()`:
+`JinjaEnvironment` ถูกส่งผ่านจาก Router ไปยัง ViewModel แต่ละตัวก่อนที่จะเรียก `Handle()` `BaseViewModel` เก็บมันเป็นพร็อพเพอร์ตี `Jinja` คุณไม่เคยเข้าถึงมันโดยตรง — เพียงแค่เรียก `Render()`:
 
 ```xojo
-// ใน ViewModel ใด ๆ — Render() ใช้ Self.Jinja ภายใน
+// In any ViewModel — Render() uses Self.Jinja internally
 Var ctx As New Dictionary()
 ctx.Value("notes") = NoteModel.GetAll()
 Render("notes/list.html", ctx)
 ```
 
-## ความปลอดภัยเธรด
+## ความปลอดภัยของการใช้งานหลายเธรด
 
-`JinjaEnvironment` ปลอดภัยในการใช้ร่วมกันในเธรด **หลังจาก** `Opening()` เสร็จสิ้น เพราะ:
+`JinjaEnvironment` ปลอดภัยที่จะแชร์ข้ามเธรด **หลังจาก** `Opening()` เสร็จสิ้น เพราะว่า:
 
-- `RegisterFilter` ถูกเรียกเฉพาะในช่วง `Opening()` — ไม่มีช่วงคำขอ
-- `GetTemplate()` และ `Render()` เฉพาะการอ่านจากสภาพแวดล้อม
-- `CompiledTemplate` และ `JinjaContext` ถูกสร้างใหม่ต่อคำขอ (stackalloc ไม่ใช่ร่วมกัน)
+- `RegisterFilter` ถูกเรียกใช้เพียงระหว่าง `Opening()` — ไม่เคยระหว่างคำขอ
+- `GetTemplate()` และ `Render()` อ่านเพียงจาก environment เท่านั้น
+- `CompiledTemplate` และ `JinjaContext` ถูกสร้างใหม่ต่อคำขอ (stack-allocated ไม่ใช่ shared)
 
-แต่ละคำขอได้รับ `CompiledTemplate` และ `JinjaContext` ของตัวเอง — สิ่งเหล่านี้ไม่ใช่ร่วมกัน
+แต่ละคำขอได้รับ `CompiledTemplate` และ `JinjaContext` ของตัวเอง — สิ่งเหล่านี้ไม่ได้แชร์กันใช้

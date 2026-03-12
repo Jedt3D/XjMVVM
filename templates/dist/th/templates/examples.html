@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ตัวอย่าง — MVVM Docs</title>
-  <meta name="description" content="ตัวอย่างเทมเพลตจริงที่นำมาจากฟีเจอร์บันทึก — เลเยต์ฐาน รายการ รายละเอียด แบบฟอร์มใช้ร่วมกัน" />
+  <meta name="description" content="ตัวอย่างเทมเพลตจริงที่นำมาจากฟีเจอร์บันทึกย่อ — เลย์เอาต์พื้นฐาน, รายการ, รายละเอียด, และแบบฟอร์มที่ใช้ร่วมกัน" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -344,13 +344,13 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">ตัวอย่าง</h1>
-          <p class="page-description">ตัวอย่างเทมเพลตจริงที่นำมาจากฟีเจอร์บันทึก — เลเยต์ฐาน รายการ รายละเอียด แบบฟอร์มใช้ร่วมกัน</p>
+          <p class="page-description">ตัวอย่างเทมเพลตจริงที่นำมาจากฟีเจอร์บันทึกย่อ — เลย์เอาต์พื้นฐาน, รายการ, รายละเอียด, และแบบฟอร์มที่ใช้ร่วมกัน</p>
         </div>
 
         <h1 id="_1">ตัวอย่าง<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>นี่คือเทมเพลตจริงที่ใช้โดยฟีเจอร์บันทึก พร้อมคำอธิบายประกอบ</p>
-<h2 id="_2">เลเยต์ฐาน<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>เลเยต์ฐานกำหนดโครงสร้างไซต์ เทมเพลตหน้าทุกเทมเพลตขยายสิ่งนี้:</p>
+<p>นี่คือเทมเพลตที่ใช้จริงโดยฟีเจอร์บันทึกย่อ พร้อมกับคำอธิบายประกอบ</p>
+<h2 id="_2">เลย์เอาต์พื้นฐาน<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>เลย์เอาต์พื้นฐานกำหนดโครงสร้างของเว็บไซต์ เทมเพลตหน้าทุกหน้าสืบทอดจากเลย์เอาต์นี้:</p>
 <div class="highlight"><pre><span></span><code>{# templates/layouts/base.html #}
 <span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="p">&lt;</span><span class="nt">html</span> <span class="na">lang</span><span class="o">=</span><span class="s">&quot;en&quot;</span><span class="p">&gt;</span>
@@ -370,7 +370,7 @@
     <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/notes&quot;</span><span class="p">&gt;</span>Notes<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
   <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
 
-  {# ข้อความแฟลชถูกฉีดโดย BaseViewModel.Render() โดยอัตโนมัติ #}
+  {# Flash messages are injected by BaseViewModel.Render() automatically #}
   {% if flash %}
   <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flash flash-{{ flash.type }}&quot;</span><span class="p">&gt;</span>{{ flash.message }}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
   {% endif %}
@@ -382,8 +382,8 @@
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>ตัวแปร <code>flash</code> คือ <code>Dictionary</code> ที่มีสองกุญแจ: <code>type</code> (<code>"success"</code>, <code>"error"</code>, <code>"info"</code>) และ <code>message</code> (สตริง) ฉีดโดยอัตโนมัติ — ViewModel ใด ๆ สามารถเรียก <code>SetFlash()</code> และข้อความจะปรากฏบนหน้าที่เรนเดอร์ถัดไป</p>
-<h2 id="_3">รายการบันทึก<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>ตัวแปร <code>flash</code> เป็น <code>Dictionary</code> ที่มีกุญแจสองตัว: <code>type</code> (<code>"success"</code>, <code>"error"</code>, <code>"info"</code>) และ <code>message</code> (สตริงข้อความ) ตัวแปรนี้ถูกฉีดเข้าโดยอัตโนมัติ — ViewModel ใดๆ สามารถเรียก <code>SetFlash()</code> และข้อความจะปรากฏบนหน้าที่แสดงผลครั้งต่อไป</p>
+<h2 id="_3">รายการบันทึกย่อ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>{# templates/notes/list.html #}
 {% extends &quot;layouts/base.html&quot; %}
 
@@ -405,7 +405,7 @@
     <span class="p">&lt;</span><span class="nt">small</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;color:#999&quot;</span><span class="p">&gt;</span>Updated: {{ note.updated_at }}<span class="p">&lt;/</span><span class="nt">small</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">div</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;margin-top:10px;&quot;</span><span class="p">&gt;</span>
       <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/notes/{{ note.id }}/edit&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-sm&quot;</span><span class="p">&gt;</span>Edit<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-      {# ลบผ่านแบบฟอร์ม POST — ไม่มีวิธี DELETE ใน HTML #}
+      {# Delete via a POST form — no DELETE method in HTML #}
       <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/notes/{{ note.id }}/delete&quot;</span>
             <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:inline&quot;</span>
             <span class="na">onsubmit</span><span class="o">=</span><span class="s">&quot;return confirm(&#39;Delete this note?&#39;)&quot;</span><span class="p">&gt;</span>
@@ -420,9 +420,9 @@
 {% endblock %}
 </code></pre></div>
 
-<p>ประเด็นสำคัญ: <code>note.id</code>, <code>note.title</code>, <code>note.body</code>, <code>note.updated_at</code> คือกุญแจ Dictionary การลบเป็นแบบฟอร์ม <code>POST</code> เพราะแบบฟอร์ม HTML รองรับเฉพาะ GET และ POST — ไม่มี HTTP DELETE ในแบบฟอร์มเบราว์เซอร์</p>
-<h2 id="_4">แบบฟอร์มสร้าง/แก้ไขใช้ร่วมกัน<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>หนึ่งเทมเพลตให้ทั้งแบบฟอร์มบันทึกใหม่และแบบฟอร์มแก้ไข การมีอยู่ของตัวแปร <code>note</code> จะกำหนดโหมดใดที่ใช้งาน:</p>
+<p>จุดสำคัญคือ <code>note.id</code>, <code>note.title</code>, <code>note.body</code>, <code>note.updated_at</code> เป็นกุญแจของ Dictionary การลบทำผ่าน <code>POST</code> form เพราะแบบฟอร์ม HTML รองรับเพียง GET และ POST เท่านั้น — ไม่มี HTTP DELETE ในแบบฟอร์มบราวเซอร์</p>
+<h2 id="_4">แบบฟอร์มที่ใช้ร่วมกันสำหรับการสร้างและแก้ไข<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>เทมเพลตเดียวสามารถใช้สำหรับทั้งแบบฟอร์มสร้างบันทึกใหม่และแบบฟอร์มแก้ไข การมีอยู่ของตัวแปร <code>note</code> จะกำหนดว่าโหมดใดเป็นโหมดที่ใช้งาน:</p>
 <div class="highlight"><pre><span></span><code>{# templates/notes/form.html #}
 {% extends &quot;layouts/base.html&quot; %}
 
@@ -431,7 +431,7 @@
 {% block content %}
 <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{% if note %}Edit Note{% else %}New Note{% endif %}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 
-{# สลับการดำเนินการแบบฟอร์มและเติมค่าตามโหมด #}
+{# Switch form action and populate values based on mode #}
 <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;{% if note %}/notes/{{ note.id }}{% else %}/notes{% endif %}&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">div</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;title&quot;</span><span class="p">&gt;</span>Title <span class="p">&lt;</span><span class="nt">span</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;color:red&quot;</span><span class="p">&gt;</span>*<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
@@ -452,8 +452,8 @@
 {% endblock %}
 </code></pre></div>
 
-<p><code>NotesNewVM</code> ไม่ส่งกุญแจ <code>note</code> (หรือส่ง <code>Nil</code>) — แบบฟอร์มเรนเดอร์ในโหมดสร้าง <code>NotesEditVM</code> ส่งพจนานุกรม <code>note</code> ที่โหลด — แบบฟอร์มเติมล่วงหน้าด้วยค่าที่มีอยู่</p>
-<h2 id="_5">รายละเอียดบันทึก<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p><code>NotesNewVM</code> ไม่ส่งกุญแจ <code>note</code> (หรือส่ง <code>Nil</code>) — เทมเพลตแสดงผลในโหมดสร้าง <code>NotesEditVM</code> ส่ง Dictionary <code>note</code> ที่โหลดแล้ว — เทมเพลตจะเติมค่าที่มีอยู่แล้วล่วงหน้า</p>
+<h2 id="_5">รายละเอียดบันทึกย่อ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>{# templates/notes/detail.html #}
 {% extends &quot;layouts/base.html&quot; %}
 
@@ -483,9 +483,9 @@
 {% endblock %}
 </code></pre></div>
 
-<p><code>white-space:pre-wrap</code> รักษาตัวหยุดบรรทัดในข้อความเนื้อหาโดยไม่จำเป็นต้องแปลง <code>\n</code> เป็น <code>&lt;br&gt;</code> — มีประโยชน์สำหรับเนื้อหาเนื้อหาข้อความธรรมชาติ</p>
+<p><code>white-space:pre-wrap</code> จะรักษาการขึ้นบรรทัดในข้อความเนื้อหาโดยไม่จำเป็นต้องแปลง <code>\n</code> เป็น <code>&lt;br&gt;</code> — มีประโยชน์สำหรับเนื้อหาที่เป็นข้อความธรรมชาติ</p>
 <h2 id="_6">หน้าข้อผิดพลาด<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>เทมเพลตข้อผิดพลาดถูกส่ง <code>status_code</code> และ <code>message</code> โดยวิธี <code>Serve404()</code> และ <code>Serve500()</code> ของ Router:</p>
+<p>เทมเพลตข้อผิดพลาดจะได้รับ <code>status_code</code> และ <code>message</code> จากเมธอด <code>Serve404()</code> และ <code>Serve500()</code> ของ Router:</p>
 <div class="highlight"><pre><span></span><code>{# templates/errors/404.html #}
 {% extends &quot;layouts/base.html&quot; %}
 {% block title %}404 Not Found{% endblock %}
@@ -496,7 +496,7 @@
 {% endblock %}
 </code></pre></div>
 
-<p>เทมเพลตข้อผิดพลาดไม่ต้องกังวลเกี่ยวกับข้อความแฟลช — พวกเขาเรนเดอร์โดย Router โดยตรง ก่อนที่ ViewModel ใด ๆ จะมีโอกาสเรียก</p>
+<p>เทมเพลตข้อผิดพลาดไม่จำเป็นต้องกังวลเกี่ยวกับข้อความ flash — เทมเพลตนี้แสดงผลโดย Router โดยตรง ก่อนที่ ViewModel ใดๆ จะมีโอกาสทำงาน</p>
 
         <!-- Prev / Next navigation -->
         
@@ -530,19 +530,19 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#เลเยตฐาน">เลเยต์ฐาน</a>
+            <a class="toc-link" href="#เลยเอาตพนฐาน">เลย์เอาต์พื้นฐาน</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#รายการบนทก">รายการบันทึก</a>
+            <a class="toc-link" href="#รายการบนทกยอ">รายการบันทึกย่อ</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#แบบฟอรมสรางแกไขใชรวมกน">แบบฟอร์มสร้าง/แก้ไขใช้ร่วมกัน</a>
+            <a class="toc-link" href="#แบบฟอรมทใชรวมกนสำหรบการสรางและแกไข">แบบฟอร์มที่ใช้ร่วมกันสำหรับการสร้างและแก้ไข</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#รายละเอยดบนทก">รายละเอียดบันทึก</a>
+            <a class="toc-link" href="#รายละเอยดบนทกยอ">รายละเอียดบันทึกย่อ</a>
           </li>
           
           <li class="toc-item toc-level-2">

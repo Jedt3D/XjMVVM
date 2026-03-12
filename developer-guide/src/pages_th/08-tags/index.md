@@ -1,15 +1,15 @@
 ---
-title: "แท็ก & Many-to-Many"
-description: วิธีการเพิ่มทรัพยากรที่สอง (แท็ก) เชื่อมต่อตารางฟังก์ชันที่เชื่อมต่อหลายต่อหลาย และสอบถาม across the relationship
+title: "แท็ก & ความสัมพันธ์แบบ Many-to-Many"
+description: วิธีการเพิ่มทรัพยากร (Tags) ที่สอง สร้างตารางจุดเชื่อม many-to-many และสอบถามข้อมูลข้ามความสัมพันธ์
 ---
 
-# แท็ก & Many-to-Many
+# แท็ก & ความสัมพันธ์แบบ Many-to-Many
 
-การเพิ่มแท็กแนะนำสองสิ่งพร้อมกัน: **ทรัพยากรที่สมบูรณ์ที่สอง** (พิสูจน์ว่ารูปแบบ CRUD ทั่วไปหลายทั่ว Notes) และ **ความสัมพันธ์แบบหลายต่อหลาย** ระหว่าง Notes และ Tags ผ่านตารางฟังก์ชัน
+การเพิ่ม Tags นำเสนออสองสิ่งไปพร้อมกัน: **ทรัพยากรเต็มตัวอันที่สอง** (พิสูจน์ว่ารูปแบบ CRUD ขยายไปไกลกว่า Notes) และ **ความสัมพันธ์แบบ many-to-many** ระหว่าง Notes และ Tags ผ่านตารางจุดเชื่อม
 
 ## ทรัพยากร Tag
 
-`TagModel` ตามรูปแบบสามชั้นเดียวกับ `NoteModel`
+`TagModel` ปฏิบัติตามรูปแบบสามชั้นเดียวกับ `NoteModel` อย่างแม่นยำ
 
 <!-- diagram -->
 <!-- nomnoml
@@ -71,7 +71,7 @@ Inherits BaseModel
 End Class
 ```
 
-สคีมาลงทะเบียนใน `DBAdapter.InitDB()`:
+โครงการถูกลงทะเบียนใน `DBAdapter.InitDB()`:
 
 ```xojo
 db.ExecuteSQL("CREATE TABLE IF NOT EXISTS tags (" + _
@@ -84,23 +84,23 @@ db.ExecuteSQL("CREATE TABLE IF NOT EXISTS tags (" + _
 
 ## เส้นทาง Tags
 
-เจ็ดเส้นทางลงทะเบียนใน `App.Opening` โดยสะท้อนรูปแบบ Notes:
+เจ็ดเส้นทางลงทะเบียนใน `App.Opening` สะท้อนรูปแบบ Notes:
 
-| วิธี | เส้นทาง | ViewModel | การกระทำ |
+| Method | Path | ViewModel | Action |
 |--------|------|-----------|--------|
-| `GET` | `/tags` | `TagsListVM` | รายการแท็กทั้งหมด |
-| `GET` | `/tags/new` | `TagsNewVM` | ฟอร์มแท็กใหม่ |
+| `GET` | `/tags` | `TagsListVM` | แสดงรายชื่อแท็กทั้งหมด |
+| `GET` | `/tags/new` | `TagsNewVM` | แบบฟอร์มแท็กใหม่ |
 | `POST` | `/tags` | `TagsCreateVM` | สร้างแท็ก |
 | `GET` | `/tags/:id` | `TagsDetailVM` | ดูแท็ก |
-| `GET` | `/tags/:id/edit` | `TagsEditVM` | แก้ไขฟอร์ม |
-| `POST` | `/tags/:id` | `TagsUpdateVM` | อัพเดตแท็ก |
+| `GET` | `/tags/:id/edit` | `TagsEditVM` | แบบฟอร์มแก้ไข |
+| `POST` | `/tags/:id` | `TagsUpdateVM` | อัปเดตแท็ก |
 | `POST` | `/tags/:id/delete` | `TagsDeleteVM` | ลบแท็ก |
 
 ---
 
-## Many-to-many: note_tags
+## Many-to-Many: note_tags
 
-Notes และ Tags มีความสัมพันธ์แบบหลายต่อหลาย โน้ตหนึ่งสามารถมีแท็กจำนวนมาก แท็กหนึ่งสามารถปรากฏในหลายโน้ต สิ่งนี้มีโมเดลด้วย **ตารางฟังก์ชัน** — ไม่มีคอลัมน์ foreign key ในตาราง notes หรือ tags
+Notes และ Tags มีความสัมพันธ์แบบ many-to-many ไปมา บันทึกหนึ่งสามารถมีแท็กจำนวนมากได้ แท็กหนึ่งสามารถปรากฏบนบันทึกจำนวนมากได้ โดยแสดงผลด้วย **ตารางจุดเชื่อม** — ไม่มีคอลัมน์กุญแจต่างประเทศใน notes หรือ tags table
 
 <!-- diagram -->
 <!-- nomnoml
@@ -125,7 +125,7 @@ A tag can appear on zero or many notes.
 -->
 <!-- /diagram -->
 
-สคีมา:
+โครงการ:
 
 ```xojo
 db.ExecuteSQL("CREATE TABLE IF NOT EXISTS note_tags (" + _
@@ -134,13 +134,13 @@ db.ExecuteSQL("CREATE TABLE IF NOT EXISTS note_tags (" + _
   "PRIMARY KEY (note_id, tag_id))")
 ```
 
-คีย์หลักแบบ composite `(note_id, tag_id)` บังคับความเป็นเอกลักษณ์ที่ระดับฐานข้อมูล — โน้ตไม่สามารถเชื่อมโยงกับแท็กเดียวกันได้สองครั้ง
+คีย์หลักแบบประสม `(note_id, tag_id)` บังคับใช้ความไม่ซ้ำกันในระดับฐานข้อมูล — บันทึกไม่สามารถเชื่อมโยงกับแท็กเดียวกันสองครั้งได้
 
 ---
 
-## การอ่านแท็กสำหรับโน้ต
+## การอ่านแท็กสำหรับบันทึก
 
-`NoteModel.GetTagsForNote()` ค้นหาตารางฟังก์ชันด้วย `JOIN`:
+`NoteModel.GetTagsForNote()` สอบถามตารางจุดเชื่อมด้วย `JOIN`:
 
 ```xojo
 Function GetTagsForNote(noteID As Integer) As Variant()
@@ -164,11 +164,11 @@ Function GetTagsForNote(noteID As Integer) As Variant()
 End Function
 ```
 
-ค่าที่ส่งคืนคือ `Variant()` ของ `Dictionary` — เข้ากันได้อย่างเต็มที่กับเทมเพลต JinjaX และ JSON API
+ค่าที่ส่งคืนคือ `Variant()` ของ `Dictionary` — สอดคล้องเต็มที่กับเทมเพลต JinjaX และ JSON API
 
 ---
 
-## การเขียนแท็กสำหรับโน้ต
+## การเขียนแท็กสำหรับบันทึก
 
 `NoteModel.SetTagsForNote()` ใช้รูปแบบ **delete-then-insert** เพื่อแทนที่ชุดแท็กทั้งหมดแบบอะตอมิก:
 
@@ -184,18 +184,18 @@ End Sub
 ```
 
 !!! warning
-    `INSERT OR IGNORE` ได้ตั้งใจแล้ว คีย์หลักแบบ composite ป้องกันซ้ำที่ระดับฐานข้อมูล หาก `tagID` เดียวกันปรากฏในอาร์เรย์มากกว่าหนึ่งครั้ง `INSERT OR IGNORE` ข้ามบันทึกซ้ำเงียบ ๆ แทนที่จะเพิ่มข้อผิดพลาดข้อ จำกัด
+    `INSERT OR IGNORE` มีจุดประสงค์ คีย์หลักแบบประสมป้องกันการซ้ำกันในระดับฐานข้อมูล หากเกิด `tagID` เดียวกันปรากฏในอาร์เรย์มากกว่าหนึ่งครั้ง `INSERT OR IGNORE` จะข้ามการซ้ำกันแบบเงียบ ๆ แทนการยกเว้นข้อผิดพลาดข้อจำกัด
 
 !!! note
-    รูปแบบ delete-then-insert ปฏิบัติต่อชุดแท็กทั้งหมด — มันไม่ได้ diff ชุดเก่าเทียบกับชุดใหม่ นี่ง่ายกว่าและถูกต้องสำหรับกรณีการใช้งานส่วนใหญ่ หากคุณต้องการรักษาข้อมูลเมตาในการเชื่อมโยงแต่ละรายการ (เช่น timestamps ต่อมอบหมายแท็ก) วิธี diff จะต้องแทนที่
+    รูปแบบ delete-then-insert ถือว่าชุดแท็กเป็นทั้งหมด — ไม่เปรียบเทียบชุดเก่ากับชุดใหม่ วิธีนี้ง่ายกว่าและถูกต้องสำหรับกรณีการใช้งานส่วนใหญ่ หากคุณต้องการเก็บรักษาข้อมูลเมตาบนการเชื่อมโยงแต่ละรายการ (เช่น เวลาต่อการกำหนดแท็ก) จะต้องใช้วิธี diff แทน
 
 ---
 
-## การเพิ่มความสัมพันธ์แบบหลายต่อหลายใหม่
+## การเพิ่มความสัมพันธ์แบบ many-to-many ใหม่
 
-เพื่อเพิ่ม junction ที่สอง (เช่น Note ↔ Category):
+เพื่อเพิ่มจุดเชื่อมอื่น (เช่น Note ↔ Category):
 
-**1.** เพิ่มตารางฟังก์ชันใน `DBAdapter.InitDB()`:
+**1.** เพิ่มตารางจุดเชื่อมใน `DBAdapter.InitDB()`:
 
 ```xojo
 db.ExecuteSQL("CREATE TABLE IF NOT EXISTS note_categories (" + _
@@ -204,6 +204,6 @@ db.ExecuteSQL("CREATE TABLE IF NOT EXISTS note_categories (" + _
   "PRIMARY KEY (note_id, category_id))")
 ```
 
-**2.** เพิ่ม `GetCategoriesForNote()` และ `SetCategoriesForNote()` ให้กับรูปแบบที่เกี่ยวข้องโดยใช้รูปแบบ JOIN และ delete-then-insert เดียวกัน
+**2.** เพิ่ม `GetCategoriesForNote()` และ `SetCategoriesForNote()` ไปยังโมเดลที่เกี่ยวข้องโดยใช้รูปแบบ JOIN และ delete-then-insert เดียวกัน
 
-**3.** ใน ViewModel ที่แสดงรายละเอียดโน้ตหรือแก้ไขฟอร์ม ให้เรียกใช้วิธีทั้งสองและรวมผลลัพธ์เข้าในดิกชันนารีบริบท
+**3.** ใน ViewModel ที่แสดงรายละเอียดบันทึกหรือแบบฟอร์มแก้ไข ให้เรียกใช้ทั้งสองวิธี และรวมผลลัพธ์เข้าในพจนานุกรมบริบท

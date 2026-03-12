@@ -1,13 +1,13 @@
 ---
-title: คู่มือการใช้
-description: วิธีใช้ไวยากรณ์เทมเพลต Jinja2 — ตัวแปร บล็อก ลูป เงื่อนไข ตัวกรอง และการสืบทอดเทมเพลต
+title: คู่มือการใช้งาน
+description: วิธีใช้ไวยากรณ์ Jinja2 — ตัวแปร บล็อก ลูป เงื่อนไข ตัวกรอง และการสืบทอดเทมเพลต
 ---
 
-# คู่มือการใช้
+# คู่มือการใช้งาน
 
 ## การสืบทอดเทมเพลต
 
-เทมเพลตหน้าทุกเทมเพลตเริ่มต้นโดยขยายเลเยต์ฐาน:
+เทมเพลตแต่ละหน้าเริ่มต้นด้วยการขยาย (extend) เลย์เอาต์ฐาน:
 
 ```html
 {# templates/notes/list.html #}
@@ -17,11 +17,11 @@ description: วิธีใช้ไวยากรณ์เทมเพลต 
 
 {% block content %}
   <h1>All Notes</h1>
-  {# เนื้อหาหน้าที่นี่ #}
+  {# page content here #}
 {% endblock %}
 ```
 
-เลเยต์ฐานกำหนดบล็อกที่ชื่อว่าเทมเพลตย่อยกรอก:
+เลย์เอาต์ฐานกำหนด named blocks ที่เทมเพลตลูกสามารถเติมข้อมูลเข้าไป:
 
 ```html
 {# templates/layouts/base.html #}
@@ -44,11 +44,11 @@ description: วิธีใช้ไวยากรณ์เทมเพลต 
 </html>
 ```
 
-เทมเพลตย่อยสามารถเฉพาะแทนที่บล็อกที่กำหนดไว้ในพาเรนต์ เนื้อหาภายนอกแท็ก `{% block %}` ในเทมเพลตย่อยจะถูกละเว้น
+เทมเพลตลูกสามารถเขียนทับ (override) เฉพาะบล็อก (blocks) ที่ถูกกำหนดไว้ในพาเรนต์เท่านั้น เนื้อหาที่อยู่นอก `{% block %}` tags ในเทมเพลตลูกจะถูกไม่สนใจ
 
 ## ตัวแปร
 
-เอาต์พุตตัวแปรด้วยวงเล็บปีกกาคู่ HTML จะถูกหลีกเลี่ยงโดยอัตโนมัติ — `<script>` กลายเป็น `&lt;script&gt;`:
+แสดงผลตัวแปรด้วยวงเล็บปีกกาคู่ (double curly braces) HTML จะถูกหลีกเลี่ยงอัตโนมัติ — `<script>` จะกลายเป็น `&lt;script&gt;`:
 
 ```html
 {{ note.title }}
@@ -56,21 +56,21 @@ description: วิธีใช้ไวยากรณ์เทมเพลต 
 {{ page_title }}
 ```
 
-ตัวแปรมาจากพจนานุกรมบริบท `Dictionary` ที่คุณส่งไปยัง `Render()` กุญแจ Dictionary กลายเป็นชื่อตัวแปรในเทมเพลต
+ตัวแปรมาจาก context `Dictionary` ที่คุณส่งไปยัง `Render()` คีย์ของ Dictionary จะกลายเป็นชื่อตัวแปรในเทมเพลต
 
-### สัญกรณ์จุด Dictionary
+### Dot-notation ของ Dictionary
 
-JinjaX แก้ไข `{{ note.title }}` โดยเรียก `note.Value("title")` บน `Dictionary` นี่คือเหตุผลหลักที่ข้อมูลทั้งหมดต้องเป็นอ็อบเจ็กต์ `Dictionary` — เฉพาะ `Dictionary` ที่รองรับการค้นหาสัญกรณ์จุดผ่าน `EvaluateGetAttr`
+JinjaX แก้ไข `{{ note.title }}` โดยเรียก `note.Value("title")` บน `Dictionary` นี่คือเหตุผลหลักว่าทำไมข้อมูลทั้งหมดต้องเป็น Dictionary objects — เพียงแต่ Dictionary เท่านั้นที่รองรับ dot-notation lookup ผ่าน `EvaluateGetAttr`
 
-### เอาต์พุตดิบ (ไม่มีการหลีกเลี่ยง)
+### ผลลัพธ์แบบดิบ (ไม่หลีกเลี่ยง)
 
-ถ้าคุณต้องการเอาต์พุต HTML ที่เรนเดอร์ล่วงหน้า (เนื้อหาที่เชื่อถือได้เท่านั้น):
+หากคุณต้องการแสดงผล HTML ที่ render ไว้ก่อนแล้ว (เฉพาะเนื้อหาที่เชื่อถือได้):
 
 ```html
 {{ content | safe }}
 ```
 
-ไม่เคยใช้ `| safe` ในเนื้อหาที่ผู้ใช้จัดเตรียม
+อย่าใช้ `| safe` กับเนื้อหาที่มาจากผู้ใช้
 
 ## เงื่อนไข
 
@@ -84,11 +84,11 @@ JinjaX แก้ไข `{{ note.title }}` โดยเรียก `note.Value("
 {% endif %}
 ```
 
-ค่าเท็จใน Jinja2: `False`, `0`, `""` (สตริงว่าง), `[]` (อาร์เรย์ว่าง), `None`/`Nil` กุญแจที่ขาดหายไปถูกมองว่าเป็นเท็จ
+ค่าที่ falsy ใน Jinja2: `False`, `0`, `""` (สตริงว่าง), `[]` (อาเรย์ว่าง), `None`/`Nil` คีย์ที่หายไปถือว่า falsy
 
 ## ลูป
 
-วนซ้ำบนอาร์เรย์ `Variant()` ของอ็อบเจ็กต์ `Dictionary`:
+ทำซ้ำบนอาเรย์ `Variant()` ของ Dictionary objects:
 
 ```html
 {% for note in notes %}
@@ -102,18 +102,18 @@ JinjaX แก้ไข `{{ note.title }}` โดยเรียก `note.Value("
 {% endfor %}
 ```
 
-บล็อก `{% else %}` เรนเดอร์เมื่ออาร์เรย์ว่าง
+บล็อก `{% else %}` จะแสดงผลเมื่ออาเรย์ว่าง
 
-### ตัวแปรลูป
+### ตัวแปร loop
 
-ภายในบล็อก `{% for %}` ตัวแปร `loop` พิเศษจะพร้อมใช้งาน:
+ภายในบล็อก `{% for %}` จะมี special `loop` variables ให้ใช้:
 
 | ตัวแปร | ค่า |
 |---|---|
-| `loop.index` | การวนซ้ำปัจจุบัน 1-based |
-| `loop.index0` | การวนซ้ำปัจจุบัน 0-based |
-| `loop.first` | `True` ในการวนซ้ำครั้งแรก |
-| `loop.last` | `True` ในการวนซ้ำสุดท้าย |
+| `loop.index` | การทำซ้ำปัจจุบัน, นับจาก 1 |
+| `loop.index0` | การทำซ้ำปัจจุบัน, นับจาก 0 |
+| `loop.first` | `True` ในการทำซ้ำแรก |
+| `loop.last` | `True` ในการทำซ้ำสุดท้าย |
 | `loop.length` | จำนวนรายการทั้งหมด |
 
 ```html
@@ -128,7 +128,7 @@ JinjaX แก้ไข `{{ note.title }}` โดยเรียก `note.Value("
 
 ## ตัวกรอง
 
-ตัวกรองแปลงค่าโดยใช้ตัวดำเนินการ pipe `|`:
+ตัวกรองแปลงค่าโดยใช้ pipe `|` operator:
 
 ```html
 {{ note.title | upper }}
@@ -139,39 +139,39 @@ JinjaX แก้ไข `{{ note.title }}` โดยเรียก `note.Value("
 {{ note.title | replace("foo", "bar") }}
 ```
 
-ตัวกรองสามารถเชื่อมโยงได้:
+ตัวกรองสามารถทำต่อเนื่องกันได้:
 
 ```html
 {{ note.title | upper | truncate(50) }}
 ```
 
-## รวมเทมเพลต
+## การรวม (include) เทมเพลต
 
-รวมเทมเพลตบางส่วน:
+รวมเทมเพลต partial:
 
 ```html
 {% include "partials/pagination.html" %}
 ```
 
-เทมเพลตที่รวมใช้บริบทเดียวกันกับพาเรนต์ — สามารถเข้าถึงตัวแปรเดียวกันได้ทั้งหมด
+เทมเพลตที่รวมเข้า (included template) ร่วมใช้ context เดียวกับพาเรนต์ — มันสามารถเข้าถึงตัวแปรเดียวกันทั้งหมด
 
-## ความเห็น
+## ความเห็น (Comments)
 
-ความเห็นเทมเพลตไม่ได้ถูกส่งไปยังเบราว์เซอร์:
+ความเห็นในเทมเพลตไม่ถูกส่งไปยังเบราว์เซอร์:
 
 ```html
-{# ความเห็นนี้ถูกลบออกจากเอาต์พุต #}
+{# This comment is stripped from the output #}
 ```
 
 ความเห็น HTML ถูกส่งไปยังเบราว์เซอร์:
 
 ```html
-<!-- ความเห็นนี้ปรากฏในแหล่งหน้า -->
+<!-- This comment appears in the page source -->
 ```
 
-## การควบคุมช่องว่าง
+## การควบคุม whitespace
 
-ใช้ `-` เพื่อลบช่องว่างรอบแท็ก:
+ใช้ `-` เพื่อตัด (strip) whitespace รอบ tag:
 
 ```html
 {%- for note in notes -%}
@@ -179,16 +179,16 @@ JinjaX แก้ไข `{{ note.title }}` โดยเรียก `note.Value("
 {%- endfor -%}
 ```
 
-มีประโยชน์เมื่อสร้าง JSON หรือ CSV ขนาดกะทัดรัดจากเทมเพลต
+มีประโยชน์เมื่อสร้าง JSON หรือ CSV ที่กระชับจากเทมเพลต
 
-## ส่งบริบทจาก ViewModel
+## การส่ง context จาก ViewModel
 
-ทุกอย่างในพจนานุกรมบริบท `Dictionary` กลายเป็นตัวแปรเทมเพลต:
+ทุกอย่างใน context `Dictionary` จะกลายเป็นตัวแปรเทมเพลต:
 
 ```xojo
 Sub OnGet()
   Var ctx As New Dictionary()
-  ctx.Value("notes")      = NoteModel.GetAll()   // Variant() ของ Dictionary
+  ctx.Value("notes")      = NoteModel.GetAll()   // Variant() of Dictionary
   ctx.Value("page_title") = "All Notes"
   ctx.Value("is_admin")   = False
   Render("notes/list.html", ctx)
@@ -203,4 +203,4 @@ End Sub
 {% for note in notes %}...{% endfor %}
 ```
 
-ข้อความแฟลชถูกฉีดโดยอัตโนมัติโดย `BaseViewModel.Render()` — คุณไม่ต้องเพิ่มลงในบริบทด้วยตนเอง
+Flash messages ถูกฉีด (inject) โดยอัตโนมัติโดย `BaseViewModel.Render()` — คุณไม่ต้องเพิ่มมันลงใน context ด้วยตัวเอง

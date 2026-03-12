@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SQLite และสัญญา Dictionary — MVVM Docs</title>
-  <meta name="description" content="วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียนคลาส Model ที่ปลอดภัยจากเธรด" />
+  <title>SQLite & Dictionary Contract — MVVM Docs</title>
+  <meta name="description" content="วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียน Model classes ที่ปลอดภัยสำหรับหลายเธรด" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,14 +343,14 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">SQLite และสัญญา Dictionary</h1>
-          <p class="page-description">วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียนคลาส Model ที่ปลอดภัยจากเธรด</p>
+          <h1 class="page-title">SQLite & Dictionary Contract</h1>
+          <p class="page-description">วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียน Model classes ที่ปลอดภัยสำหรับหลายเธรด</p>
         </div>
 
-        <h1 id="sqlite-dictionary">SQLite และสัญญา Dictionary<a class="headerlink" href="#sqlite-dictionary" title="Permanent link">&para;</a></h1>
-<h2 id="_1">รูปแบบหลัก<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>ทุกเมธอด Model ปฏิบัติตามรูปแบบเดียวกัน: เปิดการเชื่อมต่อฐานข้อมูลใหม่ เรียกใช้การค้นหา แปลงแต่ละแถว <code>RowSet</code> เป็น <code>Dictionary</code> ปิดทุกสิ่ง คืนค่า</p>
-<p>รูปแบบนี้มีจงใจ — มันรับประกันความปลอดภัยเธรดและบังคับใช้สัญญาข้อมูล Dictionary ที่ JinjaX ต้องการ</p>
+        <h1 id="sqlite-dictionary-contract">SQLite &amp; Dictionary Contract<a class="headerlink" href="#sqlite-dictionary-contract" title="Permanent link">&para;</a></h1>
+<h2 id="the-core-pattern">The core pattern<a class="headerlink" href="#the-core-pattern" title="Permanent link">&para;</a></h2>
+<p>ทุก Model method ยึดตามรูปแบบเดียวกัน: เปิด database connection ใหม่ รันคำสั่ง query แปลง <code>RowSet</code> แต่ละแถวเป็น <code>Dictionary</code> ปิดทุกอย่าง คืนค่า</p>
+<p>รูปแบบนี้ตั้งใจออกแบบเพื่อให้มั่นใจว่าปลอดภัยสำหรับหลายเธรด และบังคับใช้ Dictionary data contract ที่ JinjaX ต้องการ</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">results</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
@@ -376,41 +376,41 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ประเภทการคืน <code>Variant()</code> ที่มีอ็อบเจ็กต์ <code>Dictionary</code> เป็นรูปแบบเพียงอย่างเดียวที่ JinjaX สามารถวนซ้ำได้ในลูป <code>{% for %}</code></p>
-<h2 id="_2">ประเภทการคืน<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Return type <code>Variant()</code> ที่บรรจุ <code>Dictionary</code> objects เป็นรูปแบบเดียวที่ JinjaX สามารถวนลูปใน <code>{% for %}</code> ได้</p>
+<h2 id="return-types">Return types<a class="headerlink" href="#return-types" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>การดำเนินการ</th>
-<th>ประเภทการคืน</th>
-<th>กรณี Nil</th>
+<th>Operation</th>
+<th>Return type</th>
+<th>Nil case</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>แถวหลายแถว</td>
-<td><code>Variant()</code> (ของ <code>Dictionary</code>)</td>
-<td>อาร์เรย์ว่าง <code>()</code></td>
+<td>Multiple rows</td>
+<td><code>Variant()</code> (of <code>Dictionary</code>)</td>
+<td>Empty array <code>()</code></td>
 </tr>
 <tr>
-<td>แถวเดียว</td>
+<td>Single row</td>
 <td><code>Dictionary</code></td>
 <td><code>Nil</code></td>
 </tr>
 <tr>
-<td>สร้าง</td>
-<td><code>Integer</code> (ID แถวใหม่)</td>
+<td>Create</td>
+<td><code>Integer</code> (new row ID)</td>
 <td>—</td>
 </tr>
 <tr>
-<td>อัปเดต / ลบ</td>
-<td><code>Sub</code> (ไม่มี)</td>
+<td>Update / Delete</td>
+<td><code>Sub</code> (nothing)</td>
 <td>—</td>
 </tr>
 </tbody>
 </table>
-<p>เสมอตรวจสอบ <code>Nil</code> เมื่อดึงแถวเดียว:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ใน ViewModel</span>
+<p>ตรวจสอบ <code>Nil</code> เสมอเมื่อดึงแถวเดียว:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In the ViewModel</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
 <span class="k">If</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
 <span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Note not found&quot;</span><span class="p">)</span>
@@ -418,8 +418,8 @@
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<h2 id="_3">การเชื่อมต่อฐานข้อมูลต่อคำขอ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>เมธอด <code>OpenDB()</code> ส่วนตัวเปิด <strong>ใหม่</strong> การเชื่อมต่อในการเรียกแต่ละครั้ง ไม่มีการเชื่อมต่อฐานข้อมูลแบบใช้ร่วมกันที่มีอายุยาวนาน ใน <code>App</code></p>
+<h2 id="per-request-database-connections">Per-request database connections<a class="headerlink" href="#per-request-database-connections" title="Permanent link">&para;</a></h2>
+<p>Method <code>OpenDB()</code> private เปิด connection <strong>ใหม่</strong> ทุกครั้งที่เรียก ไม่มี database connection ร่วมกันแบบยาวนาน บน <code>App</code></p>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="n">DB_PATH</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
@@ -429,17 +429,17 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p><strong>ทำไมต่อคำขอ?</strong> Xojo จัดการคำขอพร้อมกันในหลายเธรด อ็อบเจ็กต์ <code>SQLiteDatabase</code> ที่ใช้ร่วมกันจะต้องใช้ mutex การเปิดการเชื่อมต่อใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อกทั้งหมด — SQLite จัดการการเชื่อมต่อการอ่านพร้อมกันจากกระบวนการหลายตัวโดยเนื้อแท้</p>
-<p><strong>ทำไมไม่ pool การเชื่อมต่อ?</strong> สำหรับปริมาณการจราจรที่เฟรมเวิร์กนี้ลำเป้า (ทีมเล็ก ๆ เครื่องมือภายใน) ค่าใช้จ่ายในการเปิดการเชื่อมต่อไม่มีนัยสำคัญ pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่วัดได้ในขนาดนี้</p>
-<h2 id="_4">การเตรียมฐานข้อมูล<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>วิธีแรกที่เรียกใช้เมื่อแอปเริ่มต้นคือ <code>NoteModel.InitDB()</code> (จาก <code>App.Opening()</code>) มันสร้างไฟล์ฐานข้อมูลและเรียก <code>CREATE TABLE IF NOT EXISTS</code>:</p>
+<p><strong>ทำไม per-request?</strong> Xojo จัดการคำขอพร้อมกันบนหลายเธรด SQLiteDatabase instance ร่วมกันต้องใช้ mutex การเปิด connection ใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อค — SQLite จัดการการเชื่อมต่อแบบอ่านพร้อมกันจากหลายกระบวนการเองได้</p>
+<p><strong>ทำไมไม่ connection pool?</strong> สำหรับปริมาณการใช้งานที่ framework นี้เป้าหมาย (ทีมเล็ก internal tools) overhead ของการเปิด connection นั้นน้อยมาก pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่สังเกตเห็นได้ในระดับนี้</p>
+<h2 id="database-initialization">Database initialization<a class="headerlink" href="#database-initialization" title="Permanent link">&para;</a></h2>
+<p>Method แรกที่เรียกเมื่อแอปเริ่มต้นคือ <code>NoteModel.InitDB()</code> (จาก <code>App.Opening()</code>) มันสร้างไฟล์ database และรัน <code>CREATE TABLE IF NOT EXISTS</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Shared</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">InitDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="n">DB_PATH</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dbFile</span>
 
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">dbFile</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">CreateDatabase</span><span class="p">()</span><span class="w">   </span><span class="c1">// สร้างไฟล์</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">CreateDatabase</span><span class="p">()</span><span class="w">   </span><span class="c1">// Creates the file</span>
 <span class="w">  </span><span class="k">Else</span>
 <span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span>
 <span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
@@ -455,19 +455,19 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>มันปลอดภัยในการโทรทุกครั้งที่เริ่มต้น — <code>IF NOT EXISTS</code> เป็นแบบฉันทามติ</p>
-<h2 id="_5">การค้นหาแบบพารามีเตอร์<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>เสมอใช้ตัวยึดตำแหน่ง <code>?</code> สำหรับค่า ไม่เคยต่อเนื่องสตริง SQL ด้วยข้อมูลป้อนผู้ใช้ — สิ่งนี้ป้องกันการฉีด SQL:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ ถูก — มีพารามิเตอร์</span>
+<p>ปลอดภัยที่จะเรียกทุกครั้งเริ่มต้น — <code>IF NOT EXISTS</code> นั้น idempotent</p>
+<h2 id="parameterized-queries">Parameterized queries<a class="headerlink" href="#parameterized-queries" title="Permanent link">&para;</a></h2>
+<p>ใช้ <code>?</code> placeholders สำหรับค่าเสมอ ห้ามต่อ user input เข้าไปใน SQL strings — สิ่งนี้ป้องกัน SQL injection:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Correct — parameterized</span>
 <span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
 <span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM notes WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span>
 
-<span class="c1">// ❌ ผิด — ความเสี่ยงการฉีด SQL</span>
+<span class="c1">// ❌ Wrong — SQL injection risk</span>
 <span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title) VALUES (&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;)&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><code>SelectSQL()</code> และ <code>ExecuteSQL()</code> ยอมรับพารามิเตอร์ <code>Variant</code> variadic หลังสตริง SQL</p>
-<h2 id="id">การได้รับ ID แถวที่แทรกสุดท้าย<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
+<p><code>SelectSQL()</code> และ <code>ExecuteSQL()</code> ยอมรับ variadic <code>Variant</code> parameters หลังจาก SQL string</p>
+<h2 id="getting-the-last-inserted-row-id">Getting the last inserted row ID<a class="headerlink" href="#getting-the-last-inserted-row-id" title="Permanent link">&para;</a></h2>
 <p>หลังจาก <code>INSERT</code> ดึง ID ของแถวใหม่โดยใช้ <code>db.LastRowID</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
@@ -478,48 +478,48 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ViewModel ใช้ ID นี้เพื่อเปลี่ยนเส้นทางไปยังหน้ารายละเอียดบันทึกใหม่:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ใน NotesCreateVM.OnPost()</span>
+<p>ViewModel ใช้ ID นี้เพื่อ redirect ไปยังหน้ารายละเอียดของ note ใหม่:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In NotesCreateVM.OnPost()</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
 <span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Note created.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">)</span>
 <span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">newID</span><span class="p">))</span>
 </code></pre></div>
 
-<h2 id="_6">ประเภทคอลัมน์<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>SQLite ที่พิมพ์แบบไดนามิก ตัวเข้าถึงคอลัมน์ <code>RowSet</code> ของ Xojo แปลงค่าเมื่ออ่าน:</p>
+<h2 id="column-types">Column types<a class="headerlink" href="#column-types" title="Permanent link">&para;</a></h2>
+<p>SQLite เป็น dynamically typed Xojo&rsquo;s <code>RowSet</code> column accessors แปลงค่าเมื่ออ่าน:</p>
 <table>
 <thead>
 <tr>
-<th>ตัวเข้าถึง</th>
-<th>ใช้สำหรับ</th>
+<th>Accessor</th>
+<th>Use for</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>.StringValue</code></td>
-<td>คอลัมน์ <code>TEXT</code> ID (ค่าเริ่มต้นที่ปลอดภัย)</td>
+<td><code>TEXT</code> columns, IDs (safe default)</td>
 </tr>
 <tr>
 <td><code>.IntegerValue</code></td>
-<td>คอลัมน์ <code>INTEGER</code></td>
+<td><code>INTEGER</code> columns</td>
 </tr>
 <tr>
 <td><code>.DoubleValue</code></td>
-<td>คอลัมน์ <code>REAL</code></td>
+<td><code>REAL</code> columns</td>
 </tr>
 <tr>
 <td><code>.BooleanValue</code></td>
-<td><code>INTEGER</code> 0/1 เก็บเป็นบูลีน</td>
+<td><code>INTEGER</code> 0/1 stored as boolean</td>
 </tr>
 </tbody>
 </table>
-<p>เก็บวันที่ทั้งหมดเป็น <code>TEXT</code> โดยใช้ฟังก์ชัน <code>datetime()</code> ของ SQLite ดึงและแสดงเป็นสตริง — จัดรูปแบบในเทมเพลตหรือ ViewModel ตามต้องการ</p>
-<h2 id="_7">เส้นทางฐานข้อมูลสำหรับการผลิต<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<p>การใช้งานปัจจุบันเข้ารหัสเส้นทางสำหรับการพัฒนา สำหรับบิลด์โปรดักชัน ให้ใช้ <code>SpecialFolder.ApplicationData</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// การพัฒนา (เข้ารหัส — ดีสำหรับการรันดีบัต IDE)</span>
+<p>เก็บวันที่ทั้งหมดเป็น <code>TEXT</code> โดยใช้ SQLite&rsquo;s <code>datetime()</code> function ดึงและแสดงผลเป็นสตริง — format ในเทมเพลตหรือ ViewModel ตามความต้องการ</p>
+<h2 id="database-path-for-production">Database path for production<a class="headerlink" href="#database-path-for-production" title="Permanent link">&para;</a></h2>
+<p>Implementation ปัจจุบัน hardcode path สำหรับ development ในสำหรับ production builds ใช้ <code>SpecialFolder.ApplicationData</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Development (hardcoded — fine for IDE debug runs)</span>
 <span class="n">Const</span><span class="w"> </span><span class="n">DB_PATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/Users/worajedt/Xojo Projects/mvvm/data/notes.sqlite&quot;</span>
 
-<span class="c1">// โปรดักชัน (วิธีการที่ถูกต้อง)</span>
+<span class="c1">// Production (correct approach)</span>
 <span class="k">Function</span><span class="w"> </span><span class="n">ProductionDBPath</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">appData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpecialFolder</span><span class="p">.</span><span class="n">ApplicationData</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">appDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">appData</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;mvvm&quot;</span><span class="p">)</span>
@@ -528,7 +528,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ใช้ค่าคงที่ build หรือค่ากำหนดเพื่อสลับระหว่างเส้นทางการพัฒนาและการผลิต</p>
+<p>ใช้ build constant หรือ preference เพื่อสลับระหว่าง development และ production paths</p>
 
         <!-- Prev / Next navigation -->
         
@@ -562,35 +562,35 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#รปแบบหลก">รูปแบบหลัก</a>
+            <a class="toc-link" href="#the-core-pattern">The core pattern</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ประเภทการคน">ประเภทการคืน</a>
+            <a class="toc-link" href="#return-types">Return types</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การเชอมตอฐานขอมลตอคำขอ">การเชื่อมต่อฐานข้อมูลต่อคำขอ</a>
+            <a class="toc-link" href="#per-request-database-connections">Per-request database connections</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การเตรยมฐานขอมล">การเตรียมฐานข้อมูล</a>
+            <a class="toc-link" href="#database-initialization">Database initialization</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การคนหาแบบพารามเตอร">การค้นหาแบบพารามีเตอร์</a>
+            <a class="toc-link" href="#parameterized-queries">Parameterized queries</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การไดรบ-id-แถวทแทรกสดทาย">การได้รับ ID แถวที่แทรกสุดท้าย</a>
+            <a class="toc-link" href="#getting-the-last-inserted-row-id">Getting the last inserted row ID</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ประเภทคอลมน">ประเภทคอลัมน์</a>
+            <a class="toc-link" href="#column-types">Column types</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#เสนทางฐานขอมลสำหรบการผลต">เส้นทางฐานข้อมูลสำหรับการผลิต</a>
+            <a class="toc-link" href="#database-path-for-production">Database path for production</a>
           </li>
           
         </ul>

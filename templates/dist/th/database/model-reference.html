@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Database Layer Reference — MVVM Docs</title>
-  <meta name="description" content="สถาปัตยกรรม DBAdapter / BaseModel / NoteModel แบบสามชั้น — การออกแบบที่มีเหตุผล วงจรชีวิตของการเชื่อมต่อ API CRUD ทั้งหมด และวิธีการเพิ่มทรัพยากรใหม่" />
+  <title>การอ้างอิงเลเยอร์ฐานข้อมูล — MVVM Docs</title>
+  <meta name="description" content="สถาปัตยกรรม DBAdapter / BaseModel / NoteModel สามชั้น — เหตุผลการออกแบบ วงจรชีวิตของการเชื่อมต่อ API CRUD ที่สมบูรณ์ และวิธีการเพิ่มทรัพยากรใหม่" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,13 +343,13 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">Database Layer Reference</h1>
-          <p class="page-description">สถาปัตยกรรม DBAdapter / BaseModel / NoteModel แบบสามชั้น — การออกแบบที่มีเหตุผล วงจรชีวิตของการเชื่อมต่อ API CRUD ทั้งหมด และวิธีการเพิ่มทรัพยากรใหม่</p>
+          <h1 class="page-title">การอ้างอิงเลเยอร์ฐานข้อมูล</h1>
+          <p class="page-description">สถาปัตยกรรม DBAdapter / BaseModel / NoteModel สามชั้น — เหตุผลการออกแบบ วงจรชีวิตของการเชื่อมต่อ API CRUD ที่สมบูรณ์ และวิธีการเพิ่มทรัพยากรใหม่</p>
         </div>
 
-        <h1 id="database-layer-reference">Database Layer Reference<a class="headerlink" href="#database-layer-reference" title="Permanent link">&para;</a></h1>
-<h2 id="three-layer-architecture">Three-Layer Architecture<a class="headerlink" href="#three-layer-architecture" title="Permanent link">&para;</a></h2>
-<p>ชั้นฐานข้อมูลแยกความรับผิดชอบที่แตกต่างกันสามประการ แต่ละชั้นรู้เพียงเกี่ยวกับชั้นด้านล่างเท่านั้น</p>
+        <h1 id="_1">การอ้างอิงเลเยอร์ฐานข้อมูล<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<h2 id="_2">สถาปัตยกรรมสามชั้น<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>เลเยอร์ฐานข้อมูลแบ่งความรับผิดชอบออกเป็นสามส่วน แต่ละชั้นรู้เฉพาะชั้นที่อยู่ด้านล่างเท่านั้น</p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -477,31 +477,31 @@ SQLite database file</code></pre>
   </div>
 </div>
 
-<p>การแยกนี้หมายความว่า:</p>
+<p>การแบ่งนี้มีความหมายดังนี้:</p>
 <ul>
-<li><strong>ไม่มี boilerplate ในแบบจำลองทรัพยากร</strong> — <code>NoteModel</code> มีประมาณ 20 บรรทัด มันประกาศตารางและคอลัมน์ มอบหมายการดำเนินการทั่วไปให้กับ <code>BaseModel</code> และเขียน SQL ที่กำหนดเองเมื่อจำเป็นเท่านั้น</li>
-<li><strong>สถานที่เดียวในการเปลี่ยนตรรกะการเชื่อมต่อ</strong> — การย้ายจาก SQLite ไปยัง PostgreSQL สัมผัส <code>DBAdapter.Connect()</code> เท่านั้น</li>
-<li><strong>ช่องทางหลีกเลี่ยงที่ชัดเจน</strong> — <code>BaseModel.OpenDB()</code> ให้การเข้าถึง DB แบบดิบแก่คลาสย่อยโดยไม่ทำลายชั้นทั่วไป</li>
+<li><strong>ไม่มี boilerplate ในรูปแบบทรัพยากร</strong> — <code>NoteModel</code> มีเพียงประมาณ 20 บรรทัด โดยประกาศตารางและคอลัมน์ มอบหมายการดำเนินการทั่วไปให้กับ <code>BaseModel</code> และเขียน SQL แบบกำหนดเองเมื่อจำเป็นเท่านั้น</li>
+<li><strong>ที่เดียวในการเปลี่ยนตรรกะการเชื่อมต่อ</strong> — การย้ายจาก SQLite ไปยัง PostgreSQL จะสัมผัส <code>DBAdapter.Connect()</code> เท่านั้น</li>
+<li><strong>ทางออกที่ชัดเจน</strong> — <code>BaseModel.OpenDB()</code> ให้สิทธิ์ในการเข้าถึง DB ดิบแก่คลาสย่อยโดยไม่ทำลายเลเยอร์ทั่วไป</li>
 </ul>
 <hr />
-<h2 id="design-decisions">Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
-<h3 id="dictionary">เหตุใดจึงส่งคืน <code>Dictionary</code> แทนอินสแตนซ์ของแบบจำลอง?<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h3>
-<p>เทมเพลต JinjaX ใช้สัญกรณ์จุด: <code>{{ note.title }}</code> เอ็นจิน JinjaX แก้ไขนี้โดยเรียก <code>dict.Value("title")</code> บน Xojo <code>Dictionary</code> คลาสที่กำหนดเองไม่มีกลไกการประเมินว่าเท่ากัน</p>
+<h2 id="_3">การตัดสินใจออกแบบ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h3 id="dictionary">ทำไมต้องส่งคืน <code>Dictionary</code> แทนอินสแตนซ์ของโมเดล?<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h3>
+<p>เทมเพลต JinjaX ใช้สัญกรณ์จุด: <code>{{ note.title }}</code> เอนจิน JinjaX แก้ไขสิ่งนี้โดยเรียก <code>dict.Value("title")</code> บน <code>Dictionary</code> ของ Xojo อินสแตนซ์คลาสที่กำหนดเองไม่มีกลไกการสอบเทียบที่เทียบเท่า</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Template: {{ note.title }}</span>
 
-<span class="c1">// ✅ ทำงาน — Dictionary พอใจสัญกรณ์จุด</span>
+<span class="c1">// ✅ ทำงาน — Dictionary ตอบสนองสัญกรณ์จุด</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myDictionary</span><span class="w">        </span><span class="c1">// .Value(&quot;title&quot;) → &quot;Hello&quot;</span>
 
-<span class="c1">// ❌ ไม่ทำงาน — NoteModel ไม่มีการประเมินว่า JinjaX</span>
+<span class="c1">// ❌ ไม่ทำงาน — NoteModel ไม่มีการสอบเทียบ JinjaX</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myNoteInstance</span>
 </code></pre></div>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>ทุกวิธีแบบจำลองต้องส่งคืน <code>Dictionary</code> หรือ <code>Variant()</code> ของ <code>Dictionary</code> นี่คือกฎสถาปัตยกรรมที่สำคัญที่สุดในชั้นข้อมูล ไม่สามารถใช้อินสแตนซ์คลาสที่กำหนดเองในเทมเพลต JinjaX ได้</p>
+<p>เมธอดของโมเดลทั้งหมดต้องคืนค่า <code>Dictionary</code> หรือ <code>Variant()</code> ของ <code>Dictionary</code> นี่คือกฎสถาปัตยกรรมที่สำคัญที่สุดในเลเยอร์ข้อมูล ไม่สามารถใช้อินสแตนซ์คลาสที่กำหนดเองในเทมเพลต JinjaX ได้</p>
 </div>
-<h3 id="_1">เหตุใดจึงต้องเชื่อมต่อต่อคำขอ?<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
-<p>Xojo Web จัดการคำขอ HTTP พร้อมกันบนเธรดแยกต่างหาก <code>SQLiteDatabase</code> ที่ใช้ร่วมกันทั่วเธรดต้องการการล็อค และมีความเสี่ยงต่อการตายของเธรด</p>
+<h3 id="_4">ทำไมต้องมีการเชื่อมต่อหนึ่งครั้งต่อคำขอ?<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>Xojo Web จัดการคำขอ HTTP ที่เกิดขึ้นพร้อมกันบนเธรดแยกต่างหาก <code>SQLiteDatabase</code> ที่ใช้ร่วมกันในหลายเธรดต้องมีการล็อกและมีความเสี่ยงต่อการติดตัว</p>
 <div class="diagram-tabs" id="diag2">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
@@ -582,9 +582,9 @@ SQLite database file</code></pre>
   </div>
 </div>
 
-<p>การเปิดการเชื่อมต่อใหม่สำหรับแต่ละการโทรนั้นปลอดภัย SQLite overhead สำหรับการเปิดการเชื่อมต่อไฟล์ท้องถิ่นนั้นไม่สำคัญในปริมาณการจราจรของเครื่องมือภายในโดยทั่วไป</p>
+<p>การเปิดการเชื่อมต่อใหม่ต่อครั้งถือว่าปลอดภัย ค่าใช้จ่าย SQLite สำหรับการเปิดการเชื่อมต่อไฟล์ภายในเครื่องนั้นน้อยมากเมื่อเทียบกับปริมาณการรับส่งข้อมูลเทียบกับเครื่องมือภายในทั่วไป</p>
 <hr />
-<h2 id="connection-lifecycle">Connection Lifecycle<a class="headerlink" href="#connection-lifecycle" title="Permanent link">&para;</a></h2>
+<h2 id="_5">วงจรชีวิตของการเชื่อมต่อ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <div class="diagram-tabs" id="diag3">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag3','nomnoml',this)">Diagram</button>
@@ -765,15 +765,15 @@ Per-request (concurrent, independent)
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>ทุกเส้นทางของรหัสที่เรียก <code>Connect()</code> ต้องเรียก <code>db.Close()</code> ก่อนการส่งคืน — รวมถึงเส้นทางข้อผิดพลาด ทุกวิธี <code>BaseModel</code> ปิดการเชื่อมต่อในทุกสาขากลับมา</p>
+<p>เส้นโค้ดทุกเส้นที่เรียก <code>Connect()</code> ต้องเรียก <code>db.Close()</code> ก่อนที่จะส่งกลับ — รวมถึงเส้นทางข้อผิดพลาด เมธอด <code>BaseModel</code> ทั้งหมดปิดการเชื่อมต่อในทุกสาขาผลตอบแทน</p>
 </div>
 <hr />
 <h2 id="dbadapter-module">DBAdapter (Module)<a class="headerlink" href="#dbadapter-module" title="Permanent link">&para;</a></h2>
 <p><strong>ไฟล์:</strong> <code>Framework/DBAdapter.xojo_code</code></p>
-<p>โมดูล — ไม่จำเป็นต้องเป็นอินสแตนซ์ — ที่เป็นเจ้าของโรงงานการเชื่อมต่อและการตั้งค่าสคีมา</p>
+<p>โมดูล — ไม่ต้องสร้างอินสแตนซ์ — ที่เป็นเจ้าของโรงงานการเชื่อมต่อและการตั้งค่าโครงร่าง</p>
 <h3 id="connect-as-sqlitedatabase"><code>Connect() As SQLiteDatabase</code><a class="headerlink" href="#connect-as-sqlitedatabase" title="Permanent link">&para;</a></h3>
-<p>เปิดและส่งคืนการเชื่อมต่อใหม่ ผู้เรียกรับผิดชอบต่อ <code>db.Close()</code></p>
-<p>ไฟล์ฐานข้อมูลอยู่ในโฟลเดอร์ <code>data/</code> <strong>ข้าง ๆ ตัวอักษร</strong> — แก้ไขผ่าน <code>App.ExecutableFile.Parent</code> สิ่งนี้ใช้งานเหมือนกันในตัวแก้ไข Xojo และในไบนารีการผลิตที่สร้างขึ้น ไดเรกทอรี <code>data/</code> ถูกสร้างขึ้นโดยอัตโนมัติหากไม่มีอยู่</p>
+<p>เปิดและส่งคืนการเชื่อมต่อใหม่ ผู้เรียกมีหน้าที่รับผิดชอบสำหรับ <code>db.Close()</code></p>
+<p>ไฟล์ฐานข้อมูลอยู่ในโฟลเดอร์ <code>data/</code> <strong>ข้างไฟล์ปฏิบัติการ</strong> — แก้ไขผ่าน <code>App.ExecutableFile.Parent</code> สิ่งนี้ทำงานเหมือนกันในตัวดีบัก Xojo และในไบนารีผลิตภัณฑ์ที่สร้างไว้ โครงสร้าง <code>data/</code> ถูกสร้างขึ้นโดยอัตโนมัติหากไม่มี</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Connect</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="c1">// Resolve data/ next to the executable (works in debug and production)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dataDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
@@ -788,13 +788,13 @@ Per-request (concurrent, independent)
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>App.ExecutableFile</code> คือไบนารีที่ทำงาน — ในตัวแก้ไข Xojo นี่คือสตั บการดีบัก ในการผลิตเป็นแอปที่รวบรวมแล้ว ทั้งสองกรณีแก้ไข <code>Parent</code> ไปยังโฟลเดอร์เดียวกัน ดังนั้นเส้นทางจึงมั่นคงในทั่ว ทั้งสภาพแวดล้อม</p>
+<p><code>App.ExecutableFile</code> คือไบนารีที่ทำงาน — ในตัวดีบัก Xojo นี่คือส่วนตั้งจำหน่ายดีบัก ในผลิตภัณฑ์มันคือแอปที่คอมไพล์ทั้งสองกรณีแก้ไข <code>Parent</code> ไปยังโฟลเดอร์เดียวกัน ดังนั้นเส้นทางจึงคงที่ในสภาพแวดล้อมต่างๆ</p>
 </div>
 <h3 id="initdb"><code>InitDB()</code><a class="headerlink" href="#initdb" title="Permanent link">&para;</a></h3>
-<p>สร้างตารางทั้งหมดหากไม่มีอยู่ เรียกครั้งหนึ่งจาก <code>App.Opening</code> ปลอดภัยในการโทรทุกการเริ่มต้น — <code>CREATE TABLE IF NOT EXISTS</code> มีลักษณะเป็นวิธี</p>
-<p>หากต้องการเพิ่มตารางใหม่ ให้เพิ่ม <code>ExecuteSQL</code> อีกตารางหนึ่งที่นี่ก่อน <code>db.Close()</code></p>
-<h3 id="appopening-startup-paths">App.Opening — Startup Paths<a class="headerlink" href="#appopening-startup-paths" title="Permanent link">&para;</a></h3>
-<p><code>App.Opening</code> คือสถานที่เดียวที่เชื่อมต่อเส้นทางรันไทม์ทั้งสองก่อนการให้บริการคำขอ:</p>
+<p>สร้างตารางทั้งหมดหากไม่มี เรียกครั้งเดียวจาก <code>App.Opening</code> ปลอดภัยในการเรียกในทุกการเริ่มต้น — <code>CREATE TABLE IF NOT EXISTS</code> เป็นไปได้</p>
+<p>หากต้องการเพิ่มตารางใหม่ ให้เพิ่ม <code>ExecuteSQL</code> อีกอันที่นี่ก่อน <code>db.Close()</code></p>
+<h3 id="appopening">App.Opening — เส้นทางการเริ่มต้น<a class="headerlink" href="#appopening" title="Permanent link">&para;</a></h3>
+<p><code>App.Opening</code> เป็นสถานที่เดียวที่เชื่อมโยงเส้นทางรันไทม์ทั้งสองก่อนที่จะรับส่งคำขอใด ๆ:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Opening</span><span class="p">()</span>
 <span class="w">  </span><span class="c1">// Templates — resolved relative to executable, same as DB</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tplDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span>
@@ -809,45 +809,45 @@ Per-request (concurrent, independent)
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>ทั้ง <code>templates/</code> และ <code>data/</code> นั่งข้าง ๆ ตัวอักษร สิ่งนี้หมายความว่าคุณสามารถปรับใช้แอปได้โดยคัดลอกไบนารี่ร่วมกับโฟลเดอร์ทั้งสองนั้น — ไม่มีเส้นทางแบบสัมบูรณ์ ไม่มีตัวแปรสภาพแวดล้อม</p>
+<p>ทั้ง <code>templates/</code> และ <code>data/</code> นั่งข้างไฟล์ปฏิบัติการ ซึ่งหมายความว่าคุณสามารถนำแอปไปใช้งานได้โดยคัดลอกไบนารีพร้อมกับสองโฟลเดอร์เหล่านั้น — ไม่มีเส้นทางสัมบูรณ์ ไม่มีตัวแปรสภาพแวดล้อม</p>
 <hr />
 <h2 id="basemodel-class">BaseModel (Class)<a class="headerlink" href="#basemodel-class" title="Permanent link">&para;</a></h2>
 <p><strong>ไฟล์:</strong> <code>Framework/BaseModel.xojo_code</code></p>
-<p>คลาสฐาน CRUD ทั่วไป คลาสย่อยแทนที่วิธีการสองวิธีและสืบทอดการดำเนินการทั้งหมด</p>
-<h3 id="subclass-contract">Subclass Contract<a class="headerlink" href="#subclass-contract" title="Permanent link">&para;</a></h3>
+<p>คลาสพื้นฐาน CRUD ทั่วไป คลาสย่อยแทนที่เมธอดสองอันและสืบทอดการดำเนินการทั้งหมด</p>
+<h3 id="_6">สัญญาของคลาสย่อย<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Method</th>
-<th>Required</th>
-<th>Returns</th>
-<th>Purpose</th>
+<th>เมธอด</th>
+<th>จำเป็น</th>
+<th>ส่งคืน</th>
+<th>วัตถุประสงค์</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>TableName() As String</code></td>
-<td>Yes</td>
+<td>ใช่</td>
 <td><code>"notes"</code></td>
-<td>ชื่อตาราง SQL</td>
+<td>ชื่อตารางของ SQL</td>
 </tr>
 <tr>
 <td><code>Columns() As String</code></td>
-<td>Yes</td>
+<td>ใช่</td>
 <td><code>"id, title, body, ..."</code></td>
-<td>รายชื่อคอลัมน์ที่คั่นด้วยจุลภาค สำหรับ <code>SELECT</code></td>
+<td>รายการคอลัมน์คั่นด้วยจุลภาค สำหรับ <code>SELECT</code></td>
 </tr>
 </tbody>
 </table>
-<h3 id="crud-methods">CRUD Methods<a class="headerlink" href="#crud-methods" title="Permanent link">&para;</a></h3>
+<h3 id="crud">เมธอด CRUD<a class="headerlink" href="#crud" title="Permanent link">&para;</a></h3>
 <h4 id="findallorderby-as-string-as-variant"><code>FindAll(orderBy As String = "") As Variant()</code><a class="headerlink" href="#findallorderby-as-string-as-variant" title="Permanent link">&para;</a></h4>
-<p>ส่งคืนแถวทั้งหมดที่เรียงลำดับตาม <code>orderBy</code> แต่ละองค์ประกอบเป็น <code>Dictionary</code></p>
+<p>ส่งคืนแถวทั้งหมดที่เรียงลำดับตาม <code>orderBy</code> แต่ละองค์ประกอบคือ <code>Dictionary</code></p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">rows</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span>
 <span class="c1">// rows(0) → Dictionary: {&quot;id&quot;: &quot;1&quot;, &quot;title&quot;: &quot;Hello&quot;, ...}</span>
 </code></pre></div>
 
 <h4 id="findbyidid-as-integer-as-dictionary"><code>FindByID(id As Integer) As Dictionary</code><a class="headerlink" href="#findbyidid-as-integer-as-dictionary" title="Permanent link">&para;</a></h4>
-<p>ส่งคืนแถวที่ตรงกัน หรือ <code>Nil</code> หากไม่พบ ตรวจสอบเสมอก่อนใช้:</p>
+<p>ส่งคืนแถวที่ตรงกัน หรือ <code>Nil</code> ถ้าไม่พบ ตรวจสอบเสมอก่อนใช้:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 <span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
 <span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span>
@@ -856,7 +856,7 @@ Per-request (concurrent, independent)
 </code></pre></div>
 
 <h4 id="insertdata-as-dictionary-as-integer"><code>Insert(data As Dictionary) As Integer</code><a class="headerlink" href="#insertdata-as-dictionary-as-integer" title="Permanent link">&para;</a></h4>
-<p>สร้าง <code>INSERT</code> ที่มีพารามิเตอร์จากคีย์พจนานุกรม ส่งคืน <code>ROWID</code> ใหม่ ปลอดภัยจากการฉีดยาพื้นฐาน SQL — ใช้ <code>SQLitePreparedStatement</code></p>
+<p>สร้างพารามิเตอร์ <code>INSERT</code> จากคีย์พจนานุกรม ส่งคืน <code>ROWID</code> ใหม่ ปลอดภัยจากการฉีด SQL — ใช้ <code>SQLitePreparedStatement</code></p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My Note&quot;</span>
 <span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Content&quot;</span>
@@ -865,10 +865,10 @@ Per-request (concurrent, independent)
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>Insert</code> ไม่สามารถแสดงนิพจน์ SQLite-side เช่น <code>datetime('now')</code> — สิ่งเหล่านั้นต้องผ่านช่องทางหลีกเลี่ยง ดูที่ NoteModel ด้านล่าง</p>
+<p><code>Insert</code> ไม่สามารถแสดงนิพจน์ด้านฐานข้อมูล SQLite เช่น <code>datetime('now')</code> — สิ่งเหล่านี้ต้องไปผ่านทางออก ดูเพิ่มเติมที่ NoteModel ด้านล่าง</p>
 </div>
 <h4 id="updatebyidid-as-integer-data-as-dictionary"><code>UpdateByID(id As Integer, data As Dictionary)</code><a class="headerlink" href="#updatebyidid-as-integer-data-as-dictionary" title="Permanent link">&para;</a></h4>
-<p><code>UPDATE</code> ที่มีพารามิเตอร์ <code>... WHERE id = ?</code> มีเพียงคีย์ที่อยู่ในพจนานุกรมที่ได้รับการอัปเดต</p>
+<p>พารามิเตอร์ <code>UPDATE ... WHERE id = ?</code> มีเพียงคีย์ที่มีอยู่ในพจนานุกรมเท่านั้นที่จะได้รับการอัพเดต</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;New Title&quot;</span>
 <span class="n">model</span><span class="p">.</span><span class="n">UpdateByID</span><span class="p">(</span><span class="m">42</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span>
@@ -878,20 +878,20 @@ Per-request (concurrent, independent)
 <div class="highlight"><pre><span></span><code><span class="n">model</span><span class="p">.</span><span class="n">DeleteByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="protected-escape-hatch-methods">Protected Escape Hatch Methods<a class="headerlink" href="#protected-escape-hatch-methods" title="Permanent link">&para;</a></h3>
+<h3 id="_7">เมธอดทางออกที่มีการป้องกัน<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
 <h4 id="opendb-as-sqlitedatabase"><code>OpenDB() As SQLiteDatabase</code><a class="headerlink" href="#opendb-as-sqlitedatabase" title="Permanent link">&para;</a></h4>
-<p>ส่งคืนการเชื่อมต่อแบบดิบสำหรับคลาสย่อยที่ต้องการ SQL ที่กำหนดเอง คลาสย่อยมีหน้าที่ในการ <code>db.Close()</code></p>
+<p>ส่งคืนการเชื่อมต่อดิบสำหรับคลาสย่อยที่ต้องการ SQL แบบกำหนดเอง คลาสย่อยมีหน้าที่รับผิดชอบสำหรับ <code>db.Close()</code></p>
 <p>ใช้เมื่อ:
-- นิพจน์ SQLite (<code>datetime('now')</code>, <code>strftime(...)</code>) จำเป็นใน SQL — ไม่สามารถเป็นพารามิเตอร์ <code>?</code>
-- คำค้นหาที่ซับซ้อนด้วย <code>JOIN</code>, <code>GROUP BY</code>, <code>HAVING</code>, หรือแบบสอบถาม
-- <code>db.LastRowID</code> จำเป็นหลังจาก <code>INSERT</code>
-- คำสั่งหลายรายการต้องแชร์การเชื่อมต่อหนึ่งรายการ</p>
+- จำเป็นต้องใช้นิพจน์ SQLite (<code>datetime('now')</code>, <code>strftime(...)</code>) ใน SQL — ไม่สามารถเป็น <code>?</code> พารามิเตอร์ได้
+- คำขอที่ซับซ้อนพร้อม <code>JOIN</code>, <code>GROUP BY</code>, <code>HAVING</code> หรือคำขออย่างย่อย
+- <code>db.LastRowID</code> จำเป็นหลังจากการ <code>INSERT</code> ที่กำหนดเอง
+- จำเป็นต้องแชร์การเชื่อมต่อหลายคำสั่ง</p>
 <h4 id="rowtodictrs-as-rowset-as-dictionary"><code>RowToDict(rs As RowSet) As Dictionary</code><a class="headerlink" href="#rowtodictrs-as-rowset-as-dictionary" title="Permanent link">&para;</a></h4>
-<p>แมปแถว RowSet ปัจจุบันไปยัง <code>Dictionary</code> โดยใช้ชื่อคอลัมน์จาก <code>Columns()</code> ค่าทั้งหมดจะเก็บเป็น <code>StringValue</code> — ตั้งใจ JinjaX แสดงผลทุกอย่างเป็นสตริง ViewModels หล่อให้เป็นจำนวนเต็มผ่าน <code>Val()</code> เมื่อจำเป็น</p>
+<p>แมปแถว RowSet ปัจจุบันไปยัง <code>Dictionary</code> โดยใช้ชื่อคอลัมน์จาก <code>Columns()</code> ค่าทั้งหมดจะถูกเก็บไว้เป็น <code>StringValue</code> — โดยจงใจ JinjaX แสดงผลทุกอย่างเป็นสตริง ViewModels จะแปลงเป็นจำนวนเต็มผ่าน <code>Val()</code> เมื่อจำเป็น</p>
 <hr />
 <h2 id="notemodel-class">NoteModel (Class)<a class="headerlink" href="#notemodel-class" title="Permanent link">&para;</a></h2>
 <p><strong>ไฟล์:</strong> <code>Models/NoteModel.xojo_code</code></p>
-<p>แบบจำลองทรัพยากรที่เป็นรูปธรรม วิธีทั้งหมดต้องการพารามิเตอร์ <code>userID</code> เพื่อสโคป notes ต่อผู้ใช้ — แต่ละผู้ใช้สามารถดูและแก้ไขบันทึกของตนเองเท่านั้น</p>
+<p>โมเดลทรัพยากรที่เป็นรูปธรรม เมธอดทั้งหมดต้องใช้พารามิเตอร์ <code>userID</code> เพื่อจำกัดบันทึกต่อผู้ใช้ — ผู้ใช้แต่ละคนสามารถเห็นและแก้ไขบันทึกของตนเองได้เท่านั้น</p>
 <div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">NoteModel</span>
 <span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span>
 
@@ -968,66 +968,66 @@ Per-request (concurrent, independent)
 <span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
-<p><code>Create</code> และ <code>Update</code> ใช้ช่องทางหลีกเลี่ยงเนื่องจาก <code>datetime('now')</code> เป็นนิพจน์ที่ประเมินโดย SQLite — การผูกมัดสตริง <code>"datetime('now')"</code> เป็นพารามิเตอร์ <code>?</code> จะเก็บข้อความตามตัวอักษร ไม่ใช่ timestamp</p>
-<p>ทุกแบบสอบถามรวม <code>WHERE user_id = ?</code> เพื่อบังคับให้เป็นเจ้าของที่ระดับ SQL ดูสถานที่ <a href="../protected-routes/index.html">Protected Routes &amp; User Scoping</a> สำหรับรูปแบบเต็ม</p>
+<p><code>Create</code> และ <code>Update</code> ใช้ทางออกเพราะ <code>datetime('now')</code> เป็นนิพจน์ที่ประเมินโดย SQLite — การผูกสตริง <code>"datetime('now')"</code> เป็น <code>?</code> พารามิเตอร์จะเก็บข้อความตามตัวอักษรแทนที่จะเป็นเวลาประทับ</p>
+<p>ทุกแบบสอบถามจะรวม <code>WHERE user_id = ?</code> เพื่อบังคับใช้ความเป็นเจ้าของในระดับ SQL ดูข้อมูลเพิ่มเติมได้ที่ <a href="../protected-routes/index.html">เส้นทางที่มีการป้องกันและการกำหนดขอบเขตผู้ใช้</a></p>
 <hr />
-<h2 id="crud-task-mapping">CRUD Task Mapping<a class="headerlink" href="#crud-task-mapping" title="Permanent link">&para;</a></h2>
-<p>เส้นทางหมายเหตุทั้งหมดต้องการการรับรองความถูกต้อง ทุกการเรียก model รวม <code>userID</code> เพื่อสโคปข้อมูลต่อผู้ใช้</p>
+<h2 id="crud-task">การแมป CRUD Task<a class="headerlink" href="#crud-task" title="Permanent link">&para;</a></h2>
+<p>เส้นทางหมายเหตุทั้งหมดต้องมีการตรวจสอบสิทธิ์ โดยทั่วไปแต่ละการเรียกโมเดลจะรวม <code>userID</code> เพื่อกำหนดขอบเขตข้อมูลต่อผู้ใช้</p>
 <table>
 <thead>
 <tr>
-<th>User action</th>
+<th>การกระทำของผู้ใช้</th>
 <th>HTTP</th>
 <th>ViewModel</th>
-<th>Model call</th>
+<th>การเรียกโมเดล</th>
 <th>SQL</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>View list</td>
+<td>ดูรายชื่อ</td>
 <td><code>GET /notes</code></td>
 <td><code>NotesListVM</code></td>
 <td><code>NoteModel.GetAll(userID)</code></td>
 <td><code>SELECT … WHERE user_id = ? ORDER BY updated_at DESC</code></td>
 </tr>
 <tr>
-<td>View one</td>
+<td>ดูรายการเดียว</td>
 <td><code>GET /notes/:id</code></td>
 <td><code>NotesDetailVM</code></td>
 <td><code>NoteModel.GetByID(id, userID)</code></td>
 <td><code>SELECT … WHERE id = ? AND user_id = ?</code></td>
 </tr>
 <tr>
-<td>New form</td>
+<td>ฟอร์มใหม่</td>
 <td><code>GET /notes/new</code></td>
 <td><code>NotesNewVM</code></td>
 <td>—</td>
 <td>—</td>
 </tr>
 <tr>
-<td>Create</td>
+<td>สร้าง</td>
 <td><code>POST /notes</code></td>
 <td><code>NotesCreateVM</code></td>
 <td><code>NoteModel.Create(title, body, userID)</code></td>
 <td><code>INSERT INTO notes (title, body, user_id) VALUES (?, ?, ?)</code></td>
 </tr>
 <tr>
-<td>Edit form</td>
+<td>ฟอร์มแก้ไข</td>
 <td><code>GET /notes/:id/edit</code></td>
 <td><code>NotesEditVM</code></td>
 <td><code>NoteModel.GetByID(id, userID)</code></td>
 <td><code>SELECT … WHERE id = ? AND user_id = ?</code></td>
 </tr>
 <tr>
-<td>Update</td>
+<td>อัพเดต</td>
 <td><code>POST /notes/:id</code></td>
 <td><code>NotesUpdateVM</code></td>
 <td><code>NoteModel.Update(id, title, body, userID)</code></td>
 <td><code>UPDATE notes SET … WHERE id = ? AND user_id = ?</code></td>
 </tr>
 <tr>
-<td>Delete</td>
+<td>ลบ</td>
 <td><code>POST /notes/:id/delete</code></td>
 <td><code>NotesDeleteVM</code></td>
 <td><code>NoteModel.Delete(id, userID)</code></td>
@@ -1036,72 +1036,72 @@ Per-request (concurrent, independent)
 </tbody>
 </table>
 <hr />
-<h2 id="benefits-and-trade-offs">Benefits and Trade-offs<a class="headerlink" href="#benefits-and-trade-offs" title="Permanent link">&para;</a></h2>
+<h2 id="_8">ประโยชน์และการแลกเปลี่ยน<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Benefit</th>
-<th>Why</th>
+<th>ประโยชน์</th>
+<th>เหตุผล</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>No boilerplate</td>
-<td>ทรัพยากรใหม่ต้อง <code>TableName()</code> + <code>Columns()</code> + thin wrappers เท่านั้น</td>
+<td>ไม่มี boilerplate</td>
+<td>ทรัพยากรใหม่ต้องการเพียง <code>TableName()</code> + <code>Columns()</code> + ตัวห่อหุ้มบาง</td>
 </tr>
 <tr>
-<td>SQL injection safe</td>
-<td>ค่า user ทั้งหมดไปผ่านการผูกมัดพารามิเตอร์ <code>?</code></td>
+<td>ปลอดภัยจากการฉีด SQL</td>
+<td>ค่าผู้ใช้ทั้งหมดจะไปผ่านพารามิเตอร์ <code>?</code></td>
 </tr>
 <tr>
-<td>Thread-safe</td>
-<td>การเชื่อมต่อต่อคำขอ — ไม่มีสถานะที่เปลี่ยนแปลงได้ร่วมกัน</td>
+<td>ปลอดภัยจากเธรด</td>
+<td>การเชื่อมต่อต่อคำขอ — ไม่มีสถานะที่เปลี่ยนแปลงร่วมกัน</td>
 </tr>
 <tr>
-<td>JinjaX compatible</td>
-<td>ผลลัพธ์ทั้งหมดเป็น <code>Dictionary</code> — เทมเพลตทำงานทันที</td>
+<td>เข้ากันได้กับ JinjaX</td>
+<td>ผลลัพธ์ทั้งหมดเป็น <code>Dictionary</code> — เทมเพลตทำงานได้ทันที</td>
 </tr>
 <tr>
-<td>Testable</td>
-<td>การทดสอบ XojoUnit ตีฐานข้อมูล SQLite จริง overhead ไม่สำคัญ</td>
+<td>ทดสอบได้</td>
+<td>การทดสอบ XojoUnit ของ DB ที่แท้จริง ค่าใช้จ่ายเล็กน้อย</td>
 </tr>
 <tr>
-<td>Clear escape hatch</td>
-<td><code>OpenDB()</code> ได้รับการจัดทำเอกสารและตั้งใจ ไม่ใช่วิธีแก้ปัญหาชั่วคราว</td>
+<td>ทางออกที่ชัดเจน</td>
+<td><code>OpenDB()</code> ถูกบันทึกและมีจุดประสงค์ ไม่ใช่การหลีกเลี่ยง</td>
 </tr>
 </tbody>
 </table>
 <table>
 <thead>
 <tr>
-<th>Trade-off</th>
-<th>Impact</th>
+<th>การแลกเปลี่ยน</th>
+<th>ผลกระทบ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>No ORM features</td>
-<td>ไม่มีความสัมพันธ์ lazy loading หรือการติดตามการเปลี่ยนแปลง</td>
+<td>ไม่มีคุณสมบัติของ ORM</td>
+<td>ไม่มีการเชื่อมโยง โหลดแบบขี้เกียจ หรือการติดตามการเปลี่ยนแปลง</td>
 </tr>
 <tr>
-<td>String-only values</td>
-<td><code>RowToDict</code> เก็บทุกอย่างเป็น <code>StringValue</code> ViewModels ต้องหล่อผ่าน <code>Val()</code></td>
+<td>ค่าสตริงเท่านั้น</td>
+<td><code>RowToDict</code> เก็บทุกอย่างเป็น <code>StringValue</code> ViewModels ต้องแปลงผ่าน <code>Val()</code></td>
 </tr>
 <tr>
-<td>No migration system</td>
-<td>การเปลี่ยนแปลงสคีมาต้องใช้ <code>ALTER TABLE</code> คู่มือหรือสร้างฐานข้อมูลขึ้นใหม่ในเดฟ</td>
+<td>ไม่มีระบบการย้ายถิ่น</td>
+<td>การเปลี่ยนแปลงโครงร่างต้องการ <code>ALTER TABLE</code> หรือสร้างใหม่ใน dev</td>
 </tr>
 <tr>
-<td><code>datetime</code> limitation</td>
-<td><code>BaseModel.Insert</code> ไม่สามารถใช้ <code>DEFAULT (datetime('now'))</code> — ใช้ช่องทางหลีกเลี่ยง</td>
+<td>ข้อจำกัด <code>datetime</code></td>
+<td><code>BaseModel.Insert</code> ไม่สามารถใช้ <code>DEFAULT (datetime('now'))</code> — ใช้ทางออก</td>
 </tr>
 </tbody>
 </table>
-<h3 id="when-to-use-inherited-crud-vs-the-escape-hatch">When to use inherited CRUD vs the escape hatch<a class="headerlink" href="#when-to-use-inherited-crud-vs-the-escape-hatch" title="Permanent link">&para;</a></h3>
-<p>ใช้วิธีการ <code>BaseModel</code> ที่สืบทอดมาเมื่อการดำเนินการเป็นเพียง <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, หรือ <code>DELETE</code> ที่มีค่าผูกมัดธรรมชาติ</p>
-<p>ใช้ <code>OpenDB()</code> เมื่อคุณต้องการนิพจน์ SQLite (<code>datetime('now')</code>, <code>strftime(...)</code>), คำค้นหาที่ซับซ้อน (<code>JOIN</code>, <code>GROUP BY</code>, แบบสอบถาม), <code>db.LastRowID</code> หลังจากการแทรกที่กำหนดเอง หรือคำสั่งหลายรายการในการเชื่อมต่อหนึ่งรายการ</p>
+<h3 id="crud_1">เมื่อใดที่จะใช้ CRUD ที่สืบทอดมา เมื่อใดที่จะใช้ทางออก<a class="headerlink" href="#crud_1" title="Permanent link">&para;</a></h3>
+<p>ใช้วิธี <code>BaseModel</code> ที่สืบทอดมาเมื่อการดำเนินการเป็น <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code> หรือ <code>DELETE</code> ที่เรียบง่ายพร้อมค่าที่ผูกไว้ธรรมดา</p>
+<p>ใช้ <code>OpenDB()</code> เมื่อคุณต้องการนิพจน์ SQLite (<code>datetime('now')</code>, <code>strftime(...)</code>), คำขอที่ซับซ้อน (<code>JOIN</code>, <code>GROUP BY</code>, คำขออย่างย่อย), <code>db.LastRowID</code> หลังจากการแทรกแบบกำหนดเอง หรือหลายคำสั่งในการเชื่อมต่อเดียว</p>
 <hr />
-<h2 id="adding-a-new-resource">Adding a New Resource<a class="headerlink" href="#adding-a-new-resource" title="Permanent link">&para;</a></h2>
+<h2 id="_9">การเพิ่มทรัพยากรใหม่<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <p>การเพิ่ม <code>TagModel</code> เป็นตัวอย่างที่สมบูรณ์:</p>
 <p><strong>1. สร้าง <code>Models/TagModel.xojo_code</code>:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span>
@@ -1146,8 +1146,8 @@ Per-request (concurrent, independent)
 <span class="w">  </span><span class="s2">&quot;created_at TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><strong>3. ลงทะเบียน</strong> <code>Models/TagModel.xojo_code</code> ใน <code>mvvm.xojo_project</code> ภายใต้โฟลเดอร์ Models (Xojo IDE: ลากไฟล์ลงในแผง project)</p>
-<p><strong>4. สร้าง ViewModels</strong> ใน <code>ViewModels/Tags/</code> และ <strong>templates</strong> ใน <code>templates/tags/</code> ตามรูปแบบเดียวกับ <code>Notes</code></p>
+<p><strong>3. ลงทะเบียน</strong> <code>Models/TagModel.xojo_code</code> ใน <code>mvvm.xojo_project</code> ในโฟลเดอร์ Models (Xojo IDE: ลากไฟล์ไปที่แผง project)</p>
+<p><strong>4. สร้าง ViewModels</strong> ใน <code>ViewModels/Tags/</code> และ <strong>เทมเพลต</strong> ใน <code>templates/tags/</code> ตามรูปแบบเดียวกับ <code>Notes</code></p>
 
         <!-- Prev / Next navigation -->
         
@@ -1181,23 +1181,23 @@ Per-request (concurrent, independent)
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#three-layer-architecture">Three-Layer Architecture</a>
+            <a class="toc-link" href="#สถาปตยกรรมสามชน">สถาปัตยกรรมสามชั้น</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#design-decisions">Design Decisions</a>
+            <a class="toc-link" href="#การตดสนใจออกแบบ">การตัดสินใจออกแบบ</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#เหตใดจงสงคน-dictionary-แทนอนสแตนซของแบบจำลอง">เหตุใดจึงส่งคืน `Dictionary` แทนอินสแตนซ์ของแบบจำลอง?</a>
+            <a class="toc-link" href="#ทำไมตองสงคน-dictionary-แทนอนสแตนซของโมเดล">ทำไมต้องส่งคืน `Dictionary` แทนอินสแตนซ์ของโมเดล?</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#เหตใดจงตองเชอมตอตอคำขอ">เหตุใดจึงต้องเชื่อมต่อต่อคำขอ?</a>
+            <a class="toc-link" href="#ทำไมตองมการเชอมตอหนงครงตอคำขอ">ทำไมต้องมีการเชื่อมต่อหนึ่งครั้งต่อคำขอ?</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#connection-lifecycle">Connection Lifecycle</a>
+            <a class="toc-link" href="#วงจรชวตของการเชอมตอ">วงจรชีวิตของการเชื่อมต่อ</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -1213,7 +1213,7 @@ Per-request (concurrent, independent)
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#appopening-startup-paths">App.Opening — Startup Paths</a>
+            <a class="toc-link" href="#appopening-เสนทางการเรมตน">App.Opening — เส้นทางการเริ่มต้น</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -1221,15 +1221,15 @@ Per-request (concurrent, independent)
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#subclass-contract">Subclass Contract</a>
+            <a class="toc-link" href="#สญญาของคลาสยอย">สัญญาของคลาสย่อย</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#crud-methods">CRUD Methods</a>
+            <a class="toc-link" href="#เมธอด-crud">เมธอด CRUD</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#protected-escape-hatch-methods">Protected Escape Hatch Methods</a>
+            <a class="toc-link" href="#เมธอดทางออกทมการปองกน">เมธอดทางออกที่มีการป้องกัน</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -1237,19 +1237,19 @@ Per-request (concurrent, independent)
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#crud-task-mapping">CRUD Task Mapping</a>
+            <a class="toc-link" href="#การแมป-crud-task">การแมป CRUD Task</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#benefits-and-trade-offs">Benefits and Trade-offs</a>
+            <a class="toc-link" href="#ประโยชนและการแลกเปลยน">ประโยชน์และการแลกเปลี่ยน</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#when-to-use-inherited-crud-vs-the-escape-hatch">When to use inherited CRUD vs the escape hatch</a>
+            <a class="toc-link" href="#เมอใดทจะใช-crud-ทสบทอดมา-เมอใดทจะใชทางออก">เมื่อใดที่จะใช้ CRUD ที่สืบทอดมา เมื่อใดที่จะใช้ทางออก</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#adding-a-new-resource">Adding a New Resource</a>
+            <a class="toc-link" href="#การเพมทรพยากรใหม">การเพิ่มทรัพยากรใหม่</a>
           </li>
           
         </ul>

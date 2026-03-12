@@ -1,13 +1,13 @@
 ---
-title: "Database Layer Reference"
-description: สถาปัตยกรรม DBAdapter / BaseModel / NoteModel แบบสามชั้น — การออกแบบที่มีเหตุผล วงจรชีวิตของการเชื่อมต่อ API CRUD ทั้งหมด และวิธีการเพิ่มทรัพยากรใหม่
+title: "การอ้างอิงเลเยอร์ฐานข้อมูล"
+description: สถาปัตยกรรม DBAdapter / BaseModel / NoteModel สามชั้น — เหตุผลการออกแบบ วงจรชีวิตของการเชื่อมต่อ API CRUD ที่สมบูรณ์ และวิธีการเพิ่มทรัพยากรใหม่
 ---
 
-# Database Layer Reference
+# การอ้างอิงเลเยอร์ฐานข้อมูล
 
-## Three-Layer Architecture
+## สถาปัตยกรรมสามชั้น
 
-ชั้นฐานข้อมูลแยกความรับผิดชอบที่แตกต่างกันสามประการ แต่ละชั้นรู้เพียงเกี่ยวกับชั้นด้านล่างเท่านั้น
+เลเยอร์ฐานข้อมูลแบ่งความรับผิดชอบออกเป็นสามส่วน แต่ละชั้นรู้เฉพาะชั้นที่อยู่ด้านล่างเท่านั้น
 
 <!-- diagram -->
 <!-- nomnoml
@@ -38,36 +38,36 @@ SQLite database file
 -->
 <!-- /diagram -->
 
-การแยกนี้หมายความว่า:
+การแบ่งนี้มีความหมายดังนี้:
 
-- **ไม่มี boilerplate ในแบบจำลองทรัพยากร** — `NoteModel` มีประมาณ 20 บรรทัด มันประกาศตารางและคอลัมน์ มอบหมายการดำเนินการทั่วไปให้กับ `BaseModel` และเขียน SQL ที่กำหนดเองเมื่อจำเป็นเท่านั้น
-- **สถานที่เดียวในการเปลี่ยนตรรกะการเชื่อมต่อ** — การย้ายจาก SQLite ไปยัง PostgreSQL สัมผัส `DBAdapter.Connect()` เท่านั้น
-- **ช่องทางหลีกเลี่ยงที่ชัดเจน** — `BaseModel.OpenDB()` ให้การเข้าถึง DB แบบดิบแก่คลาสย่อยโดยไม่ทำลายชั้นทั่วไป
+- **ไม่มี boilerplate ในรูปแบบทรัพยากร** — `NoteModel` มีเพียงประมาณ 20 บรรทัด โดยประกาศตารางและคอลัมน์ มอบหมายการดำเนินการทั่วไปให้กับ `BaseModel` และเขียน SQL แบบกำหนดเองเมื่อจำเป็นเท่านั้น
+- **ที่เดียวในการเปลี่ยนตรรกะการเชื่อมต่อ** — การย้ายจาก SQLite ไปยัง PostgreSQL จะสัมผัส `DBAdapter.Connect()` เท่านั้น
+- **ทางออกที่ชัดเจน** — `BaseModel.OpenDB()` ให้สิทธิ์ในการเข้าถึง DB ดิบแก่คลาสย่อยโดยไม่ทำลายเลเยอร์ทั่วไป
 
 ---
 
-## Design Decisions
+## การตัดสินใจออกแบบ
 
-### เหตุใดจึงส่งคืน `Dictionary` แทนอินสแตนซ์ของแบบจำลอง?
+### ทำไมต้องส่งคืน `Dictionary` แทนอินสแตนซ์ของโมเดล?
 
-เทมเพลต JinjaX ใช้สัญกรณ์จุด: `{{ note.title }}` เอ็นจิน JinjaX แก้ไขนี้โดยเรียก `dict.Value("title")` บน Xojo `Dictionary` คลาสที่กำหนดเองไม่มีกลไกการประเมินว่าเท่ากัน
+เทมเพลต JinjaX ใช้สัญกรณ์จุด: `{{ note.title }}` เอนจิน JinjaX แก้ไขสิ่งนี้โดยเรียก `dict.Value("title")` บน `Dictionary` ของ Xojo อินสแตนซ์คลาสที่กำหนดเองไม่มีกลไกการสอบเทียบที่เทียบเท่า
 
 ```xojo
 // Template: {{ note.title }}
 
-// ✅ ทำงาน — Dictionary พอใจสัญกรณ์จุด
+// ✅ ทำงาน — Dictionary ตอบสนองสัญกรณ์จุด
 ctx.Value("note") = myDictionary        // .Value("title") → "Hello"
 
-// ❌ ไม่ทำงาน — NoteModel ไม่มีการประเมินว่า JinjaX
+// ❌ ไม่ทำงาน — NoteModel ไม่มีการสอบเทียบ JinjaX
 ctx.Value("note") = myNoteInstance
 ```
 
 !!! warning
-    ทุกวิธีแบบจำลองต้องส่งคืน `Dictionary` หรือ `Variant()` ของ `Dictionary` นี่คือกฎสถาปัตยกรรมที่สำคัญที่สุดในชั้นข้อมูล ไม่สามารถใช้อินสแตนซ์คลาสที่กำหนดเองในเทมเพลต JinjaX ได้
+    เมธอดของโมเดลทั้งหมดต้องคืนค่า `Dictionary` หรือ `Variant()` ของ `Dictionary` นี่คือกฎสถาปัตยกรรมที่สำคัญที่สุดในเลเยอร์ข้อมูล ไม่สามารถใช้อินสแตนซ์คลาสที่กำหนดเองในเทมเพลต JinjaX ได้
 
-### เหตุใดจึงต้องเชื่อมต่อต่อคำขอ?
+### ทำไมต้องมีการเชื่อมต่อหนึ่งครั้งต่อคำขอ?
 
-Xojo Web จัดการคำขอ HTTP พร้อมกันบนเธรดแยกต่างหาก `SQLiteDatabase` ที่ใช้ร่วมกันทั่วเธรดต้องการการล็อค และมีความเสี่ยงต่อการตายของเธรด
+Xojo Web จัดการคำขอ HTTP ที่เกิดขึ้นพร้อมกันบนเธรดแยกต่างหาก `SQLiteDatabase` ที่ใช้ร่วมกันในหลายเธรดต้องมีการล็อกและมีความเสี่ยงต่อการติดตัว
 
 <!-- diagram -->
 <!-- nomnoml
@@ -88,11 +88,11 @@ Thread A (GET /notes)         Thread B (POST /notes)
 -->
 <!-- /diagram -->
 
-การเปิดการเชื่อมต่อใหม่สำหรับแต่ละการโทรนั้นปลอดภัย SQLite overhead สำหรับการเปิดการเชื่อมต่อไฟล์ท้องถิ่นนั้นไม่สำคัญในปริมาณการจราจรของเครื่องมือภายในโดยทั่วไป
+การเปิดการเชื่อมต่อใหม่ต่อครั้งถือว่าปลอดภัย ค่าใช้จ่าย SQLite สำหรับการเปิดการเชื่อมต่อไฟล์ภายในเครื่องนั้นน้อยมากเมื่อเทียบกับปริมาณการรับส่งข้อมูลเทียบกับเครื่องมือภายในทั่วไป
 
 ---
 
-## Connection Lifecycle
+## วงจรชีวิตของการเชื่อมต่อ
 
 <!-- diagram -->
 <!-- nomnoml
@@ -129,7 +129,7 @@ Per-request (concurrent, independent)
 <!-- /diagram -->
 
 !!! warning
-    ทุกเส้นทางของรหัสที่เรียก `Connect()` ต้องเรียก `db.Close()` ก่อนการส่งคืน — รวมถึงเส้นทางข้อผิดพลาด ทุกวิธี `BaseModel` ปิดการเชื่อมต่อในทุกสาขากลับมา
+    เส้นโค้ดทุกเส้นที่เรียก `Connect()` ต้องเรียก `db.Close()` ก่อนที่จะส่งกลับ — รวมถึงเส้นทางข้อผิดพลาด เมธอด `BaseModel` ทั้งหมดปิดการเชื่อมต่อในทุกสาขาผลตอบแทน
 
 ---
 
@@ -137,13 +137,13 @@ Per-request (concurrent, independent)
 
 **ไฟล์:** `Framework/DBAdapter.xojo_code`
 
-โมดูล — ไม่จำเป็นต้องเป็นอินสแตนซ์ — ที่เป็นเจ้าของโรงงานการเชื่อมต่อและการตั้งค่าสคีมา
+โมดูล — ไม่ต้องสร้างอินสแตนซ์ — ที่เป็นเจ้าของโรงงานการเชื่อมต่อและการตั้งค่าโครงร่าง
 
 ### `Connect() As SQLiteDatabase`
 
-เปิดและส่งคืนการเชื่อมต่อใหม่ ผู้เรียกรับผิดชอบต่อ `db.Close()`
+เปิดและส่งคืนการเชื่อมต่อใหม่ ผู้เรียกมีหน้าที่รับผิดชอบสำหรับ `db.Close()`
 
-ไฟล์ฐานข้อมูลอยู่ในโฟลเดอร์ `data/` **ข้าง ๆ ตัวอักษร** — แก้ไขผ่าน `App.ExecutableFile.Parent` สิ่งนี้ใช้งานเหมือนกันในตัวแก้ไข Xojo และในไบนารีการผลิตที่สร้างขึ้น ไดเรกทอรี `data/` ถูกสร้างขึ้นโดยอัตโนมัติหากไม่มีอยู่
+ไฟล์ฐานข้อมูลอยู่ในโฟลเดอร์ `data/` **ข้างไฟล์ปฏิบัติการ** — แก้ไขผ่าน `App.ExecutableFile.Parent` สิ่งนี้ทำงานเหมือนกันในตัวดีบัก Xojo และในไบนารีผลิตภัณฑ์ที่สร้างไว้ โครงสร้าง `data/` ถูกสร้างขึ้นโดยอัตโนมัติหากไม่มี
 
 ```xojo
 Function Connect() As SQLiteDatabase
@@ -159,17 +159,17 @@ End Function
 ```
 
 !!! note
-    `App.ExecutableFile` คือไบนารีที่ทำงาน — ในตัวแก้ไข Xojo นี่คือสตั บการดีบัก ในการผลิตเป็นแอปที่รวบรวมแล้ว ทั้งสองกรณีแก้ไข `Parent` ไปยังโฟลเดอร์เดียวกัน ดังนั้นเส้นทางจึงมั่นคงในทั่ว ทั้งสภาพแวดล้อม
+    `App.ExecutableFile` คือไบนารีที่ทำงาน — ในตัวดีบัก Xojo นี่คือส่วนตั้งจำหน่ายดีบัก ในผลิตภัณฑ์มันคือแอปที่คอมไพล์ทั้งสองกรณีแก้ไข `Parent` ไปยังโฟลเดอร์เดียวกัน ดังนั้นเส้นทางจึงคงที่ในสภาพแวดล้อมต่างๆ
 
 ### `InitDB()`
 
-สร้างตารางทั้งหมดหากไม่มีอยู่ เรียกครั้งหนึ่งจาก `App.Opening` ปลอดภัยในการโทรทุกการเริ่มต้น — `CREATE TABLE IF NOT EXISTS` มีลักษณะเป็นวิธี
+สร้างตารางทั้งหมดหากไม่มี เรียกครั้งเดียวจาก `App.Opening` ปลอดภัยในการเรียกในทุกการเริ่มต้น — `CREATE TABLE IF NOT EXISTS` เป็นไปได้
 
-หากต้องการเพิ่มตารางใหม่ ให้เพิ่ม `ExecuteSQL` อีกตารางหนึ่งที่นี่ก่อน `db.Close()`
+หากต้องการเพิ่มตารางใหม่ ให้เพิ่ม `ExecuteSQL` อีกอันที่นี่ก่อน `db.Close()`
 
-### App.Opening — Startup Paths
+### App.Opening — เส้นทางการเริ่มต้น
 
-`App.Opening` คือสถานที่เดียวที่เชื่อมต่อเส้นทางรันไทม์ทั้งสองก่อนการให้บริการคำขอ:
+`App.Opening` เป็นสถานที่เดียวที่เชื่อมโยงเส้นทางรันไทม์ทั้งสองก่อนที่จะรับส่งคำขอใด ๆ:
 
 ```xojo
 Sub Opening()
@@ -186,7 +186,7 @@ Sub Opening()
 End Sub
 ```
 
-ทั้ง `templates/` และ `data/` นั่งข้าง ๆ ตัวอักษร สิ่งนี้หมายความว่าคุณสามารถปรับใช้แอปได้โดยคัดลอกไบนารี่ร่วมกับโฟลเดอร์ทั้งสองนั้น — ไม่มีเส้นทางแบบสัมบูรณ์ ไม่มีตัวแปรสภาพแวดล้อม
+ทั้ง `templates/` และ `data/` นั่งข้างไฟล์ปฏิบัติการ ซึ่งหมายความว่าคุณสามารถนำแอปไปใช้งานได้โดยคัดลอกไบนารีพร้อมกับสองโฟลเดอร์เหล่านั้น — ไม่มีเส้นทางสัมบูรณ์ ไม่มีตัวแปรสภาพแวดล้อม
 
 ---
 
@@ -194,20 +194,20 @@ End Sub
 
 **ไฟล์:** `Framework/BaseModel.xojo_code`
 
-คลาสฐาน CRUD ทั่วไป คลาสย่อยแทนที่วิธีการสองวิธีและสืบทอดการดำเนินการทั้งหมด
+คลาสพื้นฐาน CRUD ทั่วไป คลาสย่อยแทนที่เมธอดสองอันและสืบทอดการดำเนินการทั้งหมด
 
-### Subclass Contract
+### สัญญาของคลาสย่อย
 
-| Method | Required | Returns | Purpose |
+| เมธอด | จำเป็น | ส่งคืน | วัตถุประสงค์ |
 |--------|----------|---------|---------|
-| `TableName() As String` | Yes | `"notes"` | ชื่อตาราง SQL |
-| `Columns() As String` | Yes | `"id, title, body, ..."` | รายชื่อคอลัมน์ที่คั่นด้วยจุลภาค สำหรับ `SELECT` |
+| `TableName() As String` | ใช่ | `"notes"` | ชื่อตารางของ SQL |
+| `Columns() As String` | ใช่ | `"id, title, body, ..."` | รายการคอลัมน์คั่นด้วยจุลภาค สำหรับ `SELECT` |
 
-### CRUD Methods
+### เมธอด CRUD
 
 #### `FindAll(orderBy As String = "") As Variant()`
 
-ส่งคืนแถวทั้งหมดที่เรียงลำดับตาม `orderBy` แต่ละองค์ประกอบเป็น `Dictionary`
+ส่งคืนแถวทั้งหมดที่เรียงลำดับตาม `orderBy` แต่ละองค์ประกอบคือ `Dictionary`
 
 ```xojo
 Var rows() As Variant = model.FindAll("updated_at DESC")
@@ -216,7 +216,7 @@ Var rows() As Variant = model.FindAll("updated_at DESC")
 
 #### `FindByID(id As Integer) As Dictionary`
 
-ส่งคืนแถวที่ตรงกัน หรือ `Nil` หากไม่พบ ตรวจสอบเสมอก่อนใช้:
+ส่งคืนแถวที่ตรงกัน หรือ `Nil` ถ้าไม่พบ ตรวจสอบเสมอก่อนใช้:
 
 ```xojo
 Var row As Dictionary = model.FindByID(42)
@@ -228,7 +228,7 @@ End If
 
 #### `Insert(data As Dictionary) As Integer`
 
-สร้าง `INSERT` ที่มีพารามิเตอร์จากคีย์พจนานุกรม ส่งคืน `ROWID` ใหม่ ปลอดภัยจากการฉีดยาพื้นฐาน SQL — ใช้ `SQLitePreparedStatement`
+สร้างพารามิเตอร์ `INSERT` จากคีย์พจนานุกรม ส่งคืน `ROWID` ใหม่ ปลอดภัยจากการฉีด SQL — ใช้ `SQLitePreparedStatement`
 
 ```xojo
 Var data As New Dictionary
@@ -238,11 +238,11 @@ Var newID As Integer = model.Insert(data)
 ```
 
 !!! note
-    `Insert` ไม่สามารถแสดงนิพจน์ SQLite-side เช่น `datetime('now')` — สิ่งเหล่านั้นต้องผ่านช่องทางหลีกเลี่ยง ดูที่ NoteModel ด้านล่าง
+    `Insert` ไม่สามารถแสดงนิพจน์ด้านฐานข้อมูล SQLite เช่น `datetime('now')` — สิ่งเหล่านี้ต้องไปผ่านทางออก ดูเพิ่มเติมที่ NoteModel ด้านล่าง
 
 #### `UpdateByID(id As Integer, data As Dictionary)`
 
-`UPDATE` ที่มีพารามิเตอร์ `... WHERE id = ?` มีเพียงคีย์ที่อยู่ในพจนานุกรมที่ได้รับการอัปเดต
+พารามิเตอร์ `UPDATE ... WHERE id = ?` มีเพียงคีย์ที่มีอยู่ในพจนานุกรมเท่านั้นที่จะได้รับการอัพเดต
 
 ```xojo
 Var data As New Dictionary
@@ -256,21 +256,21 @@ model.UpdateByID(42, data)
 model.DeleteByID(42)
 ```
 
-### Protected Escape Hatch Methods
+### เมธอดทางออกที่มีการป้องกัน
 
 #### `OpenDB() As SQLiteDatabase`
 
-ส่งคืนการเชื่อมต่อแบบดิบสำหรับคลาสย่อยที่ต้องการ SQL ที่กำหนดเอง คลาสย่อยมีหน้าที่ในการ `db.Close()`
+ส่งคืนการเชื่อมต่อดิบสำหรับคลาสย่อยที่ต้องการ SQL แบบกำหนดเอง คลาสย่อยมีหน้าที่รับผิดชอบสำหรับ `db.Close()`
 
 ใช้เมื่อ:
-- นิพจน์ SQLite (`datetime('now')`, `strftime(...)`) จำเป็นใน SQL — ไม่สามารถเป็นพารามิเตอร์ `?`
-- คำค้นหาที่ซับซ้อนด้วย `JOIN`, `GROUP BY`, `HAVING`, หรือแบบสอบถาม
-- `db.LastRowID` จำเป็นหลังจาก `INSERT`
-- คำสั่งหลายรายการต้องแชร์การเชื่อมต่อหนึ่งรายการ
+- จำเป็นต้องใช้นิพจน์ SQLite (`datetime('now')`, `strftime(...)`) ใน SQL — ไม่สามารถเป็น `?` พารามิเตอร์ได้
+- คำขอที่ซับซ้อนพร้อม `JOIN`, `GROUP BY`, `HAVING` หรือคำขออย่างย่อย
+- `db.LastRowID` จำเป็นหลังจากการ `INSERT` ที่กำหนดเอง
+- จำเป็นต้องแชร์การเชื่อมต่อหลายคำสั่ง
 
 #### `RowToDict(rs As RowSet) As Dictionary`
 
-แมปแถว RowSet ปัจจุบันไปยัง `Dictionary` โดยใช้ชื่อคอลัมน์จาก `Columns()` ค่าทั้งหมดจะเก็บเป็น `StringValue` — ตั้งใจ JinjaX แสดงผลทุกอย่างเป็นสตริง ViewModels หล่อให้เป็นจำนวนเต็มผ่าน `Val()` เมื่อจำเป็น
+แมปแถว RowSet ปัจจุบันไปยัง `Dictionary` โดยใช้ชื่อคอลัมน์จาก `Columns()` ค่าทั้งหมดจะถูกเก็บไว้เป็น `StringValue` — โดยจงใจ JinjaX แสดงผลทุกอย่างเป็นสตริง ViewModels จะแปลงเป็นจำนวนเต็มผ่าน `Val()` เมื่อจำเป็น
 
 ---
 
@@ -278,7 +278,7 @@ model.DeleteByID(42)
 
 **ไฟล์:** `Models/NoteModel.xojo_code`
 
-แบบจำลองทรัพยากรที่เป็นรูปธรรม วิธีทั้งหมดต้องการพารามิเตอร์ `userID` เพื่อสโคป notes ต่อผู้ใช้ — แต่ละผู้ใช้สามารถดูและแก้ไขบันทึกของตนเองเท่านั้น
+โมเดลทรัพยากรที่เป็นรูปธรรม เมธอดทั้งหมดต้องใช้พารามิเตอร์ `userID` เพื่อจำกัดบันทึกต่อผู้ใช้ — ผู้ใช้แต่ละคนสามารถเห็นและแก้ไขบันทึกของตนเองได้เท่านั้น
 
 ```xojo
 Protected Class NoteModel
@@ -357,55 +357,55 @@ Inherits BaseModel
 End Class
 ```
 
-`Create` และ `Update` ใช้ช่องทางหลีกเลี่ยงเนื่องจาก `datetime('now')` เป็นนิพจน์ที่ประเมินโดย SQLite — การผูกมัดสตริง `"datetime('now')"` เป็นพารามิเตอร์ `?` จะเก็บข้อความตามตัวอักษร ไม่ใช่ timestamp
+`Create` และ `Update` ใช้ทางออกเพราะ `datetime('now')` เป็นนิพจน์ที่ประเมินโดย SQLite — การผูกสตริง `"datetime('now')"` เป็น `?` พารามิเตอร์จะเก็บข้อความตามตัวอักษรแทนที่จะเป็นเวลาประทับ
 
-ทุกแบบสอบถามรวม `WHERE user_id = ?` เพื่อบังคับให้เป็นเจ้าของที่ระดับ SQL ดูสถานที่ [Protected Routes & User Scoping](../protected-routes/index.html) สำหรับรูปแบบเต็ม
+ทุกแบบสอบถามจะรวม `WHERE user_id = ?` เพื่อบังคับใช้ความเป็นเจ้าของในระดับ SQL ดูข้อมูลเพิ่มเติมได้ที่ [เส้นทางที่มีการป้องกันและการกำหนดขอบเขตผู้ใช้](../protected-routes/index.html)
 
 ---
 
-## CRUD Task Mapping
+## การแมป CRUD Task
 
-เส้นทางหมายเหตุทั้งหมดต้องการการรับรองความถูกต้อง ทุกการเรียก model รวม `userID` เพื่อสโคปข้อมูลต่อผู้ใช้
+เส้นทางหมายเหตุทั้งหมดต้องมีการตรวจสอบสิทธิ์ โดยทั่วไปแต่ละการเรียกโมเดลจะรวม `userID` เพื่อกำหนดขอบเขตข้อมูลต่อผู้ใช้
 
-| User action | HTTP | ViewModel | Model call | SQL |
+| การกระทำของผู้ใช้ | HTTP | ViewModel | การเรียกโมเดล | SQL |
 |-------------|------|-----------|------------|-----|
-| View list | `GET /notes` | `NotesListVM` | `NoteModel.GetAll(userID)` | `SELECT … WHERE user_id = ? ORDER BY updated_at DESC` |
-| View one | `GET /notes/:id` | `NotesDetailVM` | `NoteModel.GetByID(id, userID)` | `SELECT … WHERE id = ? AND user_id = ?` |
-| New form | `GET /notes/new` | `NotesNewVM` | — | — |
-| Create | `POST /notes` | `NotesCreateVM` | `NoteModel.Create(title, body, userID)` | `INSERT INTO notes (title, body, user_id) VALUES (?, ?, ?)` |
-| Edit form | `GET /notes/:id/edit` | `NotesEditVM` | `NoteModel.GetByID(id, userID)` | `SELECT … WHERE id = ? AND user_id = ?` |
-| Update | `POST /notes/:id` | `NotesUpdateVM` | `NoteModel.Update(id, title, body, userID)` | `UPDATE notes SET … WHERE id = ? AND user_id = ?` |
-| Delete | `POST /notes/:id/delete` | `NotesDeleteVM` | `NoteModel.Delete(id, userID)` | `DELETE FROM notes WHERE id = ? AND user_id = ?` |
+| ดูรายชื่อ | `GET /notes` | `NotesListVM` | `NoteModel.GetAll(userID)` | `SELECT … WHERE user_id = ? ORDER BY updated_at DESC` |
+| ดูรายการเดียว | `GET /notes/:id` | `NotesDetailVM` | `NoteModel.GetByID(id, userID)` | `SELECT … WHERE id = ? AND user_id = ?` |
+| ฟอร์มใหม่ | `GET /notes/new` | `NotesNewVM` | — | — |
+| สร้าง | `POST /notes` | `NotesCreateVM` | `NoteModel.Create(title, body, userID)` | `INSERT INTO notes (title, body, user_id) VALUES (?, ?, ?)` |
+| ฟอร์มแก้ไข | `GET /notes/:id/edit` | `NotesEditVM` | `NoteModel.GetByID(id, userID)` | `SELECT … WHERE id = ? AND user_id = ?` |
+| อัพเดต | `POST /notes/:id` | `NotesUpdateVM` | `NoteModel.Update(id, title, body, userID)` | `UPDATE notes SET … WHERE id = ? AND user_id = ?` |
+| ลบ | `POST /notes/:id/delete` | `NotesDeleteVM` | `NoteModel.Delete(id, userID)` | `DELETE FROM notes WHERE id = ? AND user_id = ?` |
 
 ---
 
-## Benefits and Trade-offs
+## ประโยชน์และการแลกเปลี่ยน
 
-| Benefit | Why |
+| ประโยชน์ | เหตุผล |
 |---------|-----|
-| No boilerplate | ทรัพยากรใหม่ต้อง `TableName()` + `Columns()` + thin wrappers เท่านั้น |
-| SQL injection safe | ค่า user ทั้งหมดไปผ่านการผูกมัดพารามิเตอร์ `?` |
-| Thread-safe | การเชื่อมต่อต่อคำขอ — ไม่มีสถานะที่เปลี่ยนแปลงได้ร่วมกัน |
-| JinjaX compatible | ผลลัพธ์ทั้งหมดเป็น `Dictionary` — เทมเพลตทำงานทันที |
-| Testable | การทดสอบ XojoUnit ตีฐานข้อมูล SQLite จริง overhead ไม่สำคัญ |
-| Clear escape hatch | `OpenDB()` ได้รับการจัดทำเอกสารและตั้งใจ ไม่ใช่วิธีแก้ปัญหาชั่วคราว |
+| ไม่มี boilerplate | ทรัพยากรใหม่ต้องการเพียง `TableName()` + `Columns()` + ตัวห่อหุ้มบาง |
+| ปลอดภัยจากการฉีด SQL | ค่าผู้ใช้ทั้งหมดจะไปผ่านพารามิเตอร์ `?` |
+| ปลอดภัยจากเธรด | การเชื่อมต่อต่อคำขอ — ไม่มีสถานะที่เปลี่ยนแปลงร่วมกัน |
+| เข้ากันได้กับ JinjaX | ผลลัพธ์ทั้งหมดเป็น `Dictionary` — เทมเพลตทำงานได้ทันที |
+| ทดสอบได้ | การทดสอบ XojoUnit ของ DB ที่แท้จริง ค่าใช้จ่ายเล็กน้อย |
+| ทางออกที่ชัดเจน | `OpenDB()` ถูกบันทึกและมีจุดประสงค์ ไม่ใช่การหลีกเลี่ยง |
 
-| Trade-off | Impact |
+| การแลกเปลี่ยน | ผลกระทบ |
 |-----------|--------|
-| No ORM features | ไม่มีความสัมพันธ์ lazy loading หรือการติดตามการเปลี่ยนแปลง |
-| String-only values | `RowToDict` เก็บทุกอย่างเป็น `StringValue` ViewModels ต้องหล่อผ่าน `Val()` |
-| No migration system | การเปลี่ยนแปลงสคีมาต้องใช้ `ALTER TABLE` คู่มือหรือสร้างฐานข้อมูลขึ้นใหม่ในเดฟ |
-| `datetime` limitation | `BaseModel.Insert` ไม่สามารถใช้ `DEFAULT (datetime('now'))` — ใช้ช่องทางหลีกเลี่ยง |
+| ไม่มีคุณสมบัติของ ORM | ไม่มีการเชื่อมโยง โหลดแบบขี้เกียจ หรือการติดตามการเปลี่ยนแปลง |
+| ค่าสตริงเท่านั้น | `RowToDict` เก็บทุกอย่างเป็น `StringValue` ViewModels ต้องแปลงผ่าน `Val()` |
+| ไม่มีระบบการย้ายถิ่น | การเปลี่ยนแปลงโครงร่างต้องการ `ALTER TABLE` หรือสร้างใหม่ใน dev |
+| ข้อจำกัด `datetime` | `BaseModel.Insert` ไม่สามารถใช้ `DEFAULT (datetime('now'))` — ใช้ทางออก |
 
-### When to use inherited CRUD vs the escape hatch
+### เมื่อใดที่จะใช้ CRUD ที่สืบทอดมา เมื่อใดที่จะใช้ทางออก
 
-ใช้วิธีการ `BaseModel` ที่สืบทอดมาเมื่อการดำเนินการเป็นเพียง `SELECT`, `INSERT`, `UPDATE`, หรือ `DELETE` ที่มีค่าผูกมัดธรรมชาติ
+ใช้วิธี `BaseModel` ที่สืบทอดมาเมื่อการดำเนินการเป็น `SELECT`, `INSERT`, `UPDATE` หรือ `DELETE` ที่เรียบง่ายพร้อมค่าที่ผูกไว้ธรรมดา
 
-ใช้ `OpenDB()` เมื่อคุณต้องการนิพจน์ SQLite (`datetime('now')`, `strftime(...)`), คำค้นหาที่ซับซ้อน (`JOIN`, `GROUP BY`, แบบสอบถาม), `db.LastRowID` หลังจากการแทรกที่กำหนดเอง หรือคำสั่งหลายรายการในการเชื่อมต่อหนึ่งรายการ
+ใช้ `OpenDB()` เมื่อคุณต้องการนิพจน์ SQLite (`datetime('now')`, `strftime(...)`), คำขอที่ซับซ้อน (`JOIN`, `GROUP BY`, คำขออย่างย่อย), `db.LastRowID` หลังจากการแทรกแบบกำหนดเอง หรือหลายคำสั่งในการเชื่อมต่อเดียว
 
 ---
 
-## Adding a New Resource
+## การเพิ่มทรัพยากรใหม่
 
 การเพิ่ม `TagModel` เป็นตัวอย่างที่สมบูรณ์:
 
@@ -456,6 +456,6 @@ db.ExecuteSQL( _
   "created_at TEXT DEFAULT (datetime('now')))")
 ```
 
-**3. ลงทะเบียน** `Models/TagModel.xojo_code` ใน `mvvm.xojo_project` ภายใต้โฟลเดอร์ Models (Xojo IDE: ลากไฟล์ลงในแผง project)
+**3. ลงทะเบียน** `Models/TagModel.xojo_code` ใน `mvvm.xojo_project` ในโฟลเดอร์ Models (Xojo IDE: ลากไฟล์ไปที่แผง project)
 
-**4. สร้าง ViewModels** ใน `ViewModels/Tags/` และ **templates** ใน `templates/tags/` ตามรูปแบบเดียวกับ `Notes`
+**4. สร้าง ViewModels** ใน `ViewModels/Tags/` และ **เทมเพลต** ใน `templates/tags/` ตามรูปแบบเดียวกับ `Notes`

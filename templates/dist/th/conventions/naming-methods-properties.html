@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>เมธอดและคุณสมบัติ — MVVM Docs</title>
-  <meta name="description" content="อนุสัญญาการตั้งชื่อสำหรับเมธอด คุณสมบัติ และกุญแจ Dictionary ของ Xojo" />
+  <title>เมธอดและพร็อพเพอร์ตี้ — MVVM Docs</title>
+  <meta name="description" content="รูปแบบการตั้งชื่อสำหรับเมธอด พร็อพเพอร์ตี้ และคีย์ Dictionary ใน Xojo" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,36 +343,36 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">เมธอดและคุณสมบัติ</h1>
-          <p class="page-description">อนุสัญญาการตั้งชื่อสำหรับเมธอด คุณสมบัติ และกุญแจ Dictionary ของ Xojo</p>
+          <h1 class="page-title">เมธอดและพร็อพเพอร์ตี้</h1>
+          <p class="page-description">รูปแบบการตั้งชื่อสำหรับเมธอด พร็อพเพอร์ตี้ และคีย์ Dictionary ใน Xojo</p>
         </div>
 
-        <h1 id="_1">เมธอดและคุณสมบัติ<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+        <h1 id="_1">เมธอดและพร็อพเพอร์ตี้<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <h2 id="viewmodel">เมธอด ViewModel<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
-<p>ViewModel ทั้งหมดสืบทอดจาก <code>BaseViewModel</code> และแทนที่หนึ่งหรือทั้งสองอย่าง:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w">   </span><span class="c1">// จัดการคำขอ GET</span>
-<span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span><span class="w">  </span><span class="c1">// จัดการคำขอ POST</span>
+<p>ViewModel ทุกตัวสืบทอดมาจาก <code>BaseViewModel</code> และแทนที่เมธอดใดเมธอดหนึ่งหรือทั้งสองตัวนี้:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w">   </span><span class="c1">// Handles GET requests</span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span><span class="w">  </span><span class="c1">// Handles POST requests</span>
 </code></pre></div>
 
-<p>สิ่งเหล่านี้จงใจตั้งชื่อเหมือนตัวจัดการเหตุการณ์ — พวกเขา <em>ตอบสนอง</em> วิธี HTTP พวกเขาไม่เริ่มอะไร ถ้าคุณแทนที่เฉพาะ <code>OnGet()</code> ใด ๆ <code>POST</code> ไปยังเส้นทางนั้นจะได้รับการตอบสนอง 405 จากคลาสฐานโดยอัตโนมัติ</p>
-<p>วิธีตัวช่วยส่วนตัวภายใน ViewModel ใช้ชื่อที่อธิบายได้กริยาก่อน:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ ดี — อ่านเหมือนภาษาอังกฤษ อธิบายว่ามันทำอะไร</span>
+<p>เมธอดเหล่านี้ตั้งชื่อเจตนาให้เหมือนกับตัวจัดการเหตุการณ์ — เมธอดเหล่านี้ <strong>ตอบสนอง</strong> ต่อเมธอด HTTP ไม่ใช่เพื่อเริ่มการทำงาน หากคุณแทนที่เพียง <code>OnGet()</code> เท่านั้น การร้องขอ <code>POST</code> ใดๆ ที่เข้ามายังเส้นทางนั้นจะได้รับการตอบกลับ 405 โดยอัตโนมัติจากคลาสพื้นฐาน</p>
+<p>เมธอดตัวช่วยเอกชนภายในVM ใช้ชื่อที่ขึ้นต้นด้วยกริยาที่มีความหมาย:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ ดี — อ่านเหมือนภาษาอังกฤษ บรรยายว่าเมธอดทำอะไร</span>
 <span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">FindNoteOrRedirect</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="k">Private</span><span class="w"> </span><span class="k">Sub</span><span class="w"> </span><span class="n">ValidateTitle</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 
-<span class="c1">// ❌ หลีกเลี่ยง — คลุมเครือ อ่านเหมือนตัวรับ</span>
+<span class="c1">// ❌ หลีกเลี่ยง — ไม่ชัดเจน อ่านเหมือนเป็นตัวรับค่า</span>
 <span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">GetData</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="k">Private</span><span class="w"> </span><span class="k">Sub</span><span class="w"> </span><span class="n">Process</span><span class="p">()</span>
 </code></pre></div>
 
-<h2 id="_2">คุณสมบัติ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>อนุสัญญา Xojo: คุณสมบัติส่วนตัว (ระดับโมดูล) ใช้คำนำหน้า <code>m</code> และ <code>camelCase</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="n">mFormData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w">   </span><span class="c1">// แคช POST body ที่แยกวิเคราะห์</span>
-<span class="k">Private</span><span class="w"> </span><span class="n">mRawBody</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w">       </span><span class="c1">// ไบต์ POST body ดิบ</span>
+<h2 id="_2">พร็อพเพอร์ตี้<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>รูปแบบ Xojo: พร็อพเพอร์ตี้เอกชน (ระดับโมดูล) ใช้คำนำหน้า <code>m</code> และ <code>camelCase</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="n">mFormData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w">   </span><span class="c1">// cached parsed POST body</span>
+<span class="k">Private</span><span class="w"> </span><span class="n">mRawBody</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w">       </span><span class="c1">// raw POST body bytes</span>
 </code></pre></div>
 
-<p>คุณสมบัติสาธารณะ (สิ่งที่สืบทอดจากหรือตั้งไว้โดย <code>BaseViewModel</code>) ไม่มีคำนำหน้า:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// สิ่งเหล่านี้ถูกตั้งโดย Router ก่อนที่ Handle() จะถูกเรียก</span>
+<p>พร็อพเพอร์ตี้สาธารณะ (พร็อพเพอร์ตี้ที่สืบทอดมาจาก <code>BaseViewModel</code> หรือตั้งค่าโดย <code>BaseViewModel</code>) ไม่มีคำนำหน้า:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// These are set by the Router before Handle() is called</span>
 <span class="n">Request</span><span class="w">    </span><span class="k">As</span><span class="w"> </span><span class="n">WebRequest</span>
 <span class="n">Response</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="n">WebResponse</span>
 <span class="n">Session</span><span class="w">    </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span>
@@ -381,23 +381,23 @@
 </code></pre></div>
 
 <h2 id="model">เมธอด Model<a class="headerlink" href="#model" title="Permanent link">&para;</a></h2>
-<p>เมธอด Model อธิบายการดำเนินการข้อมูลอย่างชัดเจน ใช้กริยา CRUD มาตรฐาน:</p>
+<p>เมธอด Model บรรยายการดำเนินการกับข้อมูลอย่างชัดเจน ใช้กริยา CRUD มาตรฐาน:</p>
 <table>
 <thead>
 <tr>
 <th>การดำเนินการ</th>
 <th>ชื่อเมธอด</th>
-<th>ประเภทการคืน</th>
+<th>ประเภทที่ส่งกลับ</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>ดึงแถวทั้งหมด</td>
+<td>ดึงข้อมูลทั้งหมด</td>
 <td><code>GetAll()</code></td>
 <td><code>Variant()</code> ของ <code>Dictionary</code></td>
 </tr>
 <tr>
-<td>ดึงแถวเดียว</td>
+<td>ดึงข้อมูลหนึ่งแถว</td>
 <td><code>GetByID(id As Integer)</code></td>
 <td><code>Dictionary</code> หรือ <code>Nil</code></td>
 </tr>
@@ -409,58 +409,58 @@
 <tr>
 <td>อัปเดต</td>
 <td><code>Update(id, ...)</code></td>
-<td><code>Sub</code> (ไม่มีการคืน)</td>
+<td><code>Sub</code> (ไม่มีค่าส่งกลับ)</td>
 </tr>
 <tr>
 <td>ลบ</td>
 <td><code>Delete(id As Integer)</code></td>
-<td><code>Sub</code> (ไม่มีการคืน)</td>
+<td><code>Sub</code> (ไม่มีค่าส่งกลับ)</td>
 </tr>
 </tbody>
 </table>
-<p>เมธอด Model คือ <code>Shared</code> — คุณไม่จำเป็นต้องสร้างอินสแตนซ์คลาส Model:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ เรียกในคลาสโดยตรง</span>
+<p>เมธอด Model เป็น <code>Shared</code> — คุณไม่ต้องสร้างอินสแตนซ์ของคลาส Model:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ เรียกใช้ที่คลาสโดยตรง</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">notes</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 <span class="n">NoteModel</span><span class="p">.</span><span class="n">Delete</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 
-<span class="c1">// ❌ อย่าสร้างอินสแตนซ์ Models</span>
+<span class="c1">// ❌ อย่าสร้างอินสแตนซ์ของ Model</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
 <span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
 </code></pre></div>
 
-<h2 id="dictionary">กุญแจ Dictionary<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h2>
-<p>กุญแจในอ็อบเจ็กต์ <code>Dictionary</code> — ทั้งในพจนานุกรมบริบทสำหรับเทมเพลตและในค่าการคืน Model — ใช้สตริง <code>snake_case</code> สิ่งนี้ตรงกับชื่อคอลัมน์ใน SQLite และชื่อตัวแปรที่ใช้ในเทมเพลต Jinja2:</p>
+<h2 id="dictionary">คีย์ Dictionary<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h2>
+<p>คีย์ในออบเจกต์ <code>Dictionary</code> — ทั้งในดิกชันนารีบริบทสำหรับเทมเพลตและในค่าส่งกลับของ Model — ใช้สตริง <code>snake_case</code> ซึ่งสอดคล้องกับชื่อคอลัมน์ใน SQLite และชื่อตัวแปรที่ใช้ในเทมเพลต Jinja2:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Model → Dictionary</span>
 <span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">IntegerValue</span>
 <span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
 <span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">).</span><span class="n">StringValue</span>
 
-<span class="c1">// ViewModel → พจนานุกรมบริบทสำหรับเทมเพลต</span>
+<span class="c1">// ViewModel → context Dictionary for template</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w">    </span><span class="c1">// Variant() ของ Dictionary</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w">    </span><span class="c1">// Variant() of Dictionary</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;page_title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;All Notes&quot;</span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w">                   </span><span class="c1">// ฉีดโดย Render() โดยอัตโนมัติ</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w">                   </span><span class="c1">// injected by Render() automatically</span>
 </code></pre></div>
 
-<p>ในเทมเพลต ชื่อกุญแจ <code>snake_case</code> เดียวกันจะเข้าถึงได้ด้วยสัญกรณ์จุด:</p>
+<p>ในเทมเพลต ชื่อคีย์ <code>snake_case</code> เดียวกันจะเข้าถึงได้โดยใช้สัญกรณ์จุด:</p>
 <div class="highlight"><pre><span></span><code>{{ note.title }}
 {{ note.created_at }}
 {{ page_title }}
 </code></pre></div>
 
-<h2 id="baseviewmodel">เมธอดตัวช่วย BaseViewModel<a class="headerlink" href="#baseviewmodel" title="Permanent link">&para;</a></h2>
-<p>เมธอดเหล่านี้มีอยู่เสมอภายใน ViewModel ใด ๆ:</p>
-<p><code>GetFormValue(key)</code> — อ่านฟิลด์จาก POST body ที่เข้ารหัส URL ค่อยๆ แยกวิเคราะห์ body ในการโทรครั้งแรกและแคชผลลัพธ์</p>
+<h2 id="baseviewmodel">เมธอดตัวช่วยของ BaseViewModel<a class="headerlink" href="#baseviewmodel" title="Permanent link">&para;</a></h2>
+<p>เมธอดเหล่านี้พร้อมใช้งานได้เสมอภายในViewModel ใดๆ:</p>
+<p><code>GetFormValue(key)</code> — อ่านฟิลด์จากเนื้อหา POST ที่เข้ารหัส URL ทำการแยกวิเคราะห์เนื้อหาแบบเกียจคร่านในครั้งแรกและแคชผลลัพธ์</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">body</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <p><code>GetParam(key)</code> — อ่านพารามิเตอร์เส้นทาง URL หรือพารามิเตอร์สตริงการค้นหา พารามิเตอร์เส้นทางมีลำดับความสำคัญเหนือพารามิเตอร์สตริงการค้นหา</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// สำหรับเส้นทาง /notes/:id พร้อม URL /notes/42</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// For route /notes/:id with URL /notes/42</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">ToInteger</span><span class="p">()</span>
 
-<span class="c1">// สำหรับ URL /notes?sort=asc</span>
+<span class="c1">// For URL /notes?sort=asc</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span>
 </code></pre></div>
 
@@ -470,12 +470,12 @@
 <span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
 </code></pre></div>
 
-<p><code>Redirect(url, statusCode)</code> — ส่งการเปลี่ยนเส้นทาง HTTP สถานะเริ่มต้นคือ 302 เสมอเรียก <code>Return</code> ทันทีหลังจากนั้นเพื่อหยุดการดำเนินการ</p>
+<p><code>Redirect(url, statusCode)</code> — ส่งการเปลี่ยนเส้นทาง HTTP สถานะเริ่มต้นคือ 302 ปลอดภัยดูแลให้เรียก <code>Return</code> ทันทีหลังจากนี้เพื่อหยุดการเรียกใช้</p>
 <div class="highlight"><pre><span></span><code><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">)</span>
 <span class="k">Return</span>
 </code></pre></div>
 
-<p><code>SetFlash(message, type)</code> — เก็บข้อความแฟลชในเซสชัน การเรียก <code>Render()</code> ครั้งต่อไปใน ViewModel ใด ๆ จะฉีดมันเข้าในบริบทเทมเพลตโดยอัตโนมัติ ประเภท คือ <code>"success"</code>, <code>"error"</code> หรือ <code>"info"</code></p>
+<p><code>SetFlash(message, type)</code> — จัดเก็บข้อความแฟลชในเซสชัน การเรียก <code>Render()</code> ครั้งต่อไปบน ViewModel ใดๆ จะฉีดข้อความแฟลชลงในบริบทเทมเพลตโดยอัตโนมัติ ประเภทคือ <code>"success"</code>, <code>"error"</code>, หรือ <code>"info"</code></p>
 <div class="highlight"><pre><span></span><code><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Note created.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">)</span>
 <span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">)</span>
 <span class="k">Return</span>
@@ -517,7 +517,7 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#คณสมบต">คุณสมบัติ</a>
+            <a class="toc-link" href="#พรอพเพอรต">พร็อพเพอร์ตี้</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -525,11 +525,11 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#กญแจ-dictionary">กุญแจ Dictionary</a>
+            <a class="toc-link" href="#คย-dictionary">คีย์ Dictionary</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#เมธอดตวชวย-baseviewmodel">เมธอดตัวช่วย BaseViewModel</a>
+            <a class="toc-link" href="#เมธอดตวชวยของ-baseviewmodel">เมธอดตัวช่วยของ BaseViewModel</a>
           </li>
           
         </ul>

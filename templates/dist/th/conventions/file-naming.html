@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>การตั้งชื่อไฟล์ — MVVM Docs</title>
-  <meta name="description" content="อนุสัญญาการตั้งชื่อสำหรับไฟล์ ViewModel ไฟล์ Model และไฟล์เทมเพลต" />
+  <meta name="description" content="การตั้งชื่อไฟล์ตามแบบแผนสำหรับไฟล์ ViewModel ไฟล์ Model และไฟล์แม่แบบ" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -344,22 +344,22 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">การตั้งชื่อไฟล์</h1>
-          <p class="page-description">อนุสัญญาการตั้งชื่อสำหรับไฟล์ ViewModel ไฟล์ Model และไฟล์เทมเพลต</p>
+          <p class="page-description">การตั้งชื่อไฟล์ตามแบบแผนสำหรับไฟล์ ViewModel ไฟล์ Model และไฟล์แม่แบบ</p>
         </div>
 
         <h1 id="_1">การตั้งชื่อไฟล์<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <h2 id="viewmodels">ViewModels<a class="headerlink" href="#viewmodels" title="Permanent link">&para;</a></h2>
 <p>ไฟล์ ViewModel ปฏิบัติตามรูปแบบ <code>{Feature}{Action}VM.xojo_code</code> โดยที่:</p>
 <ul>
-<li><strong>Feature</strong> คือคำนาม (พหูพจน์สำหรับการดำเนินการของคอลเลกชัน เอกพจน์สำหรับการดำเนินการของรายการ)</li>
+<li><strong>Feature</strong> คือคำนาม (พหูพจน์สำหรับการดำเนินการกับคอลเลกชัน เอกพจน์สำหรับการดำเนินการกับรายการ)</li>
 <li><strong>Action</strong> คือกริยาที่อธิบายว่า ViewModel นี้ทำอะไร</li>
-<li>คำนำหน้า <strong>VM</strong> ทำให้ชัดเจนทันทีว่านี่คือ ViewModel</li>
+<li><strong>VM</strong> suffix ทำให้เห็นได้ชัดว่านี่คือ ViewModel</li>
 </ul>
-<p>การดำเนินการมาตรฐานทั้งเจ็ดสำหรับทรัพยากรต่อไปนี้จะตามหลักเกณฑ์ RESTful:</p>
+<p>แอคชั่นมาตรฐานเจ็ดประการสำหรับทรัพยากรปฏิบัติตามหลักการ RESTful:</p>
 <table>
 <thead>
 <tr>
-<th>การดำเนินการ</th>
+<th>Action</th>
 <th>HTTP</th>
 <th>URL</th>
 <th>ไฟล์</th>
@@ -410,62 +410,62 @@
 </tr>
 </tbody>
 </table>
-<p>ไม่ใช่ทุกทรัพยากรที่ต้องการทั้งเจ็ด ทรัพยากรอ่านเท่านั้นอาจมี <code>ListVM</code> และ <code>DetailVM</code> เท่านั้น หน้าที่ไม่ใช่ REST (เช่นหน้าแรมหรือแดชบอร์ด) ได้รับชื่อเรียบง่ายแบบอธิบาย: <code>HomeViewModel.xojo_code</code></p>
+<p>ไม่ใช่ทรัพยากรทั้งหมดจำเป็นต้องมีทั้งเจ็ด ทรัพยากรแบบอ่านอย่างเดียวอาจมีเพียง <code>ListVM</code> และ <code>DetailVM</code> เท่านั้น หน้าที่ไม่ใช่ REST (เช่นหน้าแรมหรือแดชบอร์ด) จะได้รับชื่ออธิบายอย่างง่าย: <code>HomeViewModel.xojo_code</code></p>
 <h3 id="_2">ชื่อคลาสตรงกับชื่อไฟล์<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p>ชื่อคลาสภายในไฟล์ต้องตรงกับชื่อไฟล์อย่างแน่นอน:</p>
+<p>ชื่อคลาสในไฟล์จะต้องตรงกับชื่อไฟล์ทุกประการ:</p>
 <div class="highlight"><pre><span></span><code>NotesCreateVM.xojo_code  →  Class NotesCreateVM
 NoteModel.xojo_code      →  Class NoteModel
 </code></pre></div>
 
-<p>Xojo ใช้ชื่อคลาส — ไม่ใช่ชื่อไฟล์ — ในเวลาการรัน แต่การให้พวกมันเหมือนกันจะป้องกันความสับสน</p>
+<p>Xojo ใช้ชื่อคลาส — ไม่ใช่ชื่อไฟล์ — ในระหว่างรันไทม์ แต่การทำให้ชื่อทั้งสองเหมือนกันจะช่วยป้องกันความสับสน</p>
 <h2 id="models">Models<a class="headerlink" href="#models" title="Permanent link">&para;</a></h2>
 <p>ไฟล์ Model ปฏิบัติตามรูปแบบ <code>{Feature}Model.xojo_code</code>:</p>
-<div class="highlight"><pre><span></span><code>NoteModel.xojo_code     # เอกพจน์ — &quot;โมเดลสำหรับบันทึก&quot;
-UserModel.xojo_code     # อนาคต
-ProductModel.xojo_code  # อนาคต
+<div class="highlight"><pre><span></span><code>NoteModel.xojo_code     # เอกพจน์ — &quot;โมเดลสำหรับโน้ต&quot;
+UserModel.xojo_code     # ในอนาคต
+ProductModel.xojo_code  # ในอนาคต
 </code></pre></div>
 
-<p>ใช้ <strong>รูปแบบเอกพจน์</strong> ของคำนาม — Model แทนเอนทิตี้เอง ไม่ใช่คอลเลกชัน</p>
-<h2 id="_3">เทมเพลต<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>ไฟล์เทมเพลตใช้ชื่อ <code>snake_case</code> ตัวพิมพ์เล็กและนามสกุล <code>.html</code></p>
-<p>ชื่อโฟลเดอร์ตรงกับฟีเจอร์ (พหูพจน์ตัวพิมพ์เล็ก):</p>
+<p>ใช้รูปแบบ <strong>เอกพจน์</strong> ของคำนาม — Model แทนเอนทิตีเอง ไม่ใช่คอลเลกชันของมัน</p>
+<h2 id="templates">Templates<a class="headerlink" href="#templates" title="Permanent link">&para;</a></h2>
+<p>ไฟล์แม่แบบใช้ชื่อ lowercase <code>snake_case</code> และนามสกุล <code>.html</code></p>
+<p>ชื่อโฟลเดอร์ตรงกับฟีเจอร์ (พหูพจน์ lowercase):</p>
 <div class="highlight"><pre><span></span><code>templates/
   notes/
     list.html     ← มุมมองคอลเลกชัน
-    detail.html   ← มุมมองรายการเดียว
+    detail.html   ← มุมมองรายการเดี่ยว
     form.html     ← สร้าง + แก้ไข (ใช้ร่วมกัน)
   users/
     list.html
     detail.html
     form.html
   layouts/
-    base.html     ← เลเยต์ไซต์ ไม่เรนเดอร์โดยตรง
+    base.html     ← เลเยาต์ไซต์ ไม่เคยแสดงผลโดยตรง
   errors/
     404.html
     500.html
 </code></pre></div>
 
-<h3 id="_4">เทมเพลตแบบฟอร์มใช้ร่วมกัน<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
-<p>เมื่อแบบฟอร์มสร้างและแบบฟอร์มแก้ไขเกือบเหมือนกัน ให้ใช้ <code>form.html</code> เดียวและสลับบนตัวแปรบริบท:</p>
+<h3 id="_3">แม่แบบแบบฟอร์มที่ใช้ร่วมกัน<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>เมื่อแบบฟอร์มสร้างและแบบฟอร์มแก้ไขเกือบเหมือนกัน ให้ใช้ <code>form.html</code> ไฟล์เดี่ยวและสลับไปมาตามการมีอยู่ของตัวแปรบริบท:</p>
 <div class="highlight"><pre><span></span><code>{# templates/notes/form.html #}
 {% if note %}
   {# โหมดแก้ไข — note.id มีอยู่ #}
   <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/notes/{{ note.id }}&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Edit Note<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 {% else %}
-  {# โหมดสร้าง — ไม่มีบันทึก #}
+  {# โหมดสร้าง — ไม่มี note #}
   <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/notes&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>New Note<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 {% endif %}
 </code></pre></div>
 
-<p>ViewModel ควบคุมโหมดโดยส่งหรือละเว้น <code>note</code> ในพจนานุกรมบริบท</p>
-<h2 id="_5">การลงทะเบียนเส้นทางตั้งชื่อ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>ViewModel ควบคุมโหมดโดยการส่ง <code>note</code> ในพจนานุกรมบริบทหรือการละเว้นมัน</p>
+<h2 id="_4">การตั้งชื่อการลงทะเบียนเส้นทาง<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>เมื่อลงทะเบียนเส้นทางใน <code>App.Opening()</code> ให้ตรงกับลำดับ: GET ก่อน POST รายการก่อนรายละเอียด:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ใน App.Opening() — ลงทะเบียนเส้นทางตามลำดับตรรกะ</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">                 </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">            </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">,</span><span class="w">        </span><span class="k">New</span><span class="w"> </span><span class="n">NotesNewVMFactory</span><span class="p">())</span><span class="w">    </span><span class="c1">// ← ต้องมาก่อน :id</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">,</span><span class="w">        </span><span class="k">New</span><span class="w"> </span><span class="n">NotesNewVMFactory</span><span class="p">())</span><span class="w">    </span><span class="c1">// ← จะต้องมาก่อน :id</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">NotesCreateVMFactory</span><span class="p">())</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/:id&quot;</span><span class="p">,</span><span class="w">        </span><span class="k">New</span><span class="w"> </span><span class="n">NotesDetailVMFactory</span><span class="p">())</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/:id/edit&quot;</span><span class="p">,</span><span class="w">   </span><span class="k">New</span><span class="w"> </span><span class="n">NotesEditVMFactory</span><span class="p">())</span>
@@ -474,8 +474,8 @@ ProductModel.xojo_code  # อนาคต
 </code></pre></div>
 
 <div class="admonition warning">
-<p class="admonition-title">ลำดับสำคัญ</p>
-<p><code>/notes/new</code> ต้องลงทะเบียน <strong>ก่อน</strong> <code>/notes/:id</code> Router จับคู่เส้นทางตามลำดับการลงทะเบียน — ถ้า <code>:id</code> มาก่อน ส่วนตัวอักษร <code>new</code> จะถูกจับเป็นค่า ID</p>
+<p class="admonition-title">ลำดับมีความสำคัญ</p>
+<p><code>/notes/new</code> จะต้องลงทะเบียน <strong>ก่อน</strong> <code>/notes/:id</code> Router จะจับคู่เส้นทางตามลำดับการลงทะเบียน — หากมี <code>:id</code> มาก่อน ส่วนตัวอักษรเชื่อมต่อ <code>new</code> จะถูกจับเป็นค่า ID</p>
 </div>
 
         <!-- Prev / Next navigation -->
@@ -522,15 +522,15 @@ ProductModel.xojo_code  # อนาคต
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#เทมเพลต">เทมเพลต</a>
+            <a class="toc-link" href="#templates">Templates</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#เทมเพลตแบบฟอรมใชรวมกน">เทมเพลตแบบฟอร์มใช้ร่วมกัน</a>
+            <a class="toc-link" href="#แมแบบแบบฟอรมทใชรวมกน">แม่แบบแบบฟอร์มที่ใช้ร่วมกัน</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การลงทะเบยนเสนทางตงชอ">การลงทะเบียนเส้นทางตั้งชื่อ</a>
+            <a class="toc-link" href="#การตงชอการลงทะเบยนเสนทาง">การตั้งชื่อการลงทะเบียนเส้นทาง</a>
           </li>
           
         </ul>

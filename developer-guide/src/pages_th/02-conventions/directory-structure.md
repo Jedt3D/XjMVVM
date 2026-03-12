@@ -1,29 +1,29 @@
 ---
-title: โครงสร้างไดเรกทอรี
-description: แผนที่ที่มีคำอธิบายประกอบของโฟลเดอร์และไฟล์ทุกไฟล์ในโครงการ
+title: โครงสร้างไดเรกทอรี่
+description: แผนที่อธิบายรายละเอียดของทุกโฟลเดอร์และไฟล์ในโปรเจกต์
 ---
 
-# โครงสร้างไดเรกทอรี
+# โครงสร้างไดเรกทอรี่
 
 ```
 mvvm/
-├── mvvm.xojo_project           # ไฟล์โครงการ Xojo (เปิดนี้ใน IDE)
-├── mvvm.xojo_resources         # ทรัพยากรคงที่ที่มีชุดขึ้นมาพร้อมกับแอป
+├── mvvm.xojo_project           # Xojo project file (open this in the IDE)
+├── mvvm.xojo_resources         # Static resources bundled with the app
 │
 ├── App.xojo_code               # WebApplication — Opening(), HandleURL()
-├── Session.xojo_code           # WebSession subclass — สถานะต่อผู้ใช้ ข้อความแฟลช
-├── Default.xojo_code           # WebPage ตัวยึดตำแหน่งที่จำเป็น (ไม่เสิร์ฟเลย)
+├── Session.xojo_code           # WebSession subclass — per-user state, flash messages
+├── Default.xojo_code           # Required placeholder WebPage (never served)
 │
-├── Framework/                  # โครงสร้างพื้นฐานที่นำกลับมาใช้ใหม่ — ไม่ค่อยแก้ไข
-│   ├── Router.xojo_code        # การลงทะเบียนเส้นทางและการส่ง
-│   ├── BaseViewModel.xojo_code # คลาสฐาน: Handle(), Render(), Redirect(), flash
-│   ├── FormParser.xojo_code    # แยกวิเคราะห์ application/x-www-form-urlencoded POST bodies
-│   ├── QueryParser.xojo_code   # แยกวิเคราะห์สตริงการค้นหา URL (?key=val&...)
-│   └── RouteDefinition.xojo_code  # ชั้นข้อมูล: method, pattern, factory
+├── Framework/                  # Reusable infrastructure — rarely modified
+│   ├── Router.xojo_code        # Route registration and dispatch
+│   ├── BaseViewModel.xojo_code # Base class: Handle(), Render(), Redirect(), flash
+│   ├── FormParser.xojo_code    # Parses application/x-www-form-urlencoded POST bodies
+│   ├── QueryParser.xojo_code   # Parses URL query strings (?key=val&...)
+│   └── RouteDefinition.xojo_code  # Data class: method, pattern, factory
 │
-├── ViewModels/                 # คลาสหนึ่งต่อเส้นทาง
+├── ViewModels/                 # One class per route
 │   ├── HomeViewModel.xojo_code # GET /
-│   └── Notes/                  # โฟลเดอร์ฟีเจอร์ — ViewModels ที่เกี่ยวข้องกับบันทึกทั้งหมด
+│   └── Notes/                  # Feature folder — all note-related ViewModels
 │       ├── NotesListVM.xojo_code   # GET  /notes
 │       ├── NotesNewVM.xojo_code    # GET  /notes/new
 │       ├── NotesCreateVM.xojo_code # POST /notes
@@ -32,28 +32,28 @@ mvvm/
 │       ├── NotesUpdateVM.xojo_code # POST /notes/:id
 │       └── NotesDeleteVM.xojo_code # POST /notes/:id/delete
 │
-├── Models/                     # การเข้าถึงข้อมูล — คืนค่าอ็อบเจ็กต์ Dictionary เท่านั้น
-│   └── NoteModel.xojo_code     # CRUD SQLite สำหรับตาราบันทึก
+├── Models/                     # Data access — returns Dictionary objects only
+│   └── NoteModel.xojo_code     # SQLite CRUD for the notes table
 │
-├── JinjaXLib/                  # ต้นไม้ต้นฉบับ JinjaX เต็ม (เอนจิน Jinja2 ใน Xojo)
-│   └── ...                     # อย่าแก้ไขเว้นแต่จะอัปเกรด JinjaX
+├── JinjaXLib/                  # Full JinjaX source tree (Jinja2 engine in Xojo)
+│   └── ...                     # Do not modify unless upgrading JinjaX
 │
-├── templates/                  # เทมเพลต HTML (ไวยากรณ์ Jinja2)
+├── templates/                  # HTML templates (Jinja2 syntax)
 │   ├── layouts/
-│   │   └── base.html           # เลเยต์ไซต์ — nav ข้อความแฟลช บล็อกเนื้อหา
+│   │   └── base.html           # Site layout — nav, flash messages, content block
 │   ├── home.html               # GET /
 │   ├── notes/
 │   │   ├── list.html           # GET /notes
 │   │   ├── detail.html         # GET /notes/:id
-│   │   └── form.html           # GET /notes/new และ GET /notes/:id/edit (ใช้ร่วมกัน)
+│   │   └── form.html           # GET /notes/new and GET /notes/:id/edit (shared)
 │   └── errors/
 │       ├── 404.html
 │       └── 500.html
 │
 ├── data/
-│   └── notes.sqlite            # ฐานข้อมูล SQLite (สร้างโดยอัตโนมัติในการรันครั้งแรก)
+│   └── notes.sqlite            # SQLite database (auto-created on first run)
 │
-└── developer-guide/            # เอกสารประกอบนี้
+└── developer-guide/            # This documentation
     ├── build.py
     ├── nav.yaml
     ├── src/
@@ -62,46 +62,46 @@ mvvm/
 
 ## Framework vs. ViewModels
 
-โฟลเดอร์ `Framework/` มีโค้ดที่คุณเขียนครั้งเดียวและไม่ค่อยสัมผัส มันคือ "เอนจิน" — การจัดเส้นทาง ชีวิตฐาน ViewModel ตัวช่วยคำขอ/การตอบสนอง เมื่อคุณเพิ่มฟีเจอร์ใหม่ คุณไม่เคยแก้ไข `Framework/`
+โฟลเดอร์ `Framework/` ประกอบด้วยโค้ดที่เราเขียนครั้งเดียวและแทบไม่ต้องแก้ไขอีก มันคือ "เครื่องยนต์" — routing, base ViewModel lifecycle, และ helper สำหรับ request/response สิ่งสำคัญคือเมื่อเพิ่มฟีเจอร์ใหม่ เราจะไม่ต้องแก้ไขไฟล์ใดๆ ใน `Framework/` เลย
 
-`ViewModels/` คือที่ที่งานเฉพาะแอปพลิเคชันทั้งหมดเกิดขึ้น ทุกเส้นทางใหม่ได้รับไฟล์ ViewModel ใหม่ในโฟลเดอร์ฟีเจอร์ที่เกี่ยวข้อง
+`ViewModels/` คือตำแหน่งที่ทำงานเฉพาะของแอปพลิเคชัน ทุกเส้นทาง (route) ใหม่จะได้ไฟล์ ViewModel ใหม่อยู่ในโฟลเดอร์ฟีเจอร์ที่เกี่ยวข้อง
 
-## โฟลเดอร์ฟีเจอร์ใน ViewModels
+## Feature folders ใน ViewModels
 
-จัดกลุ่ม ViewModels ตามฟีเจอร์ ไม่ใช่ตามวิธี HTTP:
+จัดกลุ่ม ViewModels ตามฟีเจอร์ ไม่ใช่ตามเมธอด HTTP:
 
 ```
 ViewModels/
-  Notes/         ← ViewModels ที่เกี่ยวข้องกับบันทึกทั้งเจ็ดตัวอยู่ที่นี่
-  Users/         ← ViewModels ที่เกี่ยวข้องกับผู้ใช้ทั้งหมด (อนาคต)
-  Admin/         ← ViewModels ที่เกี่ยวข้องกับผู้ดูแลระบบทั้งหมด (อนาคต)
+  Notes/         ← all seven note-related ViewModels live here
+  Users/         ← all user-related ViewModels (future)
+  Admin/         ← all admin-related ViewModels (future)
 ```
 
-สิ่งนี้ทำให้ไฟล์ที่เกี่ยวข้องอยู่ด้วยกัน และทำให้หาทุกอย่างเกี่ยวกับฟีเจอร์ในที่เดียวได้ง่าย
+วิธีนี้ช่วยให้ไฟล์ที่เกี่ยวข้องอยู่ด้วยกัน และทำให้ค้นหาทุกอย่างเกี่ยวกับฟีเจอร์ในที่เดียวได้ง่าย
 
-## การสะท้อนเทมเพลต
+## Template mirroring
 
-โครงสร้าง `templates/` สะท้อนลำดับชั้น URL:
+โครงสร้าง `templates/` สะท้อนให้เห็นลำดับชั้นของ URL:
 
-| URL | เทมเพลต |
+| URL | Template |
 |---|---|
 | `/notes` | `templates/notes/list.html` |
 | `/notes/new` | `templates/notes/form.html` |
 | `/notes/:id` | `templates/notes/detail.html` |
 | `/notes/:id/edit` | `templates/notes/form.html` |
-| ข้อผิดพลาด 404 | `templates/errors/404.html` |
+| Error 404 | `templates/errors/404.html` |
 
-เทมเพลต `form.html` ใช้ร่วมกันระหว่างเส้นทางสร้างและแก้ไข มันตรวจสอบตัวแปรบริบท `note`: ถ้ามีอยู่ แบบฟอร์มจะอยู่ในโหมดแก้ไข ถ้าเป็น `Nil` แบบฟอร์มจะอยู่ในโหมดสร้าง
+เทมเพลต `form.html` ใช้ร่วมกันระหว่างเส้นทาง create และ edit โดยตรวจสอบตัวแปร context `note`: ถ้ามีอยู่ ฟอร์มจะอยู่ในโหมด edit; ถ้าเป็น `Nil` ฟอร์มจะอยู่ในโหมด create
 
-## ไดเรกทอรี `data/`
+## ไดเรกทอรี่ `data/`
 
-ปัจจุบัน เส้นทางฐานข้อมูลเป็นรหัสคงที่สำหรับการพัฒนา สำหรับบิลด์โปรดักชัน ให้ใช้ `SpecialFolder.ApplicationData` เพื่อวางฐานข้อมูลในตำแหน่ง OS ที่ถูกต้อง:
+ในปัจจุบัน path ของฐานข้อมูลถูกเขียนแบบ hardcode สำหรับการพัฒนา สำหรับ production builds ให้ใช้ `SpecialFolder.ApplicationData` เพื่อวางฐานข้อมูลในตำแหน่งที่ถูกต้องตามระบบปฏิบัติการ:
 
 ```xojo
-// การพัฒนา (รหัสคงที่สำหรับการรันดีบัต IDE)
+// Development (hardcoded for IDE debug runs)
 Var dbFile As New FolderItem("/path/to/mvvm/data/notes.sqlite", FolderItem.PathModes.Native)
 
-// โปรดักชัน (วิธีการที่ถูกต้อง)
+// Production (correct approach)
 Var appData As FolderItem = SpecialFolder.ApplicationData
 Var dbFile As FolderItem = appData.Child("mvvm").Child("notes.sqlite")
 ```

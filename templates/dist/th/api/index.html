@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JSON API และการเสิร์ฟไฟล์สแตติก — MVVM Docs</title>
-  <meta name="description" content="วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการตรวจสอบสิทธิ์พร้อมกับเส้นทาง SSR และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์สแตติกในตัว" />
+  <title>JSON API และการให้บริการไฟล์แบบ Static — MVVM Docs</title>
+  <meta name="description" content="วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการรับรองตัวตน พร้อมกับเส้นทาง SSR ของมัน และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์แบบ static ที่สร้างขึ้นมา" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,16 +343,16 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">JSON API และการเสิร์ฟไฟล์สแตติก</h1>
-          <p class="page-description">วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการตรวจสอบสิทธิ์พร้อมกับเส้นทาง SSR และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์สแตติกในตัว</p>
+          <h1 class="page-title">JSON API และการให้บริการไฟล์แบบ Static</h1>
+          <p class="page-description">วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการรับรองตัวตน พร้อมกับเส้นทาง SSR ของมัน และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์แบบ static ที่สร้างขึ้นมา</p>
         </div>
 
-        <h1 id="json-api">JSON API และการเสิร์ฟไฟล์สแตติก<a class="headerlink" href="#json-api" title="Permanent link">&para;</a></h1>
-<p>XjMVVM สามารถเสิร์ฟหน้า HTML ที่เรนเดอร์ด้วยเซิร์ฟเวอร์ <strong>และ</strong> JSON API จากแอปพลิเคชันเดียวกัน — ไม่ต้องใช้กระบวนการแยกหรือเฟรมเวิร์กอื่น API ใช้ Router เดียวกัน ลวดลายโปรแกรม ViewModel เดียวกัน และ Models เดียวกัน ความแตกต่างเพียงอย่างเดียวคือรูปแบบการตอบกลับและการป้องกันการตรวจสอบสิทธิ์</p>
+        <h1 id="json-api-static">JSON API และการให้บริการไฟล์แบบ Static<a class="headerlink" href="#json-api-static" title="Permanent link">&para;</a></h1>
+<p>XjMVVM สามารถให้บริการหน้า HTML ที่สร้างจากเซิร์ฟเวอร์ <strong>และ</strong> JSON API จากแอปพลิเคชันเดียวกัน — ไม่จำเป็นต้องใช้กระบวนการแยกต่างหากหรือเฟรมเวิร์กอื่น API ใช้ Router เดียวกัน ลวดลายการใช้งาน ViewModel เดียวกัน และ Models เดียวกัน ความแตกต่างเพียงอย่างเดียวคือรูปแบบของการตอบสนองและการป้องกันการเข้าถึง</p>
 <hr />
 <h2 id="jsonserializer">โมดูล JSONSerializer<a class="headerlink" href="#jsonserializer" title="Permanent link">&para;</a></h2>
 <p><strong>ไฟล์:</strong> <code>Framework/JSONSerializer.xojo_code</code></p>
-<p>โมดูลง่ายๆ ที่แปลง <code>Dictionary</code> และ <code>Variant()</code> ของ <code>Dictionary</code> เป็นสตริง JSON ไม่ขึ้นอยู่กับไลบรารีภายนอกใด ๆ — เพียงการจัดการสตริง</p>
+<p>โมดูลง่ายๆ ที่แปลง <code>Dictionary</code> และ <code>Variant()</code> ของ <code>Dictionary</code> เป็นสตริง JSON ไม่ต้องพึ่งพาไลบรารีภายนอกใดๆ — เพียงแค่การจัดการสตริง</p>
 <div class="highlight"><pre><span></span><code><span class="k">Module</span><span class="w"> </span><span class="n">JSONSerializer</span>
 
 <span class="w">  </span><span class="c1">// Escape a value for use inside a JSON string literal</span>
@@ -391,7 +391,7 @@
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>ค่าทั้งหมดจะถูกลำดับเป็นสตริง JSON — ไม่มีประเภทตัวเลขหรือบูลีน นี่สอดคล้องกับวิธีที่ <code>RowToDict</code> ทำงาน: ค่าฐานข้อมูลทั้งหมดเก็บไว้เป็น <code>StringValue</code> ผู้บริโภค API ควรแยกวิเคราะห์ตัวเลขจากสตริงตามความจำเป็น</p>
+<p>ค่าทั้งหมดจะถูกจัดอักษรเป็น JSON string — ไม่มีประเภท numeric หรือ boolean ความสอดคล้องกับวิธีการทำงานของ <code>RowToDict</code> — ค่าฐานข้อมูลทั้งหมดเก็บไว้เป็น <code>StringValue</code> ผู้ใช้งาน API ควรแยกวิเคราะห์ตัวเลขจากสตริงตามความจำเป็น</p>
 </div>
 <h3 id="writejson-baseviewmodel"><code>WriteJSON</code> บน BaseViewModel<a class="headerlink" href="#writejson-baseviewmodel" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">jsonString</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
@@ -400,24 +400,24 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>ประเภทเนื้อหาส่งสัญญาณ JSON ไปยังลูกค้า ไม่มี ViewModel ใดจำเป็นต้องตั้งค่าส่วนหัวโดยตรง — เพียงเรียก <code>WriteJSON(...)</code> ด้วยสตริงที่เรียงลำดับ</p>
+<p>content-type จะสัญญาณว่าเป็น JSON ให้กับผู้ใช้งาน ViewModel ไม่จำเป็นต้องตั้งค่าหัวข้อโดยตรง — เพียงเรียก <code>WriteJSON(...)</code> ด้วยสตริงที่ถูกจัดอักษรแล้ว</p>
 <hr />
-<h2 id="api">การตรวจสอบสิทธิ์ของ API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
-<p>จุดปลายทาง API ทั้งหมดต้องการการตรวจสอบสิทธิ์ ต่างจากเส้นทาง HTML ที่เปลี่ยนเส้นทางไปยัง <code>/login</code> เส้นทาง API จะคืนค่า <strong>ข้อผิดพลาด 401 JSON</strong> เมื่อผู้ใช้ไม่ได้รับการตรวจสอบสิทธิ์:</p>
+<h2 id="api">การรับรองตัวตนของ API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>ปลายทาง API ทั้งหมดต้องใช้การรับรองตัวตน ต่างจากเส้นทาง HTML ที่เปลี่ยนเส้นทางไปยัง <code>/login</code> เส้นทาง API จะส่งกลับข้อผิดพลาด <strong>401 JSON</strong> เมื่อผู้ใช้ไม่ได้รับการรับรองตัวตน:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;Authentication required&quot;</span><span class="p">}</span>
 </code></pre></div>
 
-<p>ViewModel API ทุกตัวเรียก <code>RequireLoginJSON()</code> เป็นบรรทัดแรก:</p>
+<p>ViewModel API ทั้งหมดเรียก <code>RequireLoginJSON()</code> เป็นบรรทัดแรก:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// 401 if no valid mvvm_auth cookie</span>
 <span class="w">  </span><span class="c1">// ... rest of handler</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>ลูกค้า API ต้องรวมคุกกี้ <code>mvvm_auth</code> ในคำขอของพวกเขา สำหรับ JavaScript บนเบราว์เซอร์ (<code>fetch</code>) นี่จะเกิดขึ้นโดยอัตโนมัติเมื่อใช้ <code>credentials: 'same-origin'</code> สำหรับลูกค้าภายนอก คุกกี้ต้องได้รับผ่านจุดปลายทางการเข้าสู่ระบบและส่งไปพร้อมกับคำขอในภายหลัง</p>
+<p>ไคลเอนต์ API ต้องรวม cookie <code>mvvm_auth</code> ในคำขอของพวกเขา สำหรับ JavaScript ที่ใช้ในเบราว์เซอร์ (<code>fetch</code>) สิ่งนี้เกิดขึ้นโดยอัตโนมัติเมื่อใช้ <code>credentials: 'same-origin'</code> สำหรับไคลเอนต์ภายนอก cookie จะต้องได้รับผ่านปลายทางการเข้าสู่ระบบ และส่งไปพร้อมกับคำขอต่อมา</p>
 <hr />
-<h2 id="viewmodel-api">ViewModel API<a class="headerlink" href="#viewmodel-api" title="Permanent link">&para;</a></h2>
-<p>ViewModel API ทั้งหมดอยู่ใต้ <code>ViewModels/API/</code> พวกเขาทำตามลวดลายเดียวกัน <code>OnGet()</code>/<code>OnPost()</code> เช่นเดียวกับ ViewModel SSR — ความแตกต่างเพียงอย่างเดียวคือพวกเขาเรียก <code>WriteJSON()</code> แทน <code>Render()</code></p>
+<h2 id="api-viewmodels">API ViewModels<a class="headerlink" href="#api-viewmodels" title="Permanent link">&para;</a></h2>
+<p>ViewModel API ทั้งหมดอยู่ในโฟลเดอร์ <code>ViewModels/API/</code> พวกเขาปฏิบัติตามลวดลายเดียวกับ SSR ViewModels — <code>OnGet()</code>/<code>OnPost()</code> — ความแตกต่างเพียงอย่างเดียวคือพวกเขาเรียก <code>WriteJSON()</code> แทน <code>Render()</code></p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -625,7 +625,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 </div>
 
 <h3 id="notesapilistvm-get-apinotes">NotesAPIListVM — <code>GET /api/notes</code><a class="headerlink" href="#notesapilistvm-get-apinotes" title="Permanent link">&para;</a></h3>
-<p>ส่งคืนบันทึกทั้งหมดสำหรับผู้ใช้ที่ได้รับการตรวจสอบสิทธิ์:</p>
+<p>ส่งกลับบันทึกย่อทั้งหมดสำหรับผู้ใช้ที่ได้รับการรับรองตัวตน:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
 
@@ -637,9 +637,9 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 </code></pre></div>
 
 <p>การตอบสนอง: <code>[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"...","user_id":"5"},...]</code></p>
-<p>บันทึกมีขอบเขตของผู้ใช้ที่ได้รับการตรวจสอบสิทธิ์ — ผู้ใช้แต่ละคนจะเห็นเฉพาะบันทึกของตนเอง</p>
+<p>บันทึกย่อถูกจำกัดขอบเขตให้เป็นของผู้ใช้ที่ได้รับการรับรองตัวตน — แต่ละผู้ใช้มองเห็นได้เฉพาะบันทึกย่อของตนเองเท่านั้น</p>
 <h3 id="notesapidetailvm-get-apinotesid">NotesAPIDetailVM — <code>GET /api/notes/:id</code><a class="headerlink" href="#notesapidetailvm-get-apinotesid" title="Permanent link">&para;</a></h3>
-<p>ส่งคืนบันทึกพร้อมอาร์เรย์ <code>tags</code> ที่ฝังอยู่ ส่งคืน 404 หากบันทึกไม่มีอยู่หรือเป็นของผู้ใช้อื่น:</p>
+<p>ส่งกลับบันทึกย่อที่มีอาร์เรย์ <code>tags</code> แบบฝังตัว ส่งกลับ 404 หากบันทึกย่อไม่มีอยู่หรือเป็นของผู้ใช้คนอื่น:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
 
@@ -663,10 +663,10 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>อาร์เรย์แท็กถูกฉีดโดยการจัดการสตริง — ลบ <code>}</code> ปิดและเพิ่ม <code>,"tags":[...]}</code>  ก่อนปิดอีกครั้ง นี่คือจุดประสงค์: <code>JSONSerializer.DictToJSON</code> จัดการเฉพาะพจนานุกรมสตริงแบบเรียบ การฝังอาร์เรย์ที่ซ้อนกันต้องใช้การประกอบแบบฉาก</p>
+<p>อาร์เรย์แท็กถูกฉีดเข้าโดยการจัดการสตริง — การลบเครื่องหมาย <code>}</code> ปิดท้ายและเพิ่ม <code>,"tags":[...]}</code> ก่อนปิดอีกครั้ง สิ่งนี้ตั้งใจ: <code>JSONSerializer.DictToJSON</code> จัดการเฉพาะพจนานุกรมสตริงแบบราบเรียบเท่านั้น การฝังอาร์เรย์ที่ซ้อนกันต้องใช้การจัดองค์ประกอบด้วยตนเอง</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>วิธีนี้ใช้งานได้เชื่อถือได้เนื่องจาก <code>DictToJSON</code> มักสร้างวัตถุ JSON ที่ถูกต้องลงท้ายด้วย <code>}</code> หากเครื่องจัดลำดับเปลี่ยน จุดฉีดนี้จะต้องตรวจสอบ</p>
+<p>แนวทางนี้ทำงานได้อย่างน่าเชื่อถือเพราะ <code>DictToJSON</code> ให้ผลลัพธ์เป็นออบเจกต์ JSON ที่ถูกต้องเสมอและลงท้ายด้วย <code>}</code> หากตัวจัดอักษรเปลี่ยนแปลง จุดการฉีดนี้จะต้องได้รับการตรวจสอบใหม่</p>
 </div>
 <h3 id="notesapicreatevm-post-apinotes">NotesAPICreateVM — <code>POST /api/notes</code><a class="headerlink" href="#notesapicreatevm-post-apinotes" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span>
@@ -691,9 +691,9 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>รหัสสถานะที่ใช้โดย API: <strong>200</strong> สำหรับการอ่านที่สำเร็จ <strong>201</strong> สำหรับการสร้างที่สำเร็จ <strong>401</strong> สำหรับไม่ได้รับการตรวจสอบสิทธิ์ <strong>404</strong> สำหรับไม่พบ <strong>422</strong> สำหรับความล้มเหลวในการตรวจสอบความถูกต้อง</p>
+<p>รหัสสถานะที่ใช้โดย API: <strong>200</strong> สำหรับการอ่านที่สำเร็จ <strong>201</strong> สำหรับการสร้างที่สำเร็จ <strong>401</strong> สำหรับไม่มีการรับรองตัวตน <strong>404</strong> สำหรับไม่พบ <strong>422</strong> สำหรับล้มเหลวการตรวจสอบ</p>
 <h3 id="tagsapilistvm-get-apitags">TagsAPIListVM — <code>GET /api/tags</code><a class="headerlink" href="#tagsapilistvm-get-apitags" title="Permanent link">&para;</a></h3>
-<p>แท็กเป็นแบบส่วนกลาง (ไม่มีขอบเขตผู้ใช้) แต่ยังคงต้องการการตรวจสอบสิทธิ์:</p>
+<p>แท็กเป็นส่วนกลาง (ไม่ได้จำกัดขอบเขตตามผู้ใช้) แต่ยังคงต้องใช้การรับรองตัวตน:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
 
@@ -732,12 +732,12 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/api/tags/:id&quot;</span><span class="p">,</span><span class="w">    </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateTagsAPIDetailVM</span><span class="p">)</span>
 </code></pre></div>
 
-<p>คำนำหน้า <code>/api/</code> แยกเส้นทาง API จากเส้นทาง SSR ตามอนุสัญญา — Router ปฏิบัติต่อพวกเขาเหมือนกัน</p>
+<p>คำนำหน้า <code>/api/</code> แยกเส้นทาง API จากเส้นทาง SSR โดยแบบแผน — Router จัดการเหล่านี้ตรงกัน</p>
 <hr />
-<h2 id="_1">เซิร์ฟเวอร์ไฟล์สแตติก<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p><strong>ไฟล์:</strong> <code>App.xojo_code</code> (เมธอด <code>ServeStatic</code> + การส่งจ่าย <code>HandleURL</code>)</p>
-<p>เซิร์ฟเวอร์ไฟล์สแตติกทำให้เว็บไซต์เอกสารของนักพัฒนาเข้าถึงได้โดยตรงจากแอปที่กำลังทำงานที่ <code>/dist/*</code> ไฟล์จะถูกเสิร์ฟจาก <code>templates/dist/</code> — โฟลเดอร์เดียวกันที่สคริปต์ <code>build.py</code> ส่งออกไป</p>
-<h3 id="handleurl">การส่งจ่าย HandleURL<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h3>
+<h2 id="static">เซิร์ฟเวอร์ไฟล์แบบ static<a class="headerlink" href="#static" title="Permanent link">&para;</a></h2>
+<p><strong>ไฟล์:</strong> <code>App.xojo_code</code> (เมธอด <code>ServeStatic</code> + การจัดส่ง <code>HandleURL</code>)</p>
+<p>เซิร์ฟเวอร์ไฟล์แบบ static ทำให้สามารถเข้าถึงเวบไซต์เอกสารนักพัฒนาได้โดยตรงจากแอปที่กำลังทำงานอยู่ที่ <code>/dist/*</code> ไฟล์จะถูกให้บริการจากโฟลเดอร์ <code>templates/dist/</code> — โฟลเดอร์เดียวกับที่สคริปต์ <code>build.py</code> ส่งออก</p>
+<h3 id="handleurl">การจัดส่ง HandleURL<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// Redirect bare /dist to /dist/</span>
 <span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/dist&quot;</span><span class="w"> </span><span class="k">Then</span>
 <span class="w">  </span><span class="n">response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">302</span>
@@ -750,7 +750,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<p><code>p.Middle(6)</code> ลบคำนำหน้า <code>/dist/</code> (6 อักขระ ฐาน 0) และส่งส่วนที่เหลือไปที่ <code>ServeStatic</code></p>
+<p><code>p.Middle(6)</code> จะลบคำนำหน้า <code>/dist/</code> (6 อักขระ แบบเป็นศูนย์) และส่งส่วนที่เหลือไปยัง <code>ServeStatic</code></p>
 <h3 id="servestatic">ServeStatic — การป้องกันการข้ามเส้นทาง<a class="headerlink" href="#servestatic" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">ServeStatic</span><span class="p">(</span><span class="n">relativePath</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebResponse</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="c1">// Start from the known safe root</span>
@@ -784,9 +784,9 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong>ไม่เคย</strong> สร้างเส้นทางไฟล์โดยการต่อสตริง URL ดิบ คำขอ <code>/dist/../data/notes.sqlite</code> จะเสิร์ฟไฟล์ฐานข้อมูลหากเส้นทางต่อเพิ่มเติม การเดินผ่านแต่ละส่วนผ่าน <code>Child()</code> และปฏิเสธ <code>..</code> และ <code>.</code> จะป้องกันการโจมตีการข้ามเส้นทางโดยสิ้นเชิง</p>
+<p><strong>ไม่เคย</strong> สร้างเส้นทางไฟล์โดยการต่อสตริง URL ที่ไม่ได้ประมวลผล คำขอสำหรับ <code>/dist/../data/notes.sqlite</code> จะให้บริการไฟล์ฐานข้อมูลหากเส้นทางถูกต่อกันโดยตรง การเดินผ่านแต่ละส่วนผ่าน <code>Child()</code> และปฏิเสธ <code>..</code> และ <code>.</code> ป้องกันการโจมตีการข้ามเส้นทางได้อย่างสมบูรณ์</p>
 </div>
-<h3 id="_2">การแมปประเภทเนื้อหา<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<h3 id="content-type">การแมป Content-Type<a class="headerlink" href="#content-type" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">Lowercase</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;application/octet-stream&quot;</span>
 <span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">)</span><span class="w">  </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
@@ -798,15 +798,15 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.woff2&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span>
 </code></pre></div>
 
-<p>นามสกุลที่ไม่รู้จักจะกลับไป <code>application/octet-stream</code> เพิ่มรายการใหม่ที่นี่หากเสิร์ฟไฟล์ประเภทเพิ่มเติม</p>
-<h3 id="_3">การเข้าถึงเอกสาร<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>เมื่อแอปทำงานบนพอร์ต 8080 เอกสารนักพัฒนาจะพร้อมใช้งานที่:</p>
+<p>นามสกุลที่ไม่รู้จักจะกลับไปใช้ <code>application/octet-stream</code> เพิ่มรายการใหม่ที่นี่หากต้องการให้บริการประเภทไฟล์เพิ่มเติม</p>
+<h3 id="_1">การเข้าถึงเอกสาร<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>เมื่อแอปทำงานบนพอร์ต 8080 เอกสารนักพัฒนาจะสามารถเข้าถึงได้ที่:</p>
 <div class="highlight"><pre><span></span><code>http://localhost:8080/dist/en/index.html
 http://localhost:8080/dist/th/index.html
 http://localhost:8080/dist/jp/index.html
 </code></pre></div>
 
-<p>เส้นทาง <code>/dist/</code> ได้รับการจัดการก่อน SSR router ดังนั้นเซิร์ฟเวอร์สแตติกจึงให้ความสำคัญก่อนเสมอสำหรับคำนำหน้านั้น</p>
+<p>เส้นทาง <code>/dist/</code> จะได้รับการจัดการก่อนเราเตอร์ SSR ดังนั้นเซิร์ฟเวอร์ static จะให้บริการสำหรับคำนำหน้านั้นเสมอ</p>
 
         <!-- Prev / Next navigation -->
         
@@ -848,11 +848,11 @@ http://localhost:8080/dist/jp/index.html
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การตรวจสอบสทธของ-api">การตรวจสอบสิทธิ์ของ API</a>
+            <a class="toc-link" href="#การรบรองตวตนของ-api">การรับรองตัวตนของ API</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#viewmodel-api">ViewModel API</a>
+            <a class="toc-link" href="#api-viewmodels">API ViewModels</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -880,11 +880,11 @@ http://localhost:8080/dist/jp/index.html
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#เซรฟเวอรไฟลสแตตก">เซิร์ฟเวอร์ไฟล์สแตติก</a>
+            <a class="toc-link" href="#เซรฟเวอรไฟลแบบ-static">เซิร์ฟเวอร์ไฟล์แบบ static</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#การสงจาย-handleurl">การส่งจ่าย HandleURL</a>
+            <a class="toc-link" href="#การจดสง-handleurl">การจัดส่ง HandleURL</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -892,7 +892,7 @@ http://localhost:8080/dist/jp/index.html
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#การแมปประเภทเนอหา">การแมปประเภทเนื้อหา</a>
+            <a class="toc-link" href="#การแมป-content-type">การแมป Content-Type</a>
           </li>
           
           <li class="toc-item toc-level-3">

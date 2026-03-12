@@ -250,6 +250,20 @@ def translate_markdown(content, target_lang):
         return content
 
     client = anthropic.Anthropic(api_key=api_key)
+
+    # Language-specific tone guidance
+    tone_guidance = ""
+    if target_lang == "Thai":
+        tone_guidance = textwrap.dedent("""
+        Tone and style for Thai:
+        - Write like a senior developer teaching a junior programmer — friendly, encouraging,
+          and approachable, but remain professional and formal. No jokes or casual slang.
+        - Use active voice. Be direct and clear.
+        - Use ครับ/ค่ะ-free style (neutral technical prose), but keep warmth through
+          word choice — e.g. "เรามาดูกันว่า...", "สังเกตว่า...", "สิ่งสำคัญคือ...".
+        - When explaining concepts, briefly state WHY something matters, not just what it does.
+        """).strip()
+
     system_prompt = textwrap.dedent(f"""
         You are a technical documentation translator specialising in software development.
         Translate the given Markdown content to {target_lang}.
@@ -262,6 +276,7 @@ def translate_markdown(content, target_lang):
           SQLite, HandleURL, WebSession, GET, POST, HTTP, API, etc.
         - Keep all code variable names, function names, and file paths unchanged.
         - Output ONLY the translated Markdown — no preamble, no explanation.
+        {tone_guidance}
     """).strip()
 
     print(f"    → Translating to {target_lang} via Haiku 4.5 ...", flush=True)

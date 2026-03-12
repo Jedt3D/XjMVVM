@@ -1,15 +1,15 @@
 ---
-title: SQLite และสัญญา Dictionary
-description: วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียนคลาส Model ที่ปลอดภัยจากเธรด
+title: SQLite & Dictionary Contract
+description: วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียน Model classes ที่ปลอดภัยสำหรับหลายเธรด
 ---
 
-# SQLite และสัญญา Dictionary
+# SQLite & Dictionary Contract
 
-## รูปแบบหลัก
+## The core pattern
 
-ทุกเมธอด Model ปฏิบัติตามรูปแบบเดียวกัน: เปิดการเชื่อมต่อฐานข้อมูลใหม่ เรียกใช้การค้นหา แปลงแต่ละแถว `RowSet` เป็น `Dictionary` ปิดทุกสิ่ง คืนค่า
+ทุก Model method ยึดตามรูปแบบเดียวกัน: เปิด database connection ใหม่ รันคำสั่ง query แปลง `RowSet` แต่ละแถวเป็น `Dictionary` ปิดทุกอย่าง คืนค่า
 
-รูปแบบนี้มีจงใจ — มันรับประกันความปลอดภัยเธรดและบังคับใช้สัญญาข้อมูล Dictionary ที่ JinjaX ต้องการ
+รูปแบบนี้ตั้งใจออกแบบเพื่อให้มั่นใจว่าปลอดภัยสำหรับหลายเธรด และบังคับใช้ Dictionary data contract ที่ JinjaX ต้องการ
 
 ```xojo
 Function GetAll() As Variant()
@@ -37,21 +37,21 @@ Function GetAll() As Variant()
 End Function
 ```
 
-ประเภทการคืน `Variant()` ที่มีอ็อบเจ็กต์ `Dictionary` เป็นรูปแบบเพียงอย่างเดียวที่ JinjaX สามารถวนซ้ำได้ในลูป `{% for %}`
+Return type `Variant()` ที่บรรจุ `Dictionary` objects เป็นรูปแบบเดียวที่ JinjaX สามารถวนลูปใน `{% for %}` ได้
 
-## ประเภทการคืน
+## Return types
 
-| การดำเนินการ | ประเภทการคืน | กรณี Nil |
+| Operation | Return type | Nil case |
 |---|---|---|
-| แถวหลายแถว | `Variant()` (ของ `Dictionary`) | อาร์เรย์ว่าง `()` |
-| แถวเดียว | `Dictionary` | `Nil` |
-| สร้าง | `Integer` (ID แถวใหม่) | — |
-| อัปเดต / ลบ | `Sub` (ไม่มี) | — |
+| Multiple rows | `Variant()` (of `Dictionary`) | Empty array `()` |
+| Single row | `Dictionary` | `Nil` |
+| Create | `Integer` (new row ID) | — |
+| Update / Delete | `Sub` (nothing) | — |
 
-เสมอตรวจสอบ `Nil` เมื่อดึงแถวเดียว:
+ตรวจสอบ `Nil` เสมอเมื่อดึงแถวเดียว:
 
 ```xojo
-// ใน ViewModel
+// In the ViewModel
 Var note As Dictionary = NoteModel.GetByID(id)
 If note = Nil Then
   RenderError(404, "Note not found")
@@ -59,9 +59,9 @@ If note = Nil Then
 End If
 ```
 
-## การเชื่อมต่อฐานข้อมูลต่อคำขอ
+## Per-request database connections
 
-เมธอด `OpenDB()` ส่วนตัวเปิด **ใหม่** การเชื่อมต่อในการเรียกแต่ละครั้ง ไม่มีการเชื่อมต่อฐานข้อมูลแบบใช้ร่วมกันที่มีอายุยาวนาน ใน `App`
+Method `OpenDB()` private เปิด connection **ใหม่** ทุกครั้งที่เรียก ไม่มี database connection ร่วมกันแบบยาวนาน บน `App`
 
 ```xojo
 Private Function OpenDB() As SQLiteDatabase
@@ -73,13 +73,13 @@ Private Function OpenDB() As SQLiteDatabase
 End Function
 ```
 
-**ทำไมต่อคำขอ?** Xojo จัดการคำขอพร้อมกันในหลายเธรด อ็อบเจ็กต์ `SQLiteDatabase` ที่ใช้ร่วมกันจะต้องใช้ mutex การเปิดการเชื่อมต่อใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อกทั้งหมด — SQLite จัดการการเชื่อมต่อการอ่านพร้อมกันจากกระบวนการหลายตัวโดยเนื้อแท้
+**ทำไม per-request?** Xojo จัดการคำขอพร้อมกันบนหลายเธรด SQLiteDatabase instance ร่วมกันต้องใช้ mutex การเปิด connection ใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อค — SQLite จัดการการเชื่อมต่อแบบอ่านพร้อมกันจากหลายกระบวนการเองได้
 
-**ทำไมไม่ pool การเชื่อมต่อ?** สำหรับปริมาณการจราจรที่เฟรมเวิร์กนี้ลำเป้า (ทีมเล็ก ๆ เครื่องมือภายใน) ค่าใช้จ่ายในการเปิดการเชื่อมต่อไม่มีนัยสำคัญ pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่วัดได้ในขนาดนี้
+**ทำไมไม่ connection pool?** สำหรับปริมาณการใช้งานที่ framework นี้เป้าหมาย (ทีมเล็ก internal tools) overhead ของการเปิด connection นั้นน้อยมาก pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่สังเกตเห็นได้ในระดับนี้
 
-## การเตรียมฐานข้อมูล
+## Database initialization
 
-วิธีแรกที่เรียกใช้เมื่อแอปเริ่มต้นคือ `NoteModel.InitDB()` (จาก `App.Opening()`) มันสร้างไฟล์ฐานข้อมูลและเรียก `CREATE TABLE IF NOT EXISTS`:
+Method แรกที่เรียกเมื่อแอปเริ่มต้นคือ `NoteModel.InitDB()` (จาก `App.Opening()`) มันสร้างไฟล์ database และรัน `CREATE TABLE IF NOT EXISTS`:
 
 ```xojo
 Shared Function InitDB() As SQLiteDatabase
@@ -88,7 +88,7 @@ Shared Function InitDB() As SQLiteDatabase
   db.DatabaseFile = dbFile
 
   If Not dbFile.Exists Then
-    db.CreateDatabase()   // สร้างไฟล์
+    db.CreateDatabase()   // Creates the file
   Else
     db.Connect()
   End If
@@ -104,24 +104,24 @@ Shared Function InitDB() As SQLiteDatabase
 End Function
 ```
 
-มันปลอดภัยในการโทรทุกครั้งที่เริ่มต้น — `IF NOT EXISTS` เป็นแบบฉันทามติ
+ปลอดภัยที่จะเรียกทุกครั้งเริ่มต้น — `IF NOT EXISTS` นั้น idempotent
 
-## การค้นหาแบบพารามีเตอร์
+## Parameterized queries
 
-เสมอใช้ตัวยึดตำแหน่ง `?` สำหรับค่า ไม่เคยต่อเนื่องสตริง SQL ด้วยข้อมูลป้อนผู้ใช้ — สิ่งนี้ป้องกันการฉีด SQL:
+ใช้ `?` placeholders สำหรับค่าเสมอ ห้ามต่อ user input เข้าไปใน SQL strings — สิ่งนี้ป้องกัน SQL injection:
 
 ```xojo
-// ✅ ถูก — มีพารามิเตอร์
+// ✅ Correct — parameterized
 db.ExecuteSQL("INSERT INTO notes (title, body) VALUES (?, ?)", title, body)
 db.SelectSQL("SELECT * FROM notes WHERE id = ?", id)
 
-// ❌ ผิด — ความเสี่ยงการฉีด SQL
+// ❌ Wrong — SQL injection risk
 db.ExecuteSQL("INSERT INTO notes (title) VALUES ('" + title + "')")
 ```
 
-`SelectSQL()` และ `ExecuteSQL()` ยอมรับพารามิเตอร์ `Variant` variadic หลังสตริง SQL
+`SelectSQL()` และ `ExecuteSQL()` ยอมรับ variadic `Variant` parameters หลังจาก SQL string
 
-## การได้รับ ID แถวที่แทรกสุดท้าย
+## Getting the last inserted row ID
 
 หลังจาก `INSERT` ดึง ID ของแถวใหม่โดยใช้ `db.LastRowID`:
 
@@ -135,37 +135,37 @@ Function Create(title As String, body As String) As Integer
 End Function
 ```
 
-ViewModel ใช้ ID นี้เพื่อเปลี่ยนเส้นทางไปยังหน้ารายละเอียดบันทึกใหม่:
+ViewModel ใช้ ID นี้เพื่อ redirect ไปยังหน้ารายละเอียดของ note ใหม่:
 
 ```xojo
-// ใน NotesCreateVM.OnPost()
+// In NotesCreateVM.OnPost()
 Var newID As Integer = NoteModel.Create(title, body)
 SetFlash("Note created.", "success")
 Redirect("/notes/" + Str(newID))
 ```
 
-## ประเภทคอลัมน์
+## Column types
 
-SQLite ที่พิมพ์แบบไดนามิก ตัวเข้าถึงคอลัมน์ `RowSet` ของ Xojo แปลงค่าเมื่ออ่าน:
+SQLite เป็น dynamically typed Xojo's `RowSet` column accessors แปลงค่าเมื่ออ่าน:
 
-| ตัวเข้าถึง | ใช้สำหรับ |
+| Accessor | Use for |
 |---|---|
-| `.StringValue` | คอลัมน์ `TEXT` ID (ค่าเริ่มต้นที่ปลอดภัย) |
-| `.IntegerValue` | คอลัมน์ `INTEGER` |
-| `.DoubleValue` | คอลัมน์ `REAL` |
-| `.BooleanValue` | `INTEGER` 0/1 เก็บเป็นบูลีน |
+| `.StringValue` | `TEXT` columns, IDs (safe default) |
+| `.IntegerValue` | `INTEGER` columns |
+| `.DoubleValue` | `REAL` columns |
+| `.BooleanValue` | `INTEGER` 0/1 stored as boolean |
 
-เก็บวันที่ทั้งหมดเป็น `TEXT` โดยใช้ฟังก์ชัน `datetime()` ของ SQLite ดึงและแสดงเป็นสตริง — จัดรูปแบบในเทมเพลตหรือ ViewModel ตามต้องการ
+เก็บวันที่ทั้งหมดเป็น `TEXT` โดยใช้ SQLite's `datetime()` function ดึงและแสดงผลเป็นสตริง — format ในเทมเพลตหรือ ViewModel ตามความต้องการ
 
-## เส้นทางฐานข้อมูลสำหรับการผลิต
+## Database path for production
 
-การใช้งานปัจจุบันเข้ารหัสเส้นทางสำหรับการพัฒนา สำหรับบิลด์โปรดักชัน ให้ใช้ `SpecialFolder.ApplicationData`:
+Implementation ปัจจุบัน hardcode path สำหรับ development ในสำหรับ production builds ใช้ `SpecialFolder.ApplicationData`:
 
 ```xojo
-// การพัฒนา (เข้ารหัส — ดีสำหรับการรันดีบัต IDE)
+// Development (hardcoded — fine for IDE debug runs)
 Const DB_PATH = "/Users/worajedt/Xojo Projects/mvvm/data/notes.sqlite"
 
-// โปรดักชัน (วิธีการที่ถูกต้อง)
+// Production (correct approach)
 Function ProductionDBPath() As String
   Var appData As FolderItem = SpecialFolder.ApplicationData
   Var appDir As FolderItem = appData.Child("mvvm")
@@ -174,4 +174,4 @@ Function ProductionDBPath() As String
 End Function
 ```
 
-ใช้ค่าคงที่ build หรือค่ากำหนดเพื่อสลับระหว่างเส้นทางการพัฒนาและการผลิต
+ใช้ build constant หรือ preference เพื่อสลับระหว่าง development และ production paths

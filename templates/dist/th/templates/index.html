@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ภาพรวม JinjaX — MVVM Docs</title>
-  <meta name="description" content="JinjaX คืออะไร วิธีการที่มันพอดีกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()" />
+  <title>JinjaX Overview — MVVM Docs</title>
+  <meta name="description" content="JinjaX คืออะไร วิธีที่มันทำงานกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,47 +343,47 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">ภาพรวม JinjaX</h1>
-          <p class="page-description">JinjaX คืออะไร วิธีการที่มันพอดีกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()</p>
+          <h1 class="page-title">JinjaX Overview</h1>
+          <p class="page-description">JinjaX คืออะไร วิธีที่มันทำงานกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()</p>
         </div>
 
-        <h1 id="jinjax">JinjaX และเทมเพลต<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h1>
-<p>JinjaX เป็นการใช้งานเอนจิน Jinja2 ของ Python ที่เขียนด้วย Xojo แบบบริสุทธิ์ ทำให้คุณสามารถเขียนเทมเพลต HTML ด้วยไวยากรณ์ที่เข้ากันได้กับ Jinja2 ของ Python — เอนจินเดียวกันที่ใช้โดย Flask และ Django</p>
-<h2 id="jinjax_1">JinjaX มอบให้สิ่งใด<a class="headerlink" href="#jinjax_1" title="Permanent link">&para;</a></h2>
+        <h1 id="jinjax-templates">JinjaX &amp; Templates<a class="headerlink" href="#jinjax-templates" title="Permanent link">&para;</a></h1>
+<p>JinjaX เป็นการนำเสนอ Jinja2 template engine ที่เขียนด้วย Xojo แบบบริสุทธิ์ มันให้คุณเขียน HTML templates ด้วยไวยากรณ์ที่เข้ากันได้กับ Jinja2 ของ Python — เอนจิ้นเดียวกับที่ใช้โดย Flask และ Django</p>
+<h2 id="jinjax">JinjaX มอบอะไรให้<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>การสืบทอดเทมเพลต</strong> — <code>{% extends "layouts/base.html" %}</code> ด้วย <code>{% block %}</code> overrides</li>
-<li><strong>รวมเทมเพลต</strong> — <code>{% include "partials/nav.html" %}</code></li>
-<li><strong>เอาต์พุตตัวแปร</strong> — <code>{{ variable }}</code> ด้วยการหลีกเลี่ยง HTML อัตโนมัติ</li>
-<li><strong>โฟลว์ควบคุม</strong> — <code>{% if %}</code>, <code>{% for %}</code>, <code>{% else %}</code>, <code>{% elif %}</code></li>
-<li><strong>ตัวกรอง</strong> — <code>{{ value | upper }}</code>, <code>{{ value | length }}</code>, ตัวกรองแบบกำหนดเอง</li>
-<li><strong>Autoescape</strong> — การป้องกัน XSS เปิดใช้งานโดยค่าเริ่มต้น</li>
+<li><strong>Template inheritance</strong> — <code>{% extends "layouts/base.html" %}</code> พร้อม <code>{% block %}</code> overrides</li>
+<li><strong>Template includes</strong> — <code>{% include "partials/nav.html" %}</code></li>
+<li><strong>Variable output</strong> — <code>{{ variable }}</code> พร้อม HTML escaping อัตโนมัติ</li>
+<li><strong>Control flow</strong> — <code>{% if %}</code>, <code>{% for %}</code>, <code>{% else %}</code>, <code>{% elif %}</code></li>
+<li><strong>Filters</strong> — <code>{{ value | upper }}</code>, <code>{{ value | length }}</code>, custom filters</li>
+<li><strong>Autoescape</strong> — ป้องกัน XSS โดยเปิดใช้งานตามค่าเริ่มต้น</li>
 </ul>
-<h2 id="_1">ต้นไม้ต้นฉบับโครงการ<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>JinjaX อาศัยอยู่ใต้ <code>JinjaXLib/</code> ในรูตของโครงการ มีรวมอยู่เป็นต้นฉบับ Xojo เต็มรูปแบบแทนไลบรารีที่รวบรวม ดังนั้นจึงใช้งานได้กับไฟล์โครงการรูปแบบข้อความ <code>.xojo_code</code> และสามารถตรวจสอบหรือดีบัตได้หากจำเป็น</p>
-<p>อย่าแก้ไข <code>JinjaXLib/</code> เว้นแต่จะตั้งใจอัปเกรดหรือแพทช์ JinjaX</p>
+<h2 id="_1">ที่มาของโปรเจกต์<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>JinjaX อยู่ใต้ <code>JinjaXLib/</code> ในรากโปรเจกต์ มันรวมอยู่เป็นซอร์สโค้ด Xojo เต็มรูปแบบแทนที่จะเป็นไลบรารีที่คอมไพล์แล้ว ดังนั้นจึงทำงานได้กับไฟล์โปรเจกต์ <code>.xojo_code</code> รูปแบบข้อความและสามารถตรวจสอบหรือดีบักได้หากจำเป็น</p>
+<p>อย่าแก้ไข <code>JinjaXLib/</code> เว้นแต่ว่าคุณต้องการปรับปรุงหรือแพตช์ JinjaX</p>
 <h2 id="appopening">การตั้งค่าใน App.Opening()<a class="headerlink" href="#appopening" title="Permanent link">&para;</a></h2>
-<p><code>JinjaEnvironment</code> ถูกเริ่มต้นเพียงครั้งเดียวเมื่อแอปพลิเคชันเริ่มต้นและเก็บไว้บน <code>App</code> เป็นซิงเกิลตันที่ใช้ร่วมกัน มันเป็นแบบอ่านเท่านั้นหลังจาก <code>Opening()</code> เสร็จสิ้น ซึ่งทำให้มันปลอดภัยเธรด:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ใน App.Opening()</span>
+<p><code>JinjaEnvironment</code> ถูกเตรียมใช้งานเพียงครั้งเดียวเมื่อแอปพลิเคชันเริ่มต้นและเก็บไว้บน <code>App</code> เป็น singleton ที่แชร์กันได้ มันเป็นแบบอ่านเท่านั้นหลังจาก <code>Opening()</code> เสร็จสิ้น ซึ่งทำให้มันปลอดภัยสำหรับการใช้งานหลายเธรด:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In App.Opening()</span>
 
-<span class="c1">// 1. สร้างสภาพแวดล้อม</span>
+<span class="c1">// 1. Create the environment</span>
 <span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="p">()</span>
 
-<span class="c1">// 2. ชี้ไปที่โฟลเดอร์เทมเพลตของคุณ</span>
-<span class="c1">//    ใช้เส้นทางสัมบูรณ์เพื่อให้มันใช้งานได้จากตำแหน่งเอาต์พุตดีบัต IDE</span>
+<span class="c1">// 2. Point it at your templates folder</span>
+<span class="c1">//    Use an absolute path so it works from any IDE debug output location</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">projectDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">templatesDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span>
 <span class="n">mJinja</span><span class="p">.</span><span class="n">Loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">templatesDir</span><span class="p">)</span>
 
-<span class="c1">// 3. เปิด autoescape (ป้องกัน XSS — เสมออยู่)</span>
+<span class="c1">// 3. Enable autoescape (protects against XSS — always on)</span>
 <span class="n">mJinja</span><span class="p">.</span><span class="n">Autoescape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span>
 
-<span class="c1">// 4. ลงทะเบียนตัวกรองแบบกำหนดเอง</span>
+<span class="c1">// 4. Register custom filters</span>
 <span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span>
 </code></pre></div>
 
-<h2 id="_2">การลงทะเบียนตัวกรองแบบกำหนดเอง<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>ตัวกรองคือเมธอด Xojo ที่ใช้ <code>Variant</code> และส่งคืน <code>Variant</code> ลงทะเบียนด้วยชื่อสตริงที่เทมเพลตใช้กับตัวดำเนินการ pipe <code>|</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ใน App.xojo_code (หรือโมดูล Filters)</span>
+<h2 id="custom-filter">การลงทะเบียน custom filter<a class="headerlink" href="#custom-filter" title="Permanent link">&para;</a></h2>
+<p>filter คือเมธอด Xojo ที่รับ <code>Variant</code> และคืนค่า <code>Variant</code> ลงทะเบียนด้วยชื่อสตริงที่ templates ใช้กับตัวดำเนิน pipe <code>|</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In App.xojo_code (or a Filters module)</span>
 <span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="k">Then</span>
@@ -392,7 +392,7 @@
 <span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="c1">// ลงทะเบียนใน Opening():</span>
+<span class="c1">// Register in Opening():</span>
 <span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span>
 </code></pre></div>
 
@@ -400,22 +400,22 @@
 <div class="highlight"><pre><span></span><code>{{ note.body | truncate80 }}
 </code></pre></div>
 
-<h2 id="viewmodel">การเข้าถึงสภาพแวดล้อมจาก ViewModel<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
-<p><code>JinjaEnvironment</code> ถูกส่งผ่านจาก Router ไปยัง ViewModel แต่ละอันก่อนที่ <code>Handle()</code> จะถูกเรียก <code>BaseViewModel</code> เก็บไว้เป็นคุณสมบัติ <code>Jinja</code> คุณไม่เคยเข้าถึงมันโดยตรง — เพียงเรียก <code>Render()</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ใน ViewModel ใด ๆ — Render() ใช้ Self.Jinja ภายใน</span>
+<h2 id="environment-viewmodel">การเข้าถึง environment จาก ViewModel<a class="headerlink" href="#environment-viewmodel" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> ถูกส่งผ่านจาก Router ไปยัง ViewModel แต่ละตัวก่อนที่จะเรียก <code>Handle()</code> <code>BaseViewModel</code> เก็บมันเป็นพร็อพเพอร์ตี <code>Jinja</code> คุณไม่เคยเข้าถึงมันโดยตรง — เพียงแค่เรียก <code>Render()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In any ViewModel — Render() uses Self.Jinja internally</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
 <span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
 </code></pre></div>
 
-<h2 id="_3">ความปลอดภัยเธรด<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p><code>JinjaEnvironment</code> ปลอดภัยในการใช้ร่วมกันในเธรด <strong>หลังจาก</strong> <code>Opening()</code> เสร็จสิ้น เพราะ:</p>
+<h2 id="_2">ความปลอดภัยของการใช้งานหลายเธรด<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> ปลอดภัยที่จะแชร์ข้ามเธรด <strong>หลังจาก</strong> <code>Opening()</code> เสร็จสิ้น เพราะว่า:</p>
 <ul>
-<li><code>RegisterFilter</code> ถูกเรียกเฉพาะในช่วง <code>Opening()</code> — ไม่มีช่วงคำขอ</li>
-<li><code>GetTemplate()</code> และ <code>Render()</code> เฉพาะการอ่านจากสภาพแวดล้อม</li>
-<li><code>CompiledTemplate</code> และ <code>JinjaContext</code> ถูกสร้างใหม่ต่อคำขอ (stackalloc ไม่ใช่ร่วมกัน)</li>
+<li><code>RegisterFilter</code> ถูกเรียกใช้เพียงระหว่าง <code>Opening()</code> — ไม่เคยระหว่างคำขอ</li>
+<li><code>GetTemplate()</code> และ <code>Render()</code> อ่านเพียงจาก environment เท่านั้น</li>
+<li><code>CompiledTemplate</code> และ <code>JinjaContext</code> ถูกสร้างใหม่ต่อคำขอ (stack-allocated ไม่ใช่ shared)</li>
 </ul>
-<p>แต่ละคำขอได้รับ <code>CompiledTemplate</code> และ <code>JinjaContext</code> ของตัวเอง — สิ่งเหล่านี้ไม่ใช่ร่วมกัน</p>
+<p>แต่ละคำขอได้รับ <code>CompiledTemplate</code> และ <code>JinjaContext</code> ของตัวเอง — สิ่งเหล่านี้ไม่ได้แชร์กันใช้</p>
 
         <!-- Prev / Next navigation -->
         
@@ -449,11 +449,11 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#jinjax-มอบใหสงใด">JinjaX มอบให้สิ่งใด</a>
+            <a class="toc-link" href="#jinjax-มอบอะไรให">JinjaX มอบอะไรให้</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ตนไมตนฉบบโครงการ">ต้นไม้ต้นฉบับโครงการ</a>
+            <a class="toc-link" href="#ทมาของโปรเจกต">ที่มาของโปรเจกต์</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -461,15 +461,15 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การลงทะเบยนตวกรองแบบกำหนดเอง">การลงทะเบียนตัวกรองแบบกำหนดเอง</a>
+            <a class="toc-link" href="#การลงทะเบยน-custom-filter">การลงทะเบียน custom filter</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การเขาถงสภาพแวดลอมจาก-viewmodel">การเข้าถึงสภาพแวดล้อมจาก ViewModel</a>
+            <a class="toc-link" href="#การเขาถง-environment-จาก-viewmodel">การเข้าถึง environment จาก ViewModel</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ความปลอดภยเธรด">ความปลอดภัยเธรด</a>
+            <a class="toc-link" href="#ความปลอดภยของการใชงานหลายเธรด">ความปลอดภัยของการใช้งานหลายเธรด</a>
           </li>
           
         </ul>

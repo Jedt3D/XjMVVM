@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>อ้างอิง แท็กและตัวกรอง — MVVM Docs</title>
-  <meta name="description" content="อ้างอิงฉบับเต็มสำหรับทุกแท็ก Jinja2 และตัวกรองที่รองรับโดย JinjaX พร้อมหมายเหตุเฉพาะ Xojo" />
+  <title>ข้อมูลอ้างอิง Tag และ Filter — MVVM Docs</title>
+  <meta name="description" content="ข้อมูลอ้างอิงที่ครบถ้วนสำหรับ Jinja2 tag และ filter ทั้งหมดที่ JinjaX รองรับ พร้อมหมายเหตุสำหรับ Xojo" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,45 +343,45 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">อ้างอิง แท็กและตัวกรอง</h1>
-          <p class="page-description">อ้างอิงฉบับเต็มสำหรับทุกแท็ก Jinja2 และตัวกรองที่รองรับโดย JinjaX พร้อมหมายเหตุเฉพาะ Xojo</p>
+          <h1 class="page-title">ข้อมูลอ้างอิง Tag และ Filter</h1>
+          <p class="page-description">ข้อมูลอ้างอิงที่ครบถ้วนสำหรับ Jinja2 tag และ filter ทั้งหมดที่ JinjaX รองรับ พร้อมหมายเหตุสำหรับ Xojo</p>
         </div>
 
-        <h1 id="_1">อ้างอิง แท็กและตัวกรอง<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<h2 id="_2">แท็ก<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>แท็กใช้ตัวคั่น <code>{% %}</code> และควบคุมตรรกะเทมเพลต แท็กบล็อก Jinja2 มาตรฐานทั้งหมดรองรับโดย JinjaX</p>
+        <h1 id="tag-filter">ข้อมูลอ้างอิง Tag และ Filter<a class="headerlink" href="#tag-filter" title="Permanent link">&para;</a></h1>
+<h2 id="tag">Tag<a class="headerlink" href="#tag" title="Permanent link">&para;</a></h2>
+<p>Tag ใช้ delimiter <code>{% %}</code> และควบคุมตรรกะของ template นั่นเอง tag ของ Jinja2 block มาตรฐานทั้งหมดได้รับการสนับสนุนจาก JinjaX</p>
 <h3 id="extends"><code>{% extends %}</code><a class="headerlink" href="#extends" title="Permanent link">&para;</a></h3>
-<p>สืบทอดจากเทมเพลตพาเรนต์ ต้องเป็นแท็ก <strong>แรก</strong> ในไฟล์</p>
+<p>สืบทอดมาจาก parent template สิ่งสำคัญคือ tag นี้ต้องเป็น <strong>tag แรก</strong> ในไฟล์</p>
 <div class="highlight"><pre><span></span><code>{% extends &quot;layouts/base.html&quot; %}
 </code></pre></div>
 
-<p>เทมเพลตสามารถขยายพาเรนต์เดียวเท่านั้น เทมเพลตย่อยสามารถกำหนดเนื้อหาเฉพาะภายในแท็ก <code>{% block %}</code></p>
+<p>Template สามารถสืบทอดจาก parent เพียงตัวเดียวเท่านั้น Child template สามารถกำหนดเนื้อหาได้เฉพาะภายใน <code>{% block %}</code> tag เท่านั้น</p>
 <h3 id="block"><code>{% block %}</code><a class="headerlink" href="#block" title="Permanent link">&para;</a></h3>
-<p>กำหนดพื้นที่ที่เขียนทับได้ ในพาเรนต์ ตั้งค่าเนื้อหาเริ่มต้น ในลูก ให้แทนที่</p>
-<div class="highlight"><pre><span></span><code>{# ในพาเรนต์ (base.html) #}
+<p>กำหนดพื้นที่ที่สามารถแทนที่ได้ ใน parent จะตั้งเนื้อหาเริ่มต้น ใน child จะแทนที่เนื้อหาเดิม</p>
+<div class="highlight"><pre><span></span><code>{# In parent (base.html) #}
 {% block title %}Default Title{% endblock %}
 
-{# ในลูก — แทนที่ #}
+{# In child — overrides #}
 {% block title %}Notes List{% endblock %}
 </code></pre></div>
 
-<p>เรียก <code>{{ super() }}</code> ภายในบล็อกลูกเพื่อรวมเนื้อหาของพาเรนต์:</p>
+<p>เรียก <code>{{ super() }}</code> ภายใน child block เพื่อรวมเนื้อหาของ parent ด้วย</p>
 <div class="highlight"><pre><span></span><code>{% block title %}{{ super() }} — Notes{% endblock %}
-{# เรนเดอร์: &quot;Default Title — Notes&quot; #}
+{# Renders: &quot;Default Title — Notes&quot; #}
 </code></pre></div>
 
 <h3 id="include"><code>{% include %}</code><a class="headerlink" href="#include" title="Permanent link">&para;</a></h3>
-<p>แทรกเทมเพลตอื่นที่จุดนี้ ไฟล์ที่รวมใช้บริบทปัจจุบัน</p>
+<p>แทรก template อื่นในตำแหน่งนี้ ไฟล์ที่รวมไว้จะแบ่ง context ปัจจุบัน</p>
 <div class="highlight"><pre><span></span><code>{% include &quot;partials/pagination.html&quot; %}
 {% include &quot;partials/nav.html&quot; %}
 </code></pre></div>
 
-<p>ใช้ <code>ignore missing</code> เพื่อข้ามโดยเงียบหากไฟล์ไม่มี:</p>
+<p>ใช้ <code>ignore missing</code> เพื่อข้ามไปโดยเงียบเมื่อไฟล์ไม่มีอยู่</p>
 <div class="highlight"><pre><span></span><code>{% include &quot;partials/optional.html&quot; ignore missing %}
 </code></pre></div>
 
 <h3 id="if-elif-else-endif"><code>{% if %} / {% elif %} / {% else %} / {% endif %}</code><a class="headerlink" href="#if-elif-else-endif" title="Permanent link">&para;</a></h3>
-<p>เอาต์พุตตามเงื่อนไข</p>
+<p>เอาต์พุตแบบมีเงื่อนไข</p>
 <div class="highlight"><pre><span></span><code>{% if user %}
   Hello, {{ user.name }}
 {% elif guest %}
@@ -398,7 +398,7 @@
 </code></pre></div>
 
 <h3 id="for-else-endfor"><code>{% for %} / {% else %} / {% endfor %}</code><a class="headerlink" href="#for-else-endfor" title="Permanent link">&para;</a></h3>
-<p>วนซ้ำบนอาร์เรย์ <code>Variant()</code> บล็อก <code>{% else %}</code> เรนเดอร์เมื่อลำดับว่าง</p>
+<p>วนซ้ำผ่าน array <code>Variant()</code> Block <code>{% else %}</code> จะแสดงผลเมื่อลำดับว่างเปล่า</p>
 <div class="highlight"><pre><span></span><code>{% for note in notes %}
   <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ note.title }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 {% else %}
@@ -406,25 +406,25 @@
 {% endfor %}
 </code></pre></div>
 
-<p>ตัวแปรลูปที่พร้อมใช้งานภายในบล็อก:</p>
+<p>ตัวแปร loop ที่พร้อมใช้งานภายใน block</p>
 <table>
 <thead>
 <tr>
-<th>ตัวแปร</th>
-<th>ประเภท</th>
-<th>คำอธิบาย</th>
+<th>Variable</th>
+<th>Type</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>loop.index</code></td>
 <td>Integer</td>
-<td>จำนวนการวนซ้ำ 1-based</td>
+<td>จำนวนการวนซ้ำโดยเริ่มจาก 1</td>
 </tr>
 <tr>
 <td><code>loop.index0</code></td>
 <td>Integer</td>
-<td>จำนวนการวนซ้ำ 0-based</td>
+<td>จำนวนการวนซ้ำโดยเริ่มจาก 0</td>
 </tr>
 <tr>
 <td><code>loop.first</code></td>
@@ -434,17 +434,17 @@
 <tr>
 <td><code>loop.last</code></td>
 <td>Boolean</td>
-<td>True ในการวนซ้ำสุดท้าย</td>
+<td>True ในการวนซ้ำครั้งสุดท้าย</td>
 </tr>
 <tr>
 <td><code>loop.length</code></td>
 <td>Integer</td>
-<td>รายการทั้งหมดในลำดับ</td>
+<td>จำนวนรายการทั้งหมดในลำดับ</td>
 </tr>
 </tbody>
 </table>
 <h3 id="set"><code>{% set %}</code><a class="headerlink" href="#set" title="Permanent link">&para;</a></h3>
-<p>กำหนดตัวแปรภายในเทมเพลต:</p>
+<p>กำหนดตัวแปรภายใน template</p>
 <div class="highlight"><pre><span></span><code>{% set count = notes | length %}
 <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ count }} note{{ &quot;s&quot; if count != 1 else &quot;&quot; }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 
@@ -452,7 +452,7 @@
 </code></pre></div>
 
 <h3 id="macro-endmacro"><code>{% macro %} / {% endmacro %}</code><a class="headerlink" href="#macro-endmacro" title="Permanent link">&para;</a></h3>
-<p>กำหนดฟังก์ชันเทมเพลตที่นำกลับมาใช้ใหม่:</p>
+<p>กำหนดฟังก์ชัน template ที่นำกลับมาใช้ได้</p>
 <div class="highlight"><pre><span></span><code>{% macro render_note(note, show_edit=True) %}
   <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;note&quot;</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>{{ note.title }}<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
@@ -462,42 +462,42 @@
   <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 {% endmacro %}
 
-{# เรียกมัน: #}
+{# Call it: #}
 {{ render_note(note) }}
 {{ render_note(note, show_edit=False) }}
 </code></pre></div>
 
 <h3 id="with-endwith"><code>{% with %} / {% endwith %}</code><a class="headerlink" href="#with-endwith" title="Permanent link">&para;</a></h3>
-<p>สร้างขอบเขตชั่วคราวด้วยตัวแปรโลคัล:</p>
+<p>สร้าง scope ชั่วคราวพร้อมตัวแปรท้องถิ่น</p>
 <div class="highlight"><pre><span></span><code>{% with error = &quot;Title is required&quot; %}
   <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;error&quot;</span><span class="p">&gt;</span>{{ error }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 {% endwith %}
 </code></pre></div>
 
 <h3 id="raw-endraw"><code>{% raw %} / {% endraw %}</code><a class="headerlink" href="#raw-endraw" title="Permanent link">&para;</a></h3>
-<p>เอาต์พุตไวยากรณ์ Jinja2 ตามตัวอักษร — มีประโยชน์เมื่อรวมสตริงเทมเพลต JavaScript:</p>
+<p>เอาต์พุตไวยากรณ์ Jinja2 ตามตัวอักษร — มีประโยชน์เมื่อรวมสตริง template ของ JavaScript</p>
 <div class="highlight"><pre><span></span><code>{% raw %}
   <span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`Hello {{ name }}`</span><span class="p">;</span><span class="w"> </span><span class="c1">// ไม่ได้ประมวลผลโดย Jinja</span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sb">`Hello {{ name }}`</span><span class="p">;</span><span class="w"> </span><span class="c1">// not processed by Jinja</span>
 <span class="w">  </span><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 {% endraw %}
 </code></pre></div>
 
 <h3 id="comment"><code>{% comment %}</code> / <code>{# #}</code><a class="headerlink" href="#comment" title="Permanent link">&para;</a></h3>
-<p>ความเห็นเทมเพลต — ไม่ส่งไปยังเบราว์เซอร์:</p>
-<div class="highlight"><pre><span></span><code>{# นี่คือความเห็น — ลบออกจากเอาต์พุต #}
+<p>ความเห็นของ template — ไม่ส่งไปยังเบราว์เซอร์</p>
+<div class="highlight"><pre><span></span><code>{# This is a comment — stripped from output #}
 </code></pre></div>
 
 <hr />
-<h2 id="_3">ตัวกรอง<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>ตัวกรองแปลงค่าโดยใช้ตัวดำเนินการ <code>|</code> pipe ตัวกรองหลายตัวสามารถเชื่อมโยงได้</p>
-<h3 id="_4">ตัวกรองสตริง<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<h2 id="filter">Filter<a class="headerlink" href="#filter" title="Permanent link">&para;</a></h2>
+<p>Filter เปลี่ยนแปลงค่าโดยใช้ตัวดำเนินการ pipe <code>|</code> สามารถต่อ filter หลายตัวได้</p>
+<h3 id="string-filter">String filter<a class="headerlink" href="#string-filter" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>ตัวกรอง</th>
-<th>ตัวอย่าง</th>
-<th>เอาต์พุต</th>
+<th>Filter</th>
+<th>Example</th>
+<th>Output</th>
 </tr>
 </thead>
 <tbody>
@@ -543,13 +543,13 @@
 </tr>
 </tbody>
 </table>
-<h3 id="_5">ตัวกรองลำดับ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<h3 id="sequence-filter">Sequence filter<a class="headerlink" href="#sequence-filter" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>ตัวกรอง</th>
-<th>ตัวอย่าง</th>
-<th>ผลลัพธ์</th>
+<th>Filter</th>
+<th>Example</th>
+<th>Result</th>
 </tr>
 </thead>
 <tbody>
@@ -571,12 +571,12 @@
 <tr>
 <td><code>reverse</code></td>
 <td><code>{% for n in notes \| reverse %}</code></td>
-<td>การวนซ้ำแบบผกผัน</td>
+<td>การวนซ้ำแบบกลับด้าน</td>
 </tr>
 <tr>
 <td><code>sort</code></td>
 <td><code>{% for n in notes \| sort(attribute="title") %}</code></td>
-<td>การวนซ้ำแบบเรียง</td>
+<td>การวนซ้ำแบบเรียงลำดับ</td>
 </tr>
 <tr>
 <td><code>join(sep)</code></td>
@@ -585,18 +585,18 @@
 </tr>
 </tbody>
 </table>
-<h3 id="_6">ตัวกรองประเภท/ความปลอดภัย<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<h3 id="typesafety-filter">Type/safety filter<a class="headerlink" href="#typesafety-filter" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>ตัวกรอง</th>
-<th>คำอธิบาย</th>
+<th>Filter</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>safe</code></td>
-<td>ทำเครื่องหมาย HTML ว่าเชื่อถือได้ — ข้ามการเข้ารหัสซ้ำ ไม่เคยใช้ในข้อมูลของผู้ใช้</td>
+<td>ทำเครื่องหมาย HTML เป็นที่เชื่อถือได้ — บายพาส autoescape ไม่ควรใช้กับข้อมูลป้อนข้อมูลของผู้ใช้</td>
 </tr>
 <tr>
 <td><code>int</code></td>
@@ -612,26 +612,26 @@
 </tr>
 <tr>
 <td><code>default(val)</code></td>
-<td>ใช้ <code>val</code> ถ้าตัวแปรไม่ได้กำหนดหรือว่าง</td>
+<td>ใช้ <code>val</code> หากตัวแปรไม่ได้กำหนดหรือว่างเปล่า</td>
 </tr>
 </tbody>
 </table>
-<h3 id="_7">ตัวกรองแบบกำหนดเอง (โครงการนี้)<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p>ลงทะเบียนตัวกรองแบบกำหนดเองใน <code>App.Opening()</code> ด้วย <code>mJinja.RegisterFilter(name, AddressOf func)</code></p>
-<p>ลายเซ็นฟังก์ชันตัวกรอง:</p>
+<h3 id="custom-filter">Custom filter (โครงการนี้)<a class="headerlink" href="#custom-filter" title="Permanent link">&para;</a></h3>
+<p>ลงทะเบียน custom filter ใน <code>App.Opening()</code> ด้วย <code>mJinja.RegisterFilter(name, AddressOf func)</code></p>
+<p>ลายเซ็นฟังก์ชัน filter</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">MyFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
-<span class="w">  </span><span class="c1">// แปลงค่า คืนค่าผลลัพธ์</span>
+<span class="w">  </span><span class="c1">// transform value, return result</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
 <hr />
 <h2 id="xojo">ข้อจำกัดเฉพาะ Xojo<a class="headerlink" href="#xojo" title="Permanent link">&para;</a></h2>
-<p>นี่คือข้อ จำกัด เมื่อเทียบกับ Jinja2 Python แบบเต็ม — ให้รู้จักพวกเขาเพื่อหลีกเลี่ยงข้อผิดพลาดเงียบ ๆ</p>
-<p><strong>สัญกรณ์จุด Dictionary เท่านั้น</strong> <code>{{ obj.key }}</code> ใช้งานได้เฉพาะเมื่อ <code>obj</code> เป็น <code>Dictionary</code> อ็อบเจ็กต์คลาสแบบกำหนดเอง — คุณสมบัติของพวกมันไม่สามารถเข้าถึงได้ผ่านสัญกรณ์จุดในเทมเพลต</p>
-<p><strong>ไม่มีเรียกเมธอด</strong> <code>{{ note.title.upper() }}</code> ไม่ทำงาน ใช้ตัวกรองแทน: <code>{{ note.title | upper }}</code></p>
-<p><strong>ไม่มีตัวสร้าง Python</strong> <code>range()</code>, <code>enumerate()</code>, <code>zip()</code> และ Python built-ins ที่คล้ายกันไม่พร้อมใช้ สร้างข้อมูลที่คุณต้องการใน ViewModel ก่อนส่งไปยังเทมเพลต</p>
-<p><strong>อาร์เรย์ต้องเป็น <code>Variant()</code></strong> ส่งอาร์เรย์เป็น <code>Variant()</code> (ไม่ใช่อาร์เรย์ที่พิมพ์เช่น <code>String()</code> หรือ <code>Integer()</code>) JinjaX ของ <code>RenderFor</code> คาดหวัง <code>Variant()</code></p>
-<p><strong><code>Nil</code> เป็นค่าเท็จ</strong> กุญแจ <code>Dictionary</code> ที่มีค่า <code>Nil</code> จะหาได้ว่าเป็นค่าเท็จในการทดสอบ <code>{% if %}</code> กุญแจที่ขาดหายไปยังหาได้ว่าเป็นค่าเท็จ (ไม่ใช่ข้อผิดพลาด)</p>
+<p>นี่คือข้อจำกัดเมื่อเทียบกับ Jinja2 Python เต็มรูปแบบ — รู้จักพวกเขาเพื่อหลีกเลี่ยงข้อผิดพลาดที่เงียบ</p>
+<p><strong>Dictionary เท่านั้นสำหรับการใช้ dot-notation</strong> <code>{{ obj.key }}</code> ใช้ได้เฉพาะเมื่อ <code>obj</code> เป็น <code>Dictionary</code> เท่านั้น ไม่รองรับ instance ของคลาสที่กำหนดเอง — คุณสมบัติของคลาสเหล่านั้นไม่สามารถเข้าถึงได้ผ่าน dot-notation ใน template</p>
+<p><strong>ไม่มีการเรียกเมธอดกับ object</strong> <code>{{ note.title.upper() }}</code> ไม่ทำงาน ใช้ filter แทนนั้น: <code>{{ note.title | upper }}</code></p>
+<p><strong>ไม่มี Python built-in</strong> <code>range()</code>, <code>enumerate()</code>, <code>zip()</code> และ Python built-in ที่คล้ายกันไม่พร้อมใช้งาน สร้างข้อมูลที่คุณต้องการใน ViewModel ก่อนส่งไปยัง template</p>
+<p><strong>Array ต้องเป็น <code>Variant()</code></strong> ส่ง array เป็น <code>Variant()</code> (ไม่ใช่ array ที่มีประเภทเช่น <code>String()</code> หรือ <code>Integer()</code>) <code>RenderFor</code> ของ JinjaX คาดหวัง <code>Variant()</code></p>
+<p><strong><code>Nil</code> เป็นค่า falsy</strong> Key ของ <code>Dictionary</code> ที่มีค่าเป็น <code>Nil</code> ประเมินผลเป็น falsy ในการทดสอบ <code>{% if %}</code> Key ที่ขาดหายไปจะประเมินผลเป็น falsy ด้วย (ไม่ใช่ข้อผิดพลาด)</p>
 
         <!-- Prev / Next navigation -->
         
@@ -665,7 +665,7 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#แทก">แท็ก</a>
+            <a class="toc-link" href="#tag">Tag</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -709,23 +709,23 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ตวกรอง">ตัวกรอง</a>
+            <a class="toc-link" href="#filter">Filter</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#ตวกรองสตรง">ตัวกรองสตริง</a>
+            <a class="toc-link" href="#string-filter">String filter</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#ตวกรองลำดบ">ตัวกรองลำดับ</a>
+            <a class="toc-link" href="#sequence-filter">Sequence filter</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#ตวกรองประเภทความปลอดภย">ตัวกรองประเภท/ความปลอดภัย</a>
+            <a class="toc-link" href="#typesafety-filter">Type/safety filter</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#ตวกรองแบบกำหนดเอง-โครงการน">ตัวกรองแบบกำหนดเอง (โครงการนี้)</a>
+            <a class="toc-link" href="#custom-filter-โครงการน">Custom filter (โครงการนี้)</a>
           </li>
           
           <li class="toc-item toc-level-2">

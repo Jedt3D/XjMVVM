@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Alpine.js — MVVM Docs</title>
-  <meta name="description" content="วิธีการและเหตุผลที่ XjMVVM ใช้ Alpine.js สำหรับการโต้ตอบแบบ client-side ขั้นต่ำ และเวลาที่ควรเลือกใช้มันแทน HTML ธรรมชาติหรือ htmx" />
+  <meta name="description" content="วิธีและเหตุผลที่ XjMVVM ใช้ Alpine.js สำหรับการโต้ตอบฝั่งไคลเอนต์ขั้นต่ำ และเมื่อใดที่ควรใช้ HTML ธรรมชาติหรือ htmx แทน" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -344,80 +344,80 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">Alpine.js</h1>
-          <p class="page-description">วิธีการและเหตุผลที่ XjMVVM ใช้ Alpine.js สำหรับการโต้ตอบแบบ client-side ขั้นต่ำ และเวลาที่ควรเลือกใช้มันแทน HTML ธรรมชาติหรือ htmx</p>
+          <p class="page-description">วิธีและเหตุผลที่ XjMVVM ใช้ Alpine.js สำหรับการโต้ตอบฝั่งไคลเอนต์ขั้นต่ำ และเมื่อใดที่ควรใช้ HTML ธรรมชาติหรือ htmx แทน</p>
         </div>
 
         <h1 id="alpinejs">Alpine.js<a class="headerlink" href="#alpinejs" title="Permanent link">&para;</a></h1>
-<p>XjMVVM เป็น framework ที่ render จากเซิร์ฟเวอร์ — HTML มาจาก Xojo ไม่ใช่จาก JS framework Alpine.js เติมเต็มช่องว่างเล็ก ๆ ที่เซิร์ฟเวอร์ไม่สามารถจัดการสถานะได้: UI elements ที่มีการ react ต่อสถานะในเบราว์เซอร์ (localStorage, sessionStorage) โดยไม่ต้องโหลดหน้าเต็มใหม่</p>
-<h2 id="philosophy">Philosophy<a class="headerlink" href="#philosophy" title="Permanent link">&para;</a></h2>
+<p>XjMVVM เป็นเฟรมเวิร์กที่เรนเดอร์จากเซิร์ฟเวอร์ — HTML มาจาก Xojo ไม่ใช่จาก JS framework Alpine.js เติมช่องว่างเล็กๆ ที่เซิร์ฟเวอร์ไม่สามารถจัดการสถานะได้: องค์ประกอบ UI ที่ตอบสนองต่อสถานะในเบราว์เซอร์ (localStorage, sessionStorage) โดยไม่โหลดหน้าใหม่</p>
+<h2 id="_1">ปรัชญา<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <blockquote>
-<p><strong>Server renders. Alpine reacts. htmx fetches.</strong></p>
+<p><strong>เซิร์ฟเวอร์เรนเดอร์ Alpine ตอบสนอง htmx ดึงข้อมูล</strong></p>
 </blockquote>
-<p>เป้าหมายคือให้ JavaScript น้อยที่สุดเท่าที่เป็นไปได้ ต้นไม้การตัดสินใจสำหรับ interactive elements ใด ๆ คือ:</p>
+<p>เป้าหมายคือการใช้ JavaScript ให้น้อยที่สุด แผนการตัดสินใจสำหรับองค์ประกอบโต้ตอบใดๆ คือ:</p>
 <ol>
-<li><strong>สามารถจัดการด้วย plain HTML form + PRG pattern ได้หรือไม่?</strong> → ใช้อันนี้ ไม่ต้องมี JS</li>
-<li><strong>มันต้อง react ต่อสถานะในเบราว์เซอร์หรือต้องการ inline DOM updates หรือไม่?</strong> → Alpine</li>
-<li><strong>มันต้องดึงข้อมูลจากเซิร์ฟเวอร์และอัปเดตส่วนของหน้าหรือไม่?</strong> → htmx (ดู <a href="#when-to-reach-for-htmx">htmx adoption plan</a>)</li>
+<li><strong>แบบฟอร์ม HTML ธรรมชาติ + รูปแบบ PRG สามารถจัดการได้หรือไม่</strong> → ใช้สิ่งนั้น ไม่มี JS</li>
+<li><strong>มันตอบสนองต่อสถานะในเบราว์เซอร์หรือต้องการการอัปเดต DOM แบบอินไลน์หรือไม่</strong> → Alpine</li>
+<li><strong>มันต้องดึงข้อมูลจากเซิร์ฟเวอร์และอัปเดตส่วนของหน้าหรือไม่</strong> → htmx (ดูที่ <a href="#when-to-reach-for-htmx">แผนการนำ htmx มาใช้</a>)</li>
 </ol>
-<p>Alpine ไม่เคยใช้เป็นทดแทนสำหรับ server-side logic ชิ้นส่วนธุรกิจ ข้อมูล และการตรวจสอบทั้งหมดที่สามารถอยู่บนเซิร์ฟเวอร์ก็อยู่บนเซิร์ฟเวอร์</p>
+<p>Alpine ไม่เคยถูกใช้เป็นตัวแทนของตรรมชาติเซิร์ฟเวอร์ กฎธุรกิจ ข้อมูล และการตรวจสอบทั้งหมดที่สามารถอยู่บนเซิร์ฟเวอร์นั้นสามารถอยู่บนเซิร์ฟเวอร์ได้</p>
 <hr />
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>Alpine ถูก load จาก CDN โดยไม่มี build step ตัวเดียวที่ด้านล่างของ <code>layouts/base.html</code> ก่อน <code>&lt;/body&gt;</code>:</p>
+<h2 id="_2">การติดตั้ง<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Alpine ถูกโหลดจาก CDN โดยไม่มีขั้นตอนการสร้าง บรรทัดเดียวที่ด้านล่างของ <code>layouts/base.html</code> ก่อน <code>&lt;/body&gt;</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">defer</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>defer</code> attribute จำเป็นต้อง — Alpine ต้อง process DOM หลังจากที่มันได้รับการ parse แล้ว</p>
+<p>แอตทริบิวต์ <code>defer</code> จำเป็น — Alpine ต้องประมวลผล DOM หลังจากที่มันถูกแยกวิเคราะห์แล้ว</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Pin ไปเป็นเวอร์ชันที่เฉพาะเจาะจง (เช่น <code>@3.14.3</code>) มากกว่า <code>@3</code> เพื่อให้ builds มีความเสถียรและ upstream CDN update ไม่สามารถทำลายแอปได้</p>
+<p>ปักหมุดไปยังเวอร์ชันเฉพาะ (เช่น <code>@3.14.3</code>) แทน <code>@3</code> เพื่อให้บิลด์ทำซ้ำได้และการอัปเดต CDN ต้นน้ำไม่สามารถทำลายแอปได้</p>
 </div>
 <hr />
-<h2 id="core-directives-used-in-xjmvvm">Core directives used in XjMVVM<a class="headerlink" href="#core-directives-used-in-xjmvvm" title="Permanent link">&para;</a></h2>
+<h2 id="core-xjmvvm">คำสั่ง Core ที่ใช้ใน XjMVVM<a class="headerlink" href="#core-xjmvvm" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Directive</th>
-<th>Purpose</th>
+<th>คำสั่ง</th>
+<th>วัตถุประสงค์</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>x-data="{ ... }"</code></td>
-<td>ประกาศ reactive component กับ state ของมัน</td>
+<td>ประกาศคอมโพเนนต์ที่ตอบสนองพร้อมสถานะของมัน</td>
 </tr>
 <tr>
 <td><code>x-show="expr"</code></td>
-<td>Toggles <code>display:none</code> ตาม boolean expression</td>
+<td>สลับ <code>display:none</code> ตามนิพจน์บูลีน</td>
 </tr>
 <tr>
 <td><code>x-text="expr"</code></td>
-<td>ตั้ง element text content เป็นค่า expression</td>
+<td>ตั้งค่าเนื้อหาข้อความขององค์ประกอบให้เป็นค่านิพจน์</td>
 </tr>
 <tr>
 <td><code>:class="expr"</code></td>
-<td>Binds <code>class</code> attribute แบบ dynamic</td>
+<td>ผูกแอตทริบิวต์ <code>class</code> แบบไดนามิก</td>
 </tr>
 <tr>
 <td><code>@submit.prevent="fn"</code></td>
-<td>Intercepts form submit, prevents default, calls a function</td>
+<td>ขัดขวางการส่งแบบฟอร์ม ป้องกันค่าเริ่มต้น เรียกฟังก์ชัน</td>
 </tr>
 <tr>
 <td><code>@submit="expr"</code></td>
-<td>Runs an expression on form submit โดยไม่ prevent default</td>
+<td>รันนิพจน์บนการส่งแบบฟอร์มโดยไม่ป้องกันค่าเริ่มต้น</td>
 </tr>
 <tr>
 <td><code>x-cloak</code></td>
-<td>Hides an element จนกว่า Alpine จะ initialize (prevents FOUC)</td>
+<td>ซ่อนองค์ประกอบจนกว่า Alpine จะเริ่มต้น (ป้องกัน FOUC)</td>
 </tr>
 <tr>
 <td><code>init()</code></td>
-<td>Lifecycle hook — runs once เมื่อ component initialize</td>
+<td>ฮุก Lifecycle — ทำงานครั้งเดียวเมื่อคอมโพเนนต์เริ่มต้น</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="pattern-1-nav-auth-state">Pattern 1 — Nav auth state<a class="headerlink" href="#pattern-1-nav-auth-state" title="Permanent link">&para;</a></h2>
-<p>Nav bar ต้องแสดง Log In / Sign Up (logged-out) หรือ username + Log Out (logged-in) ที่ขับเคลื่อนโดย <code>localStorage</code> เซิร์ฟเวอร์ไม่สามารถ inject สิ่งนี้ได้เพราะ Xojo Web 2 SSR mode ไม่สามารถคงอยู่ <code>WebSession</code> state ระหว่าง plain HTTP requests</p>
+<h2 id="1-nav">รูปแบบ 1 — สถานะตรวจสอบสิทธิ์ Nav<a class="headerlink" href="#1-nav" title="Permanent link">&para;</a></h2>
+<p>บาร์นำทางต้องแสดงเข้าสู่ระบบ / ลงทะเบียน (ออกจากระบบ) หรือชื่อผู้ใช้ + ออกจากระบบ (เข้าสู่ระบบ) ขับเคลื่อนโดย <code>localStorage</code> เซิร์ฟเวอร์ไม่สามารถฉีดสิ่งนี้ได้เนื่องจากโหมด SSR ของ Xojo Web 2 ไม่รักษา <code>WebSession</code> สถานะระหว่างคำขอ HTTP ธรรมชาติ</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{ user: localStorage.getItem(&#39;_auth_user&#39;) }&quot;</span><span class="p">&gt;</span>
 
   <span class="cm">&lt;!-- Logged-out state: visible by default, hidden by Alpine if user is set --&gt;</span>
@@ -440,15 +440,15 @@
 <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>x-cloak</code> บน logged-in span ป้องกัน flash ของทั้งสองสถานะก่อนที่ Alpine จะ initialize CSS rule ที่ทำให้สิ่งนี้ทำงานต้องอยู่ในสไตล์ชีต:</p>
+<p><code>x-cloak</code> บนช่วงเข้าสู่ระบบป้องกันการแสดงผลของทั้งสองสถานะก่อน Alpine เริ่มต้น กฎ CSS ที่ทำให้สิ่งนี้ใช้งานได้ต้องอยู่ในสไตล์ชีต:</p>
 <div class="highlight"><pre><span></span><code><span class="o">[</span><span class="nt">x-cloak</span><span class="o">]</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="w"> </span><span class="cp">!important</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 
-<p><code>@submit</code> บน logout form clear localStorage และ queue flash message ก่อนที่ POST จะถูก submit ไม่จำเป็นต้องมี separate event listener หรือ script block</p>
+<p><code>@submit</code> บนแบบฟอร์มออกจากระบบล้างสมาชิกและคิวข้อความแฟลชก่อนที่จะส่ง POST หลังฟังก์ชันตัวฟังชายตัวสนับสนุนหรือบล็อกสคริปต์ที่แยกต่างหาก</p>
 <hr />
-<h2 id="pattern-2-client-side-flash-messages">Pattern 2 — Client-side flash messages<a class="headerlink" href="#pattern-2-client-side-flash-messages" title="Permanent link">&para;</a></h2>
-<p>Flash messages สำหรับ POST→redirect→GET cycle ไม่สามารถใช้ session ของ Xojo ใน SSR mode — session หายไปเมื่อ redirect&rsquo;s GET มาถึง workaround: write ไปที่ <code>sessionStorage</code> ก่อน form submit, read มันบน next page load</p>
-<p>Alpine reads และ displays queued message ใน <code>init()</code> จากนั้น <code>x-show</code> เก็บมันไว้ hidden หากไม่มีอะไรให้แสดง:</p>
+<h2 id="2">รูปแบบ 2 — ข้อความแฟลชฝั่งไคลเอนต์<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p>ข้อความแฟลชสำหรับวัฏจักร POST→ リダイเรกต์→GET ไม่สามารถใช้เซสชันของ Xojo ในโหมด SSR ได้ — เซสชันจะหายไปเมื่อเวลาที่ GET ของการเปลี่ยนเส้นทางมาถึง วิธีแก้ปัญหาคือ เขียนไปที่ <code>sessionStorage</code> ก่อนที่แบบฟอร์มจะส่ง อ่านในการโหลดหน้าต่อไป</p>
+<p>Alpine อ่านและแสดงข้อความในคิวใน <code>init()</code> จากนั้น <code>x-show</code> เก็บไว้ซ่อนถ้าไม่มีอะไรให้แสดง:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
 <span class="s">  msg: &#39;&#39;,</span>
 <span class="s">  type: &#39;success&#39;,</span>
@@ -462,11 +462,11 @@
 <span class="s">}&quot;</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">:class</span><span class="o">=</span><span class="s">&quot;&#39;flash flash-&#39; + type&quot;</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>!document.querySelector('.flash')</code> guard ป้องกัน double-flash หาก Xojo server-side session บังเอิญ deliver flash โดยตรง (future-proofs สำหรับ WebSocket mode)</p>
+<p>การป้องกัน <code>!document.querySelector('.flash')</code> ป้องกันการแสดงแฟลชซ้ำหากเซสชันเซิร์ฟเวอร์ฝั่ง Xojo เกิดขึ้นเพื่อส่งแฟลชโดยตรง (ป้องกันล่วงหน้าสำหรับโหมด WebSocket)</p>
 <hr />
-<h2 id="pattern-3-form-submit-with-async-pre-processing">Pattern 3 — Form submit with async pre-processing<a class="headerlink" href="#pattern-3-form-submit-with-async-pre-processing" title="Permanent link">&para;</a></h2>
-<p>Auth forms ต้อง hash password client-side ด้วย Web Crypto API ก่อนที่ POST จะถูกส่ง นี่คือ inherently async และต้อง intercept submit event Alpine&rsquo;s <code>@submit.prevent</code> + async method ใน <code>x-data</code> handles นี่ได้อย่างสะอาด ไม่มี separate <code>addEventListener</code> script block</p>
-<p>SHA-256 helper ถูกกำหนดใน small <code>&lt;script&gt;</code> เหนือ form (มันต้องอยู่ในขอบเขตเมื่อ Alpine method runs):</p>
+<h2 id="3">รูปแบบ 3 — ส่งแบบฟอร์มพร้อมการประมวลผลก่อนอะแซงก์ก<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<p>แบบฟอร์มตรวจสอบสิทธิ์ต้องแฮชรหัสผ่านฝั่งไคลเอนต์ด้วย Web Crypto API ก่อนที่จะส่ง POST นี่เป็นสิ่งที่ไม่สามารถเลื่อนไปได้ตามธรรมชาติและต้องขัดขวางเหตุการณ์ submit Alpine&rsquo;s <code>@submit.prevent</code> + วิธีการแบบอะแซงก์ใน <code>x-data</code> จัดการสิ่งนี้อย่างสะอาด โดยไม่มีบล็อก <code>addEventListener</code> สคริปต์แยกต่างหาก</p>
+<p>ตัวช่วย SHA-256 ถูกกำหนดไว้ในคำสั่ง <code>&lt;script&gt;</code> เล็ก ๆ เหนือแบบฟอร์ม (จะต้องอยู่ในขอบเขตเมื่อวิธีการของ Alpine ทำงาน):</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">subtle</span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;SHA-256&#39;</span><span class="p">,</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TextEncoder</span><span class="p">().</span><span class="nx">encode</span><span class="p">(</span><span class="nx">str</span><span class="p">));</span>
@@ -493,9 +493,9 @@
 <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>hashed</code> flag ป้องกัน re-processing หาก <code>e.target.submit()</code> บังเอิญ re-fires event <code>e.target.submit()</code> (DOM method) bypasses <code>submit</code> event ทั้งหมด ดังนั้น flag นี้เป็นหลัก safety guard</p>
-<h3 id="adding-inline-validation">Adding inline validation<a class="headerlink" href="#adding-inline-validation" title="Permanent link">&para;</a></h3>
-<p>Signup form เพิ่ม password validation <code>pwError</code> state drives inline error paragraph ไม่มี extra DOM wiring:</p>
+<p>ธง <code>hashed</code> ป้องกันการประมวลผลซ้ำหากวิธี <code>e.target.submit()</code> ทำให้เหตุการณ์ submit ไฟร์ใหม่ <code>e.target.submit()</code> (วิธี DOM) ข้ามเหตุการณ์ submit โดยสิ้นเชิง ดังนั้นธงส่วนใหญ่เป็นการป้องกันความปลอดภัย</p>
+<h3 id="_3">เพิ่มการตรวจสอบแบบอินไลน์<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>แบบฟอร์มลงทะเบียนจะเพิ่มการตรวจสอบรหัสผ่าน <code>pwError</code> สถานะขับเคลื่อนย่อหน้าข้อผิดพลาดแบบอินไลน์โดยไม่มีการจากสายอื่นๆ:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">p</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;pwError&quot;</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;pwError&quot;</span>
    <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none; color:#721c24; background:#f8d7da;</span>
 <span class="s">          padding:8px 12px; border-radius:4px; margin:0 0 12px;&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
@@ -507,11 +507,11 @@
 <span class="k">this</span><span class="p">.</span><span class="nx">pwError</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span>
 </code></pre></div>
 
-<p>ไม่มี <code>document.getElementById</code>, ไม่มี manual <code>style.display</code> toggling Alpine keeps element ในการซิงค์</p>
+<p>ไม่มี <code>document.getElementById</code> ไม่มีการสลับ <code>style.display</code> ด้วยตนเอง Alpine ทำให้องค์ประกอบอยู่ในซิงค์</p>
 <hr />
-<h2 id="pattern-4-multi-value-checkboxes-no-alpine-needed">Pattern 4 — Multi-value checkboxes (no Alpine needed)<a class="headerlink" href="#pattern-4-multi-value-checkboxes-no-alpine-needed" title="Permanent link">&para;</a></h2>
-<p>Tag checkboxes บน note form ก่อนหน้านี้ต้องมี JS เพื่อ collect checked values เป็น hidden field นี่คือ unnecessary — native HTML form serialization sends checkboxes ทั้งหมดที่ checked ด้วย <code>name</code> เดียวกันเป็น multiple values Xojo&rsquo;s <code>FormParser</code> ตรวจสอบแล้ว comma-append สำหรับ duplicate keys</p>
-<p>Pattern ที่ถูกต้องต้องการ <strong>ไม่มี JavaScript เลย</strong>:</p>
+<h2 id="4-alpine">รูปแบบ 4 — กล่องตรวจสอบหลายค่า (ไม่จำเป็นต้องใช้ Alpine)<a class="headerlink" href="#4-alpine" title="Permanent link">&para;</a></h2>
+<p>กล่องตรวจสอบแท็กบนแบบฟอร์มบันทึกย่อต้องใช้ JS เพื่อรวบรวมค่าที่ตรวจสอบลงในฟิลด์ที่ซ่อน สิ่งนี้ไม่จำเป็น — การจัดลำดับแบบฟอร์มดั้งเดิมส่งกล่องตรวจสอบทั้งหมดที่มี <code>name</code> เดียวกันเป็นค่าหลายค่า <code>FormParser</code> ของ Xojo จัดการการต่อเพิ่มแล้วสำหรับคีย์ที่ซ้ำกัน</p>
+<p>รูปแบบที่ถูกต้องต้องการ <strong>ไม่มี JavaScript เลย</strong>:</p>
 <div class="highlight"><pre><span></span><code>{% for tag in all_tags %}
 <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;tag_ids&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ tag.id }}&quot;</span>
        <span class="err">{%</span> <span class="na">if</span> <span class="na">tag</span><span class="err">.</span><span class="na">selected </span><span class="o">=</span><span class="s">=</span> <span class="err">&quot;</span><span class="na">1</span><span class="err">&quot;</span> <span class="err">%}</span><span class="na">checked</span><span class="err">{%</span> <span class="na">endif</span> <span class="err">%}</span><span class="p">&gt;</span>
@@ -519,46 +519,46 @@
 {% endfor %}
 </code></pre></div>
 
-<p>Form submits <code>tag_ids=1&amp;tag_ids=3</code>, FormParser stores <code>"1,3"</code> และ ViewModel splits บน <code>","</code> เหมือนก่อนหน้า ไม่มี hidden field ไม่มี script block</p>
+<p>แบบฟอร์มส่ง <code>tag_ids=1&amp;tag_ids=3</code> FormParser เก็บ <code>"1,3"</code> และ ViewModel แยกออกมา <code>","</code> เช่นเดิม ไม่มีฟิลด์ที่ซ่อน ไม่มีบล็อกสคริปต์</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>ก่อนที่จะ reach for Alpine (หรือ JS ใด ๆ) check ว่า browser&rsquo;s native form serialization ทำสิ่งที่คุณต้องการแล้วหรือไม่ Multiple checkboxes, radio groups และ <code>&lt;select multiple&gt;</code> ทั้งหมดทำงานได้โดยไม่มี JavaScript</p>
+<p>ก่อนที่จะมาถึง Alpine (หรือ JS ใดๆ) ให้ตรวจสอบว่าการจัดลำดับแบบฟอร์มดั้งเดิมของเบราว์เซอร์นั้นทำสิ่งที่คุณต้องการแล้ว กล่องตรวจสอบหลายกล่อง กลุ่มปุ่มวิทยุ และ <code>&lt;select multiple&gt;</code> ล้วนใช้งานได้โดยไม่มี JavaScript</p>
 </div>
 <hr />
-<h2 id="js-footprint-comparison">JS footprint comparison<a class="headerlink" href="#js-footprint-comparison" title="Permanent link">&para;</a></h2>
+<h2 id="js">การเปรียบเทียบการใช้พื้นที่ JS<a class="headerlink" href="#js" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>What</th>
-<th>Before Alpine</th>
-<th>After Alpine</th>
+<th>สิ่งที่</th>
+<th>ก่อนที่ Alpine</th>
+<th>หลังจาก Alpine</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>base.html IIFE</td>
-<td>30 lines</td>
-<td>0 (replaced by <code>x-data</code> attributes)</td>
+<td>30 บรรทัด</td>
+<td>0 (แทนที่ด้วยแอตทริบิวต์ <code>x-data</code>)</td>
 </tr>
 <tr>
 <td>login.html <code>&lt;script&gt;</code></td>
-<td>19 lines</td>
-<td>8 (sha256hex helper only)</td>
+<td>19 บรรทัด</td>
+<td>8 (ตัวช่วย sha256hex เท่านั้น)</td>
 </tr>
 <tr>
 <td>signup.html <code>&lt;script&gt;</code></td>
-<td>35 lines</td>
-<td>8 (sha256hex helper only)</td>
+<td>35 บรรทัด</td>
+<td>8 (ตัวช่วย sha256hex เท่านั้น)</td>
 </tr>
 <tr>
 <td>notes/form.html <code>&lt;script&gt;</code></td>
-<td>9 lines</td>
-<td>0 (removed entirely)</td>
+<td>9 บรรทัด</td>
+<td>0 (ลบออกทั้งหมด)</td>
 </tr>
 <tr>
-<td><strong>Total custom JS</strong></td>
-<td><strong>93 lines</strong></td>
-<td><strong>16 lines</strong></td>
+<td><strong>รวมจำนวน JS ที่กำหนดเอง</strong></td>
+<td><strong>93 บรรทัด</strong></td>
+<td><strong>16 บรรทัด</strong></td>
 </tr>
 <tr>
 <td>Alpine CDN</td>
@@ -567,40 +567,40 @@
 </tr>
 </tbody>
 </table>
-<p>16 lines irreducible คือ SHA-256 helper function (duplicated ข้าม login และ signup) นี่ไม่สามารถย้ายไปยังไฟล์ที่แชร์โดยไม่มี build step — deliberate trade-off เพื่อรักษา zero build tooling</p>
+<p>16 บรรทัดที่หลีกไม่ได้คือฟังก์ชันตัวช่วย SHA-256 (ทำซ้ำในหน้าเข้าสู่ระบบและลงทะเบียน) นี้ไม่สามารถย้ายไปยังไฟล์ที่แชร์ได้โดยไม่มีขั้นตอนการสร้าง — การแลกเปลี่ยนที่ตั้งใจไว้เพื่อให้เกิดเป็นศูนย์เครื่องมือสร้าง</p>
 <hr />
-<h2 id="when-to-reach-for-htmx">When to reach for htmx<a class="headerlink" href="#when-to-reach-for-htmx" title="Permanent link">&para;</a></h2>
-<p>Alpine manages <strong>local browser state</strong> เมื่อ interaction ต้อง <strong>fetch จากเซิร์ฟเวอร์และอัปเดตส่วนของหน้า</strong> add htmx แทนการขยาย Alpine</p>
-<p>Trigger features ที่รับประกัน adding htmx:</p>
+<h2 id="htmx">เมื่อใดที่ควรมาถึง htmx<a class="headerlink" href="#htmx" title="Permanent link">&para;</a></h2>
+<p>Alpine จัดการ <strong>สถานะในเบราว์เซอร์ในท้องถิ่น</strong> เมื่อการโต้ตอบต้องการ <strong>ดึงข้อมูลจากเซิร์ฟเวอร์และอัปเดตส่วนของหน้า</strong> ให้เพิ่ม htmx แทนการขยาย Alpine</p>
+<p>คุณสมบัติทริกเกอร์ที่รับประกันการเพิ่ม htmx:</p>
 <ul>
-<li>Inline edit (click note → form appears in place, saves ไม่มี reload)</li>
-<li>Delete ไม่มี reload (remove row จาก list)</li>
-<li>Live search / filter (notes หรือ tags update เมื่อคุณพิมพ์)</li>
-<li>Pagination ไม่มี reload</li>
-<li>Tag toggle บน list view</li>
+<li>การแก้ไขแบบอินไลน์ (บันทึกคลิก → แบบฟอร์มปรากฏในสถานที่ บันทึกโดยไม่ต้องโหลดใหม่)</li>
+<li>ลบโดยไม่ต้องโหลดใหม่ (ลบแถวออกจากรายการ)</li>
+<li>ค้นหาสดชื่น / ตัวกรอง (บันทึกย่อหรือแท็กอัปเดตเมื่อคุณพิมพ์)</li>
+<li>การแบ่งหน้าโดยไม่ต้องโหลดใหม่</li>
+<li>สลับแท็กในมุมมองรายการ</li>
 </ul>
-<p>htmx และ Alpine compose อย่างสะอาด — Alpine owns local state, htmx owns server round-trips libraries ทั้งสองไม่ conflict</p>
+<p>htmx และ Alpine องค์ประกอบอย่างสะอาด — Alpine เป็นเจ้าของสถานะในท้องถิ่น htmx เป็นเจ้าของรอบเซิร์ฟเวอร์ ห้องสมุดทั้งสองไม่ขัดแย้งกัน</p>
 <hr />
-<h2 id="what-alpine-will-never-replace">What Alpine will never replace<a class="headerlink" href="#what-alpine-will-never-replace" title="Permanent link">&para;</a></h2>
+<h2 id="alpine">สิ่งที่ Alpine จะไม่เปลี่ยนแปลงไป<a class="headerlink" href="#alpine" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>JS</th>
-<th>Reason</th>
+<th>เหตุผล</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>crypto.subtle.digest</code> (SHA-256)</td>
-<td>Browser security API ไม่มี Alpine equivalent</td>
+<td>Browser security API, ไม่มี Alpine equivalent</td>
 </tr>
 <tr>
-<td><code>localStorage</code> / <code>sessionStorage</code> reads และ writes</td>
-<td>Still needed; Alpine เพียงแค่ organises มันใน <code>x-data</code></td>
+<td><code>localStorage</code> / <code>sessionStorage</code> อ่านและเขียน</td>
+<td>ยังคง จำเป็น Alpine เพียงแค่จัดระเบียบพวกเขาใน <code>x-data</code></td>
 </tr>
 <tr>
-<td>Server-side session persistence</td>
-<td>Architectural — requires cookie-based auth ไม่เกี่ยวข้องกับ Alpine</td>
+<td>ความยืดหยุ่นของเซสชันฝั่งเซิร์ฟเวอร์</td>
+<td>สถาปัตยกรรม — ต้องการการตรวจสอบสิทธิ์ตามคุกกี้ ไม่เกี่ยวข้องกับ Alpine</td>
 </tr>
 </tbody>
 </table>
@@ -637,47 +637,47 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#philosophy">Philosophy</a>
+            <a class="toc-link" href="#ปรชญา">ปรัชญา</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#installation">Installation</a>
+            <a class="toc-link" href="#การตดตง">การติดตั้ง</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#core-directives-used-in-xjmvvm">Core directives used in XjMVVM</a>
+            <a class="toc-link" href="#คำสง-core-ทใชใน-xjmvvm">คำสั่ง Core ที่ใช้ใน XjMVVM</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#pattern-1-nav-auth-state">Pattern 1 — Nav auth state</a>
+            <a class="toc-link" href="#รปแบบ-1-สถานะตรวจสอบสทธ-nav">รูปแบบ 1 — สถานะตรวจสอบสิทธิ์ Nav</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#pattern-2-client-side-flash-messages">Pattern 2 — Client-side flash messages</a>
+            <a class="toc-link" href="#รปแบบ-2-ขอความแฟลชฝงไคลเอนต">รูปแบบ 2 — ข้อความแฟลชฝั่งไคลเอนต์</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#pattern-3-form-submit-with-async-pre-processing">Pattern 3 — Form submit with async pre-processing</a>
+            <a class="toc-link" href="#รปแบบ-3-สงแบบฟอรมพรอมการประมวลผลกอนอะแซงกก">รูปแบบ 3 — ส่งแบบฟอร์มพร้อมการประมวลผลก่อนอะแซงก์ก</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#adding-inline-validation">Adding inline validation</a>
+            <a class="toc-link" href="#เพมการตรวจสอบแบบอนไลน">เพิ่มการตรวจสอบแบบอินไลน์</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#pattern-4-multi-value-checkboxes-no-alpine-needed">Pattern 4 — Multi-value checkboxes (no Alpine needed)</a>
+            <a class="toc-link" href="#รปแบบ-4-กลองตรวจสอบหลายคา-ไมจำเปนตองใช-alpine">รูปแบบ 4 — กล่องตรวจสอบหลายค่า (ไม่จำเป็นต้องใช้ Alpine)</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#js-footprint-comparison">JS footprint comparison</a>
+            <a class="toc-link" href="#การเปรยบเทยบการใชพนท-js">การเปรียบเทียบการใช้พื้นที่ JS</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#when-to-reach-for-htmx">When to reach for htmx</a>
+            <a class="toc-link" href="#เมอใดทควรมาถง-htmx">เมื่อใดที่ควรมาถึง htmx</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#what-alpine-will-never-replace">What Alpine will never replace</a>
+            <a class="toc-link" href="#สงท-alpine-จะไมเปลยนแปลงไป">สิ่งที่ Alpine จะไม่เปลี่ยนแปลงไป</a>
           </li>
           
         </ul>

@@ -1,15 +1,15 @@
 ---
-title: การเสิร์ฟทรัพยากรคงที่
-description: วิธีการเสิร์ฟไฟล์ CSS JavaScript รูปภาพและไฟล์คงที่อื่น ๆ ในแอป XjMVVM
+title: การให้บริการ Static Assets
+description: วิธีการให้บริการไฟล์ CSS, JavaScript, รูปภาพ และไฟล์ static อื่นๆ ในแอป XjMVVM
 ---
 
-# การเสิร์ฟทรัพยากรคงที่
+# การให้บริการ Static Assets
 
-เนื่องจาก `HandleURL` ดักจับคำขอทั้งหมด คุณต้องจัดการคำขออย่างชัดเจนสำหรับทรัพยากรคงที่ (`.css`, `.js`, รูปภาพ ฟอนต์) มีสามวิธี เรียงลำดับจากที่ง่ายที่สุดไปยังที่ยืดหยุ่นมากที่สุด
+เนื่องจาก `HandleURL` จะสกัดกั้นทุกคำขอ คุณต้องจัดการคำขอ static assets (`.css`, `.js`, รูปภาพ, ฟอนต์) อย่างชัดเจน มีสามวิธี โดยเรียงลำดับจากง่ายไปยังยืดหยุ่นมากที่สุด
 
-## ตัวเลือกที่ 1 — ลิงก์ CDN (แนะนำสำหรับไลบรารี)
+## Option 1 — CDN links (แนะนำสำหรับไลบรารี)
 
-สำหรับไลบรารีบุคคลที่สาม (Tailwind Alpine.js ไลบรารีแผนภูมิ) ลิงก์โดยตรงจาก CDN ไม่ต้องใช้โค้ด Xojo
+สำหรับไลบรารีบุคคลที่สาม (Tailwind, Alpine.js, ไลบรารีแผนภูมิ) ให้เชื่อมโยงจาก CDN โดยตรง ไม่จำเป็นต้องใช้โค้ด Xojo
 
 ```html
 {# templates/layouts/base.html #}
@@ -19,11 +19,11 @@ description: วิธีการเสิร์ฟไฟล์ CSS JavaScript 
 </head>
 ```
 
-ใช้สำหรับไลบรารีที่คุณไม่ปรับเปลี่ยน ความซับซ้อนของการปรับใช้เป็นศูนย์
+ใช้วิธีนี้สำหรับไลบรารีที่คุณไม่ได้แก้ไข ความซับซ้อนในการปรับใช้เป็นศูนย์
 
-## ตัวเลือกที่ 2 — Static file ViewModel
+## Option 2 — Static file ViewModel
 
-สำหรับ CSS JS และรูปภาพของคุณเอง ลงทะเบียนเส้นทาง `/static/:file` ที่อ่านไฟล์จากดิสก์และเขียนไปยังการตอบสนอง
+สำหรับ CSS, JS และรูปภาพของคุณเอง ให้ลงทะเบียนเส้นทาง `/static/:file` ที่อ่านไฟล์จากดิสก์และเขียนไปยังการตอบสนอง
 
 ### 1. สร้าง ViewModel
 
@@ -36,14 +36,14 @@ Class StaticFileVM
   Sub OnGet()
     Var fileName As String = GetParam("file")
 
-    // ความปลอดภัย: ปฏิเสธความพยายามการข้ามเส้นทาง
+    // Security: reject path traversal attempts
     If fileName.Contains("..") Or fileName.Contains("/") Or fileName.Contains("\") Then
       Response.Status = 400
       Response.Write("Bad Request")
       Return
     End If
 
-    // สร้างเส้นทางไปยังโฟลเดอร์ static/ (ปรับตามเค้าโครงโครงการของคุณ)
+    // Build path to static/ folder (adjust for your project layout)
     Var staticDir As New FolderItem("/path/to/mvvm/static", FolderItem.PathModes.Native)
     Var file As FolderItem = staticDir.Child(fileName)
 
@@ -53,13 +53,13 @@ Class StaticFileVM
       Return
     End If
 
-    // ตั้งค่าประเภท MIME ตามนามสกุล
+    // Set MIME type based on extension
     Response.Header("Content-Type") = MimeType(fileName)
 
-    // แคชทรัพยากรคงที่เป็นเวลา 1 ชั่วโมงในโปรดักชัน
+    // Cache static assets for 1 hour in production
     Response.Header("Cache-Control") = "public, max-age=3600"
 
-    // อ่านและเขียนไบต์ไฟล์
+    // Read and write file bytes
     Var bs As BinaryStream = BinaryStream.Open(file, False)
     Response.Write(bs.Read(bs.Length))
     bs.Close()
@@ -87,15 +87,15 @@ End Class
 
 ### 2. ลงทะเบียนเส้นทาง
 
-ใน `App.Opening()` ลงทะเบียนเส้นทางคงที่ **หลังจาก** เส้นทางอื่นทั้งหมดเพื่อหลีกเลี่ยงการจับคู่เส้นทางแอปพลิเคชันโดยไม่ตั้งใจ:
+ใน `App.Opening()` ให้ลงทะเบียนเส้นทาง static **หลังจาก** เส้นทางอื่นๆ ทั้งหมดเพื่อหลีกเลี่ยงการจับคู่เส้นทางแอปพลิเคชันโดยไม่ตั้งใจ:
 
 ```xojo
-// ลงทะเบียนเส้นทางแอปพลิเคชันก่อน
+// Register application routes first
 mRouter.Get("/",           New HomeViewModelFactory())
 mRouter.Get("/notes",      New NotesListVMFactory())
-// ... เส้นทางอื่นทั้งหมด ...
+// ... all other routes ...
 
-// ไฟล์คงที่สุดท้าย
+// Static files last
 mRouter.Get("/static/:file", New StaticFileVMFactory())
 ```
 
@@ -118,24 +118,24 @@ mvvm/
 ```
 
 !!! warning "ความปลอดภัย"
-    เสมอยืนยันชื่อไฟล์ก่อนอ่านจากดิสก์ การตรวจสอบการข้ามเส้นทาง (`..`, `/`, `\`) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำที่จำเป็น ไม่เคยสร้างเส้นทางไฟล์จากข้อมูลป้อนผู้ใช้โดยไม่มีการตรวจสอบ
+    ตรวจสอบชื่อไฟล์เสมอก่อนการอ่านจากดิสก์ การตรวจสอบ path traversal (`..`, `/`, `\`) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำ ไม่ว่าสร้างเส้นทางไฟล์จากข้อมูลที่ป้อนโดยผู้ใช้โดยไม่มีการตรวจสอบ
 
-## ตัวเลือกที่ 3 — Xojo Copy Files build step
+## Option 3 — Xojo Copy Files build step
 
-สำหรับไฟล์ที่ควรมีชุดรวมกับไบนารีแอปพลิเคชัน (ฟอนต์ รูปภาพเริ่มต้น) ให้ใช้ขั้น **Copy Files** ของ Xojo เพื่อรวมไฟล์เหล่านั้นไว้ในโฟลเดอร์ Resources ของแอป
+สำหรับไฟล์ที่ควรรวมอยู่กับไบนารีแอปพลิเคชัน (ฟอนต์, รูปภาพเริ่มต้น) ให้ใช้ **Copy Files** build step ของ Xojo เพื่อรวมไฟล์เหล่านั้นในโฟลเดอร์ Resources ของแอป
 
-จากนั้นเข้าถึงพวกมันในเวลาทำงานผ่าน:
+จากนั้นเข้าถึงพวกมันในรันไทม์ผ่าน:
 
 ```xojo
 Var resourceDir As FolderItem = App.ExecutableFile.Parent.Child("Resources")
 Var file As FolderItem = resourceDir.Child(fileName)
 ```
 
-วิธีการนี้เหมาะสำหรับไฟล์ที่ส่งมาพร้อมกับแอปและไม่เปลี่ยนแปลงในเวลาทำงาน สำหรับทรัพยากรนักพัฒนาที่คุณแก้ไขบ่อย ๆ ระหว่างการพัฒนา ตัวเลือกที่ 2 จะสะดวกมากกว่า
+วิธีนี้เหมาะสำหรับไฟล์ที่มาพร้อมกับแอปและไม่เปลี่ยนแปลงในรันไทม์ สำหรับ asset นักพัฒนาที่คุณแก้ไขบ่อยครั้งระหว่างการพัฒนา Option 2 จะสะดวกกว่า
 
-## อ้างอิงประเภท MIME
+## MIME types reference
 
-| นามสกุล | ประเภท MIME |
+| ส่วนขยาย | MIME type |
 |---|---|
 | `.html` | `text/html; charset=utf-8` |
 | `.css` | `text/css; charset=utf-8` |

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ระบบการตรวจสอบสิทธิ์ — MVVM Docs</title>
-  <meta name="description" content="วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้ การเข้าสู่ระบบ การออกจากระบบ การแฮช รหัสผ่าน และการตรวจสอบสิทธิ์ตามคุกกี้สำหรับโหมด SSR" />
+  <title>ระบบการตรวจสอบอัตลักษณ์ — MVVM Docs</title>
+  <meta name="description" content="วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้, การเข้าสู่ระบบ, การออกจากระบบ, การแฮชรหัสผ่าน, และการตรวจสอบอัตลักษณ์แบบ cookie สำหรับโหมด SSR" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,15 +343,15 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">ระบบการตรวจสอบสิทธิ์</h1>
-          <p class="page-description">วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้ การเข้าสู่ระบบ การออกจากระบบ การแฮช รหัสผ่าน และการตรวจสอบสิทธิ์ตามคุกกี้สำหรับโหมด SSR</p>
+          <h1 class="page-title">ระบบการตรวจสอบอัตลักษณ์</h1>
+          <p class="page-description">วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้, การเข้าสู่ระบบ, การออกจากระบบ, การแฮชรหัสผ่าน, และการตรวจสอบอัตลักษณ์แบบ cookie สำหรับโหมด SSR</p>
         </div>
 
-        <h1 id="_1">ระบบการตรวจสอบสิทธิ์<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>การตรวจสอบสิทธิ์ใน XjMVVM สร้างขึ้นจากสามชั้น: <strong><code>UserModel</code></strong> เก็บและตรวจสอบข้อมูลประจำตัว <strong><code>BaseViewModel</code></strong> จัดเตรียมตัวช่วยด้านการตรวจสอบสิทธิ์ตามคุกกี้ที่ปกป้องเส้นทางและเปิดเผยผู้ใช้ปัจจุบันให้แม่แบบ และ <strong>JavaScript ฝั่งเบราว์เซอร์</strong> เชื่อมช่องว่าง SSR session สำหรับสถานะนำทางและข้อความประกาศ</p>
+        <h1 id="_1">ระบบการตรวจสอบอัตลักษณ์<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>การตรวจสอบอัตลักษณ์ใน XjMVVM สร้างขึ้นจากสามชั้น: <strong><code>UserModel</code></strong> จัดเก็บและตรวจสอบข้อมูลประจำตัว, <strong><code>BaseViewModel</code></strong> มีเมธอด auth ที่ใช้ cookie เพื่อปกป้องเส้นทางและเปิดเผยผู้ใช้ปัจจุบันให้กับเทมเพลต, และ <strong>JavaScript ฝั่งเบราวเซอร์</strong> เชื่อมช่องว่างเซสชัน SSR สำหรับสถานะเนวิเกชันและข้อความแฟลช</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong><code>Self.Session</code> เป็น Nil เสมอในโหมด SSR</strong> Xojo Web 2 <code>WebSession</code> ต้องการการเชื่อมต่อ WebSocket ที่ยั่งยืน ในโหมด SSR บริสุทธิ์ — โดยที่ <code>HandleURL</code> ส่งกลับ <code>True</code> เสมอ — ไม่มี WebSocket และไม่มี session ทั้งหมดการตรวจสอบสิทธิ์ใช้คุกกี้ที่ลงนามด้วย HMAC แทน</p>
+<p><strong><code>Self.Session</code> มีค่าเป็น Nil เสมอในโหมด SSR</strong> Xojo Web 2 ของ <code>WebSession</code> ต้องการการเชื่อมต่อ WebSocket ที่คงอยู่ ในโหมด SSR บริสุทธิ์ — ซึ่ง <code>HandleURL</code> จะคืนค่า <code>True</code> เสมอ — ไม่มี WebSocket และไม่มีเซสชัน การตรวจสอบอัตลักษณ์ทั้งหมดใช้ cookie ที่ลงนาม HMAC แทน</p>
 </div>
 <h2 id="_2">ภาพรวม<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <div class="diagram-tabs" id="diag1">
@@ -560,9 +560,9 @@ GET protected route
 <hr />
 <h2 id="usermodel">UserModel<a class="headerlink" href="#usermodel" title="Permanent link">&para;</a></h2>
 <p><strong>ไฟล์:</strong> <code>Models/UserModel.xojo_code</code></p>
-<p><code>UserModel</code> สืบทอด <code>BaseModel</code> ตารางของมันคือ <code>users(id, username, password_hash, created_at)</code> คอลัมน์ <code>password_hash</code> เก็บสตริงเดียวในรูปแบบ <code>hash:salt</code></p>
-<h3 id="sha-256">การแฮช SHA-256 ฝั่งไคลเอ็นต์<a class="headerlink" href="#sha-256" title="Permanent link">&para;</a></h3>
-<p>ก่อนที่ฟอร์มเข้าสู่ระบบหรือลงทะเบียนจะถูกส่ง เบราว์เซอร์จะแฮชรหัสผ่านโดยใช้ <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest">Web Crypto API</a> เพื่อที่รหัสผ่านในรูปแบบข้อความธรรมชาติจะไม่ผ่านเครือข่าย:</p>
+<p><code>UserModel</code> สืบทอดจาก <code>BaseModel</code> ตารางของมันคือ <code>users(id, username, password_hash, created_at)</code> คอลัมน์ <code>password_hash</code> จัดเก็บสตริงเดียวในรูปแบบ <code>hash:salt</code></p>
+<h3 id="sha-256">การแฮช SHA-256 ฝั่งไคลเอนต์<a class="headerlink" href="#sha-256" title="Permanent link">&para;</a></h3>
+<p>ก่อนฟอร์มการเข้าสู่ระบบหรือการลงทะเบียนถูกส่ง เบราวเซอร์จะแฮชรหัสผ่านโดยใช้ <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest">Web Crypto API</a> เพื่อไม่ให้รหัสผ่านเป็นข้อความธรรมชาติข้ามเครือข่าย:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">subtle</span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;SHA-256&#39;</span><span class="p">,</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TextEncoder</span><span class="p">().</span><span class="nx">encode</span><span class="p">(</span><span class="nx">str</span><span class="p">));</span>
@@ -572,7 +572,7 @@ GET protected route
 <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>Alpine.js ขัดขวางการส่งฟอร์ม แฮชรหัสผ่าน จากนั้นส่ง:</p>
+<p>Alpine.js ดักจับการส่งฟอร์ม แฮชรหัสผ่าน แล้วส่ง:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/login&quot;</span>
       <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
 <span class="s">        hashed: false,</span>
@@ -587,24 +587,24 @@ GET protected route
       <span class="err">@</span><span class="na">submit</span><span class="err">.</span><span class="na">prevent</span><span class="o">=</span><span class="s">&quot;handleSubmit($event)&quot;</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>ธง <code>hashed</code> ป้องกันการประมวลผลซ้ำหาก <code>e.target.submit()</code> ไม่ทำให้เหตุการณ์เกิดซ้ำ</p>
+<p>แฟล็ก <code>hashed</code> ป้องกันการประมวลผลซ้ำถ้า <code>e.target.submit()</code> ไม่ว่าด้วยเหตุใดก็ตามจะไฟ <code>e.target.submit()</code> ใหม่</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>crypto.subtle</code> พร้อมใช้งานในเบราว์เซอร์สมัยใหม่ทั้งหมดและไม่ต้องใช้ไลบรารี <code>crypto.subtle</code> ใช้ได้เฉพาะในบริบทที่ปลอดภัย (HTTPS หรือ localhost)</p>
+<p><code>crypto.subtle</code> พร้อมใช้งานในเบราวเซอร์สมัยใหม่ทั้งหมด และไม่ต้องการไลบรารี่ใด ๆ มันพร้อมใช้งานเฉพาะในบริบทที่ปลอดภัย (HTTPS หรือ localhost)</p>
 </div>
-<h3 id="_3">การเก็บรหัสผ่านฝั่งเซิร์ฟเวอร์<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>เซิร์ฟเวอร์รับแฮช SHA-256 ฝั่งไคลเอ็นต์ (<code>SHA256(plaintext)</code>) เป็นฟิลด์รหัสผ่าน จากนั้นจึงใช้แฮชที่สองด้วยการสุ่มต่อผู้ใช้ salt ก่อนการจัดเก็บ:</p>
+<h3 id="_3">การจัดเก็บรหัสผ่านฝั่งเซิร์ฟเวอร์<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>เซิร์ฟเวอร์รับแฮช SHA-256 ฝั่งไคลเอนต์ (<code>SHA256(plaintext)</code>) เป็นฟิลด์รหัสผ่าน จากนั้นจะใช้แฮชที่สองกับเกลือสุ่มต่อผู้ใช้ก่อนจัดเก็บ:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">HashPassword</span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">salt</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="c1">// password is already SHA256(plaintext) from the browser</span>
 <span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">salt</span><span class="p">))</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ค่าที่เก็บ: <code>SHA256(SHA256(plaintext) + salt) : salt</code></p>
-<p>โมเดลแฮชคู่นี้หมายความว่าฐานข้อมูลไม่เคยเห็นรหัสผ่านเดิมของผู้ใช้แม้ว่าผู้บุกรุกจะมีซอร์สเซิร์ฟเวอร์ <code>EncodeHex(Crypto.SHA256(...))</code> ส่งกลับสตริงเลขฐานสิบหก 64 ตัวอักษร — ไม่ใช่สตริงที่มีคุณสมบัติ <code>.Hex</code> จำเป็นต้องใช้ฟังก์ชันส่วนกลาง <code>EncodeHex()</code></p>
+<p>ค่าจัดเก็บ: <code>SHA256(SHA256(plaintext) + salt) : salt</code></p>
+<p>แบบจำลองแฮชดับเบิลนี้หมายความว่าฐานข้อมูลไม่เคยเห็นรหัสผ่านดั้งเดิมของผู้ใช้แม้ว่าผู้โจมตีจะมีโค้ดต้นทาง <code>EncodeHex(Crypto.SHA256(...))</code> ส่งกลับสตริงเลขฐานสิบหก 64 ตัวอักษร — ไม่ใช่สตริงที่มีคุณสมบัติ <code>.Hex</code> ฟังก์ชันส่วนกลาง <code>EncodeHex()</code> จำเป็น</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>การใช้ SHA-256 + random salt ต่อผู้ใช้นั้นเพียงพอสำหรับแอปพลิเคชันภายในหรือที่มีความเสี่ยงต่ำ สำหรับแอปพลิเคชันที่มีความปลอดภัยสูงหรือเผชิญต่อสาธารณชน ควรใช้การผูก bcrypt หรือ Argon2 หากมีสำหรับแพลตฟอร์มของคุณ</p>
+<p>การใช้ SHA-256 + เกลือสุ่มต่อผู้ใช้เพียงพอสำหรับแอปพลิเคชันภายในหรือความเสี่ยงต่ำส่วนใหญ่ สำหรับแอปพลิเคชันที่มีความปลอดภัยสูงหรือเผชิญต่อสาธารณะ การใช้การผูก bcrypt หรือ Argon2 ควรใช้หากมีอยู่สำหรับแพลตฟอร์มของคุณ</p>
 </div>
 <h3 id="_4">การสร้างผู้ใช้<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
@@ -623,7 +623,7 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ส่งกลับ <code>id</code> ใหม่เมื่อสำเร็จ หรือ <code>0</code> หากชื่อผู้ใช้ถูกใช้ไปแล้ว</p>
+<p>ส่งกลับ <code>id</code> ใหม่เมื่อสำเร็จ หรือ <code>0</code> ถ้าชื่อผู้ใช้ถูกใช้ไปแล้ว</p>
 <h3 id="_5">การตรวจสอบรหัสผ่าน<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">VerifyPassword</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FindByUsername</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
@@ -641,21 +641,21 @@ GET protected route
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>stored.Middle(colonPos + 1)</code> มีฐาน 0 (<code>String.Middle</code> สอดคล้องกับ <code>IndexOf</code>) อย่าใช้ <code>Mid()</code> ที่นี่ — ฟังก์ชันเวอร์ชันเดิมที่มีฐาน 1 จะสร้างความผิดพลาดหนึ่งหน่วยและทำให้การแยก salt เสียหาย</p>
+<p><code>stored.Middle(colonPos + 1)</code> เป็นแบบ 0-based (<code>String.Middle</code> จัดตำแหน่งกับ <code>IndexOf</code>) ไม่เคยใช้ <code>Mid()</code> ที่นี่ — ฟังก์ชันเดิมที่มีพื้นฐาน 1 จะสร้างออฟ-บาย-วันและทำให้การแยกเกลือเสียหาย</p>
 </div>
 <hr />
-<h2 id="_6">การตรวจสอบสิทธิ์ตามคุกกี้<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p>เนื่องจาก <code>Self.Session</code> เป็น Nil เสมอในโหมด SSR XjMVVM จึงใช้คุกกี้ HTTP ที่ลงนามด้วย HMAC สำหรับการตรวจสอบสิทธิ์ คุกกี้ถูกตั้งค่าผ่านส่วนหัว HTTP <code>Set-Cookie</code> และตรวจสอบการใช้งานในทุกคำขอ</p>
-<h3 id="_7">รูปแบบคุกกี้<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h2 id="cookie">การตรวจสอบอัตลักษณ์โดยใช้ Cookie<a class="headerlink" href="#cookie" title="Permanent link">&para;</a></h2>
+<p>เนื่องจาก <code>Self.Session</code> มีค่าเป็น Nil เสมอในโหมด SSR, XjMVVM ใช้ cookie HTTP ที่ลงนาม HMAC สำหรับการตรวจสอบอัตลักษณ์ cookie ถูกตั้งค่าผ่านส่วนหัว HTTP <code>Set-Cookie</code> และตรวจสอบในทุกคำขอ</p>
+<h3 id="cookie_1">รูปแบบ Cookie<a class="headerlink" href="#cookie_1" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>mvvm_auth=&lt;userID&gt;:&lt;username&gt;:&lt;HMAC&gt;
 </code></pre></div>
 
-<p>HMAC คำนวณได้ดังนี้:</p>
+<p>HMAC คำนวณเป็น:</p>
 <div class="highlight"><pre><span></span><code>SHA256(userID + &quot;:&quot; + username + &quot;:&quot; + App.mAuthSecret)
 </code></pre></div>
 
-<p><code>App.mAuthSecret</code> คือสตริง hex 32 ไบต์แบบสุ่มที่สร้างครั้งเดียวเมื่อเริ่มต้นผ่าน <code>Crypto.GenerateRandomBytes(32)</code> มันเปลี่ยนแปลงในการรีสตาร์ททุกครั้ง ซึ่งจะทำให้คุกกี้ auth ที่มีอยู่ทั้งหมดไม่ถูกต้องอย่างมีประสิทธิ</p>
-<h3 id="authcookievalue">AuthCookieValue — สร้างคุกกี้<a class="headerlink" href="#authcookievalue" title="Permanent link">&para;</a></h3>
+<p><code>App.mAuthSecret</code> เป็นสตริงเลขฐานสิบหก 32 ไบต์แบบสุ่มที่สร้างครั้งเดียวในตอนเริ่มต้นผ่าน <code>Crypto.GenerateRandomBytes(32)</code> มันเปลี่ยนแปลงในทุกการรีสตาร์ท ซึ่งมีผลเอาสิ่งอื่นออกจากการตรวจสอบอัตลักษณ์ cookie ที่มีอยู่ทั้งหมด</p>
+<h3 id="authcookievalue-cookie">AuthCookieValue — สร้าง Cookie<a class="headerlink" href="#authcookievalue-cookie" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">userID</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">hmac</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">mAuthSecret</span><span class="p">))</span>
@@ -663,8 +663,8 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<h3 id="parseauthcookie">ParseAuthCookie — ตรวจสอบคุกกี้<a class="headerlink" href="#parseauthcookie" title="Permanent link">&para;</a></h3>
-<p>เรียกในทุกคำขอเพื่อแยกและตรวจสอบผู้ใช้ที่ได้รับการยืนยันตัวตน ผลลัพธ์จะถูกแคชต่อคำขอผ่านคุณสมบัติ <code>mAuthParsed</code> / <code>mAuthCache</code> เพื่อให้หลายการเรียก (จาก <code>RequireLogin</code> <code>CurrentUserID</code> <code>Render</code>) ไม่แยกวิเคราะห์ซ้ำ</p>
+<h3 id="parseauthcookie-cookie">ParseAuthCookie — ตรวจสอบ Cookie<a class="headerlink" href="#parseauthcookie-cookie" title="Permanent link">&para;</a></h3>
+<p>เรียกในทุกคำขอเพื่อแยกและตรวจสอบผู้ใช้ที่ได้รับการตรวจสอบอัตลักษณ์ ผลลัพธ์ถูกแคชต่อคำขอผ่านคุณสมบัติ <code>mAuthParsed</code> / <code>mAuthCache</code> เพื่อหลายการเรียก (จาก <code>RequireLogin</code>, <code>CurrentUserID</code>, <code>Render</code>) ไม่ต้องแยกวิเคราะห์ใหม่</p>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">mAuthParsed</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">mAuthCache</span>
 
@@ -703,14 +703,14 @@ GET protected route
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>การตรวจสอบ HMAC ช่วยให้คุกกี้ไม่สามารถปลอมได้ ผู้บุกรุกจะต้องมี <code>App.mAuthSecret</code> เพื่อสร้างคุกกี้ที่ถูกต้องสำหรับผู้ใช้รายใดก็ได้</p>
+<p>การตรวจสอบ HMAC ช่วยให้ cookie ไม่สามารถปลอมแปลงได้ ผู้โจมตีจะต้องได้ <code>App.mAuthSecret</code> เพื่อสร้าง cookie ที่ถูกต้องสำหรับผู้ใช้ใด ๆ</p>
 </div>
-<h3 id="redirectwithauth">RedirectWithAuth — ตั้งคุกกี้เมื่อเข้าสู่ระบบ/ลงทะเบียน<a class="headerlink" href="#redirectwithauth" title="Permanent link">&para;</a></h3>
-<p>หลังจากการตรวจสอบสิทธิ์สำเร็จ <code>RedirectWithAuth</code> ทำสามสิ่งในการตอบสนองหนึ่ง:</p>
+<h3 id="redirectwithauth-cookie">RedirectWithAuth — ตั้งค่า Cookie เมื่อเข้าสู่ระบบ/ลงทะเบียน<a class="headerlink" href="#redirectwithauth-cookie" title="Permanent link">&para;</a></h3>
+<p>หลังจากการตรวจสอบอัตลักษณ์สำเร็จ <code>RedirectWithAuth</code> ทำสามสิ่งในการตอบสนองเดียว:</p>
 <ol>
-<li>ตั้งคุกกี้ <code>mvvm_auth</code> ผ่านส่วนหัว HTTP <code>Set-Cookie</code></li>
-<li>ส่งหน้า JS ระดับกลางที่เก็บชื่อผู้ใช้ใน <code>localStorage</code> และข้อความประกาศในใน <code>sessionStorage</code></li>
-<li>เปลี่ยนเส้นทางเบราว์เซอร์ไปยัง URL เป้าหมาย</li>
+<li>ตั้งค่า cookie <code>mvvm_auth</code> ผ่านส่วนหัว HTTP <code>Set-Cookie</code></li>
+<li>ส่งหน้า JS กลางที่เก็บชื่อผู้ใช้ใน <code>localStorage</code> และข้อความแฟลชใน <code>sessionStorage</code></li>
+<li>เปลี่ยนเส้นทางเบราวเซอร์ไปยัง URL เป้าหมาย</li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithAuth</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">cookieVal</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span>
@@ -725,14 +725,14 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>หน้า JS ระดับกลางนั้นจำเป็นเพราะ:</p>
+<p>หน้า JS กลางจำเป็นเพราะ:</p>
 <ul>
-<li><code>Set-Cookie</code> ตั้งคุกกี้ HTTP (สำหรับการตรวจสอบสิทธิ์ฝั่งเซิร์ฟเวอร์ในคำขอต่อมา)</li>
-<li><code>localStorage</code> เก็บชื่อผู้ใช้ (สำหรับการแสดงสถานะนำทางฝั่งไคลเอ็นต์ผ่าน Alpine.js)</li>
-<li><code>sessionStorage</code> เก็บข้อความประกาศ (สำหรับการแสดงครั้งเดียวหลังจากเปลี่ยนเส้นทาง)</li>
+<li><code>Set-Cookie</code> ตั้งค่า cookie HTTP (สำหรับการตรวจสอบอัตลักษณ์ฝั่งเซิร์ฟเวอร์ในคำขอต่อมา)</li>
+<li><code>localStorage</code> เก็บชื่อผู้ใช้ (สำหรับการแสดงสถานะเนวิเกชันฝั่งไคลเอนต์ผ่าน Alpine.js)</li>
+<li><code>sessionStorage</code> เก็บข้อความแฟลช (สำหรับการแสดงครั้งเดียวหลังจากเปลี่ยนเส้นทาง)</li>
 </ul>
-<p>กลไกการจัดเก็บสามนี้ทำหน้าที่ต่างกันและไม่สามารถแทนที่ได้</p>
-<h3 id="redirectwithlogout">RedirectWithLogout — การล้างคุกกี้<a class="headerlink" href="#redirectwithlogout" title="Permanent link">&para;</a></h3>
+<p>กลไกการจัดเก็บสามอันนี้ใช้เพื่อวัตถุประสงค์ที่แตกต่างกันและไม่สามารถแทนที่ซึ่งกันและกันได้</p>
+<h3 id="redirectwithlogout-cookie">RedirectWithLogout — ล้าง Cookie<a class="headerlink" href="#redirectwithlogout-cookie" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithLogout</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 <span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Set-Cookie&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mvvm_auth=; Path=/; Max-Age=0; SameSite=Lax&quot;</span>
 <span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
@@ -743,10 +743,10 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p><code>Max-Age=0</code> บอกเบราว์เซอร์ให้ลบคุกกี้ทันที</p>
+<p><code>Max-Age=0</code> บอกเบราวเซอร์ให้ลบ cookie ทันที</p>
 <hr />
-<h2 id="auth-baseviewmodel">ตัวช่วย Auth ของ BaseViewModel<a class="headerlink" href="#auth-baseviewmodel" title="Permanent link">&para;</a></h2>
-<p>สี่วิธีบน <code>BaseViewModel</code> ทำให้การตรวจสอบสิทธิ์สามารถเข้าถึงได้จาก ViewModel ใดก็ได้โดยไม่ต้องจัดการคุกกี้โดยตรง:</p>
+<h2 id="baseviewmodel-auth">ตัวช่วย BaseViewModel Auth<a class="headerlink" href="#baseviewmodel-auth" title="Permanent link">&para;</a></h2>
+<p>สี่เมธอดบน <code>BaseViewModel</code> ทำให้การตรวจสอบอัตลักษณ์เข้าถึงได้จาก ViewModel ใด ๆ โดยไม่จัดการ cookie โดยตรง:</p>
 <h3 id="currentuserid-as-integer"><code>CurrentUserID() As Integer</code><a class="headerlink" href="#currentuserid-as-integer" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
@@ -755,7 +755,7 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ส่งกลับ <code>0</code> เมื่อไม่ได้รับการตรวจสอบสิทธิ์ — ศูนย์ไม่มีวันเป็น ID หลักประจำตัว SQLite <code>AUTOINCREMENT</code> ที่ถูกต้อง</p>
+<p>ส่งกลับ <code>0</code> เมื่อไม่ได้รับการตรวจสอบอัตลักษณ์ — ศูนย์ไม่เคยเป็นคีย์หลักฐานอุปสรรค <code>AUTOINCREMENT</code> ของ SQLite ที่ถูกต้อง</p>
 <h3 id="currentusername-as-string"><code>CurrentUsername() As String</code><a class="headerlink" href="#currentusername-as-string" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
@@ -765,7 +765,7 @@ GET protected route
 </code></pre></div>
 
 <h3 id="requirelogin-as-boolean"><code>RequireLogin() As Boolean</code><a class="headerlink" href="#requirelogin-as-boolean" title="Permanent link">&para;</a></h3>
-<p>ปกป้องเส้นทาง HTML เปลี่ยนเส้นทางผู้ใช้ที่ไม่ได้รับการตรวจสอบสิทธิ์ไปยังหน้าเข้าสู่ระบบด้วยพารามิเตอร์ <code>next</code> เพื่อให้พวกเขากลับไปที่ URL เดิมหลังจากเข้าสู่ระบบ</p>
+<p>ปกป้องเส้นทาง HTML เปลี่ยนเส้นทางผู้ใช้ที่ไม่ได้รับการตรวจสอบอัตลักษณ์ไปยังหน้าเข้าสู่ระบบพร้อมพารามิเตอร์ <code>next</code> เพื่อให้พวกเขากลับไป URL ดั้งเดิมหลังจากเข้าสู่ระบบ</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
 <span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login?next=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EncodeURLComponent</span><span class="p">(</span><span class="n">Request</span><span class="p">.</span><span class="n">Path</span><span class="p">))</span>
@@ -773,7 +773,7 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>รูปแบบการใช้งานใน ViewModel ที่ได้รับการปกป้องใดก็ได้:</p>
+<p>รูปแบบการใช้งานใน ViewModel ที่ได้รับการปกป้องใด ๆ:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// guard -- stops execution if redirect issued</span>
 <span class="w">  </span><span class="c1">// ... rest of handler</span>
@@ -782,10 +782,10 @@ GET protected route
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>RequireLogin()</code> ออกการเปลี่ยนเส้นทาง แต่ <strong>ไม่สามารถหยุดการเรียกใช้งาน</strong> — มันส่งกลับ <code>True</code> เพื่อส่งสัญญาณผู้เรียก จับคู่กับ <code>If RequireLogin() Then Return</code> เสมอ การลืม <code>Return</code> จะทำให้ตัวจัดการทำงานต่อไปหลังจากการเปลี่ยนเส้นทางถูกส่งไปแล้ว</p>
+<p><code>RequireLogin()</code> ออกการเปลี่ยนเส้นทาง แต่ <strong>ไม่สามารถหยุดการทำงาน</strong> — มันส่งกลับ <code>True</code> เพื่อส่งสัญญาณให้ผู้เรียก จับคู่เสมอกับ <code>If RequireLogin() Then Return</code> ลืมคำสั่ง <code>Return</code> จะทำให้ตัวจัดการทำงานต่อหลังจากการเปลี่ยนเส้นทางถูกส่งไปแล้ว</p>
 </div>
 <h3 id="requireloginjson-as-boolean"><code>RequireLoginJSON() As Boolean</code><a class="headerlink" href="#requireloginjson-as-boolean" title="Permanent link">&para;</a></h3>
-<p>ปกป้องเส้นทาง API ส่งกลับข้อผิดพลาด JSON 401 แทนการเปลี่ยนเส้นทาง (ไคลเอ็นต์ API ไม่สามารถติดตามการเปลี่ยนเส้นทาง HTML)</p>
+<p>ปกป้องเส้นทาง API ส่งกลับข้อผิดพลาด 401 JSON แทนการเปลี่ยนเส้นทาง (ไคลเอนต์ API ไม่สามารถทำตามการเปลี่ยนเส้นทาง HTML)</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
 <span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">401</span>
@@ -801,8 +801,8 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<h3 id="current_user">บริบทที่ฉีดเข้าไปโดยอัตโนมัติ — <code>current_user</code><a class="headerlink" href="#current_user" title="Permanent link">&para;</a></h3>
-<p><code>BaseViewModel.Render()</code> ส่งเสมอตัวแปร <code>current_user</code> dictionary ลงในทุกบริบทแม่แบบด้วยค่าเริ่มต้นที่ปลอดภัย เพื่อไม่ให้แม่แบบโยน <code>UndefinedVariableException</code>:</p>
+<h3 id="current_user">บริบทที่ฉีดโดยอัตโนมัติ — <code>current_user</code><a class="headerlink" href="#current_user" title="Permanent link">&para;</a></h3>
+<p><code>BaseViewModel.Render()</code> ฉีด dictionary <code>current_user</code> เสมอในบริบทเทมเพลตทุกอันที่มีค่าเริ่มต้นที่ปลอดภัย เพื่อให้เทมเพลตไม่เคยโยน <code>UndefinedVariableException</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">userCtx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
 <span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0&quot;</span>
 <span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
@@ -819,49 +819,49 @@ GET protected route
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>logged_in</code> คือสตริง <code>"1"</code> หรือ <code>"0"</code> — ไม่ใช่บูลีน — เพราะค่า <code>Dictionary</code> ในแม่แบบ JinjaX ทั้งหมดเป็นสตริง เปรียบเทียบกับ <code>== "1"</code> ไม่ใช่ <code>== True</code></p>
+<p><code>logged_in</code> เป็นสตริง <code>"1"</code> หรือ <code>"0"</code> — ไม่ใช่ boolean — เพราะค่า <code>Dictionary</code> ในเทมเพลต JinjaX ทั้งหมดเป็นสตริง เปรียบเทียบกับ <code>== "1"</code>, ไม่ใช่ <code>== True</code></p>
 </div>
 <hr />
-<h2 id="ssr-session">ข้อจำกัด SSR Session และวิธีการแก้ไขฝั่งไคลเอ็นต์<a class="headerlink" href="#ssr-session" title="Permanent link">&para;</a></h2>
-<p>ใน Xojo Web 2 สถานะ <code>WebSession</code> เชื่อมโยงกับการเชื่อมต่อ WebSocket ที่ยั่งยืน ในโหมด SSR บริสุทธิ์ — โดยที่ <code>HandleURL</code> ส่งกลับ <code>True</code> เสมอและไม่มี WebSocket — แต่ละคำขอ HTTP ไม่มี session นี่หมายความว่า:</p>
+<h2 id="ssr">ข้อจำกัดเซสชัน SSR และการแก้ไขฝั่งไคลเอนต์<a class="headerlink" href="#ssr" title="Permanent link">&para;</a></h2>
+<p>ใน Xojo Web 2 สถานะ <code>WebSession</code> เชื่อมกับการเชื่อมต่อ WebSocket ที่คงอยู่ ในโหมด SSR บริสุทธิ์ — ซึ่ง <code>HandleURL</code> ส่งกลับ <code>True</code> เสมอและไม่มี WebSocket — คำขอ HTTP แต่ละคำขอจะไม่มีเซสชัน ซึ่งหมายความว่า:</p>
 <ul>
-<li>ข้อความประกาศที่เก็บไว้ระหว่าง <code>POST</code> จะ <strong>สูญหาย</strong> ตามเวลาที่การเปลี่ยนเส้นทาง <code>GET</code> มาถึง</li>
-<li>ชื่อผู้ใช้ที่เข้าสู่ระบบ <strong>ไม่พร้อม</strong> สำหรับตัวเรนเดอร์แม่แบบจากสถานะ session</li>
-<li><strong><code>SetFlash()</code> และ <code>Session.LogIn()</code> ทำเป็นว่าไม่มีอะไร</strong> — พวกมันเขียนไป session Nil</li>
+<li>ข้อความแฟลชที่เก็บไว้ระหว่าง <code>POST</code> <strong>จะหายไป</strong> ในเวลา <code>GET</code> ที่เปลี่ยนเส้นทางไป</li>
+<li>ชื่อผู้ใช้ที่เข้าสู่ระบบ <strong>ไม่พร้อมใช้งาน</strong> สำหรับการแสดงเทมเพลตจากสถานะเซสชัน</li>
+<li><strong><code>SetFlash()</code> และ <code>Session.LogIn()</code> ทำโดยปริยายว่าไม่มีอะไร</strong> — พวกเขาเขียนไปยังเซสชัน Nil</li>
 </ul>
-<p>XjMVVM ทำงานรอบข้อจำกัดเหล่านี้ด้วยสามกลไก:</p>
+<p>XjMVVM แก้ไขข้อจำกัดเหล่านี้ด้วยกลไกสามอย่าง:</p>
 <table>
 <thead>
 <tr>
 <th>กลไก</th>
-<th>ที่เก็บ</th>
+<th>การจัดเก็บ</th>
 <th>วัตถุประสงค์</th>
 <th>อายุการใช้งาน</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>คุกกี้ <code>mvvm_auth</code></td>
-<td>คุกกี้ HTTP</td>
-<td>การตรวจสอบสิทธิ์ฝั่งเซิร์ฟเวอร์</td>
-<td>จนกว่าเบราว์เซอร์จะล้างหรือ <code>Max-Age=0</code></td>
+<td>cookie <code>mvvm_auth</code></td>
+<td>cookie HTTP</td>
+<td>การตรวจสอบอัตลักษณ์ฝั่งเซิร์ฟเวอร์</td>
+<td>จนกว่าเบราวเซอร์จะล้างหรือ <code>Max-Age=0</code></td>
 </tr>
 <tr>
 <td><code>localStorage._auth_user</code></td>
-<td>localStorage ของเบราว์เซอร์</td>
-<td>การแสดงนำทางฝั่งไคลเอ็นต์</td>
-<td>ทั้งทั่วแท็บ/การรีสตาร์ท</td>
+<td>localStorage เบราวเซอร์</td>
+<td>การแสดงเนวิเกชันฝั่งไคลเอนต์</td>
+<td>คงอยู่ในแท็บ/การรีสตาร์ท</td>
 </tr>
 <tr>
 <td><code>sessionStorage._flash_msg</code></td>
-<td>sessionStorage ของเบราว์เซอร์</td>
-<td>ข้อความประกาศครั้งเดียว</td>
-<td>แท็บปัจจุบันเท่านั้น รอดชีวิตจากการเปลี่ยนเส้นทาง</td>
+<td>sessionStorage เบราวเซอร์</td>
+<td>ข้อความแฟลชแบบครั้งเดียว</td>
+<td>แท็บปัจจุบันเท่านั้น อยู่รอดได้จากการเปลี่ยนเส้นทาง</td>
 </tr>
 </tbody>
 </table>
-<h3 id="sessionstorage">ข้อความประกาศ — <code>sessionStorage</code><a class="headerlink" href="#sessionstorage" title="Permanent link">&para;</a></h3>
-<p>หน้า JS ระดับกลาง (ส่งโดย <code>RedirectWithAuth</code>) เขียนข้อความความสำเร็จไปยัง <code>sessionStorage</code> Alpine.js อ่านและแสดงสิ่งนี้ในการโหลดหน้าถัดไป:</p>
+<h3 id="sessionstorage">ข้อความแฟลช — <code>sessionStorage</code><a class="headerlink" href="#sessionstorage" title="Permanent link">&para;</a></h3>
+<p>หน้า JS กลาง (ส่งโดย <code>RedirectWithAuth</code>) เขียนข้อความสำเร็จไปยัง <code>sessionStorage</code> Alpine.js อ่านและแสดงในการโหลดหน้าถัดไป:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
 <span class="s">  msg: &#39;&#39;,</span>
 <span class="s">  type: &#39;success&#39;,</span>
@@ -875,8 +875,8 @@ GET protected route
 <span class="s">}&quot;</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">:class</span><span class="o">=</span><span class="s">&quot;&#39;flash flash-&#39; + type&quot;</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<h3 id="_8">การเรนเดอร์ข้อผิดพลาดแบบอินไลน์<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>ข้อผิดพลาดในการเข้าสู่ระบบและลงทะเบียนไม่สามารถใช้ข้อความประกาศ (การเปลี่ยนเส้นทางจะสูญหาย) แทนที่จะเป็นเช่นนั้น ViewModel จะเรนเดอร์ฟอร์มอีกครั้งด้วยตัวแปรแม่แบบ <code>error_message</code>:</p>
+<h3 id="_6">การแสดงข้อผิดพลาดแบบอินไลน์<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<p>ข้อผิดพลาดการเข้าสู่ระบบและการลงทะเบียนไม่สามารถใช้ข้อความแฟลช (การเปลี่ยนเส้นทางจะหล่นพวกเขา) แทนนั้น ViewModel จะแสดงฟอร์มใหม่ด้วยตัวแปรเทมเพลต <code>error_message</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// In LoginVM.OnPost() — on failed login:</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;error_message&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Invalid username or password.&quot;</span>
@@ -884,14 +884,14 @@ GET protected route
 <span class="n">Render</span><span class="p">(</span><span class="s2">&quot;auth/login.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
 </code></pre></div>
 
-<p>แม่แบบแสดงแบบอินไลน์:</p>
+<p>เทมเพลตแสดงแบบอินไลน์:</p>
 <div class="highlight"><pre><span></span><code>{% if error_message %}
 <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flash flash-error&quot;</span><span class="p">&gt;</span>{{ error_message }}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 {% endif %}
 </code></pre></div>
 
-<h3 id="auth-localstorage">สถานะ auth นำทาง — <code>localStorage</code><a class="headerlink" href="#auth-localstorage" title="Permanent link">&para;</a></h3>
-<p>Alpine.js อ่าน <code>localStorage._auth_user</code> เพื่อแสดงสถานะนำทางที่ถูกต้อง:</p>
+<h3 id="localstorage">สถานะการตรวจสอบอัตลักษณ์เนวิเกชัน — <code>localStorage</code><a class="headerlink" href="#localstorage" title="Permanent link">&para;</a></h3>
+<p>Alpine.js อ่าน <code>localStorage._auth_user</code> เพื่อแสดงสถานะเนวิเกชันที่ถูกต้อง:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{ user: localStorage.getItem(&#39;_auth_user&#39;) }&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;!user&quot;</span><span class="p">&gt;</span>
     <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/login&quot;</span><span class="p">&gt;</span>Log In<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
@@ -910,8 +910,10 @@ GET protected route
 <hr />
 <h2 id="auth-viewmodels">Auth ViewModels<a class="headerlink" href="#auth-viewmodels" title="Permanent link">&para;</a></h2>
 <h3 id="loginvm">LoginVM<a class="headerlink" href="#loginvm" title="Permanent link">&para;</a></h3>
-<p><code>GET /login</code> — เรนเดอร์ฟอร์มเข้าสู่ระบบด้วย <code>error_message = ""</code> และอ่านพารามิเตอร์คิวรี <code>next</code> สำหรับการเปลี่ยนเส้นทางหลังจากเข้าสู่ระบบ</p>
-<p><code>POST /login</code> — ตรวจสอบความถูกต้องชื่อผู้ใช้ + รหัสผ่านไม่ว่างเปล่า เรียก <code>UserModel.VerifyPassword()</code> เมื่อสำเร็จ เรียก <code>RedirectWithAuth(nextURL, userID, username)</code> เมื่อล้มเหลว เรนเดอร์ฟอร์มเข้าสู่ระบบอีกครั้งด้วยข้อความแสดงข้อผิดพลาดแบบอินไลน์ (ไม่ใช่</p>
+<p><code>GET /login</code> — แสดงฟอร์มการเข้าสู่ระบบด้วย <code>error_message = ""</code> และอ่านพารามิเตอร์ query <code>next</code> สำหรับการเปลี่ยนเส้นทางหลังเข้าสู่ระบบ</p>
+<p><code>POST /login</code> — ตรวจสอบ username + password ไม่ว่างเปล่า เรียก <code>UserModel.VerifyPassword()</code> เมื่อสำเร็จ เรียก <code>RedirectWithAuth(nextURL, userID, username)</code> เมื่อล้มเหลว แสดงฟอร์มการเข้าสู่ระบบใหม่ด้วยข้อความข้อผิดพลาดแบบอินไลน์ (ไม่ใช่แฟลช — <code>SetFlash</code> เสียหายใน SSR)</p>
+<h3 id="signupvm">SignupVM<a class="headerlink" href="#signupvm" title="Permanent link">&para;</a></h3>
+<p><code>GET /signup</code> — แสดงฟ</p>
 
         <!-- Prev / Next navigation -->
         
@@ -953,11 +955,11 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#การแฮช-sha-256-ฝงไคลเอนต">การแฮช SHA-256 ฝั่งไคลเอ็นต์</a>
+            <a class="toc-link" href="#การแฮช-sha-256-ฝงไคลเอนต">การแฮช SHA-256 ฝั่งไคลเอนต์</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#การเกบรหสผานฝงเซรฟเวอร">การเก็บรหัสผ่านฝั่งเซิร์ฟเวอร์</a>
+            <a class="toc-link" href="#การจดเกบรหสผานฝงเซรฟเวอร">การจัดเก็บรหัสผ่านฝั่งเซิร์ฟเวอร์</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -969,31 +971,31 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การตรวจสอบสทธตามคกก">การตรวจสอบสิทธิ์ตามคุกกี้</a>
+            <a class="toc-link" href="#การตรวจสอบอตลกษณโดยใช-cookie">การตรวจสอบอัตลักษณ์โดยใช้ Cookie</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#รปแบบคกก">รูปแบบคุกกี้</a>
+            <a class="toc-link" href="#รปแบบ-cookie">รูปแบบ Cookie</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#authcookievalue-สรางคกก">AuthCookieValue — สร้างคุกกี้</a>
+            <a class="toc-link" href="#authcookievalue-สราง-cookie">AuthCookieValue — สร้าง Cookie</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#parseauthcookie-ตรวจสอบคกก">ParseAuthCookie — ตรวจสอบคุกกี้</a>
+            <a class="toc-link" href="#parseauthcookie-ตรวจสอบ-cookie">ParseAuthCookie — ตรวจสอบ Cookie</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#redirectwithauth-ตงคกกเมอเขาสระบบลงทะเบยน">RedirectWithAuth — ตั้งคุกกี้เมื่อเข้าสู่ระบบ/ลงทะเบียน</a>
+            <a class="toc-link" href="#redirectwithauth-ตงคา-cookie-เมอเขาสระบบลงทะเบยน">RedirectWithAuth — ตั้งค่า Cookie เมื่อเข้าสู่ระบบ/ลงทะเบียน</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#redirectwithlogout-การลางคกก">RedirectWithLogout — การล้างคุกกี้</a>
+            <a class="toc-link" href="#redirectwithlogout-ลาง-cookie">RedirectWithLogout — ล้าง Cookie</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ตวชวย-auth-ของ-baseviewmodel">ตัวช่วย Auth ของ BaseViewModel</a>
+            <a class="toc-link" href="#ตวชวย-baseviewmodel-auth">ตัวช่วย BaseViewModel Auth</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -1013,23 +1015,23 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#บรบททฉดเขาไปโดยอตโนมต-current_user">บริบทที่ฉีดเข้าไปโดยอัตโนมัติ — `current_user`</a>
+            <a class="toc-link" href="#บรบททฉดโดยอตโนมต-current_user">บริบทที่ฉีดโดยอัตโนมัติ — `current_user`</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ขอจำกด-ssr-session-และวธการแกไขฝงไคลเอนต">ข้อจำกัด SSR Session และวิธีการแก้ไขฝั่งไคลเอ็นต์</a>
+            <a class="toc-link" href="#ขอจำกดเซสชน-ssr-และการแกไขฝงไคลเอนต">ข้อจำกัดเซสชัน SSR และการแก้ไขฝั่งไคลเอนต์</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#ขอความประกาศ-sessionstorage">ข้อความประกาศ — `sessionStorage`</a>
+            <a class="toc-link" href="#ขอความแฟลช-sessionstorage">ข้อความแฟลช — `sessionStorage`</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#การเรนเดอรขอผดพลาดแบบอนไลน">การเรนเดอร์ข้อผิดพลาดแบบอินไลน์</a>
+            <a class="toc-link" href="#การแสดงขอผดพลาดแบบอนไลน">การแสดงข้อผิดพลาดแบบอินไลน์</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#สถานะ-auth-นำทาง-localstorage">สถานะ auth นำทาง — `localStorage`</a>
+            <a class="toc-link" href="#สถานะการตรวจสอบอตลกษณเนวเกชน-localstorage">สถานะการตรวจสอบอัตลักษณ์เนวิเกชัน — `localStorage`</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -1038,6 +1040,10 @@ GET protected route
           
           <li class="toc-item toc-level-3">
             <a class="toc-link" href="#loginvm">LoginVM</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#signupvm">SignupVM</a>
           </li>
           
         </ul>

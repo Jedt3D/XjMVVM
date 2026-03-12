@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>การเสิร์ฟทรัพยากรคงที่ — MVVM Docs</title>
-  <meta name="description" content="วิธีการเสิร์ฟไฟล์ CSS JavaScript รูปภาพและไฟล์คงที่อื่น ๆ ในแอป XjMVVM" />
+  <title>การให้บริการ Static Assets — MVVM Docs</title>
+  <meta name="description" content="วิธีการให้บริการไฟล์ CSS, JavaScript, รูปภาพ และไฟล์ static อื่นๆ ในแอป XjMVVM" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,14 +343,14 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">การเสิร์ฟทรัพยากรคงที่</h1>
-          <p class="page-description">วิธีการเสิร์ฟไฟล์ CSS JavaScript รูปภาพและไฟล์คงที่อื่น ๆ ในแอป XjMVVM</p>
+          <h1 class="page-title">การให้บริการ Static Assets</h1>
+          <p class="page-description">วิธีการให้บริการไฟล์ CSS, JavaScript, รูปภาพ และไฟล์ static อื่นๆ ในแอป XjMVVM</p>
         </div>
 
-        <h1 id="_1">การเสิร์ฟทรัพยากรคงที่<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>เนื่องจาก <code>HandleURL</code> ดักจับคำขอทั้งหมด คุณต้องจัดการคำขออย่างชัดเจนสำหรับทรัพยากรคงที่ (<code>.css</code>, <code>.js</code>, รูปภาพ ฟอนต์) มีสามวิธี เรียงลำดับจากที่ง่ายที่สุดไปยังที่ยืดหยุ่นมากที่สุด</p>
-<h2 id="1-cdn">ตัวเลือกที่ 1 — ลิงก์ CDN (แนะนำสำหรับไลบรารี)<a class="headerlink" href="#1-cdn" title="Permanent link">&para;</a></h2>
-<p>สำหรับไลบรารีบุคคลที่สาม (Tailwind Alpine.js ไลบรารีแผนภูมิ) ลิงก์โดยตรงจาก CDN ไม่ต้องใช้โค้ด Xojo</p>
+        <h1 id="static-assets">การให้บริการ Static Assets<a class="headerlink" href="#static-assets" title="Permanent link">&para;</a></h1>
+<p>เนื่องจาก <code>HandleURL</code> จะสกัดกั้นทุกคำขอ คุณต้องจัดการคำขอ static assets (<code>.css</code>, <code>.js</code>, รูปภาพ, ฟอนต์) อย่างชัดเจน มีสามวิธี โดยเรียงลำดับจากง่ายไปยังยืดหยุ่นมากที่สุด</p>
+<h2 id="option-1-cdn-links">Option 1 — CDN links (แนะนำสำหรับไลบรารี)<a class="headerlink" href="#option-1-cdn-links" title="Permanent link">&para;</a></h2>
+<p>สำหรับไลบรารีบุคคลที่สาม (Tailwind, Alpine.js, ไลบรารีแผนภูมิ) ให้เชื่อมโยงจาก CDN โดยตรง ไม่จำเป็นต้องใช้โค้ด Xojo</p>
 <div class="highlight"><pre><span></span><code>{# templates/layouts/base.html #}
 <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;https://cdn.tailwindcss.com&quot;</span><span class="p">&gt;</span>
@@ -358,9 +358,9 @@
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>ใช้สำหรับไลบรารีที่คุณไม่ปรับเปลี่ยน ความซับซ้อนของการปรับใช้เป็นศูนย์</p>
-<h2 id="2-static-file-viewmodel">ตัวเลือกที่ 2 — Static file ViewModel<a class="headerlink" href="#2-static-file-viewmodel" title="Permanent link">&para;</a></h2>
-<p>สำหรับ CSS JS และรูปภาพของคุณเอง ลงทะเบียนเส้นทาง <code>/static/:file</code> ที่อ่านไฟล์จากดิสก์และเขียนไปยังการตอบสนอง</p>
+<p>ใช้วิธีนี้สำหรับไลบรารีที่คุณไม่ได้แก้ไข ความซับซ้อนในการปรับใช้เป็นศูนย์</p>
+<h2 id="option-2-static-file-viewmodel">Option 2 — Static file ViewModel<a class="headerlink" href="#option-2-static-file-viewmodel" title="Permanent link">&para;</a></h2>
+<p>สำหรับ CSS, JS และรูปภาพของคุณเอง ให้ลงทะเบียนเส้นทาง <code>/static/:file</code> ที่อ่านไฟล์จากดิสก์และเขียนไปยังการตอบสนอง</p>
 <h3 id="1-viewmodel">1. สร้าง ViewModel<a class="headerlink" href="#1-viewmodel" title="Permanent link">&para;</a></h3>
 <p>สร้าง <code>ViewModels/StaticFileVM.xojo_code</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Class</span><span class="w"> </span><span class="n">StaticFileVM</span>
@@ -369,14 +369,14 @@
 <span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c1">// ความปลอดภัย: ปฏิเสธความพยายามการข้ามเส้นทาง</span>
+<span class="w">    </span><span class="c1">// Security: reject path traversal attempts</span>
 <span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;\&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span>
 <span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
 <span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Bad Request&quot;</span><span class="p">)</span>
 <span class="w">      </span><span class="k">Return</span>
 <span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 
-<span class="w">    </span><span class="c1">// สร้างเส้นทางไปยังโฟลเดอร์ static/ (ปรับตามเค้าโครงโครงการของคุณ)</span>
+<span class="w">    </span><span class="c1">// Build path to static/ folder (adjust for your project layout)</span>
 <span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">staticDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/static&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
 <span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">staticDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
@@ -386,13 +386,13 @@
 <span class="w">      </span><span class="k">Return</span>
 <span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 
-<span class="w">    </span><span class="c1">// ตั้งค่าประเภท MIME ตามนามสกุล</span>
+<span class="w">    </span><span class="c1">// Set MIME type based on extension</span>
 <span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c1">// แคชทรัพยากรคงที่เป็นเวลา 1 ชั่วโมงในโปรดักชัน</span>
+<span class="w">    </span><span class="c1">// Cache static assets for 1 hour in production</span>
 <span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cache-Control&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;public, max-age=3600&quot;</span>
 
-<span class="w">    </span><span class="c1">// อ่านและเขียนไบต์ไฟล์</span>
+<span class="w">    </span><span class="c1">// Read and write file bytes</span>
 <span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">BinaryStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BinaryStream</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)</span>
 <span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Length</span><span class="p">))</span>
 <span class="w">    </span><span class="n">bs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
@@ -419,13 +419,13 @@
 </code></pre></div>
 
 <h3 id="2">2. ลงทะเบียนเส้นทาง<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
-<p>ใน <code>App.Opening()</code> ลงทะเบียนเส้นทางคงที่ <strong>หลังจาก</strong> เส้นทางอื่นทั้งหมดเพื่อหลีกเลี่ยงการจับคู่เส้นทางแอปพลิเคชันโดยไม่ตั้งใจ:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ลงทะเบียนเส้นทางแอปพลิเคชันก่อน</span>
+<p>ใน <code>App.Opening()</code> ให้ลงทะเบียนเส้นทาง static <strong>หลังจาก</strong> เส้นทางอื่นๆ ทั้งหมดเพื่อหลีกเลี่ยงการจับคู่เส้นทางแอปพลิเคชันโดยไม่ตั้งใจ:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Register application routes first</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span>
-<span class="c1">// ... เส้นทางอื่นทั้งหมด ...</span>
+<span class="c1">// ... all other routes ...</span>
 
-<span class="c1">// ไฟล์คงที่สุดท้าย</span>
+<span class="c1">// Static files last</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/static/:file&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">StaticFileVMFactory</span><span class="p">())</span>
 </code></pre></div>
 
@@ -445,22 +445,22 @@
 
 <div class="admonition warning">
 <p class="admonition-title">ความปลอดภัย</p>
-<p>เสมอยืนยันชื่อไฟล์ก่อนอ่านจากดิสก์ การตรวจสอบการข้ามเส้นทาง (<code>..</code>, <code>/</code>, <code>\</code>) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำที่จำเป็น ไม่เคยสร้างเส้นทางไฟล์จากข้อมูลป้อนผู้ใช้โดยไม่มีการตรวจสอบ</p>
+<p>ตรวจสอบชื่อไฟล์เสมอก่อนการอ่านจากดิสก์ การตรวจสอบ path traversal (<code>..</code>, <code>/</code>, <code>\</code>) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำ ไม่ว่าสร้างเส้นทางไฟล์จากข้อมูลที่ป้อนโดยผู้ใช้โดยไม่มีการตรวจสอบ</p>
 </div>
-<h2 id="3-xojo-copy-files-build-step">ตัวเลือกที่ 3 — Xojo Copy Files build step<a class="headerlink" href="#3-xojo-copy-files-build-step" title="Permanent link">&para;</a></h2>
-<p>สำหรับไฟล์ที่ควรมีชุดรวมกับไบนารีแอปพลิเคชัน (ฟอนต์ รูปภาพเริ่มต้น) ให้ใช้ขั้น <strong>Copy Files</strong> ของ Xojo เพื่อรวมไฟล์เหล่านั้นไว้ในโฟลเดอร์ Resources ของแอป</p>
-<p>จากนั้นเข้าถึงพวกมันในเวลาทำงานผ่าน:</p>
+<h2 id="option-3-xojo-copy-files-build-step">Option 3 — Xojo Copy Files build step<a class="headerlink" href="#option-3-xojo-copy-files-build-step" title="Permanent link">&para;</a></h2>
+<p>สำหรับไฟล์ที่ควรรวมอยู่กับไบนารีแอปพลิเคชัน (ฟอนต์, รูปภาพเริ่มต้น) ให้ใช้ <strong>Copy Files</strong> build step ของ Xojo เพื่อรวมไฟล์เหล่านั้นในโฟลเดอร์ Resources ของแอป</p>
+<p>จากนั้นเข้าถึงพวกมันในรันไทม์ผ่าน:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">resourceDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;Resources&quot;</span><span class="p">)</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resourceDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 </code></pre></div>
 
-<p>วิธีการนี้เหมาะสำหรับไฟล์ที่ส่งมาพร้อมกับแอปและไม่เปลี่ยนแปลงในเวลาทำงาน สำหรับทรัพยากรนักพัฒนาที่คุณแก้ไขบ่อย ๆ ระหว่างการพัฒนา ตัวเลือกที่ 2 จะสะดวกมากกว่า</p>
-<h2 id="mime">อ้างอิงประเภท MIME<a class="headerlink" href="#mime" title="Permanent link">&para;</a></h2>
+<p>วิธีนี้เหมาะสำหรับไฟล์ที่มาพร้อมกับแอปและไม่เปลี่ยนแปลงในรันไทม์ สำหรับ asset นักพัฒนาที่คุณแก้ไขบ่อยครั้งระหว่างการพัฒนา Option 2 จะสะดวกกว่า</p>
+<h2 id="mime-types-reference">MIME types reference<a class="headerlink" href="#mime-types-reference" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>นามสกุล</th>
-<th>ประเภท MIME</th>
+<th>ส่วนขยาย</th>
+<th>MIME type</th>
 </tr>
 </thead>
 <tbody>
@@ -547,11 +547,11 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ตวเลอกท-1-ลงก-cdn-แนะนำสำหรบไลบราร">ตัวเลือกที่ 1 — ลิงก์ CDN (แนะนำสำหรับไลบรารี)</a>
+            <a class="toc-link" href="#option-1-cdn-links-แนะนำสำหรบไลบราร">Option 1 — CDN links (แนะนำสำหรับไลบรารี)</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ตวเลอกท-2-static-file-viewmodel">ตัวเลือกที่ 2 — Static file ViewModel</a>
+            <a class="toc-link" href="#option-2-static-file-viewmodel">Option 2 — Static file ViewModel</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -571,11 +571,11 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ตวเลอกท-3-xojo-copy-files-build-step">ตัวเลือกที่ 3 — Xojo Copy Files build step</a>
+            <a class="toc-link" href="#option-3-xojo-copy-files-build-step">Option 3 — Xojo Copy Files build step</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#อางองประเภท-mime">อ้างอิงประเภท MIME</a>
+            <a class="toc-link" href="#mime-types-reference">MIME types reference</a>
           </li>
           
         </ul>

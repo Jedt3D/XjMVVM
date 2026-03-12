@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ทำไมถึง XjMVVM? — MVVM Docs</title>
-  <meta name="description" content="การตัดสินใจทางสถาปัตยกรรมเบื้องหลัง XjMVVM — ทำไมเราจึงข้ามระบบ WebPage ของ Xojo และทำไมจึงใช้รูปแบบ MVVM กับ JinjaX" />
+  <title>ทำไมต้อง XjMVVM? — MVVM Docs</title>
+  <meta name="description" content="การตัดสินใจเชิงสถาปัตยกรรมเบื้องหลัง XjMVVM — เหตุใดเราจึงข้าม Xojo WebPage system และเหตุใด MVVM pattern กับ JinjaX" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,26 +343,26 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">ทำไมถึง XjMVVM?</h1>
-          <p class="page-description">การตัดสินใจทางสถาปัตยกรรมเบื้องหลัง XjMVVM — ทำไมเราจึงข้ามระบบ WebPage ของ Xojo และทำไมจึงใช้รูปแบบ MVVM กับ JinjaX</p>
+          <h1 class="page-title">ทำไมต้อง XjMVVM?</h1>
+          <p class="page-description">การตัดสินใจเชิงสถาปัตยกรรมเบื้องหลัง XjMVVM — เหตุใดเราจึงข้าม Xojo WebPage system และเหตุใด MVVM pattern กับ JinjaX</p>
         </div>
 
-        <h1 id="xjmvvm">ทำไมถึง XjMVVM?<a class="headerlink" href="#xjmvvm" title="Permanent link">&para;</a></h1>
-<p>หน้านี้อธิบายการตัดสินใจหลักเบื้องหลังการออกแบบเฟรมเวิร์ก การทำความเข้าใจ <em>เหตุผล</em> ทำให้ทุกอนุสัญญาในส่วนอื่น ๆ ของคู่มือนี้สมเหตุสมผล</p>
-<h2 id="webpage-xojo">ทำไมต้องข้ามระบบ WebPage ของ Xojo?<a class="headerlink" href="#webpage-xojo" title="Permanent link">&para;</a></h2>
-<p>Xojo Web 2 มีระบบวิดเจ็ต GUI แบบเต็ม: <code>WebPage</code>, <code>WebButton</code>, <code>WebTextField</code>, <code>WebListBox</code> และอื่น ๆ อีกมากมาย วิดเจ็ตเหล่านี้สื่อสารผ่าน WebSockets และจัดการสถานะโดยอัตโนมัติ สำหรับเครื่องมือภายในที่ง่ายซึ่งสะท้อนโมเดลวิดเจ็ต Xojo อย่างใกล้ชิด พวกมันก็ใช้ได้ดี</p>
-<p>โครงการนี้ข้ามระบบนั้นไปอย่างสิ้นเชิง นี่คือเหตุผล:</p>
-<p><strong>การควบคุม HTML/CSS แบบเต็ม</strong> WebControls เรนเดอร์ HTML ของตัวเองด้วยชื่อคลาสและโครงสร้างของตนเอง คุณไม่สามารถใช้ระบบการออกแบบแบบกำหนดเองหรือรวมเฟรมเวิร์ก CSS เช่น Tailwind ได้อย่างง่ายโดยไม่ต้องต่อสู้กับผลลัพธ์ของการควบคุม ด้วยเทมเพลต JinjaX คุณเขียน HTML ด้วยตัวเอง — แท็กทุกแท็ก คลาสทุกคลาส แอตทริบิวต์ข้อมูลทั้งหมดเป็นของคุณ</p>
-<p><strong>ความหมาย HTTP มาตรฐาน</strong> หน้า WebControl เป็นเซสชัน WebSocket ที่มีสถานะ พวกมันไม่ทำตัวเหมือนแอป HTTP มาตรฐาน: การจดหมายระหว่างประเทศไม่น่าเชื่อถือ ประวัติเบราว์เซอร์ยุ่งยาก API REST ยากขึ้น แนวทาง SSR หมายความว่าทุก URL เป็นเอนด์พอยต์ HTTP ที่เหมาะสม — คาดเดาได้ แคชได้ เชื่อมโยงได้</p>
-<p><strong>เทมเพลตเป็นมิตรกับนักออกแบบ</strong> เทมเพลต HTML อาศัยอยู่ในโฟลเดอร์ <code>templates/</code> นักออกแบบหรือนักพัฒนาฝั่งหน้าสามารถแก้ไขได้โดยใช้โปรแกรมแก้ไขข้อความใด ๆ ที่มีการสนับสนุน IDE แบบเต็ม (การไฮไลต์ไวยากรณ์ Emmet Prettier) พวกเขาไม่เคยสัมผัสโค้ด Xojo</p>
-<p><strong>ไม่มีสถานะเซสชันในเลเยอร์ UI</strong> WebControls ของ Xojo มีสถานะเซสชันโดยนัย ViewModels ของเราไม่มีสถานะต่อคำขอ — พวกเขาได้รับคำขอ ทำงาน และเขียนการตอบสนอง สถานะถาวรเพียงอย่างเดียวอยู่ใน <code>Session</code> (คลาส <code>WebSession</code>) และฐานข้อมูล</p>
-<h2 id="mvvm-mvc">ทำไมต้อง MVVM มากกว่า MVC?<a class="headerlink" href="#mvvm-mvc" title="Permanent link">&para;</a></h2>
-<p>MVC แบบคลาสสิก (Model-View-Controller) มี Controller ที่รับผิดชอบทั้งตรรกะการจัดเส้นทางและการจัดวาง Model ใน Xojo หมายความว่าคลาส Controller ขนาดใหญ่หนึ่งคลาสจัดการทุกเส้นทาง</p>
-<p>XjMVVM ใช้ MVVM เพื่อแยกข้อกังวลให้สะอาดขึ้นสำหรับสถาปัตยกรรมต่อเส้นทาง:</p>
+        <h1 id="xjmvvm">ทำไมต้อง XjMVVM?<a class="headerlink" href="#xjmvvm" title="Permanent link">&para;</a></h1>
+<p>หน้านี้อธิบายการตัดสินใจหลักเบื้องหลังการออกแบบเฟรมเวิร์ก การเข้าใจ <em>เหตุผล</em> นั้นทำให้คำแนะนำอื่นๆ ทั้งหมดในคู่มือนี้มีความหมายชัดเจน</p>
+<h2 id="xojo-webpage-system">ทำไมจึงข้าม Xojo WebPage system?<a class="headerlink" href="#xojo-webpage-system" title="Permanent link">&para;</a></h2>
+<p>Xojo Web 2 มี GUI widget system ที่สมบูรณ์: <code>WebPage</code>, <code>WebButton</code>, <code>WebTextField</code>, <code>WebListBox</code> และอื่นๆ อีกมากมาย ตัวควบคุมเหล่านี้สื่อสารผ่าน WebSockets และจัดการสถานะโดยอัตโนมัติ สำหรับเครื่องมือภายในแบบง่ายๆ ที่สะท้อนแบบจำลอง widget ของ Xojo อย่างใกล้ชิด พวกมันทำงานได้ดี</p>
+<p>โครงการนี้ข้าม system นั้นไปเลยอย่างสิ้นเชิง นี่คือเหตุผล:</p>
+<p><strong>การควบคุม HTML/CSS แบบเต็มรูปแบบ</strong> WebControls เรนเดอร์ HTML ของตัวเองด้วยชื่อคลาสและโครงสร้างของตัวเอง คุณไม่สามารถใช้ระบบการออกแบบที่กำหนดเองหรือรวมเฟรมเวิร์ก CSS เช่น Tailwind ได้อย่างง่ายดาย ด้วยเทมเพลต JinjaX คุณเขียน HTML เอง — ทุกแท็ก ทุกคลาส ทุกแอตทริบิวต์ข้อมูลเป็นของคุณ</p>
+<p><strong>HTTP semantics มาตรฐาน</strong> หน้า WebControl เป็นเซสชัน WebSocket ที่มีสถานะ พวกมันไม่ทำงานเหมือนแอปพลิเคชัน HTTP มาตรฐาน: บุ๊กมาร์กไม่น่าเชื่อถือ ประวัติเบราว์เซอร์อึดอัด REST APIs ยากขึ้น วิธี SSR หมายความว่า URL ทุกตัวคือ HTTP endpoint ที่เหมาะสม — คาดเดาได้ แคชได้ และเชื่อมโยงได้</p>
+<p><strong>เทมเพลตที่เป็นมิตรกับนักออกแบบ</strong> เทมเพลต HTML อยู่ในโฟลเดอร์ <code>templates/</code> นักออกแบบหรือนักพัฒนาส่วนหน้าสามารถแก้ไขโดยใช้ตัวแก้ไขข้อความใด ๆ ที่มีการสนับสนุน IDE แบบเต็มรูปแบบ (ไฮไลต์ไวยากรณ์ Emmet Prettier) พวกเขาไม่ต้องสัมผัสโค้ด Xojo เลย</p>
+<p><strong>ไม่มีสถานะเซสชันในชั้น UI</strong> Xojo WebControls มีสถานะเซสชันโดยปริยาย ViewModels ของเราไม่มีสถานะต่อการร้องขอ — พวกมันรับการร้องขอ ทำงาน และเขียนการตอบสนอง สถานะที่ยั่งยืนเพียงอย่างเดียวอยู่ใน <code>Session</code> (คลาส <code>WebSession</code>) และฐานข้อมูล</p>
+<h2 id="mvvm-mvc">ทำไม MVVM มากกว่า MVC?<a class="headerlink" href="#mvvm-mvc" title="Permanent link">&para;</a></h2>
+<p>MVC แบบคลาสสิก (Model-View-Controller) มีส่วน Controller ที่รับผิดชอบทั้งตรรกะการกำหนดเส้นทางและการจัดการ Models ใน Xojo นี่จะหมายถึงคลาส controller ขนาดใหญ่เดียวที่จัดการทุกเส้นทาง</p>
+<p>XjMVVM ใช้ MVVM เพื่อแยกความกังวลให้สะอาดขึ้นสำหรับสถาปัตยกรรมต่อเส้นทาง:</p>
 <table>
 <thead>
 <tr>
-<th>เลเยอร์</th>
+<th>ชั้น</th>
 <th>คลาส</th>
 <th>ความรับผิดชอบ</th>
 </tr>
@@ -370,23 +370,23 @@
 <tbody>
 <tr>
 <td><strong>View</strong></td>
-<td>ไฟล์ <code>.html</code> Jinja2</td>
+<td>ไฟล์ Jinja2 <code>.html</code></td>
 <td>การนำเสนอเท่านั้น — ไม่มีตรรกะทางธุรกิจ</td>
 </tr>
 <tr>
 <td><strong>ViewModel</strong></td>
-<td>คลาสหนึ่งต่อเส้นทาง</td>
-<td>ประสานงาน Model สร้างบริบทเทมเพลต</td>
+<td>หนึ่งคลาสต่อเส้นทาง</td>
+<td>จัดการ Models สร้างบริบทเทมเพลต</td>
 </tr>
 <tr>
 <td><strong>Model</strong></td>
 <td>คลาสการเข้าถึงข้อมูล</td>
-<td>การค้นหาฐานข้อมูล คืนค่าอ็อบเจ็กต์ <code>Dictionary</code></td>
+<td>แบบสอบถามฐานข้อมูล ส่งคืน <code>Dictionary</code> objects</td>
 </tr>
 </tbody>
 </table>
-<p>ViewModel หนึ่งต่อเส้นทาง (เช่น <code>NotesListVM</code>, <code>NotesCreateVM</code>) ให้แต่ละคลาสมีขนาดเล็กและมุ่งเน้น การเพิ่มฟีเจอร์ใหม่หมายถึงการเพิ่มไฟล์ใหม่ ไม่ใช่การปรับเปลี่ยนไฟล์ที่มีอยู่</p>
-<p>ทิศทางของการพึ่งพาอย่างเคร่งครัดคือแบบเดียว:</p>
+<p>ViewModel หนึ่งตัวต่อเส้นทาง (เช่น <code>NotesListVM</code>, <code>NotesCreateVM</code>) ทำให้คลาสแต่ละคลาสมีขนาดเล็กและมีโฟกัส การเพิ่มฟีเจอร์ใหม่หมายถึงการเพิ่มไฟล์ใหม่ ไม่ใช่การปรับเปลี่ยนไฟล์ที่มีอยู่</p>
+<p>ทิศทางการพึ่งพาเป็นทางเดียวเท่านั้น:</p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -488,21 +488,63 @@
   </div>
 </div>
 
-<p>ViewModels ไม่เคยอ้างอิงชื่อเทมเพลตในตรรกะทางธุรกิจ Model ไม่เคยอ้างอิง ViewModels สิ่งนี้ทำให้แต่ละเลเยอร์สามารถทดสอบและแทนที่ได้อย่างอิสระ</p>
-<h2 id="jinjax">ทำไมต้อง JinjaX?<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h2>
-<p>JinjaX เป็นพอร์ตของเอนจิน Jinja2 ของ Python ที่เขียนด้วย Xojo แบบบริสุทธิ์ มันถูกเลือกเพราะ:</p>
-<p><strong>Jinja2 เป็นมาตรฐานในทางปฏิบัติ</strong> นักพัฒนาที่คุ้นเคยกับ Flask Django Ansible หรือ Saltstack รู้ไวยากรณ์อยู่แล้ว เส้นโค้งการเรียนรู้น้อยมาก</p>
-<p><strong>มันคือ Xojo บริสุทธิ์</strong> ต้นไม้ต้นฉบับของ JinjaX เต็มที่อยู่ภายใต้ <code>JinjaXLib/</code> ไม่มีการพึ่งพาไลบรารี <code>.xojo_library</code> ไบนารี ซึ่งหมายความว่ามันใช้งานได้กับรูปแบบโครงการข้อความของ Xojo (ไฟล์ <code>.xojo_code</code>) และสามารถตรวจสอบและดีบัตได้อย่างเต็มที่</p>
-<p><strong>มันปลอดภัยเธรดหลังจากการตั้งค่า</strong> <code>JinjaEnvironment</code> ถูกเริ่มต้นเพียงครั้งเดียวใน <code>App.Opening()</code> แล้วจึงอ่านเท่านั้น แต่ละคำขอสร้าง <code>CompiledTemplate</code> และ <code>JinjaContext</code> ใหม่ — อ็อบเจ็กต์เหล่านี้ต่อคำขอ ไม่เคยใช้ร่วมกัน</p>
-<p><strong>การสืบทอดเทมเพลตใช้งาน</strong> <code>{% extends %}</code>, <code>{% block %}</code> และ <code>{% include %}</code> ให้คุณสร้างเลเยต์ฐานครั้งเดียวและสร้างหน้าทั้งหมดจากนั้น</p>
-<h2 id="dictionary">สัญญาข้อมูล Dictionary<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h2>
+<p>ViewModels ไม่เคยอ้างอิงชื่อเทมเพลตในตรรกะทางธุรกิจ Models ไม่เคยอ้างอิง ViewModels สิ่งนี้ทำให้ชั้นแต่ละชั้นสามารถทดสอบและแทนที่ได้อย่างอิสระ</p>
+<h2 id="jinjax">ทำไม JinjaX?<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h2>
+<p>JinjaX คือพอร์ตของ Jinja2 template engine ของ Python ที่เขียนด้วย Xojo บริสุทธิ์ มันถูกเลือกเพราะ:</p>
+<p><strong>Jinja2 เป็นมาตรฐาน de-facto</strong> นักพัฒนาที่คุ้นเคยกับ Flask Django Ansible หรือ Saltstack รู้ไวยากรณ์แล้ว เส้นโค้งการเรียนรู้น้อยที่สุด</p>
+<p><strong>เป็นซอร์ส Xojo บริสุทธิ์</strong> ต้นไม้ต้นฉบับของ JinjaX ทั้งหมดอยู่ภายใต้ <code>JinjaXLib/</code> ไม่มีการพึ่งพาไบนารี <code>.xojo_library</code> ซึ่งหมายความว่ามันใช้งานได้กับรูปแบบโครงการข้อความของ Xojo (ไฟล์ <code>.xojo_code</code>) และสามารถตรวจสอบและแก้จุดบกพร่องได้อย่างสมบูรณ์</p>
+<p><strong>ปลอดภัยสำหรับเธรดหลังจากการตั้งค่า</strong> <code>JinjaEnvironment</code> ถูกเริ่มต้นครั้งเดียวใน <code>App.Opening()</code> จากนั้นจะเป็นแบบอ่านอย่างเดียว ทุกการร้องขอสร้าง <code>CompiledTemplate</code> และ <code>JinjaContext</code> ใหม่ — สิ่งเหล่านี้เป็นออบเจกต์ต่อการร้องขอ ไม่เคยแชร์</p>
+<p><strong>การสืบทอดเทมเพลตทำงาน</strong> <code>{% extends %}</code>, <code>{% block %}</code>, และ <code>{% include %}</code> ให้คุณสร้างเค้าโครงฐานครั้งเดียวและเรียบเรียงหน้าทั้งหมดจากนั้น</p>
+<h2 id="dictionary-data-contract">Dictionary data contract<a class="headerlink" href="#dictionary-data-contract" title="Permanent link">&para;</a></h2>
 <p>นี่คือกฎที่สำคัญที่สุดในระบบทั้งหมด</p>
-<p>JinjaX แก้ไขสัญกรณ์จุด (<code>{{ note.title }}</code>) โดยเรียก <code>EvaluateGetAttr</code> บนอ็อบเจ็กต์ ใน Xojo <code>EvaluateGetAttr</code> ถูกใช้งานเฉพาะสำหรับ <code>Dictionary</code> — จะค้นหากุญแจตามชื่อ อ็อบเจ็กต์คลาส Xojo แบบกำหนดเองไม่รองรับ <code>EvaluateGetAttr</code> ดังนั้นการเข้าถึงจุดจึงเรนเดอร์เป็นค่าว่างเงียบ ๆ</p>
-<p><strong>กฎ:</strong> ข้อมูลทั้งหมดที่ส่งไปยังเทมเพลตต้องเป็น <code>Dictionary</code> หรืออาร์เรย์ <code>Variant()</code> ของอ็อบเจ็กต์ <code>Dictionary</code> Model ส่งคืนหนึ่งในสองประเภทนี้เสมอ — ไม่มีอินสแตนซ์คลาสแบบกำหนดเอง</p>
+<p>JinjaX แก้ไข dot-notation (<code>{{ note.title }}</code>) โดยการเรียก <code>EvaluateGetAttr</code> บนออบเจกต์ ใน Xojo <code>EvaluateGetAttr</code> ถูกนำไปใช้เฉพาะสำหรับ <code>Dictionary</code> — มันค้นหาคีย์ตามชื่อ instance คลาส Xojo ที่กำหนดเองไม่รองรับ <code>EvaluateGetAttr</code> ดังนั้นการเข้าถึง dot จึงแสดงผลเป็นค่าว่างโดยเงียบ</p>
+<p><strong>กฎ:</strong> ข้อมูลทุกชิ้นที่ผ่านไปยังเทมเพลตต้องเป็น <code>Dictionary</code> หรือ <code>Variant()</code> array ของ <code>Dictionary</code> objects Models จะส่งคืนหนึ่งในสองประเภทนี้เท่านั้น — ไม่เคยเป็น custom class instance</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ ถูกต้อง — คีย์ Dictionary ทำงานกับ dot-notation ในเทมเพลต</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w">   </span><span class="c1">// Variant() array ของ Dictionary</span>
+
+<span class="c1">// ❌ ไม่ถูกต้อง — custom class instance การเข้าถึง dot ทำงานไม่ได้โดยเงียบในเทมเพลต</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteClass</span><span class="p">()</span>
+<span class="n">note</span><span class="p">.</span><span class="n">Title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">note</span><span class="p">)</span><span class="w">  </span><span class="c1">// {{ note.title }} แสดงผลเป็นสตริงว่าง</span>
+</code></pre></div>
+
+<p>ในเทมเพลต arrays ต้องเป็น <code>Variant()</code> ที่ประกอบด้วย <code>Dictionary</code> objects:</p>
+<div class="highlight"><pre><span></span><code>{% for note in notes %}
+  <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ note.title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>   {# ทำงาน — Dictionary key lookup #}
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ note.body }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endfor %}
+</code></pre></div>
+
 <h2 id="postredirectget">Post/Redirect/Get<a class="headerlink" href="#postredirectget" title="Permanent link">&para;</a></h2>
-<p>การส่งแบบฟอร์มทั้งหมดปฏิบัติตามรูปแบบ <strong>Post/Redirect/Get (PRG)</strong></p>
-<h2 id="_1">การแยกเซสชัน<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p><code>App</code> เป็นซิงเกิลตันที่ใช้ร่วมกัน — คำขอของผู้ใช้ทั้งหมดทำงานในอ็อบเจ็กต์ <code>App</code> เดียวกัน อย่าเก็บข้อมูลเฉพาะผู้ใช้บนคุณสมบัติ <code>App</code> สถานะต่อผู้ใช้ไปในคลาส <code>Session</code></p>
+<p>การส่งแบบฟอร์มทั้งหมดทำตามแบบ <strong>Post/Redirect/Get (PRG)</strong>:</p>
+<ol>
+<li>เบราว์เซอร์ส่งแบบฟอร์ม → <code>POST /notes</code> (จัดการโดย <code>NotesCreateVM</code>)</li>
+<li>ViewModel ตรวจสอบและสร้างหมายเหตุ</li>
+<li>ViewModel เรียก <code>Redirect("/notes")</code> — HTTP 302</li>
+<li>เบราว์เซอร์ตามเส้นทางการเปลี่ยนเส้นทาง → <code>GET /notes</code> (จัดการโดย <code>NotesListVM</code>)</li>
+<li>เบราว์เซอร์เรนเดอร์หน้าลิสต์</li>
+</ol>
+<p>สิ่งนี้ป้องกันเบราว์เซอร์จากการส่งแบบฟอร์มซ้ำเมื่อรีเฟรช (กล่องโต้ตอบ &ldquo;Reload this page?&rdquo;) นอกจากนี้ยังหมายความว่าทุกหน้าที่ผู้ใช้มองเห็นผลิตจากการร้องขอ GET — ประวัติเบราว์เซอร์ บุ๊กมาร์ก และปุ่มย้อนกลับทั้งหมดทำงานอย่างถูกต้อง</p>
+<p>หากการตรวจสอบล้มเหลว ViewModel จะ <strong>ไม่</strong> เปลี่ยนเส้นทาง — มันเรนเดอร์แบบฟอร์มอีกครั้งด้วยข้อความแฟลชข้อผิดพลาดโดยใช้เทมเพลต GET เดียวกัน:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ความล้มเหลวของการตรวจสอบ — เรนเดอร์อีกครั้ง ไม่เปลี่ยนเส้นทาง</span>
+<span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Trim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Title is required&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
+</code></pre></div>
+
+<h2 id="_1">แยกการระบุตัวตนของเซสชัน<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><code>App</code> เป็น shared singleton — ร้องขอของผู้ใช้ทั้งหมดทำงานในอินสแตนซ์ <code>App</code> เดียวกัน ไม่เคยเก็บข้อมูลเฉพาะผู้ใช้ในคุณสมบัติ <code>App</code></p>
+<p>สถานะต่อผู้ใช้ไปในคลาส <code>Session</code> (ซึ่งสืบทอดจาก <code>WebSession</code>) เบราว์เซอร์แต่ละเซสชันจะได้รับอินสแตนซ์ <code>Session</code> ของตัวเองโดยอัตโนมัติโดยรันไทม์ของ Xojo:</p>
+<div class="highlight"><pre><span></span><code>App.mRouter      → shared แบบอ่านอย่างเดียวหลังจาก Opening()  ✅ ปลอดภัย
+App.mJinja       → shared แบบอ่านอย่างเดียวหลังจาก Opening()  ✅ ปลอดภัย
+Session.userID   → per-user อินสแตนซ์หนึ่งต่อเบราว์เซอร์  ✅ ปลอดภัย
+App.currentUser  → shared ในผู้ใช้ทั้งหมด             ❌ ไม่เคยทำเช่นนี้
+</code></pre></div>
 
         <!-- Prev / Next navigation -->
         
@@ -536,19 +578,19 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ทำไมตองขามระบบ-webpage-ของ-xojo">ทำไมต้องข้ามระบบ WebPage ของ Xojo?</a>
+            <a class="toc-link" href="#ทำไมจงขาม-xojo-webpage-system">ทำไมจึงข้าม Xojo WebPage system?</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ทำไมตอง-mvvm-มากกวา-mvc">ทำไมต้อง MVVM มากกว่า MVC?</a>
+            <a class="toc-link" href="#ทำไม-mvvm-มากกวา-mvc">ทำไม MVVM มากกว่า MVC?</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ทำไมตอง-jinjax">ทำไมต้อง JinjaX?</a>
+            <a class="toc-link" href="#ทำไม-jinjax">ทำไม JinjaX?</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#สญญาขอมล-dictionary">สัญญาข้อมูล Dictionary</a>
+            <a class="toc-link" href="#dictionary-data-contract">Dictionary data contract</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -556,7 +598,7 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การแยกเซสชน">การแยกเซสชัน</a>
+            <a class="toc-link" href="#แยกการระบตวตนของเซสชน">แยกการระบุตัวตนของเซสชัน</a>
           </li>
           
         </ul>
