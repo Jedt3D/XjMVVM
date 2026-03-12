@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Database Layer Reference — MVVM Docs</title>
+  <meta name="description" content="The three-layer DBAdapter / BaseModel / NoteModel architecture — design rationale, connection lifecycle, full CRUD API, and how to add a new resource." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/database/model-reference.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/th/database/model-reference.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/database/model-reference.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Database Layer Reference</h1>
+          <p class="page-description">The three-layer DBAdapter / BaseModel / NoteModel architecture — design rationale, connection lifecycle, full CRUD API, and how to add a new resource.</p>
+        </div>
+
+        <h1 id="database-layer-reference">Database Layer Reference<a class="headerlink" href="#database-layer-reference" title="Permanent link">&para;</a></h1>
+<h2 id="three-layer-architecture">Three-Layer Architecture<a class="headerlink" href="#three-layer-architecture" title="Permanent link">&para;</a></h2>
+<p>The database layer separates three distinct responsibilities. Each layer knows only about the one below it.</p>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="1452.0" height="132.0" viewBox="0 0 1452 132" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: right
+    #spacing: 48
+    #padding: 10
+    #lineWidth: 1.5
+    [DBAdapter: Module|connection factory\nschema init] -&gt; [BaseModel: Class|generic CRUD\nFindAll / FindByID\nInsert / UpdateByID\nDeleteByID]
+    [BaseModel: Class|generic CRUD\nFindAll / FindByID\nInsert / UpdateByID\nDeleteByID] -&gt; [NoteModel: Class|TableName()\nColumns()\nthin wrappers]
+    [NoteModel: Class|TableName()\nColumns()\nthin wrappers] -&gt; [&lt;database&gt; SQLite]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="132.0" width="1452.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(10, 10)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M272.0 36.0 L296 36 L312 36 L312.0 36.0 " fill="none"></path>
+                    <path d="M304.0 42.4 L312.0 36.0 L304.0 29.6 L320.0 36.0 Z"></path>
+                    <path d="M881.0 36.0 L905 36 L921 36 L921.0 36.0 " fill="none"></path>
+                    <path d="M913.0 42.4 L921.0 36.0 L913.0 29.6 L929.0 36.0 Z"></path>
+                    <path d="M1271.0 36.0 L1295 36 L1311 36 L1311.0 36.0 " fill="none"></path>
+                    <path d="M1303.0 42.4 L1311.0 36.0 L1303.0 29.6 L1319.0 36.0 Z"></path>
+                    <g data-name="DBAdapter: Module">
+                        <g fill="white" stroke="black" data-name="DBAdapter: Module">
+                            <rect x="0.0" y="0.0" height="72.0" width="272.0" data-name="DBAdapter: Module"></rect>
+                            <path d="M0.0 36.0 L272.0 36.0" fill="none" data-name="DBAdapter: Module"></path>
+                        </g>
+                        <g transform="translate(0, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="DBAdapter: Module" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="DBAdapter: Module" data-compartment="0">
+                                <text x="126.0" y="14.1" stroke="none" text-anchor="middle" data-name="DBAdapter: Module" data-compartment="0">DBAdapter: Module</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(0, 36)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="DBAdapter: Module" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="DBAdapter: Module" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="DBAdapter: Module" data-compartment="1">connection factory
+                                schema init</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="BaseModel: Class">
+                        <g fill="white" stroke="black" data-name="BaseModel: Class">
+                            <rect x="320.0" y="0.0" height="72.0" width="561.0" data-name="BaseModel: Class"></rect>
+                            <path d="M320.0 36.0 L881.0 36.0" fill="none" data-name="BaseModel: Class"></path>
+                        </g>
+                        <g transform="translate(320, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BaseModel: Class" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="BaseModel: Class" data-compartment="0">
+                                <text x="270.5" y="14.1" stroke="none" text-anchor="middle" data-name="BaseModel: Class" data-compartment="0">BaseModel: Class</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(320, 36)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="BaseModel: Class" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="BaseModel: Class" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="BaseModel: Class" data-compartment="1">generic CRUD
+                                FindAll / FindByID
+                                Insert / UpdateByID
+                                DeleteByID</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="NoteModel: Class">
+                        <g fill="white" stroke="black" data-name="NoteModel: Class">
+                            <rect x="929.0" y="0.0" height="72.0" width="342.0" data-name="NoteModel: Class"></rect>
+                            <path d="M929.0 36.0 L1271.0 36.0" fill="none" data-name="NoteModel: Class"></path>
+                        </g>
+                        <g transform="translate(929, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NoteModel: Class" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="NoteModel: Class" data-compartment="0">
+                                <text x="161.0" y="14.1" stroke="none" text-anchor="middle" data-name="NoteModel: Class" data-compartment="0">NoteModel: Class</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(929, 36)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NoteModel: Class" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="NoteModel: Class" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="NoteModel: Class" data-compartment="1">TableName()
+                                Columns()
+                                thin wrappers</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="SQLite">
+                        <g fill="white" stroke="black" data-name="SQLite">
+                            <rect x="1319.0" y="18.0" height="36.0" width="73.0" stroke="none" data-name="SQLite"></rect>
+                            <path d="M1319.0 18.0 L1319.0 54.0" fill="none" data-name="SQLite"></path>
+                            <path d="M1392.0 18.0 L1392.0 54.0" fill="none" data-name="SQLite"></path>
+                            <ellipse cx="1355.5" cy="18.0" rx="36.5" ry="7.5" data-name="SQLite"></ellipse>
+                            <path d="M1392.0 54.0 L1392.0 54.4 L1391.8 54.7 L1391.6 55.1 L1391.3 55.5 L1390.9 55.9 L1390.4 56.2 L1389.8 56.6 L1389.1 56.9 L1388.4 57.3 L1387.6 57.6 L1386.6 57.9 L1385.7 58.2 L1384.6 58.5 L1383.5 58.8 L1382.3 59.1 L1381.0 59.4 L1379.7 59.6 L1378.3 59.9 L1376.8 60.1 L1375.3 60.3 L1373.7 60.5 L1372.2 60.7 L1370.5 60.8 L1368.8 61.0 L1367.1 61.1 L1365.4 61.2 L1363.6 61.3 L1361.8 61.4 L1360.0 61.4 L1358.2 61.5 L1356.4 61.5 L1354.6 61.5 L1352.8 61.5 L1351.0 61.4 L1349.2 61.4 L1347.4 61.3 L1345.6 61.2 L1343.9 61.1 L1342.2 61.0 L1340.5 60.8 L1338.8 60.7 L1337.2 60.5 L1335.7 60.3 L1334.2 60.1 L1332.7 59.9 L1331.3 59.6 L1330.0 59.4 L1328.7 59.1 L1327.5 58.8 L1326.4 58.5 L1325.3 58.2 L1324.4 57.9 L1323.4 57.6 L1322.6 57.3 L1321.9 56.9 L1321.2 56.6 L1320.6 56.2 L1320.1 55.9 L1319.7 55.5 L1319.4 55.1 L1319.2 54.7 L1319.0 54.4 L1319.0 54.0" data-name="SQLite"></path>
+                        </g>
+                        <g transform="translate(1319, 23)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="SQLite" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="SQLite" data-compartment="0">
+                                <text x="26.5" y="14.1" stroke="none" text-anchor="middle" data-name="SQLite" data-compartment="0">SQLite</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>DBAdapter (Module)
+  └─ connection factory, schema init
+      │
+      ▼
+BaseModel (Class)
+  └─ generic CRUD: FindAll, FindByID, Insert, UpdateByID, DeleteByID
+      │
+      ▼
+NoteModel (Class)
+  └─ TableName(), Columns(), thin wrappers, escape hatch for timestamps
+      │
+      ▼
+SQLite database file</code></pre>
+  </div>
+</div>
+
+<p>This separation means:</p>
+<ul>
+<li><strong>No boilerplate in resource models</strong> — <code>NoteModel</code> is ~20 lines. It declares the table and columns, delegates generic operations to <code>BaseModel</code>, and only writes custom SQL when needed.</li>
+<li><strong>Single place to change connection logic</strong> — moving from SQLite to PostgreSQL touches only <code>DBAdapter.Connect()</code>.</li>
+<li><strong>Clear escape hatch</strong> — <code>BaseModel.OpenDB()</code> gives subclasses raw DB access without breaking the generic layer.</li>
+</ul>
+<hr />
+<h2 id="design-decisions">Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
+<h3 id="why-return-dictionary-instead-of-model-instances">Why return <code>Dictionary</code> instead of model instances?<a class="headerlink" href="#why-return-dictionary-instead-of-model-instances" title="Permanent link">&para;</a></h3>
+<p>JinjaX templates use dot-notation: <code>{{ note.title }}</code>. The JinjaX engine resolves this by calling <code>dict.Value("title")</code> on a Xojo <code>Dictionary</code>. Custom class instances have no equivalent introspection mechanism.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Template: {{ note.title }}</span><span class="w"></span>
+
+<span class="c1">// ✅ Works — Dictionary satisfies dot-notation</span><span class="w"></span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myDictionary</span><span class="w">        </span><span class="c1">// .Value(&quot;title&quot;) → &quot;Hello&quot;</span><span class="w"></span>
+
+<span class="c1">// ❌ Does NOT work — NoteModel has no JinjaX introspection</span><span class="w"></span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myNoteInstance</span><span class="w"></span>
+</code></pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>All model methods must return <code>Dictionary</code> or <code>Variant()</code> of <code>Dictionary</code>. This is the most critical architectural rule in the data layer. Custom class instances cannot be used in JinjaX templates.</p>
+</div>
+<h3 id="why-one-connection-per-request">Why one connection per request?<a class="headerlink" href="#why-one-connection-per-request" title="Permanent link">&para;</a></h3>
+<p>Xojo Web handles concurrent HTTP requests on separate threads. A shared <code>SQLiteDatabase</code> across threads requires locking and risks deadlock.</p>
+<div class="diagram-tabs" id="diag2">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag2','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="924.0" height="120.0" viewBox="0 0 924 120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: right
+    #spacing: 40
+    #padding: 8
+    #lineWidth: 1.5
+    [Thread A: GET /notes|DBAdapter.Connect()\nSELECT *\ndb.Close()] -- no conflict -- [Thread B: POST /notes|DBAdapter.Connect()\nINSERT INTO notes\ndb.Close()]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="normal" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="120.0" width="924.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(8, 8)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <text x="309.0" y="24.0" stroke="none">no conflict --</text>
+                    <g stroke-dasharray="4 4">
+                        <path d="M375.0 32.0 L395 32 L415 32 L415.0 32.0 " fill="none"></path>
+                    </g>
+                    <g data-name="Thread A: GET /notes">
+                        <g fill="white" stroke="black" data-name="Thread A: GET /notes">
+                            <rect x="0.0" y="0.0" height="64.0" width="375.0" data-name="Thread A: GET /notes"></rect>
+                            <path d="M0.0 32.0 L375.0 32.0" fill="none" data-name="Thread A: GET /notes"></path>
+                        </g>
+                        <g transform="translate(0, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Thread A: GET /notes" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Thread A: GET /notes" data-compartment="0">
+                                <text x="179.5" y="14.1" stroke="none" text-anchor="middle" data-name="Thread A: GET /notes" data-compartment="0">Thread A: GET /notes</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(0, 32)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Thread A: GET /notes" data-compartment="1">
+                            <g transform="translate(8, 8)" fill="black" text-align="left" data-name="Thread A: GET /notes" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="Thread A: GET /notes" data-compartment="1">DBAdapter.Connect()
+                                SELECT *
+                                db.Close()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Thread B: POST /notes">
+                        <g fill="white" stroke="black" data-name="Thread B: POST /notes">
+                            <rect x="415.0" y="0.0" height="64.0" width="453.0" data-name="Thread B: POST /notes"></rect>
+                            <path d="M415.0 32.0 L868.0 32.0" fill="none" data-name="Thread B: POST /notes"></path>
+                        </g>
+                        <g transform="translate(415, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Thread B: POST /notes" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Thread B: POST /notes" data-compartment="0">
+                                <text x="218.5" y="14.1" stroke="none" text-anchor="middle" data-name="Thread B: POST /notes" data-compartment="0">Thread B: POST /notes</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(415, 32)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Thread B: POST /notes" data-compartment="1">
+                            <g transform="translate(8, 8)" fill="black" text-align="left" data-name="Thread B: POST /notes" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="Thread B: POST /notes" data-compartment="1">DBAdapter.Connect()
+                                INSERT INTO notes
+                                db.Close()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>Thread A (GET /notes)         Thread B (POST /notes)
+  DBAdapter.Connect()           DBAdapter.Connect()
+  SELECT * FROM notes           INSERT INTO notes ...
+  db.Close()                    db.Close()
+       ↑ independent, no conflict ↑</code></pre>
+  </div>
+</div>
+
+<p>Opening a fresh connection per call is safe. SQLite&rsquo;s overhead for opening a local file connection is negligible at typical internal-tool traffic volumes.</p>
+<hr />
+<h2 id="connection-lifecycle">Connection Lifecycle<a class="headerlink" href="#connection-lifecycle" title="Permanent link">&para;</a></h2>
+<div class="diagram-tabs" id="diag3">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag3','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag3','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="494.5" height="616.0" viewBox="0 0 494.5 616" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: down
+    #spacing: 30
+    #padding: 8
+    #lineWidth: 1.5
+    [App.Opening|resolve paths\nExecutableFile.Parent] InitDB() -&gt; [DBAdapter.Connect()]
+    [DBAdapter.Connect()] CREATE TABLE IF NOT EXISTS -&gt; [db.Close()]
+    [db.Close()] app ready -&gt; [Per-request]
+    [Per-request] -&gt; [DBAdapter.Connect(): open]
+    [DBAdapter.Connect(): open] -&gt; [SQL: SELECT / INSERT / UPDATE / DELETE]
+    [SQL: SELECT / INSERT / UPDATE / DELETE] -&gt; [RowSet → RowToDict()]
+    [RowSet → RowToDict()] -&gt; [db.Close(): close]
+    [db.Close(): close] Dictionary -&gt; [ViewModel]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="616.0" width="494.5" stroke="none"></rect>
+            </g>
+            <g transform="translate(8, 8)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <text x="189.5" y="84.0" stroke="none">InitDB()</text>
+                    <path d="M181.5 64.0 L181.5 79 L181.5 89 L181.5 89.0 " fill="none"></path>
+                    <path d="M177.5 84.0 L181.5 89.0 L185.5 84.0 L181.5 94.0 Z"></path>
+                    <text x="189.5" y="146.0" stroke="none">CREATE TABLE IF NOT EXISTS</text>
+                    <path d="M181.5 126.0 L181.5 141 L181.5 151 L181.5 151.0 " fill="none"></path>
+                    <path d="M177.5 146.0 L181.5 151.0 L185.5 146.0 L181.5 156.0 Z"></path>
+                    <text x="189.5" y="208.0" stroke="none">app ready</text>
+                    <path d="M181.5 188.0 L181.5 203 L181.5 213 L181.5 213.0 " fill="none"></path>
+                    <path d="M177.5 208.0 L181.5 213.0 L185.5 208.0 L181.5 218.0 Z"></path>
+                    <path d="M181.5 250.0 L181.5 265 L181.5 275 L181.5 275.0 " fill="none"></path>
+                    <path d="M177.5 270.0 L181.5 275.0 L185.5 270.0 L181.5 280.0 Z"></path>
+                    <path d="M181.5 312.0 L181.5 327 L181.5 337 L181.5 337.0 " fill="none"></path>
+                    <path d="M177.5 332.0 L181.5 337.0 L185.5 332.0 L181.5 342.0 Z"></path>
+                    <path d="M181.5 374.0 L181.5 389 L181.5 399 L181.5 399.0 " fill="none"></path>
+                    <path d="M177.5 394.0 L181.5 399.0 L185.5 394.0 L181.5 404.0 Z"></path>
+                    <path d="M181.5 436.0 L181.5 451 L181.5 461 L181.5 461.0 " fill="none"></path>
+                    <path d="M177.5 456.0 L181.5 461.0 L185.5 456.0 L181.5 466.0 Z"></path>
+                    <text x="189.5" y="518.0" stroke="none">Dictionary</text>
+                    <path d="M181.5 498.0 L181.5 513 L181.5 523 L181.5 523.0 " fill="none"></path>
+                    <path d="M177.5 518.0 L181.5 523.0 L185.5 518.0 L181.5 528.0 Z"></path>
+                    <g data-name="App.Opening">
+                        <g fill="white" stroke="black" data-name="App.Opening">
+                            <rect x="25.5" y="0.0" height="64.0" width="312.0" data-name="App.Opening"></rect>
+                            <path d="M25.5 32.0 L337.5 32.0" fill="none" data-name="App.Opening"></path>
+                        </g>
+                        <g transform="translate(25.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="App.Opening" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="App.Opening" data-compartment="0">
+                                <text x="148.0" y="14.1" stroke="none" text-anchor="middle" data-name="App.Opening" data-compartment="0">App.Opening</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(25.5, 32)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="App.Opening" data-compartment="1">
+                            <g transform="translate(8, 8)" fill="black" text-align="left" data-name="App.Opening" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="App.Opening" data-compartment="1">resolve paths
+                                ExecutableFile.Parent</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="DBAdapter.Connect()">
+                        <g fill="white" stroke="black" data-name="DBAdapter.Connect()">
+                            <rect x="89.5" y="94.0" height="32.0" width="184.0" data-name="DBAdapter.Connect()"></rect>
+                        </g>
+                        <g transform="translate(89.5, 94)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="DBAdapter.Connect()" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="DBAdapter.Connect()" data-compartment="0">
+                                <text x="84.0" y="14.1" stroke="none" text-anchor="middle" data-name="DBAdapter.Connect()" data-compartment="0">DBAdapter.Connect()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="db.Close()">
+                        <g fill="white" stroke="black" data-name="db.Close()">
+                            <rect x="132.5" y="156.0" height="32.0" width="98.0" data-name="db.Close()"></rect>
+                        </g>
+                        <g transform="translate(132.5, 156)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="db.Close()" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="db.Close()" data-compartment="0">
+                                <text x="41.0" y="14.1" stroke="none" text-anchor="middle" data-name="db.Close()" data-compartment="0">db.Close()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Per-request">
+                        <g fill="white" stroke="black" data-name="Per-request">
+                            <rect x="127.0" y="218.0" height="32.0" width="109.0" data-name="Per-request"></rect>
+                        </g>
+                        <g transform="translate(127, 218)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Per-request" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Per-request" data-compartment="0">
+                                <text x="46.5" y="14.1" stroke="none" text-anchor="middle" data-name="Per-request" data-compartment="0">Per-request</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="DBAdapter.Connect(): open">
+                        <g fill="white" stroke="black" data-name="DBAdapter.Connect(): open">
+                            <rect x="64.5" y="280.0" height="32.0" width="234.0" data-name="DBAdapter.Connect(): open"></rect>
+                        </g>
+                        <g transform="translate(64.5, 280)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="DBAdapter.Connect(): open" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="DBAdapter.Connect(): open" data-compartment="0">
+                                <text x="109.0" y="14.1" stroke="none" text-anchor="middle" data-name="DBAdapter.Connect(): open" data-compartment="0">DBAdapter.Connect(): open</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="SQL: SELECT / INSERT / UPDATE / DELETE">
+                        <g fill="white" stroke="black" data-name="SQL: SELECT / INSERT / UPDATE / DELETE">
+                            <rect x="0.0" y="342.0" height="32.0" width="363.0" data-name="SQL: SELECT / INSERT / UPDATE / DELETE"></rect>
+                        </g>
+                        <g transform="translate(0, 342)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="SQL: SELECT / INSERT / UPDATE / DELETE" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="SQL: SELECT / INSERT / UPDATE / DELETE" data-compartment="0">
+                                <text x="173.5" y="14.1" stroke="none" text-anchor="middle" data-name="SQL: SELECT / INSERT / UPDATE / DELETE" data-compartment="0">SQL: SELECT / INSERT / UPDATE / DELETE</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="RowSet → RowToDict()">
+                        <g fill="white" stroke="black" data-name="RowSet → RowToDict()">
+                            <rect x="82.5" y="404.0" height="32.0" width="198.0" data-name="RowSet → RowToDict()"></rect>
+                        </g>
+                        <g transform="translate(82.5, 404)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="RowSet → RowToDict()" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="RowSet → RowToDict()" data-compartment="0">
+                                <text x="91.0" y="14.1" stroke="none" text-anchor="middle" data-name="RowSet → RowToDict()" data-compartment="0">RowSet → RowToDict()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="db.Close(): close">
+                        <g fill="white" stroke="black" data-name="db.Close(): close">
+                            <rect x="106.5" y="466.0" height="32.0" width="150.0" data-name="db.Close(): close"></rect>
+                        </g>
+                        <g transform="translate(106.5, 466)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="db.Close(): close" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="db.Close(): close" data-compartment="0">
+                                <text x="67.0" y="14.1" stroke="none" text-anchor="middle" data-name="db.Close(): close" data-compartment="0">db.Close(): close</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="ViewModel">
+                        <g fill="white" stroke="black" data-name="ViewModel">
+                            <rect x="131.0" y="528.0" height="32.0" width="101.0" data-name="ViewModel"></rect>
+                        </g>
+                        <g transform="translate(131, 528)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ViewModel" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="ViewModel" data-compartment="0">
+                                <text x="42.5" y="14.1" stroke="none" text-anchor="middle" data-name="ViewModel" data-compartment="0">ViewModel</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>App.Opening (once)
+  ├── Resolve paths: ExecutableFile.Parent / "data" and / "templates"
+  ├── DBAdapter.InitDB()
+  │     └── Connect() → CREATE TABLE IF NOT EXISTS ... → db.Close()
+  └── JinjaEnvironment(FileSystemLoader(tplDir))
+
+Per-request (concurrent, independent)
+  HandleURL → Router → ViewModel → Model method
+    └── DBAdapter.Connect()       ← open
+    └── SELECT / INSERT / ...     ← execute
+    └── RowSet → RowToDict()      ← map to Dictionary
+    └── db.Close()                ← close
+    └── Return Dictionary         ← to ViewModel → JinjaX → HTML</code></pre>
+  </div>
+</div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Every code path that calls <code>Connect()</code> must call <code>db.Close()</code> before returning — including error paths. All <code>BaseModel</code> methods close the connection on every return branch.</p>
+</div>
+<hr />
+<h2 id="dbadapter-module">DBAdapter (Module)<a class="headerlink" href="#dbadapter-module" title="Permanent link">&para;</a></h2>
+<p><strong>File:</strong> <code>Framework/DBAdapter.xojo_code</code></p>
+<p>A module — no instantiation needed — that owns the connection factory and schema setup.</p>
+<h3 id="connect-as-sqlitedatabase"><code>Connect() As SQLiteDatabase</code><a class="headerlink" href="#connect-as-sqlitedatabase" title="Permanent link">&para;</a></h3>
+<p>Opens and returns a fresh connection. The caller is responsible for <code>db.Close()</code>.</p>
+<p>The database file lives in a <code>data/</code> folder <strong>next to the executable</strong> — resolved via <code>App.ExecutableFile.Parent</code>. This works identically in the Xojo debugger and in a built production binary. The <code>data/</code> directory is created automatically if it does not exist.</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Connect</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Resolve data/ next to the executable (works in debug and production)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dataDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">CreateAsFolder</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">db</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>App.ExecutableFile</code> is the running binary — in the Xojo debugger this is the debug stub, in production it is the compiled app. Both cases resolve <code>Parent</code> to the same folder, so the path is stable across environments.</p>
+</div>
+<h3 id="initdb"><code>InitDB()</code><a class="headerlink" href="#initdb" title="Permanent link">&para;</a></h3>
+<p>Creates all tables if they do not exist. Called once from <code>App.Opening</code>. Safe to call on every startup — <code>CREATE TABLE IF NOT EXISTS</code> is idempotent.</p>
+<p>To add a new table, add another <code>ExecuteSQL</code> here before <code>db.Close()</code>.</p>
+<h3 id="appopening-startup-paths">App.Opening — Startup Paths<a class="headerlink" href="#appopening-startup-paths" title="Permanent link">&para;</a></h3>
+<p><code>App.Opening</code> is the single place that wires up both runtime paths before any request is served:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Opening</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Templates — resolved relative to executable, same as DB</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tplDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaEnvironment</span><span class="p">(</span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">tplDir</span><span class="p">.</span><span class="n">NativePath</span><span class="p">))</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Database — create schema on first launch</span><span class="w"></span>
+<span class="w">  </span><span class="n">DBAdapter</span><span class="p">.</span><span class="n">InitDB</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Router — register all routes</span><span class="w"></span>
+<span class="w">  </span><span class="n">mRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Router</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="n">RegisterRoutes</span><span class="p">()</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<p>Both <code>templates/</code> and <code>data/</code> sit alongside the executable. This means you can deploy the app by copying the binary together with those two folders — no absolute paths, no environment variables needed.</p>
+<hr />
+<h2 id="basemodel-class">BaseModel (Class)<a class="headerlink" href="#basemodel-class" title="Permanent link">&para;</a></h2>
+<p><strong>File:</strong> <code>Framework/BaseModel.xojo_code</code></p>
+<p>The generic CRUD base class. Subclasses override two methods and inherit all operations.</p>
+<h3 id="subclass-contract">Subclass Contract<a class="headerlink" href="#subclass-contract" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Required</th>
+<th>Returns</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TableName() As String</code></td>
+<td>Yes</td>
+<td><code>"notes"</code></td>
+<td>SQL table name</td>
+</tr>
+<tr>
+<td><code>Columns() As String</code></td>
+<td>Yes</td>
+<td><code>"id, title, body, ..."</code></td>
+<td>Comma-separated column list for <code>SELECT</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="crud-methods">CRUD Methods<a class="headerlink" href="#crud-methods" title="Permanent link">&para;</a></h3>
+<h4 id="findallorderby-as-string-as-variant"><code>FindAll(orderBy As String = "") As Variant()</code><a class="headerlink" href="#findallorderby-as-string-as-variant" title="Permanent link">&para;</a></h4>
+<p>Returns all rows ordered by <code>orderBy</code>. Each element is a <code>Dictionary</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">rows</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// rows(0) → Dictionary: {&quot;id&quot;: &quot;1&quot;, &quot;title&quot;: &quot;Hello&quot;, ...}</span><span class="w"></span>
+</code></pre></div>
+
+<h4 id="findbyidid-as-integer-as-dictionary"><code>FindByID(id As Integer) As Dictionary</code><a class="headerlink" href="#findbyidid-as-integer-as-dictionary" title="Permanent link">&para;</a></h4>
+<p>Returns the matching row, or <code>Nil</code> if not found. Always check before using:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+</code></pre></div>
+
+<h4 id="insertdata-as-dictionary-as-integer"><code>Insert(data As Dictionary) As Integer</code><a class="headerlink" href="#insertdata-as-dictionary-as-integer" title="Permanent link">&para;</a></h4>
+<p>Builds a parameterized <code>INSERT</code> from the dictionary keys. Returns the new <code>ROWID</code>. SQL injection safe — uses <code>SQLitePreparedStatement</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My Note&quot;</span><span class="w"></span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Content&quot;</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Insert</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>Insert</code> cannot express SQLite-side expressions like <code>datetime('now')</code> — those must go through the escape hatch. See NoteModel below.</p>
+</div>
+<h4 id="updatebyidid-as-integer-data-as-dictionary"><code>UpdateByID(id As Integer, data As Dictionary)</code><a class="headerlink" href="#updatebyidid-as-integer-data-as-dictionary" title="Permanent link">&para;</a></h4>
+<p>Parameterized <code>UPDATE ... WHERE id = ?</code>. Only keys present in the dictionary are updated.</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w"></span>
+<span class="n">model</span><span class="p">.</span><span class="n">UpdateByID</span><span class="p">(</span><span class="m">42</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<h4 id="deletebyidid-as-integer"><code>DeleteByID(id As Integer)</code><a class="headerlink" href="#deletebyidid-as-integer" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">model</span><span class="p">.</span><span class="n">DeleteByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="protected-escape-hatch-methods">Protected Escape Hatch Methods<a class="headerlink" href="#protected-escape-hatch-methods" title="Permanent link">&para;</a></h3>
+<h4 id="opendb-as-sqlitedatabase"><code>OpenDB() As SQLiteDatabase</code><a class="headerlink" href="#opendb-as-sqlitedatabase" title="Permanent link">&para;</a></h4>
+<p>Returns a raw connection for subclasses that need custom SQL. The subclass is responsible for <code>db.Close()</code>.</p>
+<p>Use when:
+- SQLite expressions (<code>datetime('now')</code>, <code>strftime(...)</code>) are needed in SQL — they cannot be <code>?</code> parameters
+- Complex queries with <code>JOIN</code>, <code>GROUP BY</code>, <code>HAVING</code>, or subqueries
+- <code>db.LastRowID</code> is needed after an <code>INSERT</code>
+- Multiple statements must share one connection</p>
+<h4 id="rowtodictrs-as-rowset-as-dictionary"><code>RowToDict(rs As RowSet) As Dictionary</code><a class="headerlink" href="#rowtodictrs-as-rowset-as-dictionary" title="Permanent link">&para;</a></h4>
+<p>Maps the current RowSet row to a <code>Dictionary</code> using the column names from <code>Columns()</code>. All values are stored as <code>StringValue</code> — intentional. JinjaX renders everything as strings; ViewModels cast to integers via <code>Val()</code> when needed.</p>
+<hr />
+<h2 id="notemodel-class">NoteModel (Class)<a class="headerlink" href="#notemodel-class" title="Permanent link">&para;</a></h2>
+<p><strong>File:</strong> <code>Models/NoteModel.xojo_code</code></p>
+<p>The concrete resource model. Only ~20 lines because <code>BaseModel</code> handles everything generic.</p>
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">NoteModel</span><span class="w"></span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;notes&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, title, body, created_at, updated_at&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Delegation — zero boilerplate</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Escape hatch — SQLite expressions required for timestamps</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">      </span><span class="s2">&quot;UPDATE notes SET title = ?, body = ?, updated_at = datetime(&#39;now&#39;) WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">      </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>Create</code> and <code>Update</code> use the escape hatch because <code>datetime('now')</code> is a SQLite-evaluated expression — binding the string <code>"datetime('now')"</code> as a <code>?</code> parameter would store the literal text, not a timestamp.</p>
+<hr />
+<h2 id="crud-task-mapping">CRUD Task Mapping<a class="headerlink" href="#crud-task-mapping" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>User action</th>
+<th>HTTP</th>
+<th>ViewModel</th>
+<th>Model call</th>
+<th>SQL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View list</td>
+<td><code>GET /notes</code></td>
+<td><code>NotesListVM</code></td>
+<td><code>NoteModel.GetAll()</code></td>
+<td><code>SELECT … ORDER BY updated_at DESC</code></td>
+</tr>
+<tr>
+<td>View one</td>
+<td><code>GET /notes/:id</code></td>
+<td><code>NotesDetailVM</code></td>
+<td><code>NoteModel.GetByID(id)</code></td>
+<td><code>SELECT … WHERE id = ?</code></td>
+</tr>
+<tr>
+<td>New form</td>
+<td><code>GET /notes/new</code></td>
+<td><code>NotesNewVM</code></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Create</td>
+<td><code>POST /notes</code></td>
+<td><code>NotesCreateVM</code></td>
+<td><code>NoteModel.Create(title, body)</code></td>
+<td><code>INSERT INTO notes (title, body) VALUES (?, ?)</code></td>
+</tr>
+<tr>
+<td>Edit form</td>
+<td><code>GET /notes/:id/edit</code></td>
+<td><code>NotesEditVM</code></td>
+<td><code>NoteModel.GetByID(id)</code></td>
+<td><code>SELECT … WHERE id = ?</code></td>
+</tr>
+<tr>
+<td>Update</td>
+<td><code>POST /notes/:id</code></td>
+<td><code>NotesUpdateVM</code></td>
+<td><code>NoteModel.Update(id, title, body)</code></td>
+<td><code>UPDATE notes SET … WHERE id = ?</code></td>
+</tr>
+<tr>
+<td>Delete</td>
+<td><code>POST /notes/:id/delete</code></td>
+<td><code>NotesDeleteVM</code></td>
+<td><code>NoteModel.Delete(id)</code></td>
+<td><code>DELETE FROM notes WHERE id = ?</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="benefits-and-trade-offs">Benefits and Trade-offs<a class="headerlink" href="#benefits-and-trade-offs" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Benefit</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No boilerplate</td>
+<td>New resource needs only <code>TableName()</code> + <code>Columns()</code> + thin wrappers</td>
+</tr>
+<tr>
+<td>SQL injection safe</td>
+<td>All user values go through <code>?</code> parameter binding</td>
+</tr>
+<tr>
+<td>Thread-safe</td>
+<td>Per-request connections — no shared mutable state</td>
+</tr>
+<tr>
+<td>JinjaX compatible</td>
+<td>All results are <code>Dictionary</code> — templates work immediately</td>
+</tr>
+<tr>
+<td>Testable</td>
+<td>XojoUnit tests hit a real SQLite DB; negligible overhead</td>
+</tr>
+<tr>
+<td>Clear escape hatch</td>
+<td><code>OpenDB()</code> is documented and intentional, not a workaround</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Trade-off</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No ORM features</td>
+<td>No associations, lazy loading, or change tracking</td>
+</tr>
+<tr>
+<td>String-only values</td>
+<td><code>RowToDict</code> stores everything as <code>StringValue</code>; ViewModels must cast via <code>Val()</code></td>
+</tr>
+<tr>
+<td>No migration system</td>
+<td>Schema changes require manual <code>ALTER TABLE</code> or recreating the DB in dev</td>
+</tr>
+<tr>
+<td><code>datetime</code> limitation</td>
+<td><code>BaseModel.Insert</code> cannot use <code>DEFAULT (datetime('now'))</code> — use escape hatch</td>
+</tr>
+</tbody>
+</table>
+<h3 id="when-to-use-inherited-crud-vs-the-escape-hatch">When to use inherited CRUD vs the escape hatch<a class="headerlink" href="#when-to-use-inherited-crud-vs-the-escape-hatch" title="Permanent link">&para;</a></h3>
+<p>Use <code>BaseModel</code> inherited methods when the operation is a simple <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> with plain bound values.</p>
+<p>Use <code>OpenDB()</code> when you need SQLite expressions (<code>datetime('now')</code>, <code>strftime(...)</code>), complex queries (<code>JOIN</code>, <code>GROUP BY</code>, subqueries), <code>db.LastRowID</code> after a custom insert, or multiple statements in one connection.</p>
+<hr />
+<h2 id="adding-a-new-resource">Adding a New Resource<a class="headerlink" href="#adding-a-new-resource" title="Permanent link">&para;</a></h2>
+<p>Adding <code>TagModel</code> as a complete example:</p>
+<p><strong>1. Create <code>Models/TagModel.xojo_code</code>:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span><span class="w"></span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;tags&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, name, created_at&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;name ASC&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO tags (name) VALUES (?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+</code></pre></div>
+
+<p><strong>2. Add the table to <code>DBAdapter.InitDB()</code>:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;id         INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;name       TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">  </span><span class="s2">&quot;created_at TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p><strong>3. Register</strong> <code>Models/TagModel.xojo_code</code> in <code>mvvm.xojo_project</code> under the Models folder (Xojo IDE: drag the file into the project panel).</p>
+<p><strong>4. Create ViewModels</strong> in <code>ViewModels/Tags/</code> and <strong>templates</strong> in <code>templates/tags/</code> following the same pattern as <code>Notes</code>.</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../database/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">SQLite & Dictionary Contract</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../encoding/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Forms, MIME & UTF-8</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#three-layer-architecture">Three-Layer Architecture</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#design-decisions">Design Decisions</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#why-return-dictionary-instead-of-model-instances">Why return `Dictionary` instead of model instances?</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#why-one-connection-per-request">Why one connection per request?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#connection-lifecycle">Connection Lifecycle</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#dbadapter-module">DBAdapter (Module)</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#connect-as-sqlitedatabase">`Connect() As SQLiteDatabase`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#initdb">`InitDB()`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#appopening-startup-paths">App.Opening — Startup Paths</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#basemodel-class">BaseModel (Class)</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#subclass-contract">Subclass Contract</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#crud-methods">CRUD Methods</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#protected-escape-hatch-methods">Protected Escape Hatch Methods</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#notemodel-class">NoteModel (Class)</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#crud-task-mapping">CRUD Task Mapping</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#benefits-and-trade-offs">Benefits and Trade-offs</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#when-to-use-inherited-crud-vs-the-escape-hatch">When to use inherited CRUD vs the escape hatch</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#adding-a-new-resource">Adding a New Resource</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

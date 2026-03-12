@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="jp" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JinjaX の概要 — MVVM Docs</title>
+  <meta name="description" content="JinjaX とは何か、フレームワークにどのようにフィットするか、App.Opening() でどのようにセットアップするか。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/templates/"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/templates/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn active" href="/jp/templates/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">JinjaX の概要</h1>
+          <p class="page-description">JinjaX とは何か、フレームワークにどのようにフィットするか、App.Opening() でどのようにセットアップするか。</p>
+        </div>
+
+        <h1 id="jinjax">JinjaX &amp; テンプレート<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h1>
+<p>JinjaX は Jinja2 テンプレートエンジンの純粋 Xojo 実装です。Python の Jinja2 と互換性のある構文で HTML テンプレートを書くことができます — Flask と Django で使用されるのと同じエンジン。</p>
+<h2 id="jinjax_1">JinjaX が提供するもの<a class="headerlink" href="#jinjax_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>テンプレート継承</strong> — <code>{% extends "layouts/base.html" %}</code> を使用した <code>{% block %}</code> オーバーライド</li>
+<li><strong>テンプレート インクルード</strong> — <code>{% include "partials/nav.html" %}</code></li>
+<li><strong>変数出力</strong> — <code>{{ variable }}</code> 自動 HTML エスケープ付き</li>
+<li><strong>制御フロー</strong> — <code>{% if %}</code>、<code>{% for %}</code>、<code>{% else %}</code>、<code>{% elif %}</code></li>
+<li><strong>フィルター</strong> — <code>{{ value | upper }}</code>、<code>{{ value | length }}</code>、カスタムフィルター</li>
+<li><strong>自動エスケープ</strong> — XSS 保護がデフォルトで有効</li>
+</ul>
+<h2 id="_1">プロジェクトソース<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>JinjaX は <code>JinjaXLib/</code> の下でプロジェクトルートに存在します。コンパイル済みライブラリではなく完全な Xojo ソースとして含まれており、text 形式の <code>.xojo_code</code> プロジェクトファイルで機能し、必要に応じて検査またはデバッグできます。</p>
+<p>JinjaX をアップグレードしたり修正したりする場合を除き、<code>JinjaXLib/</code> を変更しないでください。</p>
+<h2 id="appopening">App.Opening() でのセットアップ<a class="headerlink" href="#appopening" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> はアプリケーション起動時に 1 回初期化され、共有シングルトンとして <code>App</code> に保存されます。<code>Opening()</code> 完了後は読み取り専用で、これによりスレッドセーフになります:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// App.Opening() で</span><span class="w"></span>
+
+<span class="c1">// 1. 環境を作成</span><span class="w"></span>
+<span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="p">()</span><span class="w"></span>
+
+<span class="c1">// 2. テンプレートフォルダをポイント</span><span class="w"></span>
+<span class="c1">//    IDE デバッグ出力位置からどこでも機能するように絶対パスを使用</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">projectDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">templatesDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">templatesDir</span><span class="p">)</span><span class="w"></span>
+
+<span class="c1">// 3. 自動エスケープを有効にする (XSS に対して保護 — 常にオン)</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Autoescape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span><span class="w"></span>
+
+<span class="c1">// 4. カスタムフィルターを登録</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="_2">カスタムフィルターを登録<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>フィルターは <code>Variant</code> を取り、<code>Variant</code> を返す Xojo メソッドです。テンプレートが pipe <code>|</code> オペレータで使用する文字列名で登録します:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// App.xojo_code (またはモジュール) で</span><span class="w"></span>
+<span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">77</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="c1">// Opening() で登録:</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p>テンプレートで:</p>
+<div class="highlight"><pre><span></span><code>{{ note.body | truncate80 }}
+</code></pre></div>
+
+<h2 id="viewmodel">ViewModel から環境にアクセス<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> は <code>Handle()</code> が呼ばれる前にルーターから各 ViewModel に渡されます。<code>BaseViewModel</code> はそれを <code>Jinja</code> プロパティとして保存します。決して直接アクセスしません — <code>Render()</code> を呼び出すだけです:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 任意の ViewModel で — Render() は内部的に Self.Jinja を使用</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w"></span>
+<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="_3">スレッドセーフティ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> は <code>Opening()</code> 完了後にスレッド間で共有するのは安全です。理由は:</p>
+<ul>
+<li><code>RegisterFilter</code> は <code>Opening()</code> 中にのみ呼ばれます — リクエスト中は決にしません</li>
+<li><code>GetTemplate()</code> と <code>Render()</code> は環境から読み取るだけです</li>
+<li><code>CompiledTemplate</code> と <code>JinjaContext</code> はリクエストごとに新規作成されます (スタック割り当て、共有されません)</li>
+</ul>
+<p>各リクエストは独自の <code>CompiledTemplate</code> と <code>JinjaContext</code> を取得します — これらは共有されません。</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../static-files/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Serving Static Assets</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../templates/usage.html">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Usage Guide</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#jinjax-が提供するもの">JinjaX が提供するもの</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#プロジェクトソース">プロジェクトソース</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#appopening-でのセットアップ">App.Opening() でのセットアップ</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#カスタムフィルターを登録">カスタムフィルターを登録</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#viewmodel-から環境にアクセス">ViewModel から環境にアクセス</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#スレッドセーフティ">スレッドセーフティ</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

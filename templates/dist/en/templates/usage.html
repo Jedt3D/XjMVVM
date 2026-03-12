@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage Guide — MVVM Docs</title>
+  <meta name="description" content="How to use Jinja2 template syntax — variables, blocks, loops, conditions, filters, and template inheritance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn active" href="/en/templates/usage.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/templates/usage.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/templates/usage.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Usage Guide</h1>
+          <p class="page-description">How to use Jinja2 template syntax — variables, blocks, loops, conditions, filters, and template inheritance.</p>
+        </div>
+
+        <h1 id="usage-guide">Usage Guide<a class="headerlink" href="#usage-guide" title="Permanent link">&para;</a></h1>
+<h2 id="template-inheritance">Template inheritance<a class="headerlink" href="#template-inheritance" title="Permanent link">&para;</a></h2>
+<p>Every page template starts by extending the base layout:</p>
+<div class="highlight"><pre><span></span><code>{# templates/notes/list.html #}
+{% extends &quot;layouts/base.html&quot; %}
+
+{% block title %}Notes{% endblock %}
+
+{% block content %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>All Notes<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+  {# page content here #}
+{% endblock %}
+</code></pre></div>
+
+<p>The base layout defines named blocks that child templates fill in:</p>
+<div class="highlight"><pre><span></span><code>{# templates/layouts/base.html #}
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{% block title %}App{% endblock %} | XjMVVM<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;</span>...<span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+
+  {% if flash %}
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flash flash-{{ flash.type }}&quot;</span><span class="p">&gt;</span>{{ flash.message }}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  {% endif %}
+
+  <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
+    {% block content %}{% endblock %}
+  <span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>A child template can only override blocks that are defined in the parent. Content outside of <code>{% block %}</code> tags in a child template is ignored.</p>
+<h2 id="variables">Variables<a class="headerlink" href="#variables" title="Permanent link">&para;</a></h2>
+<p>Output a variable with double curly braces. HTML is automatically escaped — <code>&lt;script&gt;</code> becomes <code>&amp;lt;script&amp;gt;</code>:</p>
+<div class="highlight"><pre><span></span><code>{{ note.title }}
+{{ note.created_at }}
+{{ page_title }}
+</code></pre></div>
+
+<p>Variables come from the context <code>Dictionary</code> you pass to <code>Render()</code>. Dictionary keys become variable names in the template.</p>
+<h3 id="dictionary-dot-notation">Dictionary dot-notation<a class="headerlink" href="#dictionary-dot-notation" title="Permanent link">&para;</a></h3>
+<p>JinjaX resolves <code>{{ note.title }}</code> by calling <code>note.Value("title")</code> on the <code>Dictionary</code>. This is the core reason all data must be <code>Dictionary</code> objects — only <code>Dictionary</code> supports the dot-notation lookup via <code>EvaluateGetAttr</code>.</p>
+<h3 id="raw-output-no-escaping">Raw output (no escaping)<a class="headerlink" href="#raw-output-no-escaping" title="Permanent link">&para;</a></h3>
+<p>If you need to output pre-rendered HTML (trusted content only):</p>
+<div class="highlight"><pre><span></span><code>{{ content | safe }}
+</code></pre></div>
+
+<p>Never use <code>| safe</code> on user-supplied content.</p>
+<h2 id="conditions">Conditions<a class="headerlink" href="#conditions" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>{% if note %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Edit: {{ note.title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+{% elif draft %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Draft<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+{% else %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>New Note<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+{% endif %}
+</code></pre></div>
+
+<p>Falsy values in Jinja2: <code>False</code>, <code>0</code>, <code>""</code> (empty string), <code>[]</code> (empty array), <code>None</code>/<code>Nil</code>. A missing key is treated as falsy.</p>
+<h2 id="loops">Loops<a class="headerlink" href="#loops" title="Permanent link">&para;</a></h2>
+<p>Iterate over a <code>Variant()</code> array of <code>Dictionary</code> objects:</p>
+<div class="highlight"><pre><span></span><code>{% for note in notes %}
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;note&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ note.title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ note.body }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">time</span><span class="p">&gt;</span>{{ note.updated_at }}<span class="p">&lt;/</span><span class="nt">time</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+{% else %}
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>No notes yet. <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/notes/new&quot;</span><span class="p">&gt;</span>Create one.<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endfor %}
+</code></pre></div>
+
+<p>The <code>{% else %}</code> block renders when the array is empty.</p>
+<h3 id="loop-variables">Loop variables<a class="headerlink" href="#loop-variables" title="Permanent link">&para;</a></h3>
+<p>Inside a <code>{% for %}</code> block, special <code>loop</code> variables are available:</p>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>loop.index</code></td>
+<td>Current iteration, 1-based</td>
+</tr>
+<tr>
+<td><code>loop.index0</code></td>
+<td>Current iteration, 0-based</td>
+</tr>
+<tr>
+<td><code>loop.first</code></td>
+<td><code>True</code> on the first iteration</td>
+</tr>
+<tr>
+<td><code>loop.last</code></td>
+<td><code>True</code> on the last iteration</td>
+</tr>
+<tr>
+<td><code>loop.length</code></td>
+<td>Total number of items</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>{% for note in notes %}
+  {% if loop.first %}<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>{% endif %}
+  <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;{% if loop.last %}last{% endif %}&quot;</span><span class="p">&gt;</span>
+    {{ loop.index }}. {{ note.title }}
+  <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  {% if loop.last %}<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>{% endif %}
+{% endfor %}
+</code></pre></div>
+
+<h2 id="filters">Filters<a class="headerlink" href="#filters" title="Permanent link">&para;</a></h2>
+<p>Filters transform a value using the pipe <code>|</code> operator:</p>
+<div class="highlight"><pre><span></span><code>{{ note.title | upper }}
+{{ note.title | lower }}
+{{ note.body  | truncate(100) }}
+{{ notes      | length }}
+{{ note.title | default(&quot;Untitled&quot;) }}
+{{ note.title | replace(&quot;foo&quot;, &quot;bar&quot;) }}
+</code></pre></div>
+
+<p>Filters can be chained:</p>
+<div class="highlight"><pre><span></span><code>{{ note.title | upper | truncate(50) }}
+</code></pre></div>
+
+<h2 id="template-includes">Template includes<a class="headerlink" href="#template-includes" title="Permanent link">&para;</a></h2>
+<p>Include a partial template:</p>
+<div class="highlight"><pre><span></span><code>{% include &quot;partials/pagination.html&quot; %}
+</code></pre></div>
+
+<p>The included template shares the same context as the parent — it can access all the same variables.</p>
+<h2 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">&para;</a></h2>
+<p>Template comments are not sent to the browser:</p>
+<div class="highlight"><pre><span></span><code>{# This comment is stripped from the output #}
+</code></pre></div>
+
+<p>HTML comments are sent to the browser:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- This comment appears in the page source --&gt;</span>
+</code></pre></div>
+
+<h2 id="whitespace-control">Whitespace control<a class="headerlink" href="#whitespace-control" title="Permanent link">&para;</a></h2>
+<p>Use <code>-</code> to strip whitespace around a tag:</p>
+<div class="highlight"><pre><span></span><code>{%- for note in notes -%}
+  {{ note.title }}
+{%- endfor -%}
+</code></pre></div>
+
+<p>Useful when generating compact JSON or CSV from a template.</p>
+<h2 id="passing-context-from-a-viewmodel">Passing context from a ViewModel<a class="headerlink" href="#passing-context-from-a-viewmodel" title="Permanent link">&para;</a></h2>
+<p>Everything in the context <code>Dictionary</code> becomes a template variable:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w">   </span><span class="c1">// Variant() of Dictionary</span><span class="w"></span>
+<span class="w">  </span><span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;page_title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;All Notes&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;is_admin&quot;</span><span class="p">)</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="kc">False</span><span class="w"></span>
+<span class="w">  </span><span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<p>In the template:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ page_title }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+{% if is_admin %}<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/admin&quot;</span><span class="p">&gt;</span>Admin<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>{% endif %}
+{% for note in notes %}...{% endfor %}
+</code></pre></div>
+
+<p>Flash messages are injected automatically by <code>BaseViewModel.Render()</code> — you do not add them to the context manually.</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../templates/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">JinjaX Overview</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../templates/examples.html">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Examples</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#template-inheritance">Template inheritance</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#variables">Variables</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#dictionary-dot-notation">Dictionary dot-notation</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#raw-output-no-escaping">Raw output (no escaping)</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#conditions">Conditions</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#loops">Loops</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#loop-variables">Loop variables</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#filters">Filters</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#template-includes">Template includes</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#comments">Comments</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#whitespace-control">Whitespace control</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#passing-context-from-a-viewmodel">Passing context from a ViewModel</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Directory Structure — MVVM Docs</title>
+  <meta name="description" content="Annotated map of every folder and file in the project." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn active" href="/en/conventions/directory-structure.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/conventions/directory-structure.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/conventions/directory-structure.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Directory Structure</h1>
+          <p class="page-description">Annotated map of every folder and file in the project.</p>
+        </div>
+
+        <h1 id="directory-structure">Directory Structure<a class="headerlink" href="#directory-structure" title="Permanent link">&para;</a></h1>
+<div class="highlight"><pre><span></span><code>mvvm/
+├── mvvm.xojo_project           # Xojo project file (open this in the IDE)
+├── mvvm.xojo_resources         # Static resources bundled with the app
+│
+├── App.xojo_code               # WebApplication — Opening(), HandleURL()
+├── Session.xojo_code           # WebSession subclass — per-user state, flash messages
+├── Default.xojo_code           # Required placeholder WebPage (never served)
+│
+├── Framework/                  # Reusable infrastructure — rarely modified
+│   ├── Router.xojo_code        # Route registration and dispatch
+│   ├── BaseViewModel.xojo_code # Base class: Handle(), Render(), Redirect(), flash
+│   ├── FormParser.xojo_code    # Parses application/x-www-form-urlencoded POST bodies
+│   ├── QueryParser.xojo_code   # Parses URL query strings (?key=val&amp;...)
+│   └── RouteDefinition.xojo_code  # Data class: method, pattern, factory
+│
+├── ViewModels/                 # One class per route
+│   ├── HomeViewModel.xojo_code # GET /
+│   └── Notes/                  # Feature folder — all note-related ViewModels
+│       ├── NotesListVM.xojo_code   # GET  /notes
+│       ├── NotesNewVM.xojo_code    # GET  /notes/new
+│       ├── NotesCreateVM.xojo_code # POST /notes
+│       ├── NotesDetailVM.xojo_code # GET  /notes/:id
+│       ├── NotesEditVM.xojo_code   # GET  /notes/:id/edit
+│       ├── NotesUpdateVM.xojo_code # POST /notes/:id
+│       └── NotesDeleteVM.xojo_code # POST /notes/:id/delete
+│
+├── Models/                     # Data access — returns Dictionary objects only
+│   └── NoteModel.xojo_code     # SQLite CRUD for the notes table
+│
+├── JinjaXLib/                  # Full JinjaX source tree (Jinja2 engine in Xojo)
+│   └── ...                     # Do not modify unless upgrading JinjaX
+│
+├── templates/                  # HTML templates (Jinja2 syntax)
+│   ├── layouts/
+│   │   └── base.html           # Site layout — nav, flash messages, content block
+│   ├── home.html               # GET /
+│   ├── notes/
+│   │   ├── list.html           # GET /notes
+│   │   ├── detail.html         # GET /notes/:id
+│   │   └── form.html           # GET /notes/new and GET /notes/:id/edit (shared)
+│   └── errors/
+│       ├── 404.html
+│       └── 500.html
+│
+├── data/
+│   └── notes.sqlite            # SQLite database (auto-created on first run)
+│
+└── developer-guide/            # This documentation
+    ├── build.py
+    ├── nav.yaml
+    ├── src/
+    └── dist/
+</code></pre></div>
+
+<h2 id="framework-vs-viewmodels">Framework vs. ViewModels<a class="headerlink" href="#framework-vs-viewmodels" title="Permanent link">&para;</a></h2>
+<p>The <code>Framework/</code> folder contains code you write once and rarely touch again. It&rsquo;s the &ldquo;engine&rdquo; — routing, base ViewModel lifecycle, request/response helpers. When you add a new feature, you never modify <code>Framework/</code>.</p>
+<p><code>ViewModels/</code> is where all application-specific work happens. Every new route gets a new ViewModel file in the relevant feature folder.</p>
+<h2 id="feature-folders-in-viewmodels">Feature folders in ViewModels<a class="headerlink" href="#feature-folders-in-viewmodels" title="Permanent link">&para;</a></h2>
+<p>Group ViewModels by feature, not by HTTP method:</p>
+<div class="highlight"><pre><span></span><code>ViewModels/
+  Notes/         ← all seven note-related ViewModels live here
+  Users/         ← all user-related ViewModels (future)
+  Admin/         ← all admin-related ViewModels (future)
+</code></pre></div>
+
+<p>This keeps related files together and makes it easy to find everything about a feature in one place.</p>
+<h2 id="template-mirroring">Template mirroring<a class="headerlink" href="#template-mirroring" title="Permanent link">&para;</a></h2>
+<p>The <code>templates/</code> structure mirrors the URL hierarchy:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>Template</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/notes</code></td>
+<td><code>templates/notes/list.html</code></td>
+</tr>
+<tr>
+<td><code>/notes/new</code></td>
+<td><code>templates/notes/form.html</code></td>
+</tr>
+<tr>
+<td><code>/notes/:id</code></td>
+<td><code>templates/notes/detail.html</code></td>
+</tr>
+<tr>
+<td><code>/notes/:id/edit</code></td>
+<td><code>templates/notes/form.html</code></td>
+</tr>
+<tr>
+<td>Error 404</td>
+<td><code>templates/errors/404.html</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>form.html</code> template is shared between create and edit routes. It inspects the <code>note</code> context variable: if it exists, the form is in edit mode; if it&rsquo;s <code>Nil</code>, the form is in create mode.</p>
+<h2 id="the-data-directory">The <code>data/</code> directory<a class="headerlink" href="#the-data-directory" title="Permanent link">&para;</a></h2>
+<p>Currently the database path is hardcoded for development. For production builds, use <code>SpecialFolder.ApplicationData</code> to place the database in the correct OS location:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Development (hardcoded for IDE debug runs)</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/data/notes.sqlite&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
+
+<span class="c1">// Production (correct approach)</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">appData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpecialFolder</span><span class="p">.</span><span class="n">ApplicationData</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">appData</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;mvvm&quot;</span><span class="p">).</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../conventions/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Overview</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../conventions/file-naming.html">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">File Naming</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#framework-vs-viewmodels">Framework vs. ViewModels</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#feature-folders-in-viewmodels">Feature folders in ViewModels</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#template-mirroring">Template mirroring</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#the-data-directory">The `data/` directory</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

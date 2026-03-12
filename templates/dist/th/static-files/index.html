@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>การเสิร์ฟทรัพยากรคงที่ — MVVM Docs</title>
+  <meta name="description" content="วิธีการเสิร์ฟไฟล์ CSS JavaScript รูปภาพและไฟล์คงที่อื่น ๆ ในแอป XjMVVM" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/static-files/"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/th/static-files/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/static-files/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">การเสิร์ฟทรัพยากรคงที่</h1>
+          <p class="page-description">วิธีการเสิร์ฟไฟล์ CSS JavaScript รูปภาพและไฟล์คงที่อื่น ๆ ในแอป XjMVVM</p>
+        </div>
+
+        <h1 id="_1">การเสิร์ฟทรัพยากรคงที่<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>เนื่องจาก <code>HandleURL</code> ดักจับคำขอทั้งหมด คุณต้องจัดการคำขออย่างชัดเจนสำหรับทรัพยากรคงที่ (<code>.css</code>, <code>.js</code>, รูปภาพ ฟอนต์) มีสามวิธี เรียงลำดับจากที่ง่ายที่สุดไปยังที่ยืดหยุ่นมากที่สุด</p>
+<h2 id="1-cdn">ตัวเลือกที่ 1 — ลิงก์ CDN (แนะนำสำหรับไลบรารี)<a class="headerlink" href="#1-cdn" title="Permanent link">&para;</a></h2>
+<p>สำหรับไลบรารีบุคคลที่สาม (Tailwind Alpine.js ไลบรารีแผนภูมิ) ลิงก์โดยตรงจาก CDN ไม่ต้องใช้โค้ด Xojo</p>
+<div class="highlight"><pre><span></span><code>{# templates/layouts/base.html #}
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;https://cdn.tailwindcss.com&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://unpkg.com/alpinejs@3&quot;</span> <span class="na">defer</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>ใช้สำหรับไลบรารีที่คุณไม่ปรับเปลี่ยน ความซับซ้อนของการปรับใช้เป็นศูนย์</p>
+<h2 id="2-static-file-viewmodel">ตัวเลือกที่ 2 — Static file ViewModel<a class="headerlink" href="#2-static-file-viewmodel" title="Permanent link">&para;</a></h2>
+<p>สำหรับ CSS JS และรูปภาพของคุณเอง ลงทะเบียนเส้นทาง <code>/static/:file</code> ที่อ่านไฟล์จากดิสก์และเขียนไปยังการตอบสนอง</p>
+<h3 id="1-viewmodel">1. สร้าง ViewModel<a class="headerlink" href="#1-viewmodel" title="Permanent link">&para;</a></h3>
+<p>สร้าง <code>ViewModels/StaticFileVM.xojo_code</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Class</span><span class="w"> </span><span class="n">StaticFileVM</span><span class="w"></span>
+<span class="w">  </span><span class="k">Inherits</span><span class="w"> </span><span class="n">BaseViewModel</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// ความปลอดภัย: ปฏิเสธความพยายามการข้ามเส้นทาง</span><span class="w"></span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;\&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="w"></span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Bad Request&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="k">Return</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// สร้างเส้นทางไปยังโฟลเดอร์ static/ (ปรับตามเค้าโครงโครงการของคุณ)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">staticDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/static&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">staticDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span><span class="w"></span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Not Found&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="k">Return</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// ตั้งค่าประเภท MIME ตามนามสกุล</span><span class="w"></span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// แคชทรัพยากรคงที่เป็นเวลา 1 ชั่วโมงในโปรดักชัน</span><span class="w"></span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cache-Control&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;public, max-age=3600&quot;</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// อ่านและเขียนไบต์ไฟล์</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">BinaryStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BinaryStream</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Length</span><span class="p">))</span><span class="w"></span>
+<span class="w">    </span><span class="n">bs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">NthField</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">CountFields</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)).</span><span class="n">Lowercase</span><span class="w"></span>
+<span class="w">    </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">ext</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;css&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;text/css; charset=utf-8&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;js&quot;</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/javascript; charset=utf-8&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;png&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;jpeg&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/jpeg&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;gif&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/gif&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;svg&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/svg+xml&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;ico&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/x-icon&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff2&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff&quot;</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;pdf&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/pdf&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">Else</span><span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/octet-stream&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="2">2. ลงทะเบียนเส้นทาง<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<p>ใน <code>App.Opening()</code> ลงทะเบียนเส้นทางคงที่ <strong>หลังจาก</strong> เส้นทางอื่นทั้งหมดเพื่อหลีกเลี่ยงการจับคู่เส้นทางแอปพลิเคชันโดยไม่ตั้งใจ:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ลงทะเบียนเส้นทางแอปพลิเคชันก่อน</span><span class="w"></span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span><span class="w"></span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span><span class="w"></span>
+<span class="c1">// ... เส้นทางอื่นทั้งหมด ...</span><span class="w"></span>
+
+<span class="c1">// ไฟล์คงที่สุดท้าย</span><span class="w"></span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/static/:file&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">StaticFileVMFactory</span><span class="p">())</span><span class="w"></span>
+</code></pre></div>
+
+<h3 id="3-static">3. สร้างโฟลเดอร์ static/<a class="headerlink" href="#3-static" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>mvvm/
+  static/
+    app.css
+    app.js
+    logo.png
+</code></pre></div>
+
+<h3 id="4">4. อ้างอิงในเทมเพลต<a class="headerlink" href="#4" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&quot;stylesheet&quot;</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/static/app.css&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/static/app.js&quot;</span> <span class="na">defer</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/static/logo.png&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Logo&quot;</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">ความปลอดภัย</p>
+<p>เสมอยืนยันชื่อไฟล์ก่อนอ่านจากดิสก์ การตรวจสอบการข้ามเส้นทาง (<code>..</code>, <code>/</code>, <code>\</code>) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำที่จำเป็น ไม่เคยสร้างเส้นทางไฟล์จากข้อมูลป้อนผู้ใช้โดยไม่มีการตรวจสอบ</p>
+</div>
+<h2 id="3-xojo-copy-files-build-step">ตัวเลือกที่ 3 — Xojo Copy Files build step<a class="headerlink" href="#3-xojo-copy-files-build-step" title="Permanent link">&para;</a></h2>
+<p>สำหรับไฟล์ที่ควรมีชุดรวมกับไบนารีแอปพลิเคชัน (ฟอนต์ รูปภาพเริ่มต้น) ให้ใช้ขั้น <strong>Copy Files</strong> ของ Xojo เพื่อรวมไฟล์เหล่านั้นไว้ในโฟลเดอร์ Resources ของแอป</p>
+<p>จากนั้นเข้าถึงพวกมันในเวลาทำงานผ่าน:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">resourceDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;Resources&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resourceDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p>วิธีการนี้เหมาะสำหรับไฟล์ที่ส่งมาพร้อมกับแอปและไม่เปลี่ยนแปลงในเวลาทำงาน สำหรับทรัพยากรนักพัฒนาที่คุณแก้ไขบ่อย ๆ ระหว่างการพัฒนา ตัวเลือกที่ 2 จะสะดวกมากกว่า</p>
+<h2 id="mime">อ้างอิงประเภท MIME<a class="headerlink" href="#mime" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>นามสกุล</th>
+<th>ประเภท MIME</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.html</code></td>
+<td><code>text/html; charset=utf-8</code></td>
+</tr>
+<tr>
+<td><code>.css</code></td>
+<td><code>text/css; charset=utf-8</code></td>
+</tr>
+<tr>
+<td><code>.js</code></td>
+<td><code>application/javascript; charset=utf-8</code></td>
+</tr>
+<tr>
+<td><code>.json</code></td>
+<td><code>application/json</code></td>
+</tr>
+<tr>
+<td><code>.png</code></td>
+<td><code>image/png</code></td>
+</tr>
+<tr>
+<td><code>.jpg</code> / <code>.jpeg</code></td>
+<td><code>image/jpeg</code></td>
+</tr>
+<tr>
+<td><code>.gif</code></td>
+<td><code>image/gif</code></td>
+</tr>
+<tr>
+<td><code>.svg</code></td>
+<td><code>image/svg+xml</code></td>
+</tr>
+<tr>
+<td><code>.ico</code></td>
+<td><code>image/x-icon</code></td>
+</tr>
+<tr>
+<td><code>.woff2</code></td>
+<td><code>font/woff2</code></td>
+</tr>
+<tr>
+<td><code>.woff</code></td>
+<td><code>font/woff</code></td>
+</tr>
+<tr>
+<td><code>.pdf</code></td>
+<td><code>application/pdf</code></td>
+</tr>
+</tbody>
+</table>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../conventions/naming-methods-properties.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Methods & Properties</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../templates/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">JinjaX Overview</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ตวเลอกท-1-ลงก-cdn-แนะนำสำหรบไลบราร">ตัวเลือกที่ 1 — ลิงก์ CDN (แนะนำสำหรับไลบรารี)</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ตวเลอกท-2-static-file-viewmodel">ตัวเลือกที่ 2 — Static file ViewModel</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#1-สราง-viewmodel">1. สร้าง ViewModel</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#2-ลงทะเบยนเสนทาง">2. ลงทะเบียนเส้นทาง</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#3-สรางโฟลเดอร-static">3. สร้างโฟลเดอร์ static/</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#4-อางองในเทมเพลต">4. อ้างอิงในเทมเพลต</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ตวเลอกท-3-xojo-copy-files-build-step">ตัวเลือกที่ 3 — Xojo Copy Files build step</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#อางองประเภท-mime">อ้างอิงประเภท MIME</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

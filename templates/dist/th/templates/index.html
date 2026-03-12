@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ภาพรวม JinjaX — MVVM Docs</title>
+  <meta name="description" content="JinjaX คืออะไร วิธีการที่มันพอดีกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/templates/"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/th/templates/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/templates/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">ภาพรวม JinjaX</h1>
+          <p class="page-description">JinjaX คืออะไร วิธีการที่มันพอดีกับเฟรมเวิร์ก และวิธีการตั้งค่าใน App.Opening()</p>
+        </div>
+
+        <h1 id="jinjax">JinjaX และเทมเพลต<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h1>
+<p>JinjaX เป็นการใช้งานเอนจิน Jinja2 ของ Python ที่เขียนด้วย Xojo แบบบริสุทธิ์ ทำให้คุณสามารถเขียนเทมเพลต HTML ด้วยไวยากรณ์ที่เข้ากันได้กับ Jinja2 ของ Python — เอนจินเดียวกันที่ใช้โดย Flask และ Django</p>
+<h2 id="jinjax_1">JinjaX มอบให้สิ่งใด<a class="headerlink" href="#jinjax_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>การสืบทอดเทมเพลต</strong> — <code>{% extends "layouts/base.html" %}</code> ด้วย <code>{% block %}</code> overrides</li>
+<li><strong>รวมเทมเพลต</strong> — <code>{% include "partials/nav.html" %}</code></li>
+<li><strong>เอาต์พุตตัวแปร</strong> — <code>{{ variable }}</code> ด้วยการหลีกเลี่ยง HTML อัตโนมัติ</li>
+<li><strong>โฟลว์ควบคุม</strong> — <code>{% if %}</code>, <code>{% for %}</code>, <code>{% else %}</code>, <code>{% elif %}</code></li>
+<li><strong>ตัวกรอง</strong> — <code>{{ value | upper }}</code>, <code>{{ value | length }}</code>, ตัวกรองแบบกำหนดเอง</li>
+<li><strong>Autoescape</strong> — การป้องกัน XSS เปิดใช้งานโดยค่าเริ่มต้น</li>
+</ul>
+<h2 id="_1">ต้นไม้ต้นฉบับโครงการ<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>JinjaX อาศัยอยู่ใต้ <code>JinjaXLib/</code> ในรูตของโครงการ มีรวมอยู่เป็นต้นฉบับ Xojo เต็มรูปแบบแทนไลบรารีที่รวบรวม ดังนั้นจึงใช้งานได้กับไฟล์โครงการรูปแบบข้อความ <code>.xojo_code</code> และสามารถตรวจสอบหรือดีบัตได้หากจำเป็น</p>
+<p>อย่าแก้ไข <code>JinjaXLib/</code> เว้นแต่จะตั้งใจอัปเกรดหรือแพทช์ JinjaX</p>
+<h2 id="appopening">การตั้งค่าใน App.Opening()<a class="headerlink" href="#appopening" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> ถูกเริ่มต้นเพียงครั้งเดียวเมื่อแอปพลิเคชันเริ่มต้นและเก็บไว้บน <code>App</code> เป็นซิงเกิลตันที่ใช้ร่วมกัน มันเป็นแบบอ่านเท่านั้นหลังจาก <code>Opening()</code> เสร็จสิ้น ซึ่งทำให้มันปลอดภัยเธรด:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ใน App.Opening()</span><span class="w"></span>
+
+<span class="c1">// 1. สร้างสภาพแวดล้อม</span><span class="w"></span>
+<span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="p">()</span><span class="w"></span>
+
+<span class="c1">// 2. ชี้ไปที่โฟลเดอร์เทมเพลตของคุณ</span><span class="w"></span>
+<span class="c1">//    ใช้เส้นทางสัมบูรณ์เพื่อให้มันใช้งานได้จากตำแหน่งเอาต์พุตดีบัต IDE</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">projectDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">templatesDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">templatesDir</span><span class="p">)</span><span class="w"></span>
+
+<span class="c1">// 3. เปิด autoescape (ป้องกัน XSS — เสมออยู่)</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Autoescape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span><span class="w"></span>
+
+<span class="c1">// 4. ลงทะเบียนตัวกรองแบบกำหนดเอง</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="_2">การลงทะเบียนตัวกรองแบบกำหนดเอง<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>ตัวกรองคือเมธอด Xojo ที่ใช้ <code>Variant</code> และส่งคืน <code>Variant</code> ลงทะเบียนด้วยชื่อสตริงที่เทมเพลตใช้กับตัวดำเนินการ pipe <code>|</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ใน App.xojo_code (หรือโมดูล Filters)</span><span class="w"></span>
+<span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">77</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+
+<span class="c1">// ลงทะเบียนใน Opening():</span><span class="w"></span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p>ในเทมเพลต:</p>
+<div class="highlight"><pre><span></span><code>{{ note.body | truncate80 }}
+</code></pre></div>
+
+<h2 id="viewmodel">การเข้าถึงสภาพแวดล้อมจาก ViewModel<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> ถูกส่งผ่านจาก Router ไปยัง ViewModel แต่ละอันก่อนที่ <code>Handle()</code> จะถูกเรียก <code>BaseViewModel</code> เก็บไว้เป็นคุณสมบัติ <code>Jinja</code> คุณไม่เคยเข้าถึงมันโดยตรง — เพียงเรียก <code>Render()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ใน ViewModel ใด ๆ — Render() ใช้ Self.Jinja ภายใน</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w"></span>
+<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="_3">ความปลอดภัยเธรด<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p><code>JinjaEnvironment</code> ปลอดภัยในการใช้ร่วมกันในเธรด <strong>หลังจาก</strong> <code>Opening()</code> เสร็จสิ้น เพราะ:</p>
+<ul>
+<li><code>RegisterFilter</code> ถูกเรียกเฉพาะในช่วง <code>Opening()</code> — ไม่มีช่วงคำขอ</li>
+<li><code>GetTemplate()</code> และ <code>Render()</code> เฉพาะการอ่านจากสภาพแวดล้อม</li>
+<li><code>CompiledTemplate</code> และ <code>JinjaContext</code> ถูกสร้างใหม่ต่อคำขอ (stackalloc ไม่ใช่ร่วมกัน)</li>
+</ul>
+<p>แต่ละคำขอได้รับ <code>CompiledTemplate</code> และ <code>JinjaContext</code> ของตัวเอง — สิ่งเหล่านี้ไม่ใช่ร่วมกัน</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../static-files/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Serving Static Assets</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../templates/usage.html">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Usage Guide</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#jinjax-มอบใหสงใด">JinjaX มอบให้สิ่งใด</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ตนไมตนฉบบโครงการ">ต้นไม้ต้นฉบับโครงการ</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การตงคาใน-appopening">การตั้งค่าใน App.Opening()</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การลงทะเบยนตวกรองแบบกำหนดเอง">การลงทะเบียนตัวกรองแบบกำหนดเอง</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การเขาถงสภาพแวดลอมจาก-viewmodel">การเข้าถึงสภาพแวดล้อมจาก ViewModel</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ความปลอดภยเธรด">ความปลอดภัยเธรด</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

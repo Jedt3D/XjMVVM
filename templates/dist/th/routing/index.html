@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Routing Architecture — MVVM Docs</title>
+  <meta name="description" content="How HTTP requests flow through HandleURL, when Xojo takes over, and how to safely cross between the SSR world and Xojo WebPage controls." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/routing/"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/th/routing/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/routing/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Routing Architecture</h1>
+          <p class="page-description">How HTTP requests flow through HandleURL, when Xojo takes over, and how to safely cross between the SSR world and Xojo WebPage controls.</p>
+        </div>
+
+        <h1 id="routing-architecture">Routing Architecture<a class="headerlink" href="#routing-architecture" title="Permanent link">&para;</a></h1>
+<h2 id="two-worlds-inside-one-app">Two Worlds Inside One App<a class="headerlink" href="#two-worlds-inside-one-app" title="Permanent link">&para;</a></h2>
+<p>A Xojo Web 2 application hosts two fundamentally different request-handling systems simultaneously. Every HTTP request enters through <code>HandleURL</code>, and its return value decides which world handles it.</p>
+<table>
+<thead>
+<tr>
+<th>World</th>
+<th>Entry point</th>
+<th>Response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MVVM (SSR)</strong></td>
+<td><code>HandleURL</code> → Router → ViewModel → JinjaX</td>
+<td>Plain HTTP, stateless HTML</td>
+</tr>
+<tr>
+<td><strong>Xojo WebPage</strong></td>
+<td>Bootstrap HTML → WebSocket → Session → controls</td>
+<td>Stateful, event-driven UI</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><code>Return True</code> — this app handled it; Xojo does nothing further</li>
+<li><code>Return False</code> — Xojo handles it (serves bootstrap HTML, JS framework files, or WebSocket messages)</li>
+</ul>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="628.1" height="324.0" viewBox="0 0 628.1315789473684 324" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: down
+    #spacing: 40
+    #padding: 10
+    #lineWidth: 1.5
+    [Browser] -&gt; [HandleURL: App.HandleURL]
+    [HandleURL: App.HandleURL] Return True -&gt; [MVVM SSR]
+    [HandleURL: App.HandleURL] Return False -&gt; [Xojo Framework]
+    [MVVM SSR] -&gt; [ViewModel]
+    [ViewModel] HTML -&gt; [Browser]
+    [Xojo Framework] -&gt; [WebSocket Session]
+    [WebSocket Session] UI events -&gt; [Browser]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="324.0" width="628.1" stroke="none"></rect>
+            </g>
+            <g transform="translate(10, 10)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M244.0 27.8 L123 56 L123 69.33333333333333 L123.0 69.3 " fill="none"></path>
+                    <path d="M117.7 62.7 L123.0 69.3 L128.3 62.7 L123.0 76.0 Z"></path>
+                    <text x="133.0" y="134.0" stroke="none">Return True</text>
+                    <path d="M123.0 112.0 L123 132 L123 145.33333333333334 L123.0 145.3 " fill="none"></path>
+                    <path d="M117.7 138.7 L123.0 145.3 L128.3 138.7 L123.0 152.0 Z"></path>
+                    <text x="135.0" y="132.9" stroke="none">Return False</text>
+                    <path d="M246.0 110.9 L399.5 132 L399.5 145.33333333333334 L399.5 145.3 " fill="none"></path>
+                    <path d="M394.2 138.7 L399.5 145.3 L404.8 138.7 L399.5 152.0 Z"></path>
+                    <path d="M123.0 188.0 L123 208 L159.85256924382955 225.18279302166286 L159.9 225.2 " fill="none"></path>
+                    <path d="M151.6 227.2 L159.9 225.2 L156.1 217.5 L165.9 228.0 Z"></path>
+                    <text x="187.1" y="218.0" stroke="none">HTML</text>
+                    <path d="M243.1 228.0 L286 208 L286 170 L286 170 L286 132 L286 132 L286 94 L286 94 L286 56 L286 56 L286 42.666666666666664 L286.0 42.7 " fill="none"></path>
+                    <path d="M291.3 49.3 L286.0 42.7 L280.7 49.3 L286.0 36.0 Z"></path>
+                    <path d="M399.5 188.0 L399.5 208 L423.82893914142875 224.2907433898554 L423.8 224.3 " fill="none"></path>
+                    <path d="M415.3 225.0 L423.8 224.3 L421.3 216.1 L429.4 228.0 Z"></path>
+                    <text x="493.1" y="218.0" stroke="none">UI events</text>
+                    <path d="M483.1 228.0 L513 208 L513 170 L513 170 L513 132 L513 132 L513 94 L513 94 L513 56 L513 56 L334.57517496255343 26.13152708624243 L334.6 26.1 " fill="none"></path>
+                    <path d="M342.0 22.0 L334.6 26.1 L340.3 32.5 L328.0 25.0 Z"></path>
+                    <g data-name="Browser">
+                        <g fill="white" stroke="black" data-name="Browser">
+                            <rect x="244.0" y="0.0" height="36.0" width="84.0" data-name="Browser"></rect>
+                        </g>
+                        <g transform="translate(244, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Browser" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Browser" data-compartment="0">
+                                <text x="32.0" y="14.1" stroke="none" text-anchor="middle" data-name="Browser" data-compartment="0">Browser</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="HandleURL: App.HandleURL">
+                        <g fill="white" stroke="black" data-name="HandleURL: App.HandleURL">
+                            <rect x="0.0" y="76.0" height="36.0" width="246.0" data-name="HandleURL: App.HandleURL"></rect>
+                        </g>
+                        <g transform="translate(0, 76)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="HandleURL: App.HandleURL" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="HandleURL: App.HandleURL" data-compartment="0">
+                                <text x="113.0" y="14.1" stroke="none" text-anchor="middle" data-name="HandleURL: App.HandleURL" data-compartment="0">HandleURL: App.HandleURL</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="MVVM SSR">
+                        <g fill="white" stroke="black" data-name="MVVM SSR">
+                            <rect x="68.5" y="152.0" height="36.0" width="109.0" data-name="MVVM SSR"></rect>
+                        </g>
+                        <g transform="translate(68.5, 152)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="MVVM SSR" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="MVVM SSR" data-compartment="0">
+                                <text x="44.5" y="14.1" stroke="none" text-anchor="middle" data-name="MVVM SSR" data-compartment="0">MVVM SSR</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Xojo Framework">
+                        <g fill="white" stroke="black" data-name="Xojo Framework">
+                            <rect x="326.0" y="152.0" height="36.0" width="147.0" data-name="Xojo Framework"></rect>
+                        </g>
+                        <g transform="translate(326, 152)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Xojo Framework" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Xojo Framework" data-compartment="0">
+                                <text x="63.5" y="14.1" stroke="none" text-anchor="middle" data-name="Xojo Framework" data-compartment="0">Xojo Framework</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="ViewModel">
+                        <g fill="white" stroke="black" data-name="ViewModel">
+                            <rect x="152.0" y="228.0" height="36.0" width="105.0" data-name="ViewModel"></rect>
+                        </g>
+                        <g transform="translate(152, 228)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ViewModel" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="ViewModel" data-compartment="0">
+                                <text x="42.5" y="14.1" stroke="none" text-anchor="middle" data-name="ViewModel" data-compartment="0">ViewModel</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="WebSocket Session">
+                        <g fill="white" stroke="black" data-name="WebSocket Session">
+                            <rect x="367.3" y="228.0" height="36.0" width="178.0" data-name="WebSocket Session"></rect>
+                        </g>
+                        <g transform="translate(367.25, 228)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="WebSocket Session" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="WebSocket Session" data-compartment="0">
+                                <text x="79.0" y="14.1" stroke="none" text-anchor="middle" data-name="WebSocket Session" data-compartment="0">WebSocket Session</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>Browser
+  │
+  ▼
+App.HandleURL
+  ├─ Return True  →  MVVM SSR  →  ViewModel  →  HTML  →  Browser
+  └─ Return False →  Xojo Framework  →  WebSocket Session  →  Browser</code></pre>
+  </div>
+</div>
+
+<hr />
+<h2 id="handleurl-decision-tree">HandleURL Decision Tree<a class="headerlink" href="#handleurl-decision-tree" title="Permanent link">&para;</a></h2>
+<p><code>HandleURL</code> applies a fixed order of checks before dispatching any request. Path normalization comes first — every comparison depends on it.</p>
+<div class="diagram-tabs" id="diag2">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag2','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="816.0" height="472.0" viewBox="0 0 816 472" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: down
+    #spacing: 32
+    #padding: 8
+    #lineWidth: 1.5
+    [Browser GET path] -&gt; [Normalize path]
+    [Normalize path] -&gt; [p = &quot;/&quot; AND _xojo=1?]
+    [p = &quot;/&quot; AND _xojo=1?] Yes -&gt; [Return False: Xojo bootstrap]
+    [p = &quot;/&quot; AND _xojo=1?] No -&gt; [p = &quot;/tests&quot;?]
+    [p = &quot;/tests&quot;?] Yes -&gt; [302 redirect to /?_xojo=1]
+    [302 redirect to /?_xojo=1] -&gt; [Return True]
+    [p = &quot;/tests&quot;?] No -&gt; [Router.Route(...)]
+    [Router.Route(...)] matched -&gt; [ViewModel handles request]
+    [ViewModel handles request] -&gt; [Return True]
+    [Router.Route(...)] no match -&gt; [Return False: Xojo serves file]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="472.0" width="816.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(8, 8)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M267.3 32.0 L267.25 48 L267.25 58.666666666666664 L267.3 58.7 " fill="none"></path>
+                    <path d="M263.0 53.3 L267.3 58.7 L271.5 53.3 L267.3 64.0 Z"></path>
+                    <path d="M267.3 96.0 L267.25 112 L267.25 122.66666666666667 L267.3 122.7 " fill="none"></path>
+                    <path d="M263.0 117.3 L267.3 122.7 L271.5 117.3 L267.3 128.0 Z"></path>
+                    <text x="223.1" y="180.0" stroke="none">Yes</text>
+                    <path d="M215.1 160.0 L163 176 L163 186.66666666666666 L163.0 186.7 " fill="none"></path>
+                    <path d="M158.7 181.3 L163.0 186.7 L167.3 181.3 L163.0 192.0 Z"></path>
+                    <text x="289.4" y="180.0" stroke="none">No</text>
+                    <path d="M319.4 160.0 L371.5 176 L371.5 186.66666666666666 L371.5 186.7 " fill="none"></path>
+                    <path d="M367.2 181.3 L371.5 186.7 L375.8 181.3 L371.5 192.0 Z"></path>
+                    <text x="324.0" y="234.7" stroke="none">Yes</text>
+                    <path d="M316.0 214.7 L107 240 L107 272 L107 272 L107 304 L107 304 L107 314.6666666666667 L107.0 314.7 " fill="none"></path>
+                    <path d="M102.7 309.3 L107.0 314.7 L111.3 309.3 L107.0 320.0 Z"></path>
+                    <path d="M107.0 352.0 L107 368 L174.82590666589155 384.9564766664729 L174.8 385.0 " fill="none"></path>
+                    <path d="M168.6 387.8 L174.8 385.0 L170.7 379.5 L180.0 386.3 Z"></path>
+                    <text x="397.0" y="241.9" stroke="none">No</text>
+                    <path d="M427.0 221.9 L499.5 240 L499.5 250.66666666666666 L499.5 250.7 " fill="none"></path>
+                    <path d="M495.2 245.3 L499.5 250.7 L503.8 245.3 L499.5 256.0 Z"></path>
+                    <text x="439.3" y="308.0" stroke="none">matched</text>
+                    <path d="M431.3 288.0 L363 304 L363 314.6666666666667 L363.0 314.7 " fill="none"></path>
+                    <path d="M358.7 309.3 L363.0 314.7 L367.3 309.3 L363.0 320.0 Z"></path>
+                    <path d="M363.0 352.0 L363 368 L295.1740933341084 384.9564766664729 L295.2 385.0 " fill="none"></path>
+                    <path d="M299.3 379.5 L295.2 385.0 L301.4 387.8 L290.0 386.3 Z"></path>
+                    <text x="486.8" y="308.0" stroke="none">no match</text>
+                    <path d="M567.8 288.0 L636 304 L636 314.6666666666667 L636.0 314.7 " fill="none"></path>
+                    <path d="M631.7 309.3 L636.0 314.7 L640.3 309.3 L636.0 320.0 Z"></path>
+                    <g data-name="Browser GET path">
+                        <g fill="white" stroke="black" data-name="Browser GET path">
+                            <rect x="187.8" y="0.0" height="32.0" width="159.0" data-name="Browser GET path"></rect>
+                        </g>
+                        <g transform="translate(187.75, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Browser GET path" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Browser GET path" data-compartment="0">
+                                <text x="71.5" y="14.1" stroke="none" text-anchor="middle" data-name="Browser GET path" data-compartment="0">Browser GET path</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Normalize path">
+                        <g fill="white" stroke="black" data-name="Normalize path">
+                            <rect x="199.8" y="64.0" height="32.0" width="135.0" data-name="Normalize path"></rect>
+                        </g>
+                        <g transform="translate(199.75, 64)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Normalize path" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Normalize path" data-compartment="0">
+                                <text x="59.5" y="14.1" stroke="none" text-anchor="middle" data-name="Normalize path" data-compartment="0">Normalize path</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="p = &quot;/&quot; AND _xojo=1?">
+                        <g fill="white" stroke="black" data-name="p = &quot;/&quot; AND _xojo=1?">
+                            <rect x="176.8" y="128.0" height="32.0" width="181.0" data-name="p = &quot;/&quot; AND _xojo=1?"></rect>
+                        </g>
+                        <g transform="translate(176.75, 128)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="p = &quot;/&quot; AND _xojo=1?" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="p = &quot;/&quot; AND _xojo=1?" data-compartment="0">
+                                <text x="82.5" y="14.1" stroke="none" text-anchor="middle" data-name="p = &quot;/&quot; AND _xojo=1?" data-compartment="0">p = &quot;/&quot; AND _xojo=1?</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Return False: Xojo bootstrap">
+                        <g fill="white" stroke="black" data-name="Return False: Xojo bootstrap">
+                            <rect x="42.0" y="192.0" height="32.0" width="242.0" data-name="Return False: Xojo bootstrap"></rect>
+                        </g>
+                        <g transform="translate(42, 192)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Return False: Xojo bootstrap" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Return False: Xojo bootstrap" data-compartment="0">
+                                <text x="113.0" y="14.1" stroke="none" text-anchor="middle" data-name="Return False: Xojo bootstrap" data-compartment="0">Return False: Xojo bootstrap</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="p = &quot;/tests&quot;?">
+                        <g fill="white" stroke="black" data-name="p = &quot;/tests&quot;?">
+                            <rect x="316.0" y="192.0" height="32.0" width="111.0" data-name="p = &quot;/tests&quot;?"></rect>
+                        </g>
+                        <g transform="translate(316, 192)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="p = &quot;/tests&quot;?" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="p = &quot;/tests&quot;?" data-compartment="0">
+                                <text x="47.5" y="14.1" stroke="none" text-anchor="middle" data-name="p = &quot;/tests&quot;?" data-compartment="0">p = &quot;/tests&quot;?</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="302 redirect to /?_xojo=1">
+                        <g fill="white" stroke="black" data-name="302 redirect to /?_xojo=1">
+                            <rect x="0.0" y="320.0" height="32.0" width="214.0" data-name="302 redirect to /?_xojo=1"></rect>
+                        </g>
+                        <g transform="translate(0, 320)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="302 redirect to /?_xojo=1" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="302 redirect to /?_xojo=1" data-compartment="0">
+                                <text x="99.0" y="14.1" stroke="none" text-anchor="middle" data-name="302 redirect to /?_xojo=1" data-compartment="0">302 redirect to /?_xojo=1</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Return True">
+                        <g fill="white" stroke="black" data-name="Return True">
+                            <rect x="180.0" y="384.0" height="32.0" width="110.0" data-name="Return True"></rect>
+                        </g>
+                        <g transform="translate(180, 384)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Return True" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Return True" data-compartment="0">
+                                <text x="47.0" y="14.1" stroke="none" text-anchor="middle" data-name="Return True" data-compartment="0">Return True</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Router.Route(...)">
+                        <g fill="white" stroke="black" data-name="Router.Route(...)">
+                            <rect x="425.5" y="256.0" height="32.0" width="148.0" data-name="Router.Route(...)"></rect>
+                        </g>
+                        <g transform="translate(425.5, 256)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Router.Route(...)" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Router.Route(...)" data-compartment="0">
+                                <text x="66.0" y="14.1" stroke="none" text-anchor="middle" data-name="Router.Route(...)" data-compartment="0">Router.Route(...)</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="ViewModel handles request">
+                        <g fill="white" stroke="black" data-name="ViewModel handles request">
+                            <rect x="246.0" y="320.0" height="32.0" width="234.0" data-name="ViewModel handles request"></rect>
+                        </g>
+                        <g transform="translate(246, 320)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ViewModel handles request" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="ViewModel handles request" data-compartment="0">
+                                <text x="109.0" y="14.1" stroke="none" text-anchor="middle" data-name="ViewModel handles request" data-compartment="0">ViewModel handles request</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Return False: Xojo serves file">
+                        <g fill="white" stroke="black" data-name="Return False: Xojo serves file">
+                            <rect x="512.0" y="320.0" height="32.0" width="248.0" data-name="Return False: Xojo serves file"></rect>
+                        </g>
+                        <g transform="translate(512, 320)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Return False: Xojo serves file" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Return False: Xojo serves file" data-compartment="0">
+                                <text x="116.0" y="14.1" stroke="none" text-anchor="middle" data-name="Return False: Xojo serves file" data-compartment="0">Return False: Xojo serves file</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>Browser GET path
+  │
+  ▼
+Normalize: prepend "/" if missing, strip trailing "/"
+  │
+  ├─ p = "/" AND QueryString = "_xojo=1"
+  │     └── Return False  →  Xojo serves bootstrap HTML
+  │
+  ├─ p = "/tests"
+  │     └── 302 redirect to /?_xojo=1  →  Return True
+  │
+  └─ all other paths
+        └── Router.Route(...)
+              ├─ matched  →  ViewModel.Handle()  →  Return True
+              └─ no match →  Return False  →  Xojo serves JS/CSS/WebSocket</code></pre>
+  </div>
+</div>
+
+<h3 id="the-requestpath-quirk">The <code>request.Path</code> Quirk<a class="headerlink" href="#the-requestpath-quirk" title="Permanent link">&para;</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Xojo Web 2 omits the leading <code>/</code> from <code>request.Path</code>. A request to <code>/notes</code> arrives with <code>request.Path = "notes"</code>, not <code>"/notes"</code>. Every path comparison silently fails without normalization.</p>
+</div>
+<p>Always normalize before any path check:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="n">Path</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Right</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p>Without this, <code>"notes" &lt;&gt; "/notes"</code> evaluates <code>True</code> with no error — every route match fails silently.</p>
+<hr />
+<h2 id="the-mvvm-request-pipeline">The MVVM Request Pipeline<a class="headerlink" href="#the-mvvm-request-pipeline" title="Permanent link">&para;</a></h2>
+<p>For any matched SSR route, the full pipeline from <code>HandleURL</code> to HTML response:</p>
+<div class="diagram-tabs" id="diag3">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag3','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag3','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="349.5" height="388.0" viewBox="0 0 349.5333333333333 388" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: down
+    #spacing: 28
+    #padding: 8
+    #lineWidth: 1.5
+    [HandleURL] normalize + match -&gt; [Router]
+    [Router] factory.Invoke() -&gt; [ViewModel]
+    [ViewModel] OnGet / OnPost -&gt; [Model]
+    [&lt;database&gt; Model] Dictionary -&gt; [ViewModel]
+    [ViewModel] context -&gt; [JinjaX Template]
+    [JinjaX Template] HTML string -&gt; [response.Write]
+    [response.Write] Return True -&gt; [Browser]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="388.0" width="349.5" stroke="none"></rect>
+            </g>
+            <g transform="translate(35.53333333333333, 8)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <text x="91.5" y="52.0" stroke="none">normalize + match</text>
+                    <path d="M83.5 32.0 L83.5 46 L83.5 55.333333333333336 L83.5 55.3 " fill="none"></path>
+                    <path d="M79.8 50.7 L83.5 55.3 L87.2 50.7 L83.5 60.0 Z"></path>
+                    <text x="91.5" y="112.0" stroke="none">factory.Invoke()</text>
+                    <path d="M83.5 92.0 L83.5 106 L83.5 115.33333333333333 L83.5 115.3 " fill="none"></path>
+                    <path d="M79.8 110.7 L83.5 115.3 L87.2 110.7 L83.5 120.0 Z"></path>
+                    <text x="56.6" y="172.0" stroke="none">OnGet / OnPost</text>
+                    <path d="M48.6 152.0 L18 166 L22.559867828454752 175.77114534668877 L22.6 175.8 " fill="none"></path>
+                    <path d="M17.2 173.1 L22.6 175.8 L24.0 170.0 L24.5 180.0 Z"></path>
+                    <text x="-27.5" y="172.0" stroke="none">Dictionary</text>
+                    <path d="M59.5 180.0 L83.5 166 L83.5 156.66666666666666 L83.5 156.7 " fill="none"></path>
+                    <path d="M87.2 161.3 L83.5 156.7 L79.8 161.3 L83.5 152.0 Z"></path>
+                    <text x="59.9" y="172.0" stroke="none">context</text>
+                    <path d="M125.9 152.0 L163 166 L163 175.33333333333334 L163.0 175.3 " fill="none"></path>
+                    <path d="M159.3 170.7 L163.0 175.3 L166.7 170.7 L163.0 180.0 Z"></path>
+                    <text x="171.0" y="232.0" stroke="none">HTML string</text>
+                    <path d="M163.0 212.0 L163 226 L163 235.33333333333334 L163.0 235.3 " fill="none"></path>
+                    <path d="M159.3 230.7 L163.0 235.3 L166.7 230.7 L163.0 240.0 Z"></path>
+                    <text x="171.0" y="292.0" stroke="none">Return True</text>
+                    <path d="M163.0 272.0 L163 286 L163 295.3333333333333 L163.0 295.3 " fill="none"></path>
+                    <path d="M159.3 290.7 L163.0 295.3 L166.7 290.7 L163.0 300.0 Z"></path>
+                    <g data-name="HandleURL">
+                        <g fill="white" stroke="black" data-name="HandleURL">
+                            <rect x="30.5" y="0.0" height="32.0" width="106.0" data-name="HandleURL"></rect>
+                        </g>
+                        <g transform="translate(30.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="HandleURL" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="HandleURL" data-compartment="0">
+                                <text x="45.0" y="14.1" stroke="none" text-anchor="middle" data-name="HandleURL" data-compartment="0">HandleURL</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Router">
+                        <g fill="white" stroke="black" data-name="Router">
+                            <rect x="49.0" y="60.0" height="32.0" width="69.0" data-name="Router"></rect>
+                        </g>
+                        <g transform="translate(49, 60)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Router" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Router" data-compartment="0">
+                                <text x="26.5" y="14.1" stroke="none" text-anchor="middle" data-name="Router" data-compartment="0">Router</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="ViewModel">
+                        <g fill="white" stroke="black" data-name="ViewModel">
+                            <rect x="33.0" y="120.0" height="32.0" width="101.0" data-name="ViewModel"></rect>
+                        </g>
+                        <g transform="translate(33, 120)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ViewModel" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="ViewModel" data-compartment="0">
+                                <text x="42.5" y="14.1" stroke="none" text-anchor="middle" data-name="ViewModel" data-compartment="0">ViewModel</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Model">
+                        <g fill="white" stroke="black" data-name="Model">
+                            <rect x="0.0" y="180.0" height="32.0" width="64.0" data-name="Model"></rect>
+                        </g>
+                        <g transform="translate(0, 180)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Model" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Model" data-compartment="0">
+                                <text x="24.0" y="14.1" stroke="none" text-anchor="middle" data-name="Model" data-compartment="0">Model</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="JinjaX Template">
+                        <g fill="white" stroke="black" data-name="JinjaX Template">
+                            <rect x="92.0" y="180.0" height="32.0" width="142.0" data-name="JinjaX Template"></rect>
+                        </g>
+                        <g transform="translate(92, 180)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="JinjaX Template" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="JinjaX Template" data-compartment="0">
+                                <text x="63.0" y="14.1" stroke="none" text-anchor="middle" data-name="JinjaX Template" data-compartment="0">JinjaX Template</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="response.Write">
+                        <g fill="white" stroke="black" data-name="response.Write">
+                            <rect x="95.0" y="240.0" height="32.0" width="136.0" data-name="response.Write"></rect>
+                        </g>
+                        <g transform="translate(95, 240)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="response.Write" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="response.Write" data-compartment="0">
+                                <text x="60.0" y="14.1" stroke="none" text-anchor="middle" data-name="response.Write" data-compartment="0">response.Write</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Browser">
+                        <g fill="white" stroke="black" data-name="Browser">
+                            <rect x="123.0" y="300.0" height="32.0" width="80.0" data-name="Browser"></rect>
+                        </g>
+                        <g transform="translate(123, 300)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Browser" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Browser" data-compartment="0">
+                                <text x="32.0" y="14.1" stroke="none" text-anchor="middle" data-name="Browser" data-compartment="0">Browser</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>HandleURL  →  normalize path, match route
+Router     →  factory.Invoke()  →  new ViewModel
+ViewModel  →  OnGet() / OnPost()
+Model      →  returns Dictionary / Variant() of Dictionary
+ViewModel  →  builds context Dictionary
+JinjaX     →  CompiledTemplate.Render(context)  →  HTML string
+response.Write(html)  →  Return True  →  Browser</code></pre>
+  </div>
+</div>
+
+<p>Because SSR routes return <code>True</code>, Xojo never establishes a WebSocket session for them. This means Xojo WebPage controls (<code>WebLabel</code>, <code>WebListBox</code>, etc.) cannot be used from a ViewModel, and there is no real-time push from server to browser without adding Server-Sent Events or JS polling separately.</p>
+<hr />
+<h2 id="the-tests-redirect-dance">The <code>/tests</code> Redirect Dance<a class="headerlink" href="#the-tests-redirect-dance" title="Permanent link">&para;</a></h2>
+<p>The test runner (<code>XojoUnitTestPage</code>) is a Xojo WebPage — it needs a live WebSocket session. Getting there from an MVVM link requires a three-step dance.</p>
+<h3 id="why-you-cant-just-return-false-at-tests">Why you can&rsquo;t just <code>Return False</code> at <code>/tests</code><a class="headerlink" href="#why-you-cant-just-return-false-at-tests" title="Permanent link">&para;</a></h3>
+<p>Xojo only serves its bootstrap HTML at the <strong>root path</strong> <code>/</code>. For any other path, returning <code>False</code> produces a bare browser 404 — not the MVVM 404 template, just a browser error page.</p>
+<h3 id="why-defaultwindowxojounittestpage-crashes">Why <code>DefaultWindow=XojoUnitTestPage</code> crashes<a class="headerlink" href="#why-defaultwindowxojounittestpage-crashes" title="Permanent link">&para;</a></h3>
+<p>Setting <code>DefaultWindow=XojoUnitTestPage</code> in the project makes Xojo instantiate it as the first WebPage when a session connects. But <code>XojoUnitTestPage.Opening</code> runs toolbar setup and test registration — code that requires the page and session to be fully wired. At bootstrap time they are not. Result: runtime crash.</p>
+<h3 id="what-actually-works">What actually works<a class="headerlink" href="#what-actually-works" title="Permanent link">&para;</a></h3>
+<div class="diagram-tabs" id="diag4">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag4','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag4','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="366.5" height="536.0" viewBox="0 0 366.5 536" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: down
+    #spacing: 32
+    #padding: 8
+    #lineWidth: 1.5
+    [Browser: GET /tests] -&gt; [HandleURL]
+    [HandleURL] 302 /?_xojo=1 -&gt; [Browser: follows redirect]
+    [Browser: follows redirect] -&gt; [HandleURL: GET /?_xojo=1]
+    [HandleURL: GET /?_xojo=1] Return False -&gt; [Xojo Bootstrap]
+    [Xojo Bootstrap] WebSocket established -&gt; [Default: Shown event]
+    [Default: Shown event] testPage.Show() -&gt; [XojoUnitTestPage]
+    [XojoUnitTestPage] Opening + Shown -&gt; [Browser: Test Runner UI]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="536.0" width="366.5" stroke="none"></rect>
+            </g>
+            <g transform="translate(8, 8)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M116.5 32.0 L116.5 48 L116.5 58.666666666666664 L116.5 58.7 " fill="none"></path>
+                    <path d="M112.2 53.3 L116.5 58.7 L120.8 53.3 L116.5 64.0 Z"></path>
+                    <text x="124.5" y="116.0" stroke="none">302 /?_xojo=1</text>
+                    <path d="M116.5 96.0 L116.5 112 L116.5 122.66666666666667 L116.5 122.7 " fill="none"></path>
+                    <path d="M112.2 117.3 L116.5 122.7 L120.8 117.3 L116.5 128.0 Z"></path>
+                    <path d="M116.5 160.0 L116.5 176 L116.5 186.66666666666666 L116.5 186.7 " fill="none"></path>
+                    <path d="M112.2 181.3 L116.5 186.7 L120.8 181.3 L116.5 192.0 Z"></path>
+                    <text x="124.5" y="244.0" stroke="none">Return False</text>
+                    <path d="M116.5 224.0 L116.5 240 L116.5 250.66666666666666 L116.5 250.7 " fill="none"></path>
+                    <path d="M112.2 245.3 L116.5 250.7 L120.8 245.3 L116.5 256.0 Z"></path>
+                    <text x="124.5" y="308.0" stroke="none">WebSocket established</text>
+                    <path d="M116.5 288.0 L116.5 304 L116.5 314.6666666666667 L116.5 314.7 " fill="none"></path>
+                    <path d="M112.2 309.3 L116.5 314.7 L120.8 309.3 L116.5 320.0 Z"></path>
+                    <text x="124.5" y="372.0" stroke="none">testPage.Show()</text>
+                    <path d="M116.5 352.0 L116.5 368 L116.5 378.6666666666667 L116.5 378.7 " fill="none"></path>
+                    <path d="M112.2 373.3 L116.5 378.7 L120.8 373.3 L116.5 384.0 Z"></path>
+                    <text x="124.5" y="436.0" stroke="none">Opening + Shown</text>
+                    <path d="M116.5 416.0 L116.5 432 L116.5 442.6666666666667 L116.5 442.7 " fill="none"></path>
+                    <path d="M112.2 437.3 L116.5 442.7 L120.8 437.3 L116.5 448.0 Z"></path>
+                    <g data-name="Browser: GET /tests">
+                        <g fill="white" stroke="black" data-name="Browser: GET /tests">
+                            <rect x="30.5" y="0.0" height="32.0" width="172.0" data-name="Browser: GET /tests"></rect>
+                        </g>
+                        <g transform="translate(30.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Browser: GET /tests" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Browser: GET /tests" data-compartment="0">
+                                <text x="78.0" y="14.1" stroke="none" text-anchor="middle" data-name="Browser: GET /tests" data-compartment="0">Browser: GET /tests</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="HandleURL">
+                        <g fill="white" stroke="black" data-name="HandleURL">
+                            <rect x="63.5" y="64.0" height="32.0" width="106.0" data-name="HandleURL"></rect>
+                        </g>
+                        <g transform="translate(63.5, 64)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="HandleURL" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="HandleURL" data-compartment="0">
+                                <text x="45.0" y="14.1" stroke="none" text-anchor="middle" data-name="HandleURL" data-compartment="0">HandleURL</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Browser: follows redirect">
+                        <g fill="white" stroke="black" data-name="Browser: follows redirect">
+                            <rect x="12.0" y="128.0" height="32.0" width="209.0" data-name="Browser: follows redirect"></rect>
+                        </g>
+                        <g transform="translate(12, 128)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Browser: follows redirect" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Browser: follows redirect" data-compartment="0">
+                                <text x="96.5" y="14.1" stroke="none" text-anchor="middle" data-name="Browser: follows redirect" data-compartment="0">Browser: follows redirect</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="HandleURL: GET /?_xojo=1">
+                        <g fill="white" stroke="black" data-name="HandleURL: GET /?_xojo=1">
+                            <rect x="0.0" y="192.0" height="32.0" width="233.0" data-name="HandleURL: GET /?_xojo=1"></rect>
+                        </g>
+                        <g transform="translate(0, 192)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="HandleURL: GET /?_xojo=1" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="HandleURL: GET /?_xojo=1" data-compartment="0">
+                                <text x="108.5" y="14.1" stroke="none" text-anchor="middle" data-name="HandleURL: GET /?_xojo=1" data-compartment="0">HandleURL: GET /?_xojo=1</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Xojo Bootstrap">
+                        <g fill="white" stroke="black" data-name="Xojo Bootstrap">
+                            <rect x="50.5" y="256.0" height="32.0" width="132.0" data-name="Xojo Bootstrap"></rect>
+                        </g>
+                        <g transform="translate(50.5, 256)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Xojo Bootstrap" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Xojo Bootstrap" data-compartment="0">
+                                <text x="58.0" y="14.1" stroke="none" text-anchor="middle" data-name="Xojo Bootstrap" data-compartment="0">Xojo Bootstrap</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Default: Shown event">
+                        <g fill="white" stroke="black" data-name="Default: Shown event">
+                            <rect x="24.5" y="320.0" height="32.0" width="184.0" data-name="Default: Shown event"></rect>
+                        </g>
+                        <g transform="translate(24.5, 320)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Default: Shown event" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Default: Shown event" data-compartment="0">
+                                <text x="84.0" y="14.1" stroke="none" text-anchor="middle" data-name="Default: Shown event" data-compartment="0">Default: Shown event</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="XojoUnitTestPage">
+                        <g fill="white" stroke="black" data-name="XojoUnitTestPage">
+                            <rect x="38.0" y="384.0" height="32.0" width="157.0" data-name="XojoUnitTestPage"></rect>
+                        </g>
+                        <g transform="translate(38, 384)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="XojoUnitTestPage" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="XojoUnitTestPage" data-compartment="0">
+                                <text x="70.5" y="14.1" stroke="none" text-anchor="middle" data-name="XojoUnitTestPage" data-compartment="0">XojoUnitTestPage</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Browser: Test Runner UI">
+                        <g fill="white" stroke="black" data-name="Browser: Test Runner UI">
+                            <rect x="12.0" y="448.0" height="32.0" width="209.0" data-name="Browser: Test Runner UI"></rect>
+                        </g>
+                        <g transform="translate(12, 448)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Browser: Test Runner UI" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Browser: Test Runner UI" data-compartment="0">
+                                <text x="96.5" y="14.1" stroke="none" text-anchor="middle" data-name="Browser: Test Runner UI" data-compartment="0">Browser: Test Runner UI</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>Browser GET /tests
+  │
+HandleURL: 302 redirect to /?_xojo=1  →  Return True
+  │
+Browser follows redirect → GET /?_xojo=1
+  │
+HandleURL: Return False  (bypasses Router)
+  │
+Xojo serves bootstrap HTML → Xojo.js → WebSocket opens
+  │
+Session established → DefaultWindow = Default (empty WebPage)
+  │
+Default.Shown fires → New XojoUnitTestPage → testPage.Show()
+  │
+XojoUnitTestPage.Opening + Shown → test groups loaded ✓
+  │
+Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
+  </div>
+</div>
+
+<p>The <code>Default</code> page is a trivially empty <code>WebPage</code>. Its <code>Shown</code> event fires after the session is fully established — the safe earliest point to show <code>XojoUnitTestPage</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Default.xojo_code — Shown event</span><span class="w"></span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">Shown</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">testPage</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">XojoUnitTestPage</span><span class="w"></span>
+<span class="w">  </span><span class="n">testPage</span><span class="p">.</span><span class="n">Show</span><span class="p">()</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>XojoUnitTestPage</code> has <code>ImplicitInstance=False</code>, so <code>New XojoUnitTestPage</code> is required — <code>XojoUnitTestPage.Show()</code> directly would be a compile error.</p>
+<h3 id="why-_xojo1-and-not-just">Why <code>/?_xojo=1</code> and not just <code>/</code>?<a class="headerlink" href="#why-_xojo1-and-not-just" title="Permanent link">&para;</a></h3>
+<p><code>/</code> is a registered MVVM route. The Router would match it and return <code>True</code>, serving the MVVM home page — never reaching <code>Return False</code>. The <code>_xojo=1</code> query parameter is the sentinel that tells <code>HandleURL</code> to skip the Router. Normal browsers visiting <code>/</code> never send <code>_xojo=1</code>, so the home page is unaffected.</p>
+<hr />
+<h2 id="linking-back-xojo-webpage-mvvm">Linking Back: Xojo WebPage → MVVM<a class="headerlink" href="#linking-back-xojo-webpage-mvvm" title="Permanent link">&para;</a></h2>
+<p>To navigate from a Xojo WebPage back to an MVVM route, use <code>Session.GoToURL()</code>. This sends a browser-level navigation instruction, breaking out of the WebSocket session entirely.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// XojoUnitTestPage — WebToolbar Pressed event</span><span class="w"></span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">Pressed</span><span class="p">(</span><span class="n">item</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebToolbarButton</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">Caption</span><span class="w"></span>
+<span class="w">  </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;XjMVVM&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="n">Session</span><span class="p">.</span><span class="n">GoToURL</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// browser navigates to MVVM home</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Inside a <code>WebToolbar.Pressed</code> event, <code>Me</code> refers to the <code>WebToolbar</code> itself, not the page. <code>Me.Session</code> does not exist on <code>WebToolbar</code>. Use the thread-local global <code>Session</code> directly.</p>
+</div>
+<h3 id="navigation-api">Navigation API<a class="headerlink" href="#navigation-api" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>From</th>
+<th>To</th>
+<th>Method</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MVVM template</td>
+<td>MVVM route</td>
+<td><code>&lt;a href="/notes"&gt;</code></td>
+<td>Standard HTML anchor</td>
+</tr>
+<tr>
+<td>MVVM template</td>
+<td>Xojo WebPage</td>
+<td><code>&lt;a href="/tests"&gt;</code></td>
+<td>Triggers redirect dance</td>
+</tr>
+<tr>
+<td>Xojo WebPage</td>
+<td>MVVM route</td>
+<td><code>Session.GoToURL("/")</code></td>
+<td>Browser-level navigation, drops WebSocket</td>
+</tr>
+<tr>
+<td>Xojo WebPage</td>
+<td>Xojo WebPage</td>
+<td><code>page.Show()</code></td>
+<td>WebSocket-internal, no URL change</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="router-returns-boolean">Router Returns Boolean<a class="headerlink" href="#router-returns-boolean" title="Permanent link">&para;</a></h2>
+<p><code>Router.Route()</code> is a <code>Function As Boolean</code>, not a <code>Sub</code>. When no MVVM route matches (e.g., <code>/framework/Xojo.js</code>, <code>/websocket</code>), it returns <code>False</code>. <code>HandleURL</code> propagates that <code>False</code> to Xojo&rsquo;s own handler, which serves the file.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// HandleURL — simplified</span><span class="w"></span>
+<span class="k">Return</span><span class="w"> </span><span class="n">mRouter</span><span class="p">.</span><span class="n">Route</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">session</span><span class="p">,</span><span class="w"> </span><span class="n">mJinja</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// If no route matched → Router returns False → HandleURL returns False</span><span class="w"></span>
+<span class="c1">// → Xojo serves Xojo.js, WebSocket frames, etc.</span><span class="w"></span>
+</code></pre></div>
+
+<p>If <code>Route()</code> always returned <code>True</code>, Xojo&rsquo;s own JS and CSS files would be blocked, the WebSocket session would never establish, and the <code>/tests</code> flow would break entirely.</p>
+<hr />
+<h2 id="files-reference">Files Reference<a class="headerlink" href="#files-reference" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>App.xojo_code</code></td>
+<td><code>HandleURL</code> — path normalization, <code>/tests</code> redirect, <code>/?_xojo=1</code> passthrough, Router dispatch</td>
+</tr>
+<tr>
+<td><code>Framework/Router.xojo_code</code></td>
+<td>Route registration (<code>Get</code>, <code>Post</code>, <code>Any</code>), path matching (<code>ParsePath</code>), dispatch, error pages</td>
+</tr>
+<tr>
+<td><code>Default.xojo_code</code></td>
+<td>Trampoline <code>WebPage</code> — <code>Shown</code> event instantiates <code>XojoUnitTestPage</code> after session is ready</td>
+</tr>
+<tr>
+<td><code>mvvm.xojo_project</code></td>
+<td><code>DefaultWindow=Default</code> — must be <code>Default</code>, not <code>XojoUnitTestPage</code></td>
+</tr>
+<tr>
+<td><code>XojoUnit/XojoUnitTestPage.xojo_code</code></td>
+<td>Test runner; XjMVVM toolbar button calls <code>Session.GoToURL("/")</code></td>
+</tr>
+</tbody>
+</table>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../concepts/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Why MVVM?</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../conventions/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Overview</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#two-worlds-inside-one-app">Two Worlds Inside One App</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#handleurl-decision-tree">HandleURL Decision Tree</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#the-requestpath-quirk">The `request.Path` Quirk</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#the-mvvm-request-pipeline">The MVVM Request Pipeline</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#the-tests-redirect-dance">The `/tests` Redirect Dance</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#why-you-cant-just-return-false-at-tests">Why you can't just `Return False` at `/tests`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#why-defaultwindowxojounittestpage-crashes">Why `DefaultWindow=XojoUnitTestPage` crashes</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#what-actually-works">What actually works</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#why-_xojo1-and-not-just">Why `/?_xojo=1` and not just `/`?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#linking-back-xojo-webpage-mvvm">Linking Back: Xojo WebPage → MVVM</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#navigation-api">Navigation API</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#router-returns-boolean">Router Returns Boolean</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#files-reference">Files Reference</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

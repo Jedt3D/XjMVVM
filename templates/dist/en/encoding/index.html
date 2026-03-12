@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forms, MIME & UTF-8 — MVVM Docs</title>
+  <meta name="description" content="How HTML form data is encoded, how FormParser decodes it, and how UTF-8 percent-encoding works correctly in Xojo." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn active" href="/en/encoding/"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/encoding/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/encoding/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Forms, MIME & UTF-8</h1>
+          <p class="page-description">How HTML form data is encoded, how FormParser decodes it, and how UTF-8 percent-encoding works correctly in Xojo.</p>
+        </div>
+
+        <h1 id="forms-mime-utf-8">Forms, MIME &amp; UTF-8<a class="headerlink" href="#forms-mime-utf-8" title="Permanent link">&para;</a></h1>
+<h2 id="html-form-encoding">HTML form encoding<a class="headerlink" href="#html-form-encoding" title="Permanent link">&para;</a></h2>
+<p>When a browser submits a <code>&lt;form method="post"&gt;</code>, it encodes the field values as a byte string in the request body. The encoding format is specified by the form&rsquo;s <code>enctype</code> attribute.</p>
+<p>This project handles the default encoding: <code>application/x-www-form-urlencoded</code>.</p>
+<h3 id="what-the-encoded-body-looks-like">What the encoded body looks like<a class="headerlink" href="#what-the-encoded-body-looks-like" title="Permanent link">&para;</a></h3>
+<p>Given this form:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/notes&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;title&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Hello World&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">textarea</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;body&quot;</span><span class="p">&gt;</span>Line 1
+Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>The POST body sent to the server is:</p>
+<div class="highlight"><pre><span></span><code>title=Hello+World&amp;body=Line+1%0ALine+2
+</code></pre></div>
+
+<p>The rules:
+- Fields are separated by <code>&amp;</code>
+- Key and value are separated by <code>=</code>
+- Spaces become <code>+</code>
+- Special characters become <code>%XX</code> where <code>XX</code> is the hex byte value
+- Multi-byte characters (Thai, emoji, accented letters) become multiple <code>%XX</code> sequences — one per UTF-8 byte</p>
+<h3 id="reading-the-post-body-in-xojo">Reading the POST body in Xojo<a class="headerlink" href="#reading-the-post-body-in-xojo" title="Permanent link">&para;</a></h3>
+<p>Xojo&rsquo;s <code>WebRequest.Body</code> contains the raw encoded string. It must be read <strong>once</strong>, immediately, because the internal buffer may not be re-readable after the first access. <code>BaseViewModel.Handle()</code> caches it:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Handle</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Cache POST body immediately — Request.Body may only be readable once</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">    </span><span class="n">mRawBody</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Body</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// ...</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="formparser-how-it-works">FormParser — how it works<a class="headerlink" href="#formparser-how-it-works" title="Permanent link">&para;</a></h2>
+<p><code>FormParser.Parse(body)</code> converts the raw encoded string into a <code>Dictionary</code> of key → value pairs.</p>
+<p>The full implementation, annotated:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Parse</span><span class="p">(</span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Split on &amp; to get individual key=value pairs</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">pairs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="n">pairs</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pairs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Find the = separator (0-based index)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// Decode both key and value</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"></span>
+<span class="w">    </span><span class="k">ElseIf</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// Key with no = (e.g. a checkbox that&#39;s checked with no value)</span><span class="w"></span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Next</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">0-based string indexing</p>
+<p><code>pair.IndexOf("=")</code> returns a 0-based position. <code>pair.Left(eqPos)</code> extracts the key (everything before <code>=</code>). <code>pair.Middle(eqPos + 1)</code> extracts the value (everything after <code>=</code>). <code>Middle()</code> is 0-based and aligns correctly with <code>IndexOf</code>. Never use <code>Mid()</code> — it is a legacy 1-based function that gives wrong results when combined with <code>IndexOf</code>.</p>
+</div>
+<h2 id="decodeuricomponent-the-utf-8-trick">DecodeURIComponent — the UTF-8 trick<a class="headerlink" href="#decodeuricomponent-the-utf-8-trick" title="Permanent link">&para;</a></h2>
+<p>This is the most important encoding function in the project. Getting it wrong silently corrupts Thai text, emoji, and any non-ASCII input.</p>
+<h3 id="the-wrong-approach-corrupts-multi-byte-characters">The wrong approach (corrupts multi-byte characters)<a class="headerlink" href="#the-wrong-approach-corrupts-multi-byte-characters" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ WRONG — Chr() maps integers to Unicode code points, not raw bytes</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byte</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Chr</span><span class="p">(</span><span class="n">byte</span><span class="p">)</span><span class="w">   </span><span class="c1">// Chr(0xE0) = &quot;à&quot;, not the byte 0xE0</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>Chr(0xE0)</code> returns the Unicode character U+00E0 (<code>à</code>), which is a two-byte UTF-8 sequence <code>0xC3 0xA0</code>. But we wanted the single byte <code>0xE0</code>, which is the start byte of a three-byte Thai character sequence like <code>ก</code> (<code>0xE0 0xB8 0x81</code>). The two-byte-per-byte mismatch corrupts every multi-byte character.</p>
+<h3 id="the-correct-approach-memoryblock-defineencoding">The correct approach (MemoryBlock + DefineEncoding)<a class="headerlink" href="#the-correct-approach-memoryblock-defineencoding" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ CORRECT — collect raw bytes in MemoryBlock, then decode as UTF-8</span><span class="w"></span>
+<span class="k">Function</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// + → space (must happen first)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">encoded</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">mb</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">MemoryBlock</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// Percent-encoded byte — extract the two hex digits</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">hex</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="k">Try</span><span class="w"></span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w">   </span><span class="c1">// store the raw byte</span><span class="w"></span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">3</span><span class="w">   </span><span class="c1">// skip past %XX</span><span class="w"></span>
+<span class="w">      </span><span class="k">Catch</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// Invalid hex — treat % as a literal character</span><span class="w"></span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">      </span><span class="k">End</span><span class="w"> </span><span class="k">Try</span><span class="w"></span>
+<span class="w">    </span><span class="k">Else</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// Literal character — store its byte value</span><span class="w"></span>
+<span class="w">      </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">      </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Wend</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// Interpret the collected bytes as a UTF-8 string</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mb</span><span class="p">.</span><span class="n">StringValue</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">byteCount</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">DefineEncoding</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">Encodings</span><span class="p">.</span><span class="n">UTF8</span><span class="p">)</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p>The key insight: collect all raw bytes into a <code>MemoryBlock</code> first, then call <code>DefineEncoding(..., Encodings.UTF8)</code> once at the end. This correctly assembles multi-byte sequences before Xojo interprets the string encoding.</p>
+<h2 id="string-indexing-0-based-in-xojo-2025">String indexing — 0-based in Xojo 2025<a class="headerlink" href="#string-indexing-0-based-in-xojo-2025" title="Permanent link">&para;</a></h2>
+<p>Xojo 2025 strings use a fully <strong>0-based</strong> modern API. The legacy <code>Mid()</code> function is 1-based and must never be used alongside <code>IndexOf()</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Base</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>String.IndexOf("x")</code></td>
+<td><strong>0-based</strong></td>
+<td>Returns <code>0</code> for first character</td>
+</tr>
+<tr>
+<td><code>String.Middle(index, len)</code></td>
+<td><strong>0-based</strong></td>
+<td>Aligns naturally with <code>IndexOf</code></td>
+</tr>
+<tr>
+<td><code>String.Left(n)</code></td>
+<td>count</td>
+<td>Index-agnostic — always safe</td>
+</tr>
+<tr>
+<td><code>String.Right(n)</code></td>
+<td>count</td>
+<td>Index-agnostic — always safe</td>
+</tr>
+<tr>
+<td><code>Mid(s, start, len)</code></td>
+<td><strong>1-based</strong></td>
+<td>Legacy VB function — do not use</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;title=Hello&quot;</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// returns 5 (0-based)</span><span class="w"></span>
+
+<span class="c1">// ✅ Correct — Middle() is 0-based</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">)</span><span class="w">          </span><span class="c1">// &quot;title&quot;</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">    </span><span class="c1">// &quot;Hello&quot;</span><span class="w"></span>
+
+<span class="c1">// ❌ Wrong — Mid() is 1-based, off by one</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mid</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">      </span><span class="c1">// &quot;=Hello&quot; (wrong!)</span><span class="w"></span>
+</code></pre></div>
+
+<p>Counter loops also use 0-based <code>Middle</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+<span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">   </span><span class="c1">// 0-based</span><span class="w"></span>
+<span class="w">  </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="k">Wend</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="mime-types-and-content-type">MIME types and Content-Type<a class="headerlink" href="#mime-types-and-content-type" title="Permanent link">&para;</a></h2>
+<p><code>Content-Type</code> tells the browser (and server) how to interpret the body. The two most relevant types:</p>
+<p><strong>Request Content-Type</strong> (set by the browser):
+- <code>application/x-www-form-urlencoded</code> — default HTML form encoding
+- <code>multipart/form-data</code> — for file uploads (not yet implemented)
+- <code>application/json</code> — for JSON API requests</p>
+<p><strong>Response Content-Type</strong> (set by the ViewModel or Router):
+- <code>text/html; charset=utf-8</code> — all rendered page responses
+- <code>application/json</code> — for JSON API responses
+- <code>text/css; charset=utf-8</code> — served CSS files
+- <code>application/javascript; charset=utf-8</code> — served JS files</p>
+<p>Always include <code>; charset=utf-8</code> on text types. Without it, some browsers default to Latin-1, which breaks Thai and other non-ASCII content.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Always set Content-Type explicitly</span><span class="w"></span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span><span class="w"></span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>BaseViewModel.Render()</code> sets this automatically. You only need to set it manually when writing raw responses (error handlers, static files, JSON endpoints).</p>
+<h2 id="query-string-parsing">Query string parsing<a class="headerlink" href="#query-string-parsing" title="Permanent link">&para;</a></h2>
+<p>URL query strings (the <code>?key=val&amp;key2=val2</code> part of a GET URL) use the same percent-encoding format as form bodies. <code>QueryParser.Parse()</code> handles them identically to <code>FormParser.Parse()</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In a ViewModel</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">// reads ?sort=asc</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// reads ?page=2</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>GetParam()</code> checks path parameters first, then falls back to the query string — so <code>/notes/42?sort=asc</code> with a route <code>/notes/:id</code> gives <code>GetParam("id") = "42"</code> and <code>GetParam("sort") = "asc"</code>.</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../database/model-reference.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">DB Layer Reference</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#html-form-encoding">HTML form encoding</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#what-the-encoded-body-looks-like">What the encoded body looks like</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#reading-the-post-body-in-xojo">Reading the POST body in Xojo</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#formparser-how-it-works">FormParser — how it works</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#decodeuricomponent-the-utf-8-trick">DecodeURIComponent — the UTF-8 trick</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#the-wrong-approach-corrupts-multi-byte-characters">The wrong approach (corrupts multi-byte characters)</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#the-correct-approach-memoryblock-defineencoding">The correct approach (MemoryBlock + DefineEncoding)</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#string-indexing-0-based-in-xojo-2025">String indexing — 0-based in Xojo 2025</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#mime-types-and-content-type">MIME types and Content-Type</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#query-string-parsing">Query string parsing</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

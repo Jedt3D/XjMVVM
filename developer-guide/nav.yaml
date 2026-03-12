@@ -1,0 +1,73 @@
+title: "MVVM Docs"
+version: "v0.4.2"
+repo: "https://github.com/worajedt/mvvm"
+
+sections:
+  - title: "Getting Started"
+    pages:
+      - title: "Introduction"
+        slug: "index"
+        src: "pages/index.md"
+
+  - title: "Architecture"
+    pages:
+      - title: "Why MVVM?"
+        slug: "concepts/index"
+        src: "pages/01-concepts/index.md"
+
+  - title: "Routing"
+    pages:
+      - title: "Routing Architecture"
+        slug: "routing/index"
+        src: "pages/07-routing/index.md"
+
+  - title: "Conventions"
+    pages:
+      - title: "Overview"
+        slug: "conventions/index"
+        src: "pages/02-conventions/index.md"
+      - title: "Directory Structure"
+        slug: "conventions/directory-structure"
+        src: "pages/02-conventions/directory-structure.md"
+      - title: "File Naming"
+        slug: "conventions/file-naming"
+        src: "pages/02-conventions/file-naming.md"
+      - title: "Methods & Properties"
+        slug: "conventions/naming-methods-properties"
+        src: "pages/02-conventions/naming-methods-properties.md"
+
+  - title: "Static Files"
+    pages:
+      - title: "Serving Static Assets"
+        slug: "static-files/index"
+        src: "pages/03-static-files/index.md"
+
+  - title: "Templates"
+    pages:
+      - title: "JinjaX Overview"
+        slug: "templates/index"
+        src: "pages/04-templates/index.md"
+      - title: "Usage Guide"
+        slug: "templates/usage"
+        src: "pages/04-templates/usage.md"
+      - title: "Examples"
+        slug: "templates/examples"
+        src: "pages/04-templates/examples.md"
+      - title: "Tag & Filter Reference"
+        slug: "templates/reference"
+        src: "pages/04-templates/reference.md"
+
+  - title: "Database"
+    pages:
+      - title: "SQLite & Dictionary Contract"
+        slug: "database/index"
+        src: "pages/05-database/index.md"
+      - title: "DB Layer Reference"
+        slug: "database/model-reference"
+        src: "pages/05-database/model-reference.md"
+
+  - title: "Encoding"
+    pages:
+      - title: "Forms, MIME & UTF-8"
+        slug: "encoding/index"
+        src: "pages/06-encoding/index.md"

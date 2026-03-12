@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="jp" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ディレクトリ構造 — MVVM Docs</title>
+  <meta name="description" content="プロジェクト内のすべてのフォルダーとファイルの注釈付きマップ。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/conventions/directory-structure.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/conventions/directory-structure.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn active" href="/jp/conventions/directory-structure.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">ディレクトリ構造</h1>
+          <p class="page-description">プロジェクト内のすべてのフォルダーとファイルの注釈付きマップ。</p>
+        </div>
+
+        <h1 id="_1">ディレクトリ構造<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<div class="highlight"><pre><span></span><code>mvvm/
+├── mvvm.xojo_project           # Xojo プロジェクトファイル (IDE で開く)
+├── mvvm.xojo_resources         # アプリでバンドルされた静的リソース
+│
+├── App.xojo_code               # WebApplication — Opening()、HandleURL()
+├── Session.xojo_code           # WebSession サブクラス — ユーザーごとの状態、フラッシュメッセージ
+├── Default.xojo_code           # 必須プレースホルダー WebPage (提供されません)
+│
+├── Framework/                  # 再利用可能なインフラストラクチャ — めったに変更されない
+│   ├── Router.xojo_code        # ルート登録とディスパッチ
+│   ├── BaseViewModel.xojo_code # ベースクラス: Handle()、Render()、Redirect()、flash
+│   ├── FormParser.xojo_code    # application/x-www-form-urlencoded POST ボディを解析
+│   ├── QueryParser.xojo_code   # URL クエリ文字列を解析 (?key=val&amp;...)
+│   └── RouteDefinition.xojo_code  # データクラス: method、pattern、factory
+│
+├── ViewModels/                 # ルートごとに 1 クラス
+│   ├── HomeViewModel.xojo_code # GET /
+│   └── Notes/                  # フィーチャーフォルダ — すべてのノート関連の ViewModel
+│       ├── NotesListVM.xojo_code   # GET  /notes
+│       ├── NotesNewVM.xojo_code    # GET  /notes/new
+│       ├── NotesCreateVM.xojo_code # POST /notes
+│       ├── NotesDetailVM.xojo_code # GET  /notes/:id
+│       ├── NotesEditVM.xojo_code   # GET  /notes/:id/edit
+│       ├── NotesUpdateVM.xojo_code # POST /notes/:id
+│       └── NotesDeleteVM.xojo_code # POST /notes/:id/delete
+│
+├── Models/                     # データアクセス — Dictionary オブジェクトのみを返す
+│   └── NoteModel.xojo_code     # notes テーブルの SQLite CRUD
+│
+├── JinjaXLib/                  # 完全な JinjaX ソースツリー (Xojo での Jinja2 エンジン)
+│   └── ...                     # JinjaX をアップグレードしている場合を除き変更しないでください
+│
+├── templates/                  # HTML テンプレート (Jinja2 構文)
+│   ├── layouts/
+│   │   └── base.html           # サイトレイアウト — nav、フラッシュメッセージ、コンテンツブロック
+│   ├── home.html               # GET /
+│   ├── notes/
+│   │   ├── list.html           # GET /notes
+│   │   ├── detail.html         # GET /notes/:id
+│   │   └── form.html           # GET /notes/new と GET /notes/:id/edit (共有)
+│   └── errors/
+│       ├── 404.html
+│       └── 500.html
+│
+├── data/
+│   └── notes.sqlite            # SQLite データベース (初回実行時に自動作成)
+│
+└── developer-guide/            # このドキュメント
+    ├── build.py
+    ├── nav.yaml
+    ├── src/
+    └── dist/
+</code></pre></div>
+
+<h2 id="framework-vs-viewmodels">Framework vs ViewModels<a class="headerlink" href="#framework-vs-viewmodels" title="Permanent link">&para;</a></h2>
+<p><code>Framework/</code> フォルダには 1 回書いてめったに触れないコードが含まれています。これは「エンジン」です — ルーティング、基本 ViewModel ライフサイクル、リクエスト/レスポンスヘルパー。新しい機能を追加するときは、<code>Framework/</code> を変更しません。</p>
+<p><code>ViewModels/</code> はすべてのアプリケーション固有の作業が行われる場所です。すべての新しいルートは、関連するフィーチャーフォルダに新しい ViewModel ファイルを取得します。</p>
+<h2 id="viewmodels">ViewModels のフィーチャーフォルダ<a class="headerlink" href="#viewmodels" title="Permanent link">&para;</a></h2>
+<p>HTTP メソッドではなく、フィーチャーで ViewModel をグループ化します:</p>
+<div class="highlight"><pre><span></span><code>ViewModels/
+  Notes/         ← すべての 7 つのノート関連 ViewModel がここに存在
+  Users/         ← すべてのユーザー関連 ViewModel (今後)
+  Admin/         ← すべての管理関連 ViewModel (今後)
+</code></pre></div>
+
+<p>これにより、関連ファイルが一緒に保たれ、1 つの場所でフィーチャーに関するすべてを見つけやすくなります。</p>
+<h2 id="_2">テンプレートミラーリング<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><code>templates/</code> 構造は URL 階層を反映しています:</p>
+<table>
+<thead>
+<tr>
+<th>URL</th>
+<th>テンプレート</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/notes</code></td>
+<td><code>templates/notes/list.html</code></td>
+</tr>
+<tr>
+<td><code>/notes/new</code></td>
+<td><code>templates/notes/form.html</code></td>
+</tr>
+<tr>
+<td><code>/notes/:id</code></td>
+<td><code>templates/notes/detail.html</code></td>
+</tr>
+<tr>
+<td><code>/notes/:id/edit</code></td>
+<td><code>templates/notes/form.html</code></td>
+</tr>
+<tr>
+<td>エラー 404</td>
+<td><code>templates/errors/404.html</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>form.html</code> テンプレートは create と edit ルート間で共有されます。<code>note</code> コンテキスト変数の存在を検査します: 存在する場合、フォームはエディットモード; 存在しない場合、フォームは作成モード。</p>
+<h2 id="data"><code>data/</code> ディレクトリ<a class="headerlink" href="#data" title="Permanent link">&para;</a></h2>
+<p>現在、データベースパスは開発用にハードコードされています。本番ビルドの場合、<code>SpecialFolder.ApplicationData</code> を使用して、データベースを正しい OS 位置に配置します:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 開発 (IDE デバッグ実行用にハードコード)</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/data/notes.sqlite&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
+
+<span class="c1">// 本番 (正しいアプローチ)</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">appData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpecialFolder</span><span class="p">.</span><span class="n">ApplicationData</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">appData</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;mvvm&quot;</span><span class="p">).</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../conventions/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Overview</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../conventions/file-naming.html">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">File Naming</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#framework-vs-viewmodels">Framework vs ViewModels</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#viewmodels-のフィーチャーフォルダ">ViewModels のフィーチャーフォルダ</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#テンプレートミラーリング">テンプレートミラーリング</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#data-ディレクトリ">`data/` ディレクトリ</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

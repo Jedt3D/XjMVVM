@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แบบฟอร์ม MIME และ UTF-8 — MVVM Docs</title>
+  <meta name="description" content="วิธีการเข้ารหัสข้อมูลแบบฟอร์ม HTML วิธี FormParser ถอดรหัส และวิธี UTF-8 percent-encoding ทำงานอย่างถูกต้องใน Xojo" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/encoding/"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/th/encoding/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/encoding/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">แบบฟอร์ม MIME และ UTF-8</h1>
+          <p class="page-description">วิธีการเข้ารหัสข้อมูลแบบฟอร์ม HTML วิธี FormParser ถอดรหัส และวิธี UTF-8 percent-encoding ทำงานอย่างถูกต้องใน Xojo</p>
+        </div>
+
+        <h1 id="mime-utf-8">แบบฟอร์ม MIME และ UTF-8<a class="headerlink" href="#mime-utf-8" title="Permanent link">&para;</a></h1>
+<h2 id="html">การเข้ารหัสแบบฟอร์ม HTML<a class="headerlink" href="#html" title="Permanent link">&para;</a></h2>
+<p>เมื่อเบราว์เซอร์ส่ง <code>&lt;form method="post"&gt;</code> มันจะเข้ารหัสค่าฟิลด์เป็นสตริงไบต์ในเนื้อหาคำขอ รูปแบบการเข้ารหัสถูกระบุโดยแอตทริบิวต์ <code>enctype</code> ของแบบฟอร์ม</p>
+<p>โครงการนี้จัดการการเข้ารหัสเริ่มต้น: <code>application/x-www-form-urlencoded</code></p>
+<h3 id="_1">เนื้อหาที่เข้ารหัสดูเหมือนไร<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>ให้แบบฟอร์มนี้:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/notes&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;title&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Hello World&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">textarea</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;body&quot;</span><span class="p">&gt;</span>Line 1
+Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>เนื้อหา POST ที่ส่งไปยังเซิร์ฟเวอร์คือ:</p>
+<div class="highlight"><pre><span></span><code>title=Hello+World&amp;body=Line+1%0ALine+2
+</code></pre></div>
+
+<p>กฎ:
+- ฟิลด์คั่นด้วย <code>&amp;</code>
+- กุญแจและค่าคั่นด้วย <code>=</code>
+- ช่องว่างกลายเป็น <code>+</code>
+- อักขระพิเศษกลายเป็น <code>%XX</code> โดยที่ <code>XX</code> คือค่าไบต์ฐานสิบหก
+- อักขระหลายไบต์ (ไทย emoji ตัวอักษรเน้น) กลายเป็นลำดับ <code>%XX</code> หลายตัว — หนึ่งต่อไบต์ UTF-8</p>
+<h3 id="post-xojo">อ่านเนื้อหา POST ใน Xojo<a class="headerlink" href="#post-xojo" title="Permanent link">&para;</a></h3>
+<p><code>WebRequest.Body</code> ของ Xojo มีสตริงที่เข้ารหัสดิบ มันต้องอ่าน <strong>เพียงครั้งเดียว</strong> ทันทีเพราะบัฟเฟอร์ภายในอาจไม่สามารถอ่านซ้ำได้หลังจากการเข้าถึงแรก <code>BaseViewModel.Handle()</code> แคชมัน:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Handle</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// แคช POST body ทันที — Request.Body อาจอ่านได้เพียงครั้งเดียวเท่านั้น</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">    </span><span class="n">mRawBody</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Body</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// ...</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="formparser">FormParser — วิธีการทำงาน<a class="headerlink" href="#formparser" title="Permanent link">&para;</a></h2>
+<p><code>FormParser.Parse(body)</code> แปลงสตริงที่เข้ารหัสดิบเป็นพจนานุกรม <code>Dictionary</code> ของกุญแจ → คู่ค่า</p>
+<p>การใช้งานแบบเต็มที่มีคำอธิบายประกอบ:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Parse</span><span class="p">(</span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// แยกบน &amp; เพื่อรับคู่ key=value แต่ละอัน</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">pairs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="n">pairs</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pairs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// ค้นหาตัวคั่น = (ดัชนี 0-based)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// ถอดรหัสทั้งกุญแจและค่า</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"></span>
+<span class="w">    </span><span class="k">ElseIf</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// กุญแจที่ไม่มี = (เช่น checkbox ที่ทำเครื่องหมายด้วยค่าไม่มี)</span><span class="w"></span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Next</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">ดัชนีสตริง 0-based</p>
+<p><code>pair.IndexOf("=")</code> คืนตำแหน่ง 0-based <code>pair.Left(eqPos)</code> แยกกุญแจ (ทุกอย่างก่อน <code>=</code>) <code>pair.Middle(eqPos + 1)</code> แยกค่า (ทุกอย่างหลัง <code>=</code>) <code>Middle()</code> คือ 0-based และจัดตำแหน่งอย่างถูกต้องกับ <code>IndexOf</code> ไม่เคยใช้ <code>Mid()</code> — มันคือฟังก์ชัน VB เก่า 1-based ที่ให้ผลลัพธ์ที่ผิดเมื่อรวมกับ <code>IndexOf</code></p>
+</div>
+<h2 id="decodeuricomponent-utf-8">DecodeURIComponent — เคล็ดลับ UTF-8<a class="headerlink" href="#decodeuricomponent-utf-8" title="Permanent link">&para;</a></h2>
+<p>นี่คือฟังก์ชันการเข้ารหัสที่สำคัญที่สุดในโครงการ การทำให้ผิดปนเปื้อนข้อความไทย emoji และข้อมูลป้อนที่ไม่ใช่ ASCII อย่างเงียบ ๆ</p>
+<h3 id="_2">วิธีการ ผิด (ทำให้อักขระหลายไบต์เสียหาย)<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ ผิด — Chr() แมปจำนวนเต็มกับจุดรหัส Unicode ไม่ใช่ไบต์ดิบ</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byte</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Chr</span><span class="p">(</span><span class="n">byte</span><span class="p">)</span><span class="w">   </span><span class="c1">// Chr(0xE0) = &quot;à&quot; ไม่ใช่ไบต์ 0xE0</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>Chr(0xE0)</code> คืนอักขระ Unicode U+00E0 (<code>à</code>) ซึ่งเป็นลำดับ UTF-8 สองไบต์ <code>0xC3 0xA0</code> แต่เราต้องการไบต์เดียว <code>0xE0</code> ซึ่งเป็นไบต์เริ่มต้นของลำดับตัวอักษรไทยสามไบต์เช่น <code>ก</code> (<code>0xE0 0xB8 0x81</code>) ความเบาบางของไบต์ต่อไบต์แต่ละไบต์เสียหายอักขระหลายไบต์ทั้งหมด</p>
+<h3 id="memoryblock-defineencoding">วิธีการ ถูก (MemoryBlock + DefineEncoding)<a class="headerlink" href="#memoryblock-defineencoding" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ ถูก — รวบรวมไบต์ดิบใน MemoryBlock จากนั้นถอดรหัสเป็น UTF-8</span><span class="w"></span>
+<span class="k">Function</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// + → space (ต้องเกิดขึ้นก่อน)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">encoded</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">mb</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">MemoryBlock</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// ไบต์ที่เข้ารหัสเปอร์เซ็นต์ — แยกตัวเลขฐานสิบหกสองตัว</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">hex</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="k">Try</span><span class="w"></span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w">   </span><span class="c1">// เก็บไบต์ดิบ</span><span class="w"></span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">3</span><span class="w">   </span><span class="c1">// ข้าม %XX</span><span class="w"></span>
+<span class="w">      </span><span class="k">Catch</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// hex ไม่ถูกต้อง — ถือว่า % เป็นอักขระตามตัวอักษร</span><span class="w"></span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">      </span><span class="k">End</span><span class="w"> </span><span class="k">Try</span><span class="w"></span>
+<span class="w">    </span><span class="k">Else</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// อักขระตามตัวอักษร — เก็บค่าไบต์</span><span class="w"></span>
+<span class="w">      </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">      </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Wend</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// ตีความไบต์ที่รวบรวมเป็นสตริง UTF-8</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mb</span><span class="p">.</span><span class="n">StringValue</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">byteCount</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">DefineEncoding</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">Encodings</span><span class="p">.</span><span class="n">UTF8</span><span class="p">)</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p>ข้อมูลสำคัญ: รวบรวมไบต์ดิบทั้งหมดเข้า <code>MemoryBlock</code> ก่อน จากนั้นเรียก <code>DefineEncoding(..., Encodings.UTF8)</code> เพียงครั้งเดียวที่ท้ายสุด สิ่งนี้จะประกอบลำดับหลายไบต์ได้อย่างถูกต้องก่อนที่ Xojo จะตีความการเข้ารหัสสตริง</p>
+<h2 id="0-based-xojo-2025">ดัชนีสตริง — 0-based ใน Xojo 2025<a class="headerlink" href="#0-based-xojo-2025" title="Permanent link">&para;</a></h2>
+<p>สตริง Xojo 2025 ใช้ API สมัยใหม่ที่เป็น 0-based อย่างเต็มที่ ฟังก์ชัน <code>Mid()</code> เก่ามี 1-based และต้องไม่ใช้ร่วมกับ <code>IndexOf()</code>:</p>
+<table>
+<thead>
+<tr>
+<th>วิธีการ</th>
+<th>ฐาน</th>
+<th>หมายเหตุ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>String.IndexOf("x")</code></td>
+<td><strong>0-based</strong></td>
+<td>คืน <code>0</code> สำหรับอักขระแรก</td>
+</tr>
+<tr>
+<td><code>String.Middle(index, len)</code></td>
+<td><strong>0-based</strong></td>
+<td>จัดตำแหน่งธรรมชาติกับ <code>IndexOf</code></td>
+</tr>
+<tr>
+<td><code>String.Left(n)</code></td>
+<td>count</td>
+<td>ดัชนี-ไม่รู้ — เสมอปลอดภัย</td>
+</tr>
+<tr>
+<td><code>String.Right(n)</code></td>
+<td>count</td>
+<td>ดัชนี-ไม่รู้ — เสมอปลอดภัย</td>
+</tr>
+<tr>
+<td><code>Mid(s, start, len)</code></td>
+<td><strong>1-based</strong></td>
+<td>ฟังก์ชัน VB เก่า — อย่าใช้</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;title=Hello&quot;</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// ส่งคืน 5 (0-based)</span><span class="w"></span>
+
+<span class="c1">// ✅ ถูก — Middle() คือ 0-based</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">)</span><span class="w">          </span><span class="c1">// &quot;title&quot;</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">    </span><span class="c1">// &quot;Hello&quot;</span><span class="w"></span>
+
+<span class="c1">// ❌ ผิด — Mid() คือ 1-based ออกไปหนึ่ง</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mid</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">      </span><span class="c1">// &quot;=Hello&quot; (ผิด!)</span><span class="w"></span>
+</code></pre></div>
+
+<p>ลูปตัวนับใช้ 0-based <code>Middle</code> ด้วย:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+<span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">   </span><span class="c1">// 0-based</span><span class="w"></span>
+<span class="w">  </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="k">Wend</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="mime-content-type">ประเภท MIME และ Content-Type<a class="headerlink" href="#mime-content-type" title="Permanent link">&para;</a></h2>
+<p><code>Content-Type</code> บอกเบราว์เซอร์ (และเซิร์ฟเวอร์) วิธีการตีความเนื้อหา สองประเภทที่เกี่ยวข้องมากที่สุด:</p>
+<p><strong>Content-Type ของคำขอ</strong> (ตั้งโดยเบราว์เซอร์):
+- <code>application/x-www-form-urlencoded</code> — การเข้ารหัสแบบฟอร์ม HTML เริ่มต้น
+- <code>multipart/form-data</code> — สำหรับการอัปโหลดไฟล์ (ยังไม่ใช้งาน)
+- <code>application/json</code> — สำหรับคำขอ JSON API</p>
+<p><strong>Content-Type ของการตอบสนอง</strong> (ตั้งโดย ViewModel หรือ Router):
+- <code>text/html; charset=utf-8</code> — ทั้งหมดเรนเดอร์หน้าการตอบสนอง
+- <code>application/json</code> — สำหรับการตอบสนอง JSON API
+- <code>text/css; charset=utf-8</code> — ไฟล์ CSS ที่เสิร์ฟ
+- <code>application/javascript; charset=utf-8</code> — ไฟล์ JS ที่เสิร์ฟ</p>
+<p>เสมอรวม <code>; charset=utf-8</code> บนประเภทข้อความ โดยไม่มีมัน เบราว์เซอร์บางตัวเริ่มต้นเป็น Latin-1 ซึ่งหักไทยและเนื้อหาที่ไม่ใช่ ASCII อื่น ๆ</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// เสมอตั้งค่า Content-Type อย่างชัดเจน</span><span class="w"></span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span><span class="w"></span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>BaseViewModel.Render()</code> ตั้งค่านี้โดยอัตโนมัติ คุณต้องตั้งค่าด้วยตนเองเมื่อเขียนการตอบสนองดิบ (ตัวจัดการข้อผิดพลาด ไฟล์คงที่ เอนด์พอยต์ JSON)</p>
+<h2 id="_3">การแยกวิเคราะห์สตริงการค้นหา<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>สตริงการค้นหา URL (ส่วน <code>?key=val&amp;key2=val2</code> ของ URL GET) ใช้รูปแบบการเข้ารหัสเปอร์เซ็นต์เดียวกันกับเนื้อหาแบบฟอร์ม <code>QueryParser.Parse()</code> จัดการเช่นเดียวกับ <code>FormParser.Parse()</code></p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ใน ViewModel</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">// อ่าน ?sort=asc</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// อ่าน ?page=2</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>GetParam()</code> ตรวจสอบพารามิเตอร์เส้นทางก่อน จากนั้นจึงกลับไปยังสตริงการค้นหา — ดังนั้น <code>/notes/42?sort=asc</code> ที่มีเส้นทาง <code>/notes/:id</code> ให้ <code>GetParam("id") = "42"</code> และ <code>GetParam("sort") = "asc"</code></p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../database/model-reference.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">DB Layer Reference</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การเขารหสแบบฟอรม-html">การเข้ารหัสแบบฟอร์ม HTML</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#เนอหาทเขารหสดเหมอนไร">เนื้อหาที่เข้ารหัสดูเหมือนไร</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#อานเนอหา-post-ใน-xojo">อ่านเนื้อหา POST ใน Xojo</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#formparser-วธการทำงาน">FormParser — วิธีการทำงาน</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#decodeuricomponent-เคลดลบ-utf-8">DecodeURIComponent — เคล็ดลับ UTF-8</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#วธการ-ผด-ทำใหอกขระหลายไบตเสยหาย">วิธีการ ผิด (ทำให้อักขระหลายไบต์เสียหาย)</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#วธการ-ถก-memoryblock-defineencoding">วิธีการ ถูก (MemoryBlock + DefineEncoding)</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ดชนสตรง-0-based-ใน-xojo-2025">ดัชนีสตริง — 0-based ใน Xojo 2025</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ประเภท-mime-และ-content-type">ประเภท MIME และ Content-Type</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การแยกวเคราะหสตรงการคนหา">การแยกวิเคราะห์สตริงการค้นหา</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

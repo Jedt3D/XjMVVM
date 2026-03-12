@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="jp" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>使用ガイド — MVVM Docs</title>
+  <meta name="description" content="Jinja2 テンプレート構文の使用方法 — 変数、ブロック、ループ、条件、フィルター、テンプレート継承。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/templates/usage.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/templates/usage.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn active" href="/jp/templates/usage.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">使用ガイド</h1>
+          <p class="page-description">Jinja2 テンプレート構文の使用方法 — 変数、ブロック、ループ、条件、フィルター、テンプレート継承。</p>
+        </div>
+
+        <h1 id="_1">使用ガイド<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<h2 id="_2">テンプレート継承<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>すべてのページテンプレートは基本レイアウトを拡張することで開始します:</p>
+<div class="highlight"><pre><span></span><code>{# templates/notes/list.html #}
+{% extends &quot;layouts/base.html&quot; %}
+
+{% block title %}Notes{% endblock %}
+
+{% block content %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>All Notes<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+  {# ページコンテンツはここへ #}
+{% endblock %}
+</code></pre></div>
+
+<p>基本レイアウトは、子テンプレートが埋める名前付きブロックを定義します:</p>
+<div class="highlight"><pre><span></span><code>{# templates/layouts/base.html #}
+<span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{% block title %}App{% endblock %} | XjMVVM<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">nav</span><span class="p">&gt;</span>...<span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+
+  {% if flash %}
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flash flash-{{ flash.type }}&quot;</span><span class="p">&gt;</span>{{ flash.message }}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+  {% endif %}
+
+  <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>
+    {% block content %}{% endblock %}
+  <span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>子テンプレートは、親で定義されているブロックのみをオーバーライドできます。子テンプレートの <code>{% block %}</code> タグの外のコンテンツは無視されます。</p>
+<h2 id="_3">変数<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>double curly braces で変数を出力します。HTML は自動的にエスケープされます — <code>&lt;script&gt;</code> は <code>&amp;lt;script&amp;gt;</code> になります:</p>
+<div class="highlight"><pre><span></span><code>{{ note.title }}
+{{ note.created_at }}
+{{ page_title }}
+</code></pre></div>
+
+<p>変数は <code>Render()</code> に渡すコンテキスト <code>Dictionary</code> から来ます。Dictionary キーはテンプレートの変数名になります。</p>
+<h3 id="dictionary">Dictionary ドット記法<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h3>
+<p>JinjaX は <code>{{ note.title }}</code> をオブジェクトで <code>note.Value("title")</code> を呼び出すことで解決します。これはすべてのデータが <code>Dictionary</code> オブジェクトである必要があるコア理由です — <code>Dictionary</code> のみが <code>EvaluateGetAttr</code> を介したドット記法ルックアップをサポートします。</p>
+<h3 id="_4">生出力 (エスケープなし)<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>事前にレンダリングされた HTML (信頼できるコンテンツのみ) を出力する必要がある場合:</p>
+<div class="highlight"><pre><span></span><code>{{ content | safe }}
+</code></pre></div>
+
+<p>ユーザー提供のコンテンツで <code>| safe</code> を使用しないでください。</p>
+<h2 id="_5">条件<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>{% if note %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Edit: {{ note.title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+{% elif draft %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Draft<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+{% else %}
+  <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>New Note<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+{% endif %}
+</code></pre></div>
+
+<p>Jinja2 のフォルシー値: <code>False</code>、<code>0</code>、<code>""</code> (空文字列)、<code>[]</code> (空配列)、<code>None</code>/<code>Nil</code>。存在しないキーはフォルシーとして扱われます。</p>
+<h2 id="_6">ループ<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p><code>Variant()</code> の <code>Dictionary</code> オブジェクト配列を反復:</p>
+<div class="highlight"><pre><span></span><code>{% for note in notes %}
+  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;note&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ note.title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ note.body }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">time</span><span class="p">&gt;</span>{{ note.updated_at }}<span class="p">&lt;/</span><span class="nt">time</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+{% else %}
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>No notes yet. <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/notes/new&quot;</span><span class="p">&gt;</span>Create one.<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endfor %}
+</code></pre></div>
+
+<p><code>{% else %}</code> ブロックは配列が空のときレンダリングします。</p>
+<h3 id="_7">ループ変数<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<p><code>{% for %}</code> ブロック内では、特別な <code>loop</code> 変数が利用可能です:</p>
+<table>
+<thead>
+<tr>
+<th>変数</th>
+<th>値</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>loop.index</code></td>
+<td>現在のイテレーション、1-based</td>
+</tr>
+<tr>
+<td><code>loop.index0</code></td>
+<td>現在のイテレーション、0-based</td>
+</tr>
+<tr>
+<td><code>loop.first</code></td>
+<td>最初のイテレーションで <code>True</code></td>
+</tr>
+<tr>
+<td><code>loop.last</code></td>
+<td>最後のイテレーションで <code>True</code></td>
+</tr>
+<tr>
+<td><code>loop.length</code></td>
+<td>アイテムの総数</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code>{% for note in notes %}
+  {% if loop.first %}<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>{% endif %}
+  <span class="p">&lt;</span><span class="nt">li</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;{% if loop.last %}last{% endif %}&quot;</span><span class="p">&gt;</span>
+    {{ loop.index }}. {{ note.title }}
+  <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  {% if loop.last %}<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>{% endif %}
+{% endfor %}
+</code></pre></div>
+
+<h2 id="_8">フィルター<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<p>フィルターは pipe <code>|</code> オペレータを使用して値を変換します:</p>
+<div class="highlight"><pre><span></span><code>{{ note.title | upper }}
+{{ note.title | lower }}
+{{ note.body  | truncate(100) }}
+{{ notes      | length }}
+{{ note.title | default(&quot;Untitled&quot;) }}
+{{ note.title | replace(&quot;foo&quot;, &quot;bar&quot;) }}
+</code></pre></div>
+
+<p>フィルターをチェーンできます:</p>
+<div class="highlight"><pre><span></span><code>{{ note.title | upper | truncate(50) }}
+</code></pre></div>
+
+<h2 id="_9">テンプレート インクルード<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<p>部分的なテンプレートをインクルード:</p>
+<div class="highlight"><pre><span></span><code>{% include &quot;partials/pagination.html&quot; %}
+</code></pre></div>
+
+<p>含まれるテンプレートは親と同じコンテキストを共有します — 同じすべての変数にアクセスできます。</p>
+<h2 id="_10">コメント<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<p>テンプレートコメントはブラウザに送信されません:</p>
+<div class="highlight"><pre><span></span><code>{# このコメントは出力から削除されます #}
+</code></pre></div>
+
+<p>HTML コメントはブラウザに送信されます:</p>
+<div class="highlight"><pre><span></span><code><span class="cm">&lt;!-- このコメントはページソースに表示されます --&gt;</span>
+</code></pre></div>
+
+<h2 id="_11">空白制御<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h2>
+<p><code>-</code> を使用してタグの周囲の空白を削除:</p>
+<div class="highlight"><pre><span></span><code>{%- for note in notes -%}
+  {{ note.title }}
+{%- endfor -%}
+</code></pre></div>
+
+<p>JSON または CSV をテンプレートから生成する場合に有用です。</p>
+<h2 id="viewmodel">ViewModel からコンテキストを渡す<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
+<p>コンテキスト <code>Dictionary</code> のすべてのものはテンプレート変数になります:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w">   </span><span class="c1">// Variant() of Dictionary</span><span class="w"></span>
+<span class="w">  </span><span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;page_title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;All Notes&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;is_admin&quot;</span><span class="p">)</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="kc">False</span><span class="w"></span>
+<span class="w">  </span><span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<p>テンプレートで:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ page_title }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+{% if is_admin %}<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/admin&quot;</span><span class="p">&gt;</span>Admin<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>{% endif %}
+{% for note in notes %}...{% endfor %}
+</code></pre></div>
+
+<p>フラッシュメッセージは <code>BaseViewModel.Render()</code> によって自動的に注入されます — それらを手動でコンテキストに追加しません。</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../templates/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">JinjaX Overview</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../templates/examples.html">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Examples</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#テンプレート継承">テンプレート継承</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#変数">変数</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#dictionary-ドット記法">Dictionary ドット記法</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#生出力-エスケープなし">生出力 (エスケープなし)</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#条件">条件</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ループ">ループ</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#ループ変数">ループ変数</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#フィルター">フィルター</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#テンプレート-インクルード">テンプレート インクルード</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#コメント">コメント</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#空白制御">空白制御</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#viewmodel-からコンテキストを渡す">ViewModel からコンテキストを渡す</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

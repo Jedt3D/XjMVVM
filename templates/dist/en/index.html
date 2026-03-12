@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction — MVVM Docs</title>
+  <meta name="description" content="A server-side rendered Xojo MVVM Web Framework (XjMVVM) built on Xojo Web 2, powered by JinjaX templates." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn active" href="/en/"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="./index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Introduction</h1>
+          <p class="page-description">A server-side rendered Xojo MVVM Web Framework (XjMVVM) built on Xojo Web 2, powered by JinjaX templates.</p>
+        </div>
+
+        <h1 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h1>
+<p>This is <strong>XjMVVM</strong> (Xojo MVVM Web Framework) — a server-side rendered (SSR) web application framework built on Xojo Web 2. Instead of using Xojo&rsquo;s built-in WebPage and WebControl GUI system, every HTTP request is intercepted in <code>HandleURL</code> and routed to a ViewModel, which renders an HTML response using the <strong>JinjaX template engine</strong>.</p>
+<p>The architecture is deliberately similar to <strong>Flask</strong> or <strong>Django</strong> — familiar to anyone who has built SSR web apps in Python. If you&rsquo;ve never used Flask, think of it this way: the browser asks for a page, the server runs some code, builds an HTML string, and sends it back. No JavaScript framework, no WebSockets for rendering, just clean request/response.</p>
+<h2 id="the-request-lifecycle">The request lifecycle<a class="headerlink" href="#the-request-lifecycle" title="Permanent link">&para;</a></h2>
+<p>Every request — regardless of URL — flows through the same pipeline:</p>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="602.0" height="376.0" viewBox="0 0 602 376" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: down
+    #spacing: 36
+    #padding: 8
+    #lineWidth: 1.5
+    [Browser] HTTP Request -&gt; [HandleURL: WebApplication.HandleURL]
+    [HandleURL: WebApplication.HandleURL] -&gt; [Router]
+    [Router] -&gt; [ViewModel: ViewModel.Handle]
+    [ViewModel: ViewModel.Handle] queries -&gt; [&lt;database&gt; Model]
+    [&lt;database&gt; Model] Dictionary -&gt; [ViewModel: ViewModel.Handle]
+    [ViewModel: ViewModel.Handle] -&gt; [Render: JinjaX.CompiledTemplate.Render]
+    [Render: JinjaX.CompiledTemplate.Render] HTML -&gt; [Browser]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="376.0" width="602.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(8, 8)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <text x="257.0" y="47.1" stroke="none">HTTP Request</text>
+                    <path d="M249.0 27.1 L167 50 L167 62 L167.0 62.0 " fill="none"></path>
+                    <path d="M162.2 56.0 L167.0 62.0 L171.8 56.0 L167.0 68.0 Z"></path>
+                    <path d="M167.0 100.0 L167 118 L167 130 L167.0 130.0 " fill="none"></path>
+                    <path d="M162.2 124.0 L167.0 130.0 L171.8 124.0 L167.0 136.0 Z"></path>
+                    <path d="M167.0 168.0 L167 186 L167 198 L167.0 198.0 " fill="none"></path>
+                    <path d="M162.2 192.0 L167.0 198.0 L171.8 192.0 L167.0 204.0 Z"></path>
+                    <text x="149.6" y="256.0" stroke="none">queries</text>
+                    <path d="M141.6 236.0 L113 254 L118.3507699228107 266.48512981989165 L118.4 266.5 " fill="none"></path>
+                    <path d="M111.6 262.9 L118.4 266.5 L120.4 259.1 L120.7 272.0 Z"></path>
+                    <text x="65.3" y="264.0" stroke="none">Dictionary</text>
+                    <path d="M152.3 272.0 L168.25 254 L167.80867460202924 241.99594917519548 L167.8 242.0 " fill="none"></path>
+                    <path d="M172.8 247.8 L167.8 242.0 L163.2 248.2 L167.6 236.0 Z"></path>
+                    <path d="M215.4 236.0 L269.75 254 L327.8032155804785 277.7297815511445 L327.8 277.7 " fill="none"></path>
+                    <path d="M320.4 279.9 L327.8 277.7 L324.1 271.0 L333.4 280.0 Z"></path>
+                    <text x="387.4" y="272.0" stroke="none">HTML</text>
+                    <path d="M379.4 280.0 L390.5 254 L390.5 220 L390.5 220 L390.5 186 L390.5 186 L390.5 152 L390.5 152 L390.5 118 L390.5 118 L390.5 84 L390.5 84 L390.5 50 L390.5 50 L334.68929097230085 31.30478712372639 L334.7 31.3 " fill="none"></path>
+                    <path d="M341.9 28.7 L334.7 31.3 L338.9 37.8 L329.0 29.4 Z"></path>
+                    <g data-name="Browser">
+                        <g fill="white" stroke="black" data-name="Browser">
+                            <rect x="249.0" y="0.0" height="32.0" width="80.0" data-name="Browser"></rect>
+                        </g>
+                        <g transform="translate(249, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Browser" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Browser" data-compartment="0">
+                                <text x="32.0" y="14.1" stroke="none" text-anchor="middle" data-name="Browser" data-compartment="0">Browser</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="HandleURL: WebApplication.HandleURL">
+                        <g fill="white" stroke="black" data-name="HandleURL: WebApplication.HandleURL">
+                            <rect x="0.0" y="68.0" height="32.0" width="334.0" data-name="HandleURL: WebApplication.HandleURL"></rect>
+                        </g>
+                        <g transform="translate(0, 68)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="HandleURL: WebApplication.HandleURL" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="HandleURL: WebApplication.HandleURL" data-compartment="0">
+                                <text x="159.0" y="14.1" stroke="none" text-anchor="middle" data-name="HandleURL: WebApplication.HandleURL" data-compartment="0">HandleURL: WebApplication.HandleURL</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Router">
+                        <g fill="white" stroke="black" data-name="Router">
+                            <rect x="132.5" y="136.0" height="32.0" width="69.0" data-name="Router"></rect>
+                        </g>
+                        <g transform="translate(132.5, 136)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Router" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Router" data-compartment="0">
+                                <text x="26.5" y="14.1" stroke="none" text-anchor="middle" data-name="Router" data-compartment="0">Router</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="ViewModel: ViewModel.Handle">
+                        <g fill="white" stroke="black" data-name="ViewModel: ViewModel.Handle">
+                            <rect x="38.5" y="204.0" height="32.0" width="257.0" data-name="ViewModel: ViewModel.Handle"></rect>
+                        </g>
+                        <g transform="translate(38.5, 204)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ViewModel: ViewModel.Handle" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="ViewModel: ViewModel.Handle" data-compartment="0">
+                                <text x="120.5" y="14.1" stroke="none" text-anchor="middle" data-name="ViewModel: ViewModel.Handle" data-compartment="0">ViewModel: ViewModel.Handle</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Model">
+                        <g fill="white" stroke="black" data-name="Model">
+                            <rect x="99.0" y="280.0" height="32.0" width="64.0" stroke="none" data-name="Model"></rect>
+                            <path d="M99.0 280.0 L99.0 312.0" fill="none" data-name="Model"></path>
+                            <path d="M163.0 280.0 L163.0 312.0" fill="none" data-name="Model"></path>
+                            <ellipse cx="131.0" cy="280.0" rx="32.0" ry="6.0" data-name="Model"></ellipse>
+                            <path d="M163.0 312.0 L163.0 312.3 L162.8 312.6 L162.6 312.9 L162.4 313.2 L162.0 313.5 L161.6 313.8 L161.1 314.1 L160.5 314.3 L159.8 314.6 L159.1 314.9 L158.3 315.1 L157.4 315.4 L156.5 315.6 L155.5 315.9 L154.5 316.1 L153.3 316.3 L152.2 316.5 L151.0 316.7 L149.7 316.9 L148.4 317.0 L147.0 317.2 L145.6 317.3 L144.2 317.5 L142.7 317.6 L141.2 317.7 L139.7 317.8 L138.1 317.8 L136.6 317.9 L135.0 318.0 L133.4 318.0 L131.8 318.0 L130.2 318.0 L128.6 318.0 L127.0 318.0 L125.4 317.9 L123.9 317.8 L122.3 317.8 L120.8 317.7 L119.3 317.6 L117.8 317.5 L116.4 317.3 L115.0 317.2 L113.6 317.0 L112.3 316.9 L111.0 316.7 L109.8 316.5 L108.7 316.3 L107.5 316.1 L106.5 315.9 L105.5 315.6 L104.6 315.4 L103.7 315.1 L102.9 314.9 L102.2 314.6 L101.5 314.3 L100.9 314.1 L100.4 313.8 L100.0 313.5 L99.6 313.2 L99.4 312.9 L99.2 312.6 L99.0 312.3 L99.0 312.0" data-name="Model"></path>
+                        </g>
+                        <g transform="translate(99, 284)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Model" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Model" data-compartment="0">
+                                <text x="24.0" y="14.1" stroke="none" text-anchor="middle" data-name="Model" data-compartment="0">Model</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Render: JinjaX.CompiledTemplate.Render">
+                        <g fill="white" stroke="black" data-name="Render: JinjaX.CompiledTemplate.Render">
+                            <rect x="199.0" y="280.0" height="32.0" width="347.0" data-name="Render: JinjaX.CompiledTemplate.Render"></rect>
+                        </g>
+                        <g transform="translate(199, 280)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Render: JinjaX.CompiledTemplate.Render" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Render: JinjaX.CompiledTemplate.Render" data-compartment="0">
+                                <text x="165.5" y="14.1" stroke="none" text-anchor="middle" data-name="Render: JinjaX.CompiledTemplate.Render" data-compartment="0">Render: JinjaX.CompiledTemplate.Render</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>Browser
+  │  HTTP Request  (GET /notes  or  POST /notes/42)
+  ▼
+WebApplication.HandleURL
+  │  Returns True (takes ownership of all requests)
+  ▼
+Router
+  │  Matches path pattern → selects ViewModel
+  │  Extracts URL params  (e.g. /notes/:id → id = "42")
+  ▼
+ViewModel.Handle()
+  │  Dispatches to OnGet() or OnPost()
+  ▼
+Model  (database queries)
+  │  Returns Dictionary / Variant() of Dictionary
+  ▼
+ViewModel builds context Dictionary
+  │  { "notes": [...], "flash": {...}, "page_title": "Notes" }
+  ▼
+JinjaX.CompiledTemplate.Render(context) → HTML string
+  │  Template: templates/notes/list.html
+  ▼
+WebResponse.Write(html)
+  ▼
+Browser renders the page</code></pre>
+  </div>
+</div>
+
+<p>Nothing in this pipeline uses <code>WebPage</code>, <code>WebButton</code>, <code>WebTextField</code>, or any other Xojo web control. The <code>Default</code> WebPage in the project file is a required placeholder for Xojo&rsquo;s project structure — it is never actually served.</p>
+<h2 id="running-the-app">Running the app<a class="headerlink" href="#running-the-app" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Open <code>mvvm.xojo_project</code> in <strong>Xojo 2025r3.1</strong>.</li>
+<li>Click <strong>Run</strong> (⌘R). The app starts on <code>http://localhost:8080</code>.</li>
+<li>The SQLite database <code>data/notes.sqlite</code> is created automatically on first launch.</li>
+</ol>
+<p>There is no CLI build system. All testing and building happens inside the Xojo IDE.</p>
+<h2 id="whats-in-this-guide">What&rsquo;s in this guide<a class="headerlink" href="#whats-in-this-guide" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What you&rsquo;ll learn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="concepts/index.html">Why MVVM?</a></td>
+<td>The architectural decisions and trade-offs behind this design</td>
+</tr>
+<tr>
+<td><a href="routing/index.html">Routing</a></td>
+<td>HandleURL decision tree, the <code>/tests</code> redirect dance, crossing between SSR and Xojo WebPage</td>
+</tr>
+<tr>
+<td><a href="conventions/index.html">Conventions</a></td>
+<td>Directory structure, file naming, method and property naming</td>
+</tr>
+<tr>
+<td><a href="static-files/index.html">Static Files</a></td>
+<td>How to serve CSS, JS, and images</td>
+</tr>
+<tr>
+<td><a href="templates/index.html">Templates</a></td>
+<td>JinjaX setup, Jinja2 syntax, real examples, full tag reference</td>
+</tr>
+<tr>
+<td><a href="database/index.html">Database</a></td>
+<td>SQLite patterns, the Dictionary contract, thread safety</td>
+</tr>
+<tr>
+<td><a href="database/model-reference.html">DB Layer Reference</a></td>
+<td>Three-layer architecture (DBAdapter / BaseModel / NoteModel), full CRUD API, trade-offs</td>
+</tr>
+<tr>
+<td><a href="encoding/index.html">Encoding</a></td>
+<td>Form parsing, MIME types, UTF-8 and percent-encoding</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-version">Current version<a class="headerlink" href="#current-version" title="Permanent link">&para;</a></h2>
+<p><strong>v0.4.2</strong> — Production path fix: DB (<code>data/notes.sqlite</code>) and templates are now located relative to the executable via <code>App.ExecutableFile.Parent</code>, so the app works correctly both in debug and as a built application. v0.4.1 added the XojoUnit test runner at <code>/tests</code> and the BaseModel/DBAdapter three-layer architecture. Phase 3 (authentication, multiple models) is next.</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="./concepts/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Why MVVM?</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#the-request-lifecycle">The request lifecycle</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#running-the-app">Running the app</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#whats-in-this-guide">What's in this guide</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#current-version">Current version</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="./../assets/docs.js"></script>
+</body>
+</html>

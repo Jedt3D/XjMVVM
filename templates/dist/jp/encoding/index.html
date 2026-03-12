@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="jp" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>フォーム、MIME & UTF-8 — MVVM Docs</title>
+  <meta name="description" content="HTML フォームデータの符号化方法、FormParser がそれをデコードする方法、UTF-8 パーセントエンコーディングが Xojo で正しく機能する方法。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/encoding/"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/encoding/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn active" href="/jp/encoding/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">フォーム、MIME & UTF-8</h1>
+          <p class="page-description">HTML フォームデータの符号化方法、FormParser がそれをデコードする方法、UTF-8 パーセントエンコーディングが Xojo で正しく機能する方法。</p>
+        </div>
+
+        <h1 id="mime-utf-8">フォーム、MIME &amp; UTF-8<a class="headerlink" href="#mime-utf-8" title="Permanent link">&para;</a></h1>
+<h2 id="html">HTML フォームエンコーディング<a class="headerlink" href="#html" title="Permanent link">&para;</a></h2>
+<p>ブラウザが <code>&lt;form method="post"&gt;</code> を送信するとき、フィールド値をリクエストボディ内のバイト文字列として符号化します。エンコーディング形式はフォームの <code>enctype</code> 属性で指定されます。</p>
+<p>このプロジェクトはデフォルトエンコーディングを処理します: <code>application/x-www-form-urlencoded</code>。</p>
+<h3 id="_1">エンコードされたボディはどのように見えるか<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p>このフォームを考えます:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/notes&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;title&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Hello World&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">textarea</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;body&quot;</span><span class="p">&gt;</span>Line 1
+Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p>サーバーに送信された POST ボディ:</p>
+<div class="highlight"><pre><span></span><code>title=Hello+World&amp;body=Line+1%0ALine+2
+</code></pre></div>
+
+<p>規則:
+- フィールドは <code>&amp;</code> で分離
+- キーと値は <code>=</code> で分離
+- スペースは <code>+</code> になる
+- 特殊文字は <code>%XX</code> になる。<code>XX</code> は 16 進バイト値
+- マルチバイト文字 (タイ、絵文字、アクセント付き文字) は複数の <code>%XX</code> シーケンス — 1 つずつ UTF-8 バイト</p>
+<h3 id="xojo-post">Xojo で POST ボディを読む<a class="headerlink" href="#xojo-post" title="Permanent link">&para;</a></h3>
+<p>Xojo の <code>WebRequest.Body</code> は生のエンコードされた文字列を含みます。<strong>一度</strong> 読む必要があります。直後に。内部バッファは最初のアクセス後に再読み取り可能ではないかもしれないため。<code>BaseViewModel.Handle()</code> はキャッシュします:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Handle</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// POST ボディを直後にキャッシュ — Request.Body は 1 回のみ読み取り可能かもしれません</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">    </span><span class="n">mRawBody</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Body</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// ...</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="formparser">FormParser — それがどのように機能するか<a class="headerlink" href="#formparser" title="Permanent link">&para;</a></h2>
+<p><code>FormParser.Parse(body)</code> は生のエンコードされた文字列をキー → 値ペアの <code>Dictionary</code> に変換します。</p>
+<p>完全な実装、注釈付き:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Parse</span><span class="p">(</span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// &amp; で分割して個々の key=value ペアを取得</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">pairs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="n">pairs</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pairs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// = セパレータを検索 (0-based インデックス)</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// キーと値をデコード</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="w"></span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"></span>
+<span class="w">    </span><span class="k">ElseIf</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// = を持たないキー (例: チェックボックスがチェックされていて値がない)</span><span class="w"></span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Next</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">0-based 文字列インデックス</p>
+<p><code>pair.IndexOf("=")</code> は 0-based 位置を返します。<code>pair.Left(eqPos)</code> はキー (<code>=</code> の前のすべて) を抽出します。<code>pair.Middle(eqPos + 1)</code> は値を抽出します (<code>=</code> の後のすべて)。<code>Middle()</code> は 0-based で <code>IndexOf</code> に正しく整合します。決に <code>Mid()</code> を使用しないでください — それは <code>IndexOf</code> と組み合わせると間違った結果を与える従来の 1-based 関数です。</p>
+</div>
+<h2 id="decodeuricomponent-utf-8">DecodeURIComponent — UTF-8 トリック<a class="headerlink" href="#decodeuricomponent-utf-8" title="Permanent link">&para;</a></h2>
+<p>これはプロジェクト内で最も重要なエンコーディング関数です。それを間違うとタイテキスト、絵文字、非 ASCII 入力をサイレントに破損させます。</p>
+<h3 id="_2">間違ったアプローチ (マルチバイト文字を破損)<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ 間違い — Chr() は整数を Unicode コードポイントにマップします、生バイトではなく</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byte</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Chr</span><span class="p">(</span><span class="n">byte</span><span class="p">)</span><span class="w">   </span><span class="c1">// Chr(0xE0) = &quot;à&quot;、0xE0 バイトではない</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>Chr(0xE0)</code> は Unicode 文字 U+00E0 (<code>à</code>) を返し、これは 2 バイト UTF-8 シーケンス <code>0xC3 0xA0</code> です。しかし私たちが望んだのは単一バイト <code>0xE0</code>、それは 3 バイト タイ文字シーケンスのスタートバイトのようなもの <code>ก</code> (<code>0xE0 0xB8 0x81</code>) です。バイトごどのの 2 バイト対バイトの不一致はすべてのマルチバイト文字を破損させます。</p>
+<h3 id="memoryblock-defineencoding">正しいアプローチ (MemoryBlock + DefineEncoding)<a class="headerlink" href="#memoryblock-defineencoding" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — MemoryBlock で生バイトを収集し、UTF-8 としてデコード</span><span class="w"></span>
+<span class="k">Function</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// + → スペース (最初に発生する必要があります)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">encoded</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">mb</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">MemoryBlock</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// パーセントエンコードバイト — 2 つの 16 進数字を抽出</span><span class="w"></span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">hex</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="k">Try</span><span class="w"></span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w">   </span><span class="c1">// 生バイトを保存</span><span class="w"></span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">3</span><span class="w">   </span><span class="c1">// %XX を過ぎてスキップ</span><span class="w"></span>
+<span class="w">      </span><span class="k">Catch</span><span class="w"></span>
+<span class="w">        </span><span class="c1">// 無効な 16 進 — % をリテラル文字として扱う</span><span class="w"></span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">      </span><span class="k">End</span><span class="w"> </span><span class="k">Try</span><span class="w"></span>
+<span class="w">    </span><span class="k">Else</span><span class="w"></span>
+<span class="w">      </span><span class="c1">// リテラル文字 — そのバイト値を保存</span><span class="w"></span>
+<span class="w">      </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
+<span class="w">      </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">      </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">  </span><span class="k">Wend</span><span class="w"></span>
+
+<span class="w">  </span><span class="c1">// 収集バイトを UTF-8 文字列として解釈</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mb</span><span class="p">.</span><span class="n">StringValue</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">byteCount</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">DefineEncoding</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">Encodings</span><span class="p">.</span><span class="n">UTF8</span><span class="p">)</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p>重要な洞察: すべての生バイトを <code>MemoryBlock</code> に最初に収集し、その後、最後に <code>DefineEncoding(..., Encodings.UTF8)</code> を 1 回呼び出します。これはマルチバイトシーケンスを正しく組み立てます。Xojo が文字列エンコーディングを解釈する前に。</p>
+<h2 id="xojo-2025-0-based">文字列インデックス — Xojo 2025 で 0-based<a class="headerlink" href="#xojo-2025-0-based" title="Permanent link">&para;</a></h2>
+<p>Xojo 2025 文字列は完全に <strong>0-based</strong> な最新 API を使用します。従来の <code>Mid()</code> 関数は 1-based で、<code>IndexOf()</code> と一緒に決に使用してはいけません:</p>
+<table>
+<thead>
+<tr>
+<th>メソッド</th>
+<th>ベース</th>
+<th>メモ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>String.IndexOf("x")</code></td>
+<td><strong>0-based</strong></td>
+<td>最初の文字に <code>0</code> を返す</td>
+</tr>
+<tr>
+<td><code>String.Middle(index, len)</code></td>
+<td><strong>0-based</strong></td>
+<td><code>IndexOf</code> と自然に整合</td>
+</tr>
+<tr>
+<td><code>String.Left(n)</code></td>
+<td>count</td>
+<td>インデックス無関係 — 常に安全</td>
+</tr>
+<tr>
+<td><code>String.Right(n)</code></td>
+<td>count</td>
+<td>インデックス無関係 — 常に安全</td>
+</tr>
+<tr>
+<td><code>Mid(s, start, len)</code></td>
+<td><strong>1-based</strong></td>
+<td>従来の VB 関数 — 使用しないでください</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;title=Hello&quot;</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// 5 を返す (0-based)</span><span class="w"></span>
+
+<span class="c1">// ✅ 正解 — Middle() は 0-based</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">)</span><span class="w">          </span><span class="c1">// &quot;title&quot;</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">    </span><span class="c1">// &quot;Hello&quot;</span><span class="w"></span>
+
+<span class="c1">// ❌ 間違い — Mid() は 1-based、1 つずれている</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mid</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">      </span><span class="c1">// &quot;=Hello&quot; (間違い!)</span><span class="w"></span>
+</code></pre></div>
+
+<p>カウンターループも 0-based <code>Middle</code> を使用:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+<span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">   </span><span class="c1">// 0-based</span><span class="w"></span>
+<span class="w">  </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
+<span class="k">Wend</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="mime-content-type">MIME タイプと Content-Type<a class="headerlink" href="#mime-content-type" title="Permanent link">&para;</a></h2>
+<p><code>Content-Type</code> はボディをどう解釈するかをブラウザ (とサーバー) に伝えます。最も関連のある 2 つのタイプ:</p>
+<p><strong>リクエスト Content-Type</strong> (ブラウザで設定):
+- <code>application/x-www-form-urlencoded</code> — デフォルト HTML フォームエンコーディング
+- <code>multipart/form-data</code> — ファイルアップロード用 (まだ実装されていません)
+- <code>application/json</code> — JSON API リクエスト用</p>
+<p><strong>レスポンス Content-Type</strong> (ViewModel またはルーターで設定):
+- <code>text/html; charset=utf-8</code> — すべてのレンダリングされたページレスポンス
+- <code>application/json</code> — JSON API レスポンス用
+- <code>text/css; charset=utf-8</code> — サーブされた CSS ファイル用
+- <code>application/javascript; charset=utf-8</code> — サーブされた JS ファイル用</p>
+<p>常にテキスト型に <code>; charset=utf-8</code> を含めます。それなしで、いくつかのブラウザは Latin-1 にデフォルトします。タイなど非 ASCII コンテンツを破損させます。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 常に Content-Type を明示的に設定</span><span class="w"></span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span><span class="w"></span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>BaseViewModel.Render()</code> はこれを自動的に設定します。生のレスポンス (エラーハンドラー、静的ファイル、JSON エンドポイント) を書き込むときのみ手動で設定する必要があります。</p>
+<h2 id="_3">クエリ文字列解析<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>URL クエリ文字列 (GET URL の <code>?key=val&amp;key2=val2</code> 部分) はフォームボディと同じパーセントエンコーディング形式を使用します。<code>QueryParser.Parse()</code> は <code>FormParser.Parse()</code> と同じように処理します。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ViewModel で</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">// ?sort=asc を読む</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// ?page=2 を読む</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>GetParam()</code> はパスパラメータを最初にチェック、クエリ文字列にフォールバック — そのため <code>/notes/42?sort=asc</code> ルート <code>/notes/:id</code> で <code>GetParam("id") = "42"</code> と <code>GetParam("sort") = "asc"</code> を与えます。</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../database/model-reference.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">DB Layer Reference</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#html-フォームエンコーディング">HTML フォームエンコーディング</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#エンコードされたボディはどのように見えるか">エンコードされたボディはどのように見えるか</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#xojo-で-post-ボディを読む">Xojo で POST ボディを読む</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#formparser-それがどのように機能するか">FormParser — それがどのように機能するか</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#decodeuricomponent-utf-8-トリック">DecodeURIComponent — UTF-8 トリック</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#間違ったアプローチ-マルチバイト文字を破損">間違ったアプローチ (マルチバイト文字を破損)</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#正しいアプローチ-memoryblock-defineencoding">正しいアプローチ (MemoryBlock + DefineEncoding)</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#文字列インデックス-xojo-2025-で-0-based">文字列インデックス — Xojo 2025 で 0-based</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#mime-タイプと-content-type">MIME タイプと Content-Type</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#クエリ文字列解析">クエリ文字列解析</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

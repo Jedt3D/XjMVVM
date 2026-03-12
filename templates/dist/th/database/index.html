@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQLite และสัญญา Dictionary — MVVM Docs</title>
+  <meta name="description" content="วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียนคลาส Model ที่ปลอดภัยจากเธรด" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/database/"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/th/database/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/database/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">SQLite และสัญญา Dictionary</h1>
+          <p class="page-description">วิธีการทำงานกับ SQLite แปลง RowSet เป็น Dictionary และเขียนคลาส Model ที่ปลอดภัยจากเธรด</p>
+        </div>
+
+        <h1 id="sqlite-dictionary">SQLite และสัญญา Dictionary<a class="headerlink" href="#sqlite-dictionary" title="Permanent link">&para;</a></h1>
+<h2 id="_1">รูปแบบหลัก<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>ทุกเมธอด Model ปฏิบัติตามรูปแบบเดียวกัน: เปิดการเชื่อมต่อฐานข้อมูลใหม่ เรียกใช้การค้นหา แปลงแต่ละแถว <code>RowSet</code> เป็น <code>Dictionary</code> ปิดทุกสิ่ง คืนค่า</p>
+<p>รูปแบบนี้มีจงใจ — มันรับประกันความปลอดภัยเธรดและบังคับใช้สัญญาข้อมูล Dictionary ที่ JinjaX ต้องการ</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">results</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">RowSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;SELECT id, title, body, created_at, updated_at FROM notes ORDER BY updated_at DESC&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">While</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">AfterLastRow</span><span class="w"></span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">IntegerValue</span><span class="w"></span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;updated_at&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;updated_at&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<span class="w">    </span><span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">rs</span><span class="p">.</span><span class="n">MoveToNextRow</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Wend</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">rs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">results</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p>ประเภทการคืน <code>Variant()</code> ที่มีอ็อบเจ็กต์ <code>Dictionary</code> เป็นรูปแบบเพียงอย่างเดียวที่ JinjaX สามารถวนซ้ำได้ในลูป <code>{% for %}</code></p>
+<h2 id="_2">ประเภทการคืน<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>การดำเนินการ</th>
+<th>ประเภทการคืน</th>
+<th>กรณี Nil</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>แถวหลายแถว</td>
+<td><code>Variant()</code> (ของ <code>Dictionary</code>)</td>
+<td>อาร์เรย์ว่าง <code>()</code></td>
+</tr>
+<tr>
+<td>แถวเดียว</td>
+<td><code>Dictionary</code></td>
+<td><code>Nil</code></td>
+</tr>
+<tr>
+<td>สร้าง</td>
+<td><code>Integer</code> (ID แถวใหม่)</td>
+<td>—</td>
+</tr>
+<tr>
+<td>อัปเดต / ลบ</td>
+<td><code>Sub</code> (ไม่มี)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>เสมอตรวจสอบ <code>Nil</code> เมื่อดึงแถวเดียว:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ใน ViewModel</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Note not found&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="_3">การเชื่อมต่อฐานข้อมูลต่อคำขอ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>เมธอด <code>OpenDB()</code> ส่วนตัวเปิด <strong>ใหม่</strong> การเชื่อมต่อในการเรียกแต่ละครั้ง ไม่มีการเชื่อมต่อฐานข้อมูลแบบใช้ร่วมกันที่มีอายุยาวนาน ใน <code>App</code></p>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="n">DB_PATH</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dbFile</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">db</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p><strong>ทำไมต่อคำขอ?</strong> Xojo จัดการคำขอพร้อมกันในหลายเธรด อ็อบเจ็กต์ <code>SQLiteDatabase</code> ที่ใช้ร่วมกันจะต้องใช้ mutex การเปิดการเชื่อมต่อใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อกทั้งหมด — SQLite จัดการการเชื่อมต่อการอ่านพร้อมกันจากกระบวนการหลายตัวโดยเนื้อแท้</p>
+<p><strong>ทำไมไม่ pool การเชื่อมต่อ?</strong> สำหรับปริมาณการจราจรที่เฟรมเวิร์กนี้ลำเป้า (ทีมเล็ก ๆ เครื่องมือภายใน) ค่าใช้จ่ายในการเปิดการเชื่อมต่อไม่มีนัยสำคัญ pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่วัดได้ในขนาดนี้</p>
+<h2 id="_4">การเตรียมฐานข้อมูล<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>วิธีแรกที่เรียกใช้เมื่อแอปเริ่มต้นคือ <code>NoteModel.InitDB()</code> (จาก <code>App.Opening()</code>) มันสร้างไฟล์ฐานข้อมูลและเรียก <code>CREATE TABLE IF NOT EXISTS</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Shared</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">InitDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="n">DB_PATH</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dbFile</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">dbFile</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">CreateDatabase</span><span class="p">()</span><span class="w">   </span><span class="c1">// สร้างไฟล์</span><span class="w"></span>
+<span class="w">  </span><span class="k">Else</span><span class="w"></span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS notes (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;id          INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;title       TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;body        TEXT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;created_at  TEXT DEFAULT (datetime(&#39;now&#39;)), &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
+<span class="w">    </span><span class="s2">&quot;updated_at  TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">db</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p>มันปลอดภัยในการโทรทุกครั้งที่เริ่มต้น — <code>IF NOT EXISTS</code> เป็นแบบฉันทามติ</p>
+<h2 id="_5">การค้นหาแบบพารามีเตอร์<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>เสมอใช้ตัวยึดตำแหน่ง <code>?</code> สำหรับค่า ไม่เคยต่อเนื่องสตริง SQL ด้วยข้อมูลป้อนผู้ใช้ — สิ่งนี้ป้องกันการฉีด SQL:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ ถูก — มีพารามิเตอร์</span><span class="w"></span>
+<span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"></span>
+<span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM notes WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"></span>
+
+<span class="c1">// ❌ ผิด — ความเสี่ยงการฉีด SQL</span><span class="w"></span>
+<span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title) VALUES (&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;)&quot;</span><span class="p">)</span><span class="w"></span>
+</code></pre></div>
+
+<p><code>SelectSQL()</code> และ <code>ExecuteSQL()</code> ยอมรับพารามิเตอร์ <code>Variant</code> variadic หลังสตริง SQL</p>
+<h2 id="id">การได้รับ ID แถวที่แทรกสุดท้าย<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
+<p>หลังจาก <code>INSERT</code> ดึง ID ของแถวใหม่โดยใช้ <code>db.LastRowID</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span><span class="w"></span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p>ViewModel ใช้ ID นี้เพื่อเปลี่ยนเส้นทางไปยังหน้ารายละเอียดบันทึกใหม่:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ใน NotesCreateVM.OnPost()</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"></span>
+<span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Note created.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">newID</span><span class="p">))</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="_6">ประเภทคอลัมน์<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>SQLite ที่พิมพ์แบบไดนามิก ตัวเข้าถึงคอลัมน์ <code>RowSet</code> ของ Xojo แปลงค่าเมื่ออ่าน:</p>
+<table>
+<thead>
+<tr>
+<th>ตัวเข้าถึง</th>
+<th>ใช้สำหรับ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.StringValue</code></td>
+<td>คอลัมน์ <code>TEXT</code> ID (ค่าเริ่มต้นที่ปลอดภัย)</td>
+</tr>
+<tr>
+<td><code>.IntegerValue</code></td>
+<td>คอลัมน์ <code>INTEGER</code></td>
+</tr>
+<tr>
+<td><code>.DoubleValue</code></td>
+<td>คอลัมน์ <code>REAL</code></td>
+</tr>
+<tr>
+<td><code>.BooleanValue</code></td>
+<td><code>INTEGER</code> 0/1 เก็บเป็นบูลีน</td>
+</tr>
+</tbody>
+</table>
+<p>เก็บวันที่ทั้งหมดเป็น <code>TEXT</code> โดยใช้ฟังก์ชัน <code>datetime()</code> ของ SQLite ดึงและแสดงเป็นสตริง — จัดรูปแบบในเทมเพลตหรือ ViewModel ตามต้องการ</p>
+<h2 id="_7">เส้นทางฐานข้อมูลสำหรับการผลิต<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p>การใช้งานปัจจุบันเข้ารหัสเส้นทางสำหรับการพัฒนา สำหรับบิลด์โปรดักชัน ให้ใช้ <code>SpecialFolder.ApplicationData</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// การพัฒนา (เข้ารหัส — ดีสำหรับการรันดีบัต IDE)</span><span class="w"></span>
+<span class="n">Const</span><span class="w"> </span><span class="n">DB_PATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/Users/worajedt/Xojo Projects/mvvm/data/notes.sqlite&quot;</span><span class="w"></span>
+
+<span class="c1">// โปรดักชัน (วิธีการที่ถูกต้อง)</span><span class="w"></span>
+<span class="k">Function</span><span class="w"> </span><span class="n">ProductionDBPath</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">appData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SpecialFolder</span><span class="p">.</span><span class="n">ApplicationData</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">appDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">appData</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;mvvm&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">appDir</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">appDir</span><span class="p">.</span><span class="n">CreateDirectory</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">appDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">).</span><span class="n">NativePath</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+</code></pre></div>
+
+<p>ใช้ค่าคงที่ build หรือค่ากำหนดเพื่อสลับระหว่างเส้นทางการพัฒนาและการผลิต</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../templates/reference.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Tag & Filter Reference</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../database/model-reference.html">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">DB Layer Reference</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#รปแบบหลก">รูปแบบหลัก</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ประเภทการคน">ประเภทการคืน</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การเชอมตอฐานขอมลตอคำขอ">การเชื่อมต่อฐานข้อมูลต่อคำขอ</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การเตรยมฐานขอมล">การเตรียมฐานข้อมูล</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การคนหาแบบพารามเตอร">การค้นหาแบบพารามีเตอร์</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การไดรบ-id-แถวทแทรกสดทาย">การได้รับ ID แถวที่แทรกสุดท้าย</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ประเภทคอลมน">ประเภทคอลัมน์</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#เสนทางฐานขอมลสำหรบการผลต">เส้นทางฐานข้อมูลสำหรับการผลิต</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

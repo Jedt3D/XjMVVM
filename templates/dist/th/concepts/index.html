@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ทำไมถึง XjMVVM? — MVVM Docs</title>
+  <meta name="description" content="การตัดสินใจทางสถาปัตยกรรมเบื้องหลัง XjMVVM — ทำไมเราจึงข้ามระบบ WebPage ของ Xojo และทำไมจึงใช้รูปแบบ MVVM กับ JinjaX" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/en/concepts/"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/th/concepts/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/concepts/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">ทำไมถึง XjMVVM?</h1>
+          <p class="page-description">การตัดสินใจทางสถาปัตยกรรมเบื้องหลัง XjMVVM — ทำไมเราจึงข้ามระบบ WebPage ของ Xojo และทำไมจึงใช้รูปแบบ MVVM กับ JinjaX</p>
+        </div>
+
+        <h1 id="xjmvvm">ทำไมถึง XjMVVM?<a class="headerlink" href="#xjmvvm" title="Permanent link">&para;</a></h1>
+<p>หน้านี้อธิบายการตัดสินใจหลักเบื้องหลังการออกแบบเฟรมเวิร์ก การทำความเข้าใจ <em>เหตุผล</em> ทำให้ทุกอนุสัญญาในส่วนอื่น ๆ ของคู่มือนี้สมเหตุสมผล</p>
+<h2 id="webpage-xojo">ทำไมต้องข้ามระบบ WebPage ของ Xojo?<a class="headerlink" href="#webpage-xojo" title="Permanent link">&para;</a></h2>
+<p>Xojo Web 2 มีระบบวิดเจ็ต GUI แบบเต็ม: <code>WebPage</code>, <code>WebButton</code>, <code>WebTextField</code>, <code>WebListBox</code> และอื่น ๆ อีกมากมาย วิดเจ็ตเหล่านี้สื่อสารผ่าน WebSockets และจัดการสถานะโดยอัตโนมัติ สำหรับเครื่องมือภายในที่ง่ายซึ่งสะท้อนโมเดลวิดเจ็ต Xojo อย่างใกล้ชิด พวกมันก็ใช้ได้ดี</p>
+<p>โครงการนี้ข้ามระบบนั้นไปอย่างสิ้นเชิง นี่คือเหตุผล:</p>
+<p><strong>การควบคุม HTML/CSS แบบเต็ม</strong> WebControls เรนเดอร์ HTML ของตัวเองด้วยชื่อคลาสและโครงสร้างของตนเอง คุณไม่สามารถใช้ระบบการออกแบบแบบกำหนดเองหรือรวมเฟรมเวิร์ก CSS เช่น Tailwind ได้อย่างง่ายโดยไม่ต้องต่อสู้กับผลลัพธ์ของการควบคุม ด้วยเทมเพลต JinjaX คุณเขียน HTML ด้วยตัวเอง — แท็กทุกแท็ก คลาสทุกคลาส แอตทริบิวต์ข้อมูลทั้งหมดเป็นของคุณ</p>
+<p><strong>ความหมาย HTTP มาตรฐาน</strong> หน้า WebControl เป็นเซสชัน WebSocket ที่มีสถานะ พวกมันไม่ทำตัวเหมือนแอป HTTP มาตรฐาน: การจดหมายระหว่างประเทศไม่น่าเชื่อถือ ประวัติเบราว์เซอร์ยุ่งยาก API REST ยากขึ้น แนวทาง SSR หมายความว่าทุก URL เป็นเอนด์พอยต์ HTTP ที่เหมาะสม — คาดเดาได้ แคชได้ เชื่อมโยงได้</p>
+<p><strong>เทมเพลตเป็นมิตรกับนักออกแบบ</strong> เทมเพลต HTML อาศัยอยู่ในโฟลเดอร์ <code>templates/</code> นักออกแบบหรือนักพัฒนาฝั่งหน้าสามารถแก้ไขได้โดยใช้โปรแกรมแก้ไขข้อความใด ๆ ที่มีการสนับสนุน IDE แบบเต็ม (การไฮไลต์ไวยากรณ์ Emmet Prettier) พวกเขาไม่เคยสัมผัสโค้ด Xojo</p>
+<p><strong>ไม่มีสถานะเซสชันในเลเยอร์ UI</strong> WebControls ของ Xojo มีสถานะเซสชันโดยนัย ViewModels ของเราไม่มีสถานะต่อคำขอ — พวกเขาได้รับคำขอ ทำงาน และเขียนการตอบสนอง สถานะถาวรเพียงอย่างเดียวอยู่ใน <code>Session</code> (คลาส <code>WebSession</code>) และฐานข้อมูล</p>
+<h2 id="mvvm-mvc">ทำไมต้อง MVVM มากกว่า MVC?<a class="headerlink" href="#mvvm-mvc" title="Permanent link">&para;</a></h2>
+<p>MVC แบบคลาสสิก (Model-View-Controller) มี Controller ที่รับผิดชอบทั้งตรรกะการจัดเส้นทางและการจัดวาง Model ใน Xojo หมายความว่าคลาส Controller ขนาดใหญ่หนึ่งคลาสจัดการทุกเส้นทาง</p>
+<p>XjMVVM ใช้ MVVM เพื่อแยกข้อกังวลให้สะอาดขึ้นสำหรับสถาปัตยกรรมต่อเส้นทาง:</p>
+<table>
+<thead>
+<tr>
+<th>เลเยอร์</th>
+<th>คลาส</th>
+<th>ความรับผิดชอบ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>View</strong></td>
+<td>ไฟล์ <code>.html</code> Jinja2</td>
+<td>การนำเสนอเท่านั้น — ไม่มีตรรกะทางธุรกิจ</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td>คลาสหนึ่งต่อเส้นทาง</td>
+<td>ประสานงาน Model สร้างบริบทเทมเพลต</td>
+</tr>
+<tr>
+<td><strong>Model</strong></td>
+<td>คลาสการเข้าถึงข้อมูล</td>
+<td>การค้นหาฐานข้อมูล คืนค่าอ็อบเจ็กต์ <code>Dictionary</code></td>
+</tr>
+</tbody>
+</table>
+<p>ViewModel หนึ่งต่อเส้นทาง (เช่น <code>NotesListVM</code>, <code>NotesCreateVM</code>) ให้แต่ละคลาสมีขนาดเล็กและมุ่งเน้น การเพิ่มฟีเจอร์ใหม่หมายถึงการเพิ่มไฟล์ใหม่ ไม่ใช่การปรับเปลี่ยนไฟล์ที่มีอยู่</p>
+<p>ทิศทางของการพึ่งพาอย่างเคร่งครัดคือแบบเดียว:</p>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="486.0" height="122.6" viewBox="0 0 486 122.63393344244409" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: right
+    #spacing: 40
+    #padding: 8
+    #lineWidth: 1.5
+    [View] -&gt; [ViewModel]
+    [ViewModel] -&gt; [Model]
+    [Model] SQL -&gt; [&lt;database&gt; Database]
+    [&lt;database&gt; Database] rows -&gt; [Model]
+    [Model] Dictionary -&gt; [ViewModel]
+    [ViewModel] context -&gt; [View]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="122.6" width="486.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(8, 16.307692307692307)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M53.0 12.6 L73 4 L86.58641867457727 7.8543031700928445 L86.6 7.9 " fill="none"></path>
+                    <path d="M78.7 11.2 L86.6 7.9 L81.6 0.9 L93.0 9.7 Z"></path>
+                    <path d="M194.0 9.7 L214 4 L227.77769595864626 9.299113830248565 L227.8 9.3 " fill="none"></path>
+                    <path d="M219.6 11.9 L227.8 9.3 L223.5 1.9 L234.0 11.7 Z"></path>
+                    <text x="256.0" y="3.7" stroke="none">SQL</text>
+                    <path d="M298.0 11.7 L318 4 L331.6198373037768 8.127223425386923 L331.6 8.1 " fill="none"></path>
+                    <path d="M323.7 11.3 L331.6 8.1 L326.8 1.1 L338.0 10.1 Z"></path>
+                    <text x="346.0" y="57.9" stroke="none">rows</text>
+                    <path d="M338.0 37.9 L318 44 L304.2223040413537 38.700886169751435 L304.2 38.7 " fill="none"></path>
+                    <path d="M312.4 36.1 L304.2 38.7 L308.5 46.1 L298.0 36.3 Z"></path>
+                    <text x="242.0" y="56.3" stroke="none">Dictionary</text>
+                    <path d="M234.0 36.3 L214 44 L200.4135813254227 40.14569682990716 L200.4 40.1 " fill="none"></path>
+                    <path d="M208.3 36.8 L200.4 40.1 L205.4 47.1 L194.0 38.3 Z"></path>
+                    <text x="101.0" y="58.3" stroke="none">context</text>
+                    <path d="M93.0 38.3 L73 44 L59.124222249062946 38.031923547984064 L59.1 38.0 " fill="none"></path>
+                    <path d="M67.4 35.8 L59.1 38.0 L63.1 45.6 L53.0 35.4 Z"></path>
+                    <g data-name="View">
+                        <g fill="white" stroke="black" data-name="View">
+                            <rect x="0.0" y="8.0" height="32.0" width="53.0" data-name="View"></rect>
+                        </g>
+                        <g transform="translate(0, 8)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="View" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="View" data-compartment="0">
+                                <text x="18.5" y="14.1" stroke="none" text-anchor="middle" data-name="View" data-compartment="0">View</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="ViewModel">
+                        <g fill="white" stroke="black" data-name="ViewModel">
+                            <rect x="93.0" y="8.0" height="32.0" width="101.0" data-name="ViewModel"></rect>
+                        </g>
+                        <g transform="translate(93, 8)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ViewModel" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="ViewModel" data-compartment="0">
+                                <text x="42.5" y="14.1" stroke="none" text-anchor="middle" data-name="ViewModel" data-compartment="0">ViewModel</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Model">
+                        <g fill="white" stroke="black" data-name="Model">
+                            <rect x="234.0" y="8.0" height="32.0" width="64.0" data-name="Model"></rect>
+                        </g>
+                        <g transform="translate(234, 8)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Model" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Model" data-compartment="0">
+                                <text x="24.0" y="14.1" stroke="none" text-anchor="middle" data-name="Model" data-compartment="0">Model</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Database">
+                        <g fill="white" stroke="black" data-name="Database">
+                            <rect x="338.0" y="8.0" height="32.0" width="92.0" stroke="none" data-name="Database"></rect>
+                            <path d="M338.0 8.0 L338.0 40.0" fill="none" data-name="Database"></path>
+                            <path d="M430.0 8.0 L430.0 40.0" fill="none" data-name="Database"></path>
+                            <ellipse cx="384.0" cy="8.0" rx="46.0" ry="6.0" data-name="Database"></ellipse>
+                            <path d="M430.0 40.0 L429.9 40.3 L429.8 40.6 L429.5 40.9 L429.1 41.2 L428.6 41.5 L428.0 41.8 L427.2 42.1 L426.4 42.3 L425.4 42.6 L424.4 42.9 L423.3 43.1 L422.0 43.4 L420.7 43.6 L419.2 43.9 L417.7 44.1 L416.1 44.3 L414.4 44.5 L412.7 44.7 L410.9 44.9 L409.0 45.0 L407.0 45.2 L405.0 45.3 L402.9 45.5 L400.8 45.6 L398.7 45.7 L396.5 45.8 L394.2 45.8 L392.0 45.9 L389.7 46.0 L387.4 46.0 L385.1 46.0 L382.9 46.0 L380.6 46.0 L378.3 46.0 L376.0 45.9 L373.8 45.8 L371.5 45.8 L369.3 45.7 L367.2 45.6 L365.1 45.5 L363.0 45.3 L361.0 45.2 L359.0 45.0 L357.1 44.9 L355.3 44.7 L353.6 44.5 L351.9 44.3 L350.3 44.1 L348.8 43.9 L347.3 43.6 L346.0 43.4 L344.7 43.1 L343.6 42.9 L342.6 42.6 L341.6 42.3 L340.8 42.1 L340.0 41.8 L339.4 41.5 L338.9 41.2 L338.5 40.9 L338.2 40.6 L338.1 40.3 L338.0 40.0" data-name="Database"></path>
+                        </g>
+                        <g transform="translate(338, 12)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Database" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Database" data-compartment="0">
+                                <text x="38.0" y="14.1" stroke="none" text-anchor="middle" data-name="Database" data-compartment="0">Database</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>View  →  ViewModel  →  Model  →  Database</code></pre>
+  </div>
+</div>
+
+<p>ViewModels ไม่เคยอ้างอิงชื่อเทมเพลตในตรรกะทางธุรกิจ Model ไม่เคยอ้างอิง ViewModels สิ่งนี้ทำให้แต่ละเลเยอร์สามารถทดสอบและแทนที่ได้อย่างอิสระ</p>
+<h2 id="jinjax">ทำไมต้อง JinjaX?<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h2>
+<p>JinjaX เป็นพอร์ตของเอนจิน Jinja2 ของ Python ที่เขียนด้วย Xojo แบบบริสุทธิ์ มันถูกเลือกเพราะ:</p>
+<p><strong>Jinja2 เป็นมาตรฐานในทางปฏิบัติ</strong> นักพัฒนาที่คุ้นเคยกับ Flask Django Ansible หรือ Saltstack รู้ไวยากรณ์อยู่แล้ว เส้นโค้งการเรียนรู้น้อยมาก</p>
+<p><strong>มันคือ Xojo บริสุทธิ์</strong> ต้นไม้ต้นฉบับของ JinjaX เต็มที่อยู่ภายใต้ <code>JinjaXLib/</code> ไม่มีการพึ่งพาไลบรารี <code>.xojo_library</code> ไบนารี ซึ่งหมายความว่ามันใช้งานได้กับรูปแบบโครงการข้อความของ Xojo (ไฟล์ <code>.xojo_code</code>) และสามารถตรวจสอบและดีบัตได้อย่างเต็มที่</p>
+<p><strong>มันปลอดภัยเธรดหลังจากการตั้งค่า</strong> <code>JinjaEnvironment</code> ถูกเริ่มต้นเพียงครั้งเดียวใน <code>App.Opening()</code> แล้วจึงอ่านเท่านั้น แต่ละคำขอสร้าง <code>CompiledTemplate</code> และ <code>JinjaContext</code> ใหม่ — อ็อบเจ็กต์เหล่านี้ต่อคำขอ ไม่เคยใช้ร่วมกัน</p>
+<p><strong>การสืบทอดเทมเพลตใช้งาน</strong> <code>{% extends %}</code>, <code>{% block %}</code> และ <code>{% include %}</code> ให้คุณสร้างเลเยต์ฐานครั้งเดียวและสร้างหน้าทั้งหมดจากนั้น</p>
+<h2 id="dictionary">สัญญาข้อมูล Dictionary<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h2>
+<p>นี่คือกฎที่สำคัญที่สุดในระบบทั้งหมด</p>
+<p>JinjaX แก้ไขสัญกรณ์จุด (<code>{{ note.title }}</code>) โดยเรียก <code>EvaluateGetAttr</code> บนอ็อบเจ็กต์ ใน Xojo <code>EvaluateGetAttr</code> ถูกใช้งานเฉพาะสำหรับ <code>Dictionary</code> — จะค้นหากุญแจตามชื่อ อ็อบเจ็กต์คลาส Xojo แบบกำหนดเองไม่รองรับ <code>EvaluateGetAttr</code> ดังนั้นการเข้าถึงจุดจึงเรนเดอร์เป็นค่าว่างเงียบ ๆ</p>
+<p><strong>กฎ:</strong> ข้อมูลทั้งหมดที่ส่งไปยังเทมเพลตต้องเป็น <code>Dictionary</code> หรืออาร์เรย์ <code>Variant()</code> ของอ็อบเจ็กต์ <code>Dictionary</code> Model ส่งคืนหนึ่งในสองประเภทนี้เสมอ — ไม่มีอินสแตนซ์คลาสแบบกำหนดเอง</p>
+<h2 id="postredirectget">Post/Redirect/Get<a class="headerlink" href="#postredirectget" title="Permanent link">&para;</a></h2>
+<p>การส่งแบบฟอร์มทั้งหมดปฏิบัติตามรูปแบบ <strong>Post/Redirect/Get (PRG)</strong></p>
+<h2 id="_1">การแยกเซสชัน<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><code>App</code> เป็นซิงเกิลตันที่ใช้ร่วมกัน — คำขอของผู้ใช้ทั้งหมดทำงานในอ็อบเจ็กต์ <code>App</code> เดียวกัน อย่าเก็บข้อมูลเฉพาะผู้ใช้บนคุณสมบัติ <code>App</code> สถานะต่อผู้ใช้ไปในคลาส <code>Session</code></p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../index.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Introduction</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../routing/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Routing Architecture</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ทำไมตองขามระบบ-webpage-ของ-xojo">ทำไมต้องข้ามระบบ WebPage ของ Xojo?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ทำไมตอง-mvvm-มากกวา-mvc">ทำไมต้อง MVVM มากกว่า MVC?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ทำไมตอง-jinjax">ทำไมต้อง JinjaX?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#สญญาขอมล-dictionary">สัญญาข้อมูล Dictionary</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#postredirectget">Post/Redirect/Get</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#การแยกเซสชน">การแยกเซสชัน</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

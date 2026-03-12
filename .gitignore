@@ -1,5 +1,6 @@
 # Xojo build output
 Builds/
+Builds - mvvm/
 
 # Xojo IDE user files
 *.xojo_user
@@ -16,3 +17,6 @@ ziqBWdba
 
 # Database (exclude data dir from version control; keep structure via .gitkeep)
 data/*.sqlite
+
+# Python
+.venv

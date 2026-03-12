@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why XjMVVM? — MVVM Docs</title>
+  <meta name="description" content="The architectural decisions behind XjMVVM — why we bypass Xojo's WebPage system and why the MVVM pattern with JinjaX." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/en/">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.4.2</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn active" href="/en/concepts/"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/th/concepts/"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/jp/concepts/"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/en/">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Why XjMVVM?</h1>
+          <p class="page-description">The architectural decisions behind XjMVVM — why we bypass Xojo's WebPage system and why the MVVM pattern with JinjaX.</p>
+        </div>
+
+        <h1 id="why-xjmvvm">Why XjMVVM?<a class="headerlink" href="#why-xjmvvm" title="Permanent link">&para;</a></h1>
+<p>This page explains the key decisions behind the framework design. Understanding the <em>why</em> makes every convention elsewhere in this guide make sense.</p>
+<h2 id="why-bypass-xojos-webpage-system">Why bypass Xojo&rsquo;s WebPage system?<a class="headerlink" href="#why-bypass-xojos-webpage-system" title="Permanent link">&para;</a></h2>
+<p>Xojo Web 2 provides a full GUI widget system: <code>WebPage</code>, <code>WebButton</code>, <code>WebTextField</code>, <code>WebListBox</code>, and so on. These controls communicate over WebSockets and manage state automatically. For simple internal tools that closely mirror Xojo&rsquo;s widget model, they work well.</p>
+<p>This project bypasses that system entirely. Here&rsquo;s why:</p>
+<p><strong>Full HTML/CSS control.</strong> WebControls render their own HTML with their own class names and structure. You cannot easily apply a custom design system or integrate a CSS framework like Tailwind without fighting the control output. With JinjaX templates you write the HTML yourself — every tag, every class, every data attribute is yours.</p>
+<p><strong>Standard HTTP semantics.</strong> WebControl pages are stateful WebSocket sessions. They don&rsquo;t behave like standard HTTP apps: bookmarking is unreliable, browser history is awkward, REST APIs are harder to add. An SSR approach means every URL is a proper HTTP endpoint — predictable, cacheable, linkable.</p>
+<p><strong>Designer-friendly templates.</strong> HTML templates live in the <code>templates/</code> folder. A designer or front-end developer can edit them using any text editor with full IDE support (syntax highlighting, Emmet, Prettier). They never touch Xojo code.</p>
+<p><strong>No session state in the UI layer.</strong> Xojo WebControls carry implicit session state. Our ViewModels are stateless per-request — they receive a request, do work, and write a response. The only persistent state is in <code>Session</code> (the <code>WebSession</code> class) and the database.</p>
+<h2 id="why-mvvm-over-mvc">Why MVVM over MVC?<a class="headerlink" href="#why-mvvm-over-mvc" title="Permanent link">&para;</a></h2>
+<p>Classic MVC (Model-View-Controller) has the Controller responsible for both routing logic and orchestrating Models. In Xojo, this would mean one large controller class handling every route.</p>
+<p>XjMVVM uses MVVM to separate concerns more cleanly for a per-route architecture:</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Class</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>View</strong></td>
+<td>Jinja2 <code>.html</code> files</td>
+<td>Presentation only — no business logic</td>
+</tr>
+<tr>
+<td><strong>ViewModel</strong></td>
+<td>One class per route</td>
+<td>Orchestrates Models, builds template context</td>
+</tr>
+<tr>
+<td><strong>Model</strong></td>
+<td>Data access classes</td>
+<td>Database queries, returns <code>Dictionary</code> objects</td>
+</tr>
+</tbody>
+</table>
+<p>One ViewModel per route (e.g. <code>NotesListVM</code>, <code>NotesCreateVM</code>) keeps each class small and focused. Adding a new feature means adding new files, not modifying existing ones.</p>
+<p>The dependency direction is strictly one-way:</p>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="486.0" height="122.6" viewBox="0 0 486 122.63393344244409" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: right
+    #spacing: 40
+    #padding: 8
+    #lineWidth: 1.5
+    [View] -&gt; [ViewModel]
+    [ViewModel] -&gt; [Model]
+    [Model] SQL -&gt; [&lt;database&gt; Database]
+    [&lt;database&gt; Database] rows -&gt; [Model]
+    [Model] Dictionary -&gt; [ViewModel]
+    [ViewModel] context -&gt; [View]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="122.6" width="486.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(8, 16.307692307692307)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M53.0 12.6 L73 4 L86.58641867457727 7.8543031700928445 L86.6 7.9 " fill="none"></path>
+                    <path d="M78.7 11.2 L86.6 7.9 L81.6 0.9 L93.0 9.7 Z"></path>
+                    <path d="M194.0 9.7 L214 4 L227.77769595864626 9.299113830248565 L227.8 9.3 " fill="none"></path>
+                    <path d="M219.6 11.9 L227.8 9.3 L223.5 1.9 L234.0 11.7 Z"></path>
+                    <text x="256.0" y="3.7" stroke="none">SQL</text>
+                    <path d="M298.0 11.7 L318 4 L331.6198373037768 8.127223425386923 L331.6 8.1 " fill="none"></path>
+                    <path d="M323.7 11.3 L331.6 8.1 L326.8 1.1 L338.0 10.1 Z"></path>
+                    <text x="346.0" y="57.9" stroke="none">rows</text>
+                    <path d="M338.0 37.9 L318 44 L304.2223040413537 38.700886169751435 L304.2 38.7 " fill="none"></path>
+                    <path d="M312.4 36.1 L304.2 38.7 L308.5 46.1 L298.0 36.3 Z"></path>
+                    <text x="242.0" y="56.3" stroke="none">Dictionary</text>
+                    <path d="M234.0 36.3 L214 44 L200.4135813254227 40.14569682990716 L200.4 40.1 " fill="none"></path>
+                    <path d="M208.3 36.8 L200.4 40.1 L205.4 47.1 L194.0 38.3 Z"></path>
+                    <text x="101.0" y="58.3" stroke="none">context</text>
+                    <path d="M93.0 38.3 L73 44 L59.124222249062946 38.031923547984064 L59.1 38.0 " fill="none"></path>
+                    <path d="M67.4 35.8 L59.1 38.0 L63.1 45.6 L53.0 35.4 Z"></path>
+                    <g data-name="View">
+                        <g fill="white" stroke="black" data-name="View">
+                            <rect x="0.0" y="8.0" height="32.0" width="53.0" data-name="View"></rect>
+                        </g>
+                        <g transform="translate(0, 8)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="View" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="View" data-compartment="0">
+                                <text x="18.5" y="14.1" stroke="none" text-anchor="middle" data-name="View" data-compartment="0">View</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="ViewModel">
+                        <g fill="white" stroke="black" data-name="ViewModel">
+                            <rect x="93.0" y="8.0" height="32.0" width="101.0" data-name="ViewModel"></rect>
+                        </g>
+                        <g transform="translate(93, 8)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="ViewModel" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="ViewModel" data-compartment="0">
+                                <text x="42.5" y="14.1" stroke="none" text-anchor="middle" data-name="ViewModel" data-compartment="0">ViewModel</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Model">
+                        <g fill="white" stroke="black" data-name="Model">
+                            <rect x="234.0" y="8.0" height="32.0" width="64.0" data-name="Model"></rect>
+                        </g>
+                        <g transform="translate(234, 8)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Model" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Model" data-compartment="0">
+                                <text x="24.0" y="14.1" stroke="none" text-anchor="middle" data-name="Model" data-compartment="0">Model</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Database">
+                        <g fill="white" stroke="black" data-name="Database">
+                            <rect x="338.0" y="8.0" height="32.0" width="92.0" stroke="none" data-name="Database"></rect>
+                            <path d="M338.0 8.0 L338.0 40.0" fill="none" data-name="Database"></path>
+                            <path d="M430.0 8.0 L430.0 40.0" fill="none" data-name="Database"></path>
+                            <ellipse cx="384.0" cy="8.0" rx="46.0" ry="6.0" data-name="Database"></ellipse>
+                            <path d="M430.0 40.0 L429.9 40.3 L429.8 40.6 L429.5 40.9 L429.1 41.2 L428.6 41.5 L428.0 41.8 L427.2 42.1 L426.4 42.3 L425.4 42.6 L424.4 42.9 L423.3 43.1 L422.0 43.4 L420.7 43.6 L419.2 43.9 L417.7 44.1 L416.1 44.3 L414.4 44.5 L412.7 44.7 L410.9 44.9 L409.0 45.0 L407.0 45.2 L405.0 45.3 L402.9 45.5 L400.8 45.6 L398.7 45.7 L396.5 45.8 L394.2 45.8 L392.0 45.9 L389.7 46.0 L387.4 46.0 L385.1 46.0 L382.9 46.0 L380.6 46.0 L378.3 46.0 L376.0 45.9 L373.8 45.8 L371.5 45.8 L369.3 45.7 L367.2 45.6 L365.1 45.5 L363.0 45.3 L361.0 45.2 L359.0 45.0 L357.1 44.9 L355.3 44.7 L353.6 44.5 L351.9 44.3 L350.3 44.1 L348.8 43.9 L347.3 43.6 L346.0 43.4 L344.7 43.1 L343.6 42.9 L342.6 42.6 L341.6 42.3 L340.8 42.1 L340.0 41.8 L339.4 41.5 L338.9 41.2 L338.5 40.9 L338.2 40.6 L338.1 40.3 L338.0 40.0" data-name="Database"></path>
+                        </g>
+                        <g transform="translate(338, 12)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Database" data-compartment="0">
+                            <g transform="translate(8, 8)" fill="black" text-align="center" data-name="Database" data-compartment="0">
+                                <text x="38.0" y="14.1" stroke="none" text-anchor="middle" data-name="Database" data-compartment="0">Database</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>View  →  ViewModel  →  Model  →  Database</code></pre>
+  </div>
+</div>
+
+<p>ViewModels never reference template names in business logic. Models never reference ViewModels. This makes each layer independently testable and replaceable.</p>
+<h2 id="why-jinjax">Why JinjaX?<a class="headerlink" href="#why-jinjax" title="Permanent link">&para;</a></h2>
+<p>JinjaX is a port of Python&rsquo;s Jinja2 template engine written in pure Xojo. It was chosen because:</p>
+<p><strong>Jinja2 is the de-facto standard.</strong> Developers familiar with Flask, Django, Ansible, or Saltstack already know the syntax. The learning curve is minimal.</p>
+<p><strong>It&rsquo;s pure Xojo source.</strong> The full JinjaX source tree lives under <code>JinjaXLib/</code>. There&rsquo;s no binary <code>.xojo_library</code> dependency, which means it works with Xojo&rsquo;s text project format (<code>.xojo_code</code> files) and is fully inspectable and debuggable.</p>
+<p><strong>It&rsquo;s thread-safe after setup.</strong> The <code>JinjaEnvironment</code> is initialized once in <code>App.Opening()</code> and then read-only. Each request creates a fresh <code>CompiledTemplate</code> and <code>JinjaContext</code> — these are per-request objects, never shared.</p>
+<p><strong>Template inheritance works.</strong> <code>{% extends %}</code>, <code>{% block %}</code>, and <code>{% include %}</code> let you build a base layout once and compose all pages from it.</p>
+<h2 id="the-dictionary-data-contract">The Dictionary data contract<a class="headerlink" href="#the-dictionary-data-contract" title="Permanent link">&para;</a></h2>
+<p>This is the single most important rule in the entire system.</p>
+<p>JinjaX resolves dot-notation (<code>{{ note.title }}</code>) by calling <code>EvaluateGetAttr</code> on the object. In Xojo, <code>EvaluateGetAttr</code> is only implemented for <code>Dictionary</code> — it looks up the key by name. Custom Xojo class instances do not support <code>EvaluateGetAttr</code>, so dot-access silently renders as empty.</p>
+<p><strong>The rule:</strong> every piece of data passed to a template must be a <code>Dictionary</code> or a <code>Variant()</code> array of <code>Dictionary</code> objects. Models always return one of these two types — never a custom class instance.</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Correct — Dictionary keys work with dot-notation in templates</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w">   </span><span class="c1">// Variant() array of Dictionary</span><span class="w"></span>
+
+<span class="c1">// ❌ Wrong — custom class instance, dot-access silently fails in templates</span><span class="w"></span>
+<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteClass</span><span class="p">()</span><span class="w"></span>
+<span class="n">note</span><span class="p">.</span><span class="n">Title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">note</span><span class="p">)</span><span class="w">  </span><span class="c1">// {{ note.title }} renders as empty string</span><span class="w"></span>
+</code></pre></div>
+
+<p>In templates, arrays must be <code>Variant()</code> containing <code>Dictionary</code> objects:</p>
+<div class="highlight"><pre><span></span><code>{% for note in notes %}
+  <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>{{ note.title }}<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>   {# works — Dictionary key lookup #}
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ note.body }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endfor %}
+</code></pre></div>
+
+<h2 id="postredirectget">Post/Redirect/Get<a class="headerlink" href="#postredirectget" title="Permanent link">&para;</a></h2>
+<p>All form submissions follow the <strong>Post/Redirect/Get (PRG)</strong> pattern:</p>
+<ol>
+<li>Browser submits form → <code>POST /notes</code> (handled by <code>NotesCreateVM</code>)</li>
+<li>ViewModel validates and creates the note</li>
+<li>ViewModel calls <code>Redirect("/notes")</code> — HTTP 302</li>
+<li>Browser follows redirect → <code>GET /notes</code> (handled by <code>NotesListVM</code>)</li>
+<li>Browser renders the list page</li>
+</ol>
+<p>This prevents the browser from re-submitting the form on refresh (the &ldquo;Reload this page?&rdquo; dialog). It also means every page the user sees was produced by a GET request — browser history, bookmarking, and the back button all work correctly.</p>
+<p>If validation fails, the ViewModel does <strong>not</strong> redirect — it re-renders the form with an error flash message using the same GET template:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Validation failure — re-render, no redirect</span><span class="w"></span>
+<span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Trim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
+<span class="w">  </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Title is required&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+</code></pre></div>
+
+<h2 id="session-isolation">Session isolation<a class="headerlink" href="#session-isolation" title="Permanent link">&para;</a></h2>
+<p><code>App</code> is a shared singleton — every user&rsquo;s request runs in the same <code>App</code> instance. Never store user-specific data on <code>App</code> properties.</p>
+<p>Per-user state goes in the <code>Session</code> class (which inherits from <code>WebSession</code>). Each browser session gets its own <code>Session</code> instance automatically by Xojo&rsquo;s runtime:</p>
+<div class="highlight"><pre><span></span><code>App.mRouter      → shared, read-only after Opening()  ✅ safe
+App.mJinja       → shared, read-only after Opening()  ✅ safe
+Session.userID   → per-user, one instance per browser  ✅ safe
+App.currentUser  → shared across ALL users             ❌ never do this
+</code></pre></div>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../index.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Introduction</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../routing/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Routing Architecture</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#why-bypass-xojos-webpage-system">Why bypass Xojo's WebPage system?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#why-mvvm-over-mvc">Why MVVM over MVC?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#why-jinjax">Why JinjaX?</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#the-dictionary-data-contract">The Dictionary data contract</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#postredirectget">Post/Redirect/Get</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#session-isolation">Session isolation</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

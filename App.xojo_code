@@ -7,12 +7,12 @@ Inherits WebApplication
 		  Var p As String = request.Path
 		  If p.Left(1) <> "/" Then p = "/" + p
 		  If p.Length > 1 And p.Right(1) = "/" Then p = p.Left(p.Length - 1)
-
+		  
 		  // Xojo bootstrap entry point: Return False so Xojo serves bootstrap HTML + WebSocket
 		  If p = "/" And request.QueryString = "_xojo=1" Then
 		    Return False
 		  End If
-
+		  
 		  // /tests: redirect to Xojo bootstrap at root so Default page loads, then trampoline to XojoUnitTestPage
 		  If p = "/tests" Then
 		    response.Status = 302
@@ -21,7 +21,7 @@ Inherits WebApplication
 		    response.Write("<html><head><meta http-equiv=""refresh"" content=""0;url=/?_xojo=1""></head><body>Redirecting...</body></html>")
 		    Return True
 		  End If
-
+		  
 		  // All other paths: SSR router handles known routes.
 		  // Unknown paths (Xojo framework JS/CSS resources) return False
 		  // so Xojo serves its own framework files for the active WebSocket session.
