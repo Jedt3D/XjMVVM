@@ -106,13 +106,17 @@ Opens and returns a fresh `SQLiteDatabase` connection. The caller is responsible
 
 ```xojo
 Function Connect() As SQLiteDatabase
-  Var dbFile As New FolderItem("/Users/worajedt/Xojo Projects/mvvm/data/notes.sqlite", FolderItem.PathModes.Native)
+  Var dataFolder As FolderItem = App.ExecutableFile.Parent.Child("data")
+  If Not dataFolder.Exists Then dataFolder.CreateFolder()
+  Var dbFile As FolderItem = dataFolder.Child("notes.sqlite")
   Var db As New SQLiteDatabase
   db.DatabaseFile = dbFile
   db.Connect()
   Return db
 End Function
 ```
+
+The path resolves to `<binary_dir>/data/notes.sqlite`. The `data/` folder is created automatically on first run. This works on both macOS and Linux without any path configuration.
 
 ### `InitDB()`
 
@@ -307,7 +311,7 @@ The `OpenDB()` escape hatch lets `NoteModel` write raw SQL while staying within 
 | String-only values | `RowToDict` stores everything as `StringValue`; ViewModels must cast (`Val(row.Value("id"))`) |
 | No migration system | Schema changes require manual `ALTER TABLE` or dropping/recreating the DB in dev |
 | `datetime` limitation | `BaseModel.Insert` cannot use `DEFAULT (datetime('now'))` — must use escape hatch |
-| Hardcoded DB path | `DBAdapter.Connect()` path is hardcoded for development; production needs `SpecialFolder.ApplicationData` |
+| No migration system | Schema changes require manual `ALTER TABLE` or dropping/recreating the DB in dev |
 
 ### When to use `BaseModel` vs escape hatch
 

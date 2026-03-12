@@ -116,7 +116,7 @@ data/
 
 ## Current Status
 
-**v0.4.1** — `/tests` routing fixed; XojoUnit test runner fully operational.
+**v0.4.2** — Production path fix: DB and templates now resolve relative to the binary.
 
 | Feature | Status |
 |---|---|

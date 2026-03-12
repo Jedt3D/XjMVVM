@@ -1,16 +1,5 @@
-#tag Class
-Protected Class HomeViewModel
-Inherits BaseViewModel
-	#tag Method, Flags = &h0, Description = 000A0D0E000E000000000EEFBFBD000E00000E0A0E00
-		Sub OnGet()
-		  Var context As New Dictionary()
-		  context.Value("page_title") = "Home"
-		  context.Value("message") = "Welcome to Xojo MVVM Web Framework"
-		  Render("home.html", context)
-		End Sub
-	#tag EndMethod
-
-
+#tag Module
+Protected Module LabelStyle
 	#tag ViewBehavior
 		#tag ViewProperty
 			Name="Name"
@@ -53,5 +42,5 @@ Inherits BaseViewModel
 			EditorType=""
 		#tag EndViewProperty
 	#tag EndViewBehavior
-End Class
-#tag EndClass
+End Module
+#tag EndModule

@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.4.2] — 2026-03-12
+
+### Fixed
+- **Hardcoded Mac paths removed** — `DBAdapter.Connect()` and `App.Opening` both had absolute paths baked into the binary (`/Users/worajedt/Xojo Projects/mvvm/...`) causing 500 errors on the Linux production server. Both now use `App.ExecutableFile.Parent` to resolve paths relative to wherever the binary is deployed.
+  - `DBAdapter.Connect()` — DB file is now `<binary_dir>/data/notes.sqlite`; the `data/` folder is auto-created on first run if it does not exist.
+  - `App.Opening` — templates are now loaded from `<binary_dir>/templates/`.
+- **Deploy layout** — copy the compiled binary + `templates/` folder to the server. The `data/` folder is created automatically.
+
+---
+
 ## [0.4.1] — 2026-03-12
 
 ### Added

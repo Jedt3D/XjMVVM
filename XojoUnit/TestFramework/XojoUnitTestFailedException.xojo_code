@@ -1,23 +1,13 @@
 #tag Class
-Protected Class HomeViewModel
-Inherits BaseViewModel
-	#tag Method, Flags = &h0, Description = 000A0D0E000E000000000EEFBFBD000E00000E0A0E00
-		Sub OnGet()
-		  Var context As New Dictionary()
-		  context.Value("page_title") = "Home"
-		  context.Value("message") = "Welcome to Xojo MVVM Web Framework"
-		  Render("home.html", context)
-		End Sub
-	#tag EndMethod
-
-
+Protected Class XojoUnitTestFailedException
+Inherits RuntimeException
 	#tag ViewBehavior
 		#tag ViewProperty
-			Name="Name"
-			Visible=true
-			Group="ID"
-			InitialValue=""
-			Type="String"
+			Name="ErrorNumber"
+			Visible=false
+			Group="Behavior"
+			InitialValue="0"
+			Type="Integer"
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
@@ -29,7 +19,23 @@ Inherits BaseViewModel
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Super"
+			Name="Left"
+			Visible=true
+			Group="Position"
+			InitialValue="0"
+			Type="Integer"
+			EditorType=""
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Message"
+			Visible=false
+			Group="Behavior"
+			InitialValue=""
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="Name"
 			Visible=true
 			Group="ID"
 			InitialValue=""
@@ -37,11 +43,11 @@ Inherits BaseViewModel
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="Left"
+			Name="Super"
 			Visible=true
-			Group="Position"
-			InitialValue="0"
-			Type="Integer"
+			Group="ID"
+			InitialValue=""
+			Type="String"
 			EditorType=""
 		#tag EndViewProperty
 		#tag ViewProperty

@@ -53,7 +53,7 @@ developer-guide/→ Static site documentation (see Part 2)
 
 ### Current State
 
-**v0.4.1** — XojoUnit test runner reachable at `/tests`; BaseModel/DBAdapter layer complete.
+**v0.4.2** — Production path fix: DB and template paths now relative to executable.
 
 - `Framework/` — Router (returns Boolean), BaseViewModel, BaseModel, DBAdapter, FormParser, QueryParser, RouteDefinition
 - `Models/NoteModel.xojo_code` — SQLite CRUD via BaseModel, Dictionary output

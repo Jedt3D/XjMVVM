@@ -1,86 +1,31 @@
 #tag Class
 Protected Class NoteModel
-	#tag Method, Flags = &h0, Description = "Opens (or creates) the SQLite database and ensures the notes table exists."
-		Shared Function InitDB() As SQLiteDatabase
-		  Var dbFile As New FolderItem("/Users/worajedt/Xojo Projects/mvvm/data/notes.sqlite", FolderItem.PathModes.Native)
-		  Var db As New SQLiteDatabase
-		  db.DatabaseFile = dbFile
-
-		  If Not dbFile.Exists Then
-		    db.CreateDatabase()
-		  Else
-		    db.Connect()
-		  End If
-
-		  db.ExecuteSQL("CREATE TABLE IF NOT EXISTS notes (" + _
-		  "id INTEGER PRIMARY KEY AUTOINCREMENT, " + _
-		  "title TEXT NOT NULL, " + _
-		  "body TEXT, " + _
-		  "created_at TEXT DEFAULT (datetime('now')), " + _
-		  "updated_at TEXT DEFAULT (datetime('now')))")
-
-		  Return db
+Inherits BaseModel
+	#tag Method, Flags = &h1, Description = "Returns the table name."
+		Protected Function TableName() As String
+		  Return "notes"
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h21, Description = "Opens a fresh DB connection for thread-safe access."
-		Private Function OpenDB() As SQLiteDatabase
-		  Var dbFile As New FolderItem("/Users/worajedt/Xojo Projects/mvvm/data/notes.sqlite", FolderItem.PathModes.Native)
-		  Var db As New SQLiteDatabase
-		  db.DatabaseFile = dbFile
-		  db.Connect()
-		  Return db
+	#tag Method, Flags = &h1, Description = "Returns the column list for SELECT queries."
+		Protected Function Columns() As String
+		  Return "id, title, body, created_at, updated_at"
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = "Returns all notes as a Variant() of Dictionary objects."
+	#tag Method, Flags = &h0, Description = "Returns all notes ordered by updated_at DESC."
 		Function GetAll() As Variant()
-		  Var results() As Variant
-		  Var db As SQLiteDatabase = OpenDB()
-		  Var rs As RowSet = db.SelectSQL("SELECT id, title, body, created_at, updated_at FROM notes ORDER BY updated_at DESC")
-
-		  While Not rs.AfterLastRow
-		    Var row As New Dictionary()
-		    row.Value("id") = rs.Column("id").IntegerValue
-		    row.Value("title") = rs.Column("title").StringValue
-		    row.Value("body") = rs.Column("body").StringValue
-		    row.Value("created_at") = rs.Column("created_at").StringValue
-		    row.Value("updated_at") = rs.Column("updated_at").StringValue
-		    results.Add(row)
-		    rs.MoveToNextRow()
-		  Wend
-
-		  rs.Close()
-		  db.Close()
-		  Return results
+		  Return FindAll("updated_at DESC")
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = "Returns a single note as a Dictionary, or Nil if not found."
 		Function GetByID(id As Integer) As Dictionary
-		  Var db As SQLiteDatabase = OpenDB()
-		  Var rs As RowSet = db.SelectSQL("SELECT id, title, body, created_at, updated_at FROM notes WHERE id = ?", id)
-
-		  If rs.AfterLastRow Then
-		    rs.Close()
-		    db.Close()
-		    Return Nil
-		  End If
-
-		  Var row As New Dictionary()
-		  row.Value("id") = rs.Column("id").IntegerValue
-		  row.Value("title") = rs.Column("title").StringValue
-		  row.Value("body") = rs.Column("body").StringValue
-		  row.Value("created_at") = rs.Column("created_at").StringValue
-		  row.Value("updated_at") = rs.Column("updated_at").StringValue
-
-		  rs.Close()
-		  db.Close()
-		  Return row
+		  Return FindByID(id)
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = "Creates a new note and returns its ID."
+	#tag Method, Flags = &h0, Description = "Creates a new note and returns its ID. Uses custom SQL so SQLite sets timestamps via DEFAULT."
 		Function Create(title As String, body As String) As Integer
 		  Var db As SQLiteDatabase = OpenDB()
 		  db.ExecuteSQL("INSERT INTO notes (title, body) VALUES (?, ?)", title, body)
@@ -90,7 +35,7 @@ Protected Class NoteModel
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = "Updates an existing note."
+	#tag Method, Flags = &h0, Description = "Updates title, body, and updated_at for the given note ID."
 		Sub Update(id As Integer, title As String, body As String)
 		  Var db As SQLiteDatabase = OpenDB()
 		  db.ExecuteSQL("UPDATE notes SET title = ?, body = ?, updated_at = datetime('now') WHERE id = ?", title, body, id)
@@ -100,9 +45,7 @@ Protected Class NoteModel
 
 	#tag Method, Flags = &h0, Description = "Deletes a note by ID."
 		Sub Delete(id As Integer)
-		  Var db As SQLiteDatabase = OpenDB()
-		  db.ExecuteSQL("DELETE FROM notes WHERE id = ?", id)
-		  db.Close()
+		  DeleteByID(id)
 		End Sub
 	#tag EndMethod
 

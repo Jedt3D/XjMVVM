@@ -41,7 +41,7 @@ Inherits WebApplication
 		  mJinja.Autoescape = True
 		  mJinja.TrimBlocks = True
 		  mJinja.LStripBlocks = True
-		  Var templateFolder As New FolderItem("/Users/worajedt/Xojo Projects/mvvm/templates", FolderItem.PathModes.Native)
+		  Var templateFolder As FolderItem = App.ExecutableFile.Parent.Child("templates")
 		  mJinja.SetLoader(New JinjaX.FileSystemLoader(templateFolder))
 		  
 		  // Set up Router and register routes
