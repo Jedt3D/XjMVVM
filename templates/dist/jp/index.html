@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>はじめに — MVVM Docs</title>
-  <meta name="description" content="Xojo Web 2上に構築されたサーバーサイドレンダリング（SSR）Xojo MVVMフレームワーク（XjMVVM）。JinjaXテンプレートエンジンを使用しています。" />
+  <title>導入 — MVVM Docs</title>
+  <meta name="description" content="Xojo Web 2上に構築されたサーバーサイドレンダリング Xojo MVVM Webフレームワーク(XjMVVM)で、JinjaXテンプレートで駆動されています。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.9.0</span>
+        <span class="logo-version">v0.9.3</span>
       </a>
 
       <!-- Language switcher -->
@@ -307,6 +307,21 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Security</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./protected-routes/">
+                Protected Routes & User Scoping
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -328,15 +343,15 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">はじめに</h1>
-          <p class="page-description">Xojo Web 2上に構築されたサーバーサイドレンダリング（SSR）Xojo MVVMフレームワーク（XjMVVM）。JinjaXテンプレートエンジンを使用しています。</p>
+          <h1 class="page-title">導入</h1>
+          <p class="page-description">Xojo Web 2上に構築されたサーバーサイドレンダリング Xojo MVVM Webフレームワーク(XjMVVM)で、JinjaXテンプレートで駆動されています。</p>
         </div>
 
-        <h1 id="_1">はじめに<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>これは <strong>XjMVVM</strong> （Xojo MVVM Web Framework） — Xojo Web 2上に構築されたサーバーサイドレンダリング（SSR）Webアプリケーションフレームワークです。Xojoの組み込みWebPageおよびWebControl GUIシステムを使用する代わりに、すべてのHTTPリクエストは <code>HandleURL</code> で傍受され、ViewModel にルーティングされ、<strong>JinjaX テンプレートエンジン</strong>を使用してHTML応答をレンダリングします。</p>
-<p>このアーキテクチャは意図的に <strong>Flask</strong> または <strong>Django</strong> に似ています — PythonでSSRウェブアプリを構築したことのある人ならば、誰もが馴染みがあります。Flaskを使用したことがない場合は、このように考えてください。ブラウザがページをリクエストし、サーバーがコードを実行し、HTML文字列を作成して戻します。JavaScriptフレームワークもなく、レンダリング用のWebSocketもなく、クリーンなリクエスト/レスポンスだけです。</p>
-<h2 id="_2">リクエストのライフサイクル<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>すべてのリクエスト（URLに関係なく）は、同じパイプラインを通過します：</p>
+        <h1 id="_1">導入<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>これは<strong>XjMVVM</strong>(Xojo MVVM Web Framework)です — Xojo Web 2上に構築されたサーバーサイドレンダリング(SSR)Webアプリケーションフレームワークです。XojoのビルトインWebPageおよびWebControl GUIシステムを使用する代わりに、すべてのHTTPリクエストは<code>HandleURL</code>でインターセプトされてViewModelにルーティングされ、<strong>JinjaXテンプレートエンジン</strong>を使用してHTMLレスポンスをレンダリングします。</p>
+<p>このアーキテクチャは意図的に<strong>Flask</strong>または<strong>Django</strong>と類似しています — Pythonでサーバーサイドレンダリング Webアプリを構築した経験のある人には馴染み深いものです。FlaskやDjangoを使用したことがない場合は、こう考えてください: ブラウザがページをリクエストすると、サーバーは何らかのコードを実行し、HTML文字列を構築し、それを送り返します。JavaScriptフレームワークなし、レンダリング用のWebSocketなし、ただきれいなリクエスト/レスポンスだけです。</p>
+<h2 id="_2">リクエストライフサイクル<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>すべてのリクエスト — URLに関係なく — は同じパイプラインを通ります:</p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -469,13 +484,13 @@ Router
   │  Matches path pattern → selects ViewModel
   │  Extracts URL params  (e.g. /notes/:id → id = "42")
   ▼
- ViewModel.Handle()
+ViewModel.Handle()
   │  Dispatches to OnGet() or OnPost()
   ▼
 Model  (database queries)
   │  Returns Dictionary / Variant() of Dictionary
   ▼
- ViewModel builds context Dictionary
+ViewModel builds context Dictionary
   │  { "notes": [...], "flash": {...}, "page_title": "Notes" }
   ▼
 JinjaX.CompiledTemplate.Render(context) → HTML string
@@ -487,11 +502,11 @@ Browser renders the page</code></pre>
   </div>
 </div>
 
-<p>このパイプラインでは、<code>WebPage</code>、<code>WebButton</code>、<code>WebTextField</code>、またはその他のXojoウェブコントロールは使用されていません。プロジェクトファイルの<code>Default</code> WebPageは、Xojoのプロジェクト構造のために必要なプレースホルダーですが、実際には提供されることはありません。</p>
-<h2 id="_3">アプリの実行<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>このパイプラインには、<code>WebPage</code>、<code>WebButton</code>、<code>WebTextField</code>、またはその他のXojo Webコントロールは一切使用されません。プロジェクトファイル内のデフォルトWebPageはXojoのプロジェクト構造に必要なプレースホルダーです — 実際には提供されません。</p>
+<h2 id="_3">アプリを実行する<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Xojo 2025r3.1</strong> で<code>mvvm.xojo_project</code>を開きます。</li>
-<li><strong>Run</strong> （⌘R）をクリックします。アプリは<code>http://localhost:8080</code>で起動します。</li>
+<li><code>mvvm.xojo_project</code>を<strong>Xojo 2025r3.1</strong>で開きます。</li>
+<li><strong>Run</strong>(⌘R)をクリックします。アプリは<code>http://localhost:8080</code>で起動します。</li>
 <li>SQLiteデータベース<code>data/notes.sqlite</code>は初回起動時に自動的に作成されます。</li>
 </ol>
 <p>CLIビルドシステムはありません。すべてのテストとビルドはXojo IDE内で行われます。</p>
@@ -500,37 +515,37 @@ Browser renders the page</code></pre>
 <thead>
 <tr>
 <th>セクション</th>
-<th>学べること</th>
+<th>学習する内容</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><a href="concepts/index.html">MVVMが必要な理由？</a></td>
-<td>このデザインの背後にある建築上の決定とトレードオフ</td>
+<td><a href="concepts/index.html">なぜMVVM?</a></td>
+<td>このデザインの背後にあるアーキテクチャの決定とトレードオフ</td>
 </tr>
 <tr>
 <td><a href="routing/index.html">ルーティング</a></td>
-<td>HandleURL決定ツリー、<code>/tests</code>リダイレクトダンス、SSRとXojo WebPageの間のクロス</td>
+<td>HandleURLの決定ツリー、<code>/tests</code>リダイレクトダンス、SSRとXojo WebPageの切り替え</td>
 </tr>
 <tr>
 <td><a href="conventions/index.html">規約</a></td>
-<td>ディレクトリ構造、ファイル命名、メソッドとプロパティの命名</td>
+<td>ディレクトリ構造、ファイル命名、メソッドとプロパティの命名規則</td>
 </tr>
 <tr>
 <td><a href="static-files/index.html">静的ファイル</a></td>
-<td>CSS、JS、画像の提供方法</td>
+<td>CSS、JS、画像を提供する方法</td>
 </tr>
 <tr>
 <td><a href="templates/index.html">テンプレート</a></td>
-<td>JinjaXセットアップ、Jinja2構文、実例、完全なタグリファレンス</td>
+<td>JinjaXセットアップ、Jinja2構文、実際の例、完全なタグリファレンス</td>
 </tr>
 <tr>
 <td><a href="database/index.html">データベース</a></td>
-<td>SQLiteパターン、Dictionaryコントラクト、スレッド安全性</td>
+<td>SQLiteパターン、Dictionaryコントラクト、スレッドセーフティ</td>
 </tr>
 <tr>
 <td><a href="database/model-reference.html">DBレイヤーリファレンス</a></td>
-<td>3層アーキテクチャ（DBAdapter / BaseModel / NoteModel）、完全なCRUD API、トレードオフ</td>
+<td>3層アーキテクチャ(DBAdapter / BaseModel / NoteModel)、完全なCRUD API、トレードオフ</td>
 </tr>
 <tr>
 <td><a href="tags/index.html">タグと多対多</a></td>
@@ -538,20 +553,28 @@ Browser renders the page</code></pre>
 </tr>
 <tr>
 <td><a href="auth/index.html">認証システム</a></td>
-<td>UserModel、SHA-256 + ソルトパスワードハッシング、Session、RequireLoginガード</td>
+<td>クッキーベース認証、HMAC署名クッキー、SHA-256 + ソルトパスワードハッシング、SSRセッション対応</td>
 </tr>
 <tr>
 <td><a href="api/index.html">JSON API と静的提供</a></td>
-<td>JSONSerializer、API ViewModel、201/422ステータスコード、ServeStaticパストラバーサルガード</td>
+<td>JSONSerializer、認証されたAPI ViewModel、201/401/422ステータスコード、ServeStaticパストラバーサルガード</td>
+</tr>
+<tr>
+<td><a href="alpine/index.html">Alpine.js</a></td>
+<td>最小限のクライアント側インタラクティビティ — ナビゲーション認証状態、フラッシュメッセージ、フォーム検証</td>
+</tr>
+<tr>
+<td><a href="protected-routes/index.html">保護されたルートとユーザースコーピング</a></td>
+<td>ルートガード(RequireLogin / RequireLoginJSON)、ユーザースコープされたノート、所有権の強制</td>
 </tr>
 <tr>
 <td><a href="encoding/index.html">エンコーディング</a></td>
-<td>フォーム解析、MIMEタイプ、UTF-8およびパーセントエンコーディング</td>
+<td>フォーム解析、MIMEタイプ、UTF-8とパーセントエンコーディング</td>
 </tr>
 </tbody>
 </table>
 <h2 id="_5">現在のバージョン<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p><strong>v0.9.0</strong> — JSON APIレイヤー、認証（SHA-256 + ソルト、セッションログイン/ログアウト）、多対多note_tagsを持つTagsリソース、および<code>/dist/*</code>の開発者ドキュメント用の組み込み静的ファイルサーバー。本番パス修正（v0.4.2）により、DB とテンプレートは、すべての環境で実行可能ファイルに相対的に解決されることが保証されます。</p>
+<p><strong>v0.9.3</strong> — ユーザースコープされたノート(各ユーザーは自分のノートのみを表示)、クッキーベース認証(HMAC署名<code>mvvm_auth</code>クッキーが壊れたWebSession認証に置き換わる)、保護されたルート(すべての19ルートはログインが必要)、クライアント側のインタラクティビティのためのAlpine.js、認証付きJSON API、および開発者ドキュメント用の<code>/dist/*</code>でのビルトイン静的ファイルサーバー。</p>
 
         <!-- Prev / Next navigation -->
         
@@ -580,11 +603,11 @@ Browser renders the page</code></pre>
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#リクエストのライフサイクル">リクエストのライフサイクル</a>
+            <a class="toc-link" href="#リクエストライフサイクル">リクエストライフサイクル</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#アプリの実行">アプリの実行</a>
+            <a class="toc-link" href="#アプリを実行する">アプリを実行する</a>
           </li>
           
           <li class="toc-item toc-level-2">

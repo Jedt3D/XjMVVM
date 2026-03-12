@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.9.0</span>
+        <span class="logo-version">v0.9.3</span>
       </a>
 
       <!-- Language switcher -->
@@ -307,6 +307,21 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Security</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./protected-routes/">
+                Protected Routes & User Scoping
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -538,11 +553,19 @@ Browser renders the page</code></pre>
 </tr>
 <tr>
 <td><a href="auth/index.html">Auth System</a></td>
-<td>UserModel, SHA-256 + salt password hashing, Session, RequireLogin guard</td>
+<td>Cookie-based auth, HMAC-signed cookies, SHA-256 + salt password hashing, SSR session workarounds</td>
 </tr>
 <tr>
 <td><a href="api/index.html">JSON API &amp; Static Serving</a></td>
-<td>JSONSerializer, API ViewModels, 201/422 status codes, ServeStatic path-traversal guard</td>
+<td>JSONSerializer, authenticated API ViewModels, 201/401/422 status codes, ServeStatic path-traversal guard</td>
+</tr>
+<tr>
+<td><a href="alpine/index.html">Alpine.js</a></td>
+<td>Minimal client-side interactivity — nav auth state, flash messages, form validation</td>
+</tr>
+<tr>
+<td><a href="protected-routes/index.html">Protected Routes &amp; User Scoping</a></td>
+<td>Route guards (RequireLogin / RequireLoginJSON), user-scoped notes, ownership enforcement</td>
 </tr>
 <tr>
 <td><a href="encoding/index.html">Encoding</a></td>
@@ -551,7 +574,7 @@ Browser renders the page</code></pre>
 </tbody>
 </table>
 <h2 id="current-version">Current version<a class="headerlink" href="#current-version" title="Permanent link">&para;</a></h2>
-<p><strong>v0.9.0</strong> — JSON API layer, authentication (SHA-256 + salt, session login/logout), Tags resource with many-to-many note_tags, and a built-in static file server for the developer docs at <code>/dist/*</code>. Production path fix (v0.4.2) ensures DB and templates resolve relative to the executable in all environments.</p>
+<p><strong>v0.9.3</strong> — User-scoped notes (each user sees only their own), cookie-based authentication (HMAC-signed <code>mvvm_auth</code> cookie replaces broken WebSession auth), protected routes (all 19 routes require login), Alpine.js for client-side interactivity, JSON API with auth, and a built-in static file server for the developer docs at <code>/dist/*</code>.</p>
 
         <!-- Prev / Next navigation -->
         

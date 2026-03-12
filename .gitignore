@@ -1,6 +1,7 @@
 # Xojo build output
 Builds/
 Builds - mvvm/
+mvvm.debug/
 
 # Xojo IDE user files
 *.xojo_user
@@ -13,6 +14,7 @@ Builds - mvvm/
 errors.txt
 analyze.sh
 *.skill
+.env
 ziqBWdba
 
 # Database (exclude data dir from version control; keep structure via .gitkeep)

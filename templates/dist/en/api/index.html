@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JSON API & Static Serving — MVVM Docs</title>
-  <meta name="description" content="How XjMVVM exposes a JSON API alongside its SSR routes, and how the built-in static file server works." />
+  <meta name="description" content="How XjMVVM exposes an authenticated JSON API alongside its SSR routes, and how the built-in static file server works." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.9.0</span>
+        <span class="logo-version">v0.9.3</span>
       </a>
 
       <!-- Language switcher -->
@@ -307,6 +307,21 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Security</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../protected-routes/">
+                Protected Routes & User Scoping
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -329,11 +344,11 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">JSON API & Static Serving</h1>
-          <p class="page-description">How XjMVVM exposes a JSON API alongside its SSR routes, and how the built-in static file server works.</p>
+          <p class="page-description">How XjMVVM exposes an authenticated JSON API alongside its SSR routes, and how the built-in static file server works.</p>
         </div>
 
         <h1 id="json-api-static-serving">JSON API &amp; Static Serving<a class="headerlink" href="#json-api-static-serving" title="Permanent link">&para;</a></h1>
-<p>XjMVVM can serve both server-rendered HTML pages <strong>and</strong> a JSON API from the same application — no separate process or framework needed. The API uses the same Router, the same ViewModels pattern, and the same Models. The only difference is the response format.</p>
+<p>XjMVVM can serve both server-rendered HTML pages <strong>and</strong> a JSON API from the same application — no separate process or framework needed. The API uses the same Router, the same ViewModels pattern, and the same Models. The only differences are the response format and the auth guard.</p>
 <hr />
 <h2 id="jsonserializer-module">JSONSerializer module<a class="headerlink" href="#jsonserializer-module" title="Permanent link">&para;</a></h2>
 <p><strong>File:</strong> <code>Framework/JSONSerializer.xojo_code</code></p>
@@ -387,6 +402,20 @@
 
 <p>The content-type signals JSON to clients. No ViewModel needs to set headers directly — just call <code>WriteJSON(...)</code> with the serialised string.</p>
 <hr />
+<h2 id="api-authentication">API Authentication<a class="headerlink" href="#api-authentication" title="Permanent link">&para;</a></h2>
+<p>All API endpoints require authentication. Unlike HTML routes that redirect to <code>/login</code>, API routes return a <strong>401 JSON error</strong> when the user is not authenticated:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;Authentication required&quot;</span><span class="p">}</span>
+</code></pre></div>
+
+<p>Every API ViewModel calls <code>RequireLoginJSON()</code> as its first line:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// 401 if no valid mvvm_auth cookie</span>
+<span class="w">  </span><span class="c1">// ... rest of handler</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p>API clients must include the <code>mvvm_auth</code> cookie in their requests. For browser-based JavaScript (<code>fetch</code>), this happens automatically when using <code>credentials: 'same-origin'</code>. For external clients, the cookie must be obtained via the login endpoint and sent with subsequent requests.</p>
+<hr />
 <h2 id="api-viewmodels">API ViewModels<a class="headerlink" href="#api-viewmodels" title="Permanent link">&para;</a></h2>
 <p>All API ViewModels live under <code>ViewModels/API/</code>. They follow the same <code>OnGet()</code>/<code>OnPost()</code> pattern as SSR ViewModels — the only difference is that they call <code>WriteJSON()</code> instead of <code>Render()</code>.</p>
 <div class="diagram-tabs" id="diag1">
@@ -395,35 +424,35 @@
     <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
   </div>
   <div class="diagram-panel diagram-nomnoml">
-    <svg version="1.1" baseProfile="full" width="779.0" height="596.0" viewBox="0 0 779 596" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <svg version="1.1" baseProfile="full" width="913.0" height="596.0" viewBox="0 0 913 596" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
     <desc >#fill: white
     #stroke: black
     #direction: right
     #spacing: 44
     #padding: 10
     #lineWidth: 1.5
-    [GET /api/notes] -&gt; [NotesAPIListVM|model.GetAll()\nArrayToJSON()]
-    [GET /api/notes/:id] -&gt; [NotesAPIDetailVM|model.GetByID(id)\nGetTagsForNote(id)\nembed tags in JSON]
-    [POST /api/notes] -&gt; [NotesAPICreateVM|validate\nmodel.Create()\n201 Created]
-    [GET /api/tags] -&gt; [TagsAPIListVM|model.GetAll()\nArrayToJSON()]
-    [GET /api/tags/:id] -&gt; [TagsAPIDetailVM|model.GetByID(id)\nDictToJSON()]</desc>
+    [GET /api/notes] -&gt; [NotesAPIListVM|RequireLoginJSON()\nmodel.GetAll(userID)\nArrayToJSON()]
+    [GET /api/notes/:id] -&gt; [NotesAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id, userID)\nembed tags in JSON]
+    [POST /api/notes] -&gt; [NotesAPICreateVM|RequireLoginJSON()\nvalidate\nmodel.Create(title, body, userID)\n201 Created]
+    [GET /api/tags] -&gt; [TagsAPIListVM|RequireLoginJSON()\nmodel.GetAll()\nArrayToJSON()]
+    [GET /api/tags/:id] -&gt; [TagsAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id)\nDictToJSON()]</desc>
     <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="normal" font-style="normal">
         <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
             <g stroke="transparent" fill="transparent">
-                <rect x="0.0" y="0.0" height="596.0" width="779.0" stroke="none"></rect>
+                <rect x="0.0" y="0.0" height="596.0" width="913.0" stroke="none"></rect>
             </g>
             <g transform="translate(10, 10)" fill="black">
                 <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
-                    <path d="M149.0 36.0 L183 36 L321.1666666666667 36 L321.2 36.0 " fill="none"></path>
-                    <path d="M313.8 41.9 L321.2 36.0 L313.8 30.1 L328.5 36.0 Z"></path>
-                    <path d="M161.0 152.0 L183 152 L197.66666666666666 152 L197.7 152.0 " fill="none"></path>
-                    <path d="M190.3 157.9 L197.7 152.0 L190.3 146.1 L205.0 152.0 Z"></path>
-                    <path d="M154.5 268.0 L183 268 L289.6666666666667 268 L289.7 268.0 " fill="none"></path>
-                    <path d="M282.3 273.9 L289.7 268.0 L282.3 262.1 L297.0 268.0 Z"></path>
-                    <path d="M144.0 384.0 L183 384 L321.1666666666667 384 L321.2 384.0 " fill="none"></path>
-                    <path d="M313.8 389.9 L321.2 384.0 L313.8 378.1 L328.5 384.0 Z"></path>
-                    <path d="M156.0 500.0 L183 500 L311.1666666666667 500 L311.2 500.0 " fill="none"></path>
-                    <path d="M303.8 505.9 L311.2 500.0 L303.8 494.1 L318.5 500.0 Z"></path>
+                    <path d="M149.0 36.0 L183 36 L272.6666666666667 36 L272.7 36.0 " fill="none"></path>
+                    <path d="M265.3 41.9 L272.7 36.0 L265.3 30.1 L280.0 36.0 Z"></path>
+                    <path d="M161.0 152.0 L183 152 L230.16666666666666 152 L230.2 152.0 " fill="none"></path>
+                    <path d="M222.8 157.9 L230.2 152.0 L222.8 146.1 L237.5 152.0 Z"></path>
+                    <path d="M154.5 268.0 L183 268 L197.66666666666666 268 L197.7 268.0 " fill="none"></path>
+                    <path d="M190.3 273.9 L197.7 268.0 L190.3 262.1 L205.0 268.0 Z"></path>
+                    <path d="M144.0 384.0 L183 384 L298.6666666666667 384 L298.7 384.0 " fill="none"></path>
+                    <path d="M291.3 389.9 L298.7 384.0 L291.3 378.1 L306.0 384.0 Z"></path>
+                    <path d="M156.0 500.0 L183 500 L288.6666666666667 500 L288.7 500.0 " fill="none"></path>
+                    <path d="M281.3 505.9 L288.7 500.0 L281.3 494.1 L296.0 500.0 Z"></path>
                     <g data-name="GET /api/notes">
                         <g fill="white" stroke="black" data-name="GET /api/notes">
                             <rect x="12.0" y="18.0" height="36.0" width="137.0" data-name="GET /api/notes"></rect>
@@ -437,18 +466,19 @@
                     </g>
                     <g data-name="NotesAPIListVM">
                         <g fill="white" stroke="black" data-name="NotesAPIListVM">
-                            <rect x="328.5" y="0.0" height="72.0" width="267.0" data-name="NotesAPIListVM"></rect>
-                            <path d="M328.5 36.0 L595.5 36.0" fill="none" data-name="NotesAPIListVM"></path>
+                            <rect x="280.0" y="0.0" height="72.0" width="498.0" data-name="NotesAPIListVM"></rect>
+                            <path d="M280.0 36.0 L778.0 36.0" fill="none" data-name="NotesAPIListVM"></path>
                         </g>
-                        <g transform="translate(328.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPIListVM" data-compartment="0">
+                        <g transform="translate(280, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPIListVM" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="NotesAPIListVM" data-compartment="0">
-                                <text x="123.5" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPIListVM" data-compartment="0">NotesAPIListVM</text>
+                                <text x="239.0" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPIListVM" data-compartment="0">NotesAPIListVM</text>
 
                             </g>
                         </g>
-                        <g transform="translate(328.5, 36)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPIListVM" data-compartment="1">
+                        <g transform="translate(280, 36)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPIListVM" data-compartment="1">
                             <g transform="translate(10, 10)" fill="black" text-align="left" data-name="NotesAPIListVM" data-compartment="1">
-                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPIListVM" data-compartment="1">model.GetAll()
+                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPIListVM" data-compartment="1">RequireLoginJSON()
+                                model.GetAll(userID)
                                 ArrayToJSON()</text>
 
                             </g>
@@ -467,19 +497,19 @@
                     </g>
                     <g data-name="NotesAPIDetailVM">
                         <g fill="white" stroke="black" data-name="NotesAPIDetailVM">
-                            <rect x="205.0" y="116.0" height="72.0" width="514.0" data-name="NotesAPIDetailVM"></rect>
-                            <path d="M205.0 152.0 L719.0 152.0" fill="none" data-name="NotesAPIDetailVM"></path>
+                            <rect x="237.5" y="116.0" height="72.0" width="583.0" data-name="NotesAPIDetailVM"></rect>
+                            <path d="M237.5 152.0 L820.5 152.0" fill="none" data-name="NotesAPIDetailVM"></path>
                         </g>
-                        <g transform="translate(205, 116)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPIDetailVM" data-compartment="0">
+                        <g transform="translate(237.5, 116)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPIDetailVM" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="NotesAPIDetailVM" data-compartment="0">
-                                <text x="247.0" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPIDetailVM" data-compartment="0">NotesAPIDetailVM</text>
+                                <text x="281.5" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPIDetailVM" data-compartment="0">NotesAPIDetailVM</text>
 
                             </g>
                         </g>
-                        <g transform="translate(205, 152)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPIDetailVM" data-compartment="1">
+                        <g transform="translate(237.5, 152)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPIDetailVM" data-compartment="1">
                             <g transform="translate(10, 10)" fill="black" text-align="left" data-name="NotesAPIDetailVM" data-compartment="1">
-                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPIDetailVM" data-compartment="1">model.GetByID(id)
-                                GetTagsForNote(id)
+                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPIDetailVM" data-compartment="1">RequireLoginJSON()
+                                model.GetByID(id, userID)
                                 embed tags in JSON</text>
 
                             </g>
@@ -498,19 +528,20 @@
                     </g>
                     <g data-name="NotesAPICreateVM">
                         <g fill="white" stroke="black" data-name="NotesAPICreateVM">
-                            <rect x="297.0" y="232.0" height="72.0" width="330.0" data-name="NotesAPICreateVM"></rect>
-                            <path d="M297.0 268.0 L627.0 268.0" fill="none" data-name="NotesAPICreateVM"></path>
+                            <rect x="205.0" y="232.0" height="72.0" width="648.0" data-name="NotesAPICreateVM"></rect>
+                            <path d="M205.0 268.0 L853.0 268.0" fill="none" data-name="NotesAPICreateVM"></path>
                         </g>
-                        <g transform="translate(297, 232)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPICreateVM" data-compartment="0">
+                        <g transform="translate(205, 232)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPICreateVM" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="NotesAPICreateVM" data-compartment="0">
-                                <text x="155.0" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPICreateVM" data-compartment="0">NotesAPICreateVM</text>
+                                <text x="314.0" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPICreateVM" data-compartment="0">NotesAPICreateVM</text>
 
                             </g>
                         </g>
-                        <g transform="translate(297, 268)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPICreateVM" data-compartment="1">
+                        <g transform="translate(205, 268)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPICreateVM" data-compartment="1">
                             <g transform="translate(10, 10)" fill="black" text-align="left" data-name="NotesAPICreateVM" data-compartment="1">
-                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPICreateVM" data-compartment="1">validate
-                                model.Create()
+                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPICreateVM" data-compartment="1">RequireLoginJSON()
+                                validate
+                                model.Create(title, body, userID)
                                 201 Created</text>
 
                             </g>
@@ -529,18 +560,19 @@
                     </g>
                     <g data-name="TagsAPIListVM">
                         <g fill="white" stroke="black" data-name="TagsAPIListVM">
-                            <rect x="328.5" y="348.0" height="72.0" width="267.0" data-name="TagsAPIListVM"></rect>
-                            <path d="M328.5 384.0 L595.5 384.0" fill="none" data-name="TagsAPIListVM"></path>
+                            <rect x="306.0" y="348.0" height="72.0" width="446.0" data-name="TagsAPIListVM"></rect>
+                            <path d="M306.0 384.0 L752.0 384.0" fill="none" data-name="TagsAPIListVM"></path>
                         </g>
-                        <g transform="translate(328.5, 348)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TagsAPIListVM" data-compartment="0">
+                        <g transform="translate(306, 348)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TagsAPIListVM" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="TagsAPIListVM" data-compartment="0">
-                                <text x="123.5" y="14.1" stroke="none" text-anchor="middle" data-name="TagsAPIListVM" data-compartment="0">TagsAPIListVM</text>
+                                <text x="213.0" y="14.1" stroke="none" text-anchor="middle" data-name="TagsAPIListVM" data-compartment="0">TagsAPIListVM</text>
 
                             </g>
                         </g>
-                        <g transform="translate(328.5, 384)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TagsAPIListVM" data-compartment="1">
+                        <g transform="translate(306, 384)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TagsAPIListVM" data-compartment="1">
                             <g transform="translate(10, 10)" fill="black" text-align="left" data-name="TagsAPIListVM" data-compartment="1">
-                                <text x="0.0" y="14.1" stroke="none" data-name="TagsAPIListVM" data-compartment="1">model.GetAll()
+                                <text x="0.0" y="14.1" stroke="none" data-name="TagsAPIListVM" data-compartment="1">RequireLoginJSON()
+                                model.GetAll()
                                 ArrayToJSON()</text>
 
                             </g>
@@ -559,18 +591,19 @@
                     </g>
                     <g data-name="TagsAPIDetailVM">
                         <g fill="white" stroke="black" data-name="TagsAPIDetailVM">
-                            <rect x="318.5" y="464.0" height="72.0" width="287.0" data-name="TagsAPIDetailVM"></rect>
-                            <path d="M318.5 500.0 L605.5 500.0" fill="none" data-name="TagsAPIDetailVM"></path>
+                            <rect x="296.0" y="464.0" height="72.0" width="466.0" data-name="TagsAPIDetailVM"></rect>
+                            <path d="M296.0 500.0 L762.0 500.0" fill="none" data-name="TagsAPIDetailVM"></path>
                         </g>
-                        <g transform="translate(318.5, 464)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TagsAPIDetailVM" data-compartment="0">
+                        <g transform="translate(296, 464)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TagsAPIDetailVM" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="TagsAPIDetailVM" data-compartment="0">
-                                <text x="133.5" y="14.1" stroke="none" text-anchor="middle" data-name="TagsAPIDetailVM" data-compartment="0">TagsAPIDetailVM</text>
+                                <text x="223.0" y="14.1" stroke="none" text-anchor="middle" data-name="TagsAPIDetailVM" data-compartment="0">TagsAPIDetailVM</text>
 
                             </g>
                         </g>
-                        <g transform="translate(318.5, 500)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TagsAPIDetailVM" data-compartment="1">
+                        <g transform="translate(296, 500)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TagsAPIDetailVM" data-compartment="1">
                             <g transform="translate(10, 10)" fill="black" text-align="left" data-name="TagsAPIDetailVM" data-compartment="1">
-                                <text x="0.0" y="14.1" stroke="none" data-name="TagsAPIDetailVM" data-compartment="1">model.GetByID(id)
+                                <text x="0.0" y="14.1" stroke="none" data-name="TagsAPIDetailVM" data-compartment="1">RequireLoginJSON()
+                                model.GetByID(id)
                                 DictToJSON()</text>
 
                             </g>
@@ -583,29 +616,37 @@
 </svg>
   </div>
   <div class="diagram-panel diagram-ascii" style="display:none">
-    <pre class="ascii-diagram"><code>GET  /api/notes       → NotesAPIListVM   → ArrayToJSON(notes)
-GET  /api/notes/:id   → NotesAPIDetailVM → note + embedded tags array
-POST /api/notes       → NotesAPICreateVM → 201 Created + new note JSON
-GET  /api/tags        → TagsAPIListVM    → ArrayToJSON(tags)
-GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)</code></pre>
+    <pre class="ascii-diagram"><code>GET  /api/notes       -> NotesAPIListVM   -> RequireLoginJSON() -> ArrayToJSON(notes)
+GET  /api/notes/:id   -> NotesAPIDetailVM -> RequireLoginJSON() -> note + embedded tags array
+POST /api/notes       -> NotesAPICreateVM -> RequireLoginJSON() -> 201 Created + new note JSON
+GET  /api/tags        -> TagsAPIListVM    -> RequireLoginJSON() -> ArrayToJSON(tags)
+GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(tag)</code></pre>
   </div>
 </div>
 
 <h3 id="notesapilistvm-get-apinotes">NotesAPIListVM — <code>GET /api/notes</code><a class="headerlink" href="#notesapilistvm-get-apinotes" title="Permanent link">&para;</a></h3>
+<p>Returns all notes for the authenticated user:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">notes</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">notes</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">(</span><span class="n">userID</span><span class="p">)</span>
 <span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">ArrayToJSON</span><span class="p">(</span><span class="n">notes</span><span class="p">))</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>Response: <code>[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"..."},...]</code></p>
+<p>Response: <code>[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"...","user_id":"5"},...]</code></p>
+<p>Notes are scoped to the authenticated user — each user only sees their own notes.</p>
 <h3 id="notesapidetailvm-get-apinotesid">NotesAPIDetailVM — <code>GET /api/notes/:id</code><a class="headerlink" href="#notesapidetailvm-get-apinotesid" title="Permanent link">&para;</a></h3>
-<p>Returns the note with an embedded <code>tags</code> array:</p>
+<p>Returns the note with an embedded <code>tags</code> array. Returns 404 if the note does not exist or belongs to a different user:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
+
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Val</span><span class="p">(</span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
 
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
 <span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span>
@@ -629,27 +670,33 @@ GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)</code></pre>
 </div>
 <h3 id="notesapicreatevm-post-apinotes">NotesAPICreateVM — <code>POST /api/notes</code><a class="headerlink" href="#notesapicreatevm-post-apinotes" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
+
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">Trim</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
 
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">422</span><span class="w">      </span><span class="c1">// Unprocessable Entity — validation error</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">422</span><span class="w">      </span><span class="c1">// Unprocessable Entity -- validation error</span>
 <span class="w">    </span><span class="n">WriteJSON</span><span class="p">(</span><span class="s2">&quot;{&quot;&quot;error&quot;&quot;:&quot;&quot;Title is required&quot;&quot;}&quot;</span><span class="p">)</span>
 <span class="w">    </span><span class="k">Return</span>
 <span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">newID</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">newID</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
 
 <span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">201</span><span class="w">        </span><span class="c1">// Created</span>
 <span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">DictToJSON</span><span class="p">(</span><span class="n">note</span><span class="p">))</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>Status codes used by the API: <strong>200</strong> for successful reads, <strong>201</strong> for successful creation, <strong>404</strong> for not found, <strong>422</strong> for validation failure.</p>
+<p>Status codes used by the API: <strong>200</strong> for successful reads, <strong>201</strong> for successful creation, <strong>401</strong> for unauthenticated, <strong>404</strong> for not found, <strong>422</strong> for validation failure.</p>
 <h3 id="tagsapilistvm-get-apitags">TagsAPIListVM — <code>GET /api/tags</code><a class="headerlink" href="#tagsapilistvm-get-apitags" title="Permanent link">&para;</a></h3>
+<p>Tags are global (not user-scoped) but still require authentication:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
+
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">TagModel</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tags</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
 <span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">ArrayToJSON</span><span class="p">(</span><span class="n">tags</span><span class="p">))</span>
@@ -658,6 +705,8 @@ GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)</code></pre>
 
 <h3 id="tagsapidetailvm-get-apitagsid">TagsAPIDetailVM — <code>GET /api/tags/:id</code><a class="headerlink" href="#tagsapidetailvm-get-apitagsid" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
+
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Val</span><span class="p">(</span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">))</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">TagModel</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tag</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
@@ -707,7 +756,7 @@ GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)</code></pre>
 <span class="w">  </span><span class="c1">// Start from the known safe root</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">).</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span>
 
-<span class="w">  </span><span class="c1">// Walk each path segment individually — never concatenate raw user input</span>
+<span class="w">  </span><span class="c1">// Walk each path segment individually -- never concatenate raw user input</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">parts</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">relativePath</span><span class="p">.</span><span class="n">Split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
 <span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="k">Each</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="ow">In</span><span class="w"> </span><span class="n">parts</span>
 <span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;..&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Continue</span><span class="w">  </span><span class="c1">// skip dangerous segments</span>
@@ -720,7 +769,7 @@ GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)</code></pre>
 <span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 <span class="w">  </span><span class="k">Next</span>
 
-<span class="w">  </span><span class="c1">// Directory → try index.html automatically</span>
+<span class="w">  </span><span class="c1">// Directory -&gt; try index.html automatically</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">IsFolder</span><span class="w"> </span><span class="k">Then</span>
 <span class="w">    </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">)</span>
 <span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span>
@@ -796,6 +845,10 @@ http://localhost:8080/dist/jp/index.html
           
           <li class="toc-item toc-level-3">
             <a class="toc-link" href="#writejson-on-baseviewmodel">`WriteJSON` on BaseViewModel</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#api-authentication">API Authentication</a>
           </li>
           
           <li class="toc-item toc-level-2">

@@ -86,7 +86,9 @@ note_tags  (note_id, tag_id)  -- junction, PRIMARY KEY (note_id, tag_id)
 users      (id, username UNIQUE, password_hash, created_at)
 ```
 
-**Next:** Developer guide docs for Phase 3+4 features, version bump to v1.0.0.
+**Developer guide:** All 20 pages updated for v0.9.3, built for EN/TH/JP (60 pages total). New "Protected Routes & User Scoping" page. Auth docs rewritten for cookie-based auth.
+
+**Next:** Version bump to v1.0.0.
 
 ### HandleURL / Routing (Critical)
 
@@ -531,6 +533,7 @@ This must remain as the **last element in `<head>`**, after the stylesheet link.
 | v0.9.3 | User-scoped notes, protected routes, cookie-based auth (Phase 4) |
 | pygment | Xojo Pygments lexer (`xojo_lexer.py`) working |
 | dark-light | Day/Night theme toggle, cross-language state sharing |
+| docs-0.9.3 | Developer guide updated for Phase 3+4 (cookie auth, protected routes, user scoping) |
 
 ---
 

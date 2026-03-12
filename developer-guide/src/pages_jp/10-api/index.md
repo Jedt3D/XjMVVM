@@ -1,19 +1,19 @@
 ---
-title: JSON API と静的提供
-description: XjMVVMがSSRルートと並行してJSON APIを公開する方法、および組み込み静的ファイルサーバーがどのように機能するか。
+title: "JSON API & 静的ファイル配信"
+description: XjMVVMがSSRルートと同時に認証済みJSON APIを公開する方法、および組み込み静的ファイルサーバーの動作原理。
 ---
 
-# JSON API と静的提供
+# JSON API & 静的ファイル配信
 
-XjMVVMは、同じアプリケーションから**サーバーレンダリングHTMLページ** と **JSON API**の両方を提供できます — 別のプロセスやフレームワークは必要ありません。APIは同じRouter、同じViewModelsパターン、同じModelsを使用します。唯一の違いはレスポンス形式です。
+XjMVVMは、同じアプリケーションからサーバーレンダリングされたHTMLページ**と** JSON APIの両方を提供でき、別々のプロセスやフレームワークは必要ありません。APIは同じRouter、同じViewModelsパターン、同じModelsを使用します。唯一の違いはレスポンス形式と認証ガードです。
 
 ---
 
-## JSONSerializerモジュール
+## JSONSerializer モジュール
 
-**File:** `Framework/JSONSerializer.xojo_code`
+**ファイル:** `Framework/JSONSerializer.xojo_code`
 
-`Dictionary`と`Variant()`の`Dictionary`をJSON文字列に変換する単純なモジュール。外部ライブラリに依存しません — 文字列操作だけです。
+`Dictionary` と `Variant()` of `Dictionary` をJSON文字列に変換する単純なモジュールです。外部ライブラリには依存せず、文字列操作のみを使用します。
 
 ```xojo
 Module JSONSerializer
@@ -53,9 +53,9 @@ End Module
 ```
 
 !!! note
-    すべての値はJSON文字列としてシリアライズされます — 数値またはブール値の型ではなく。これは`RowToDict`がどのように機能するかと一致しています：すべてのデータベース値は`StringValue`として格納されます。APIのコンシューマーは必要に応じて文字列から数値を解析する必要があります。
+    すべての値はJSON文字列としてシリアライズされます — 数値型またはブール型はありません。これは `RowToDict` の動作方法と一致しており、すべてのデータベース値は `StringValue` として保存されます。APIの利用者は必要に応じて文字列から数値をパースするべきです。
 
-### BaseViewModelの`WriteJSON`
+### BaseViewModel の `WriteJSON`
 
 ```xojo
 Sub WriteJSON(jsonString As String)
@@ -64,13 +64,34 @@ Sub WriteJSON(jsonString As String)
 End Sub
 ```
 
-コンテンツタイプはクライアントにJSONを信号で伝えます。ViewModelはヘッダーを直接設定する必要がありません — シリアライズされた文字列でシリアライズされた`WriteJSON(...)`を呼び出すだけです。
+Content-TypeはクライアントにJSONを通知します。ViewModelがヘッダを直接設定する必要はありません — シリアライズされた文字列で `WriteJSON(...)` を呼び出すだけです。
 
 ---
 
-## API ViewModel
+## API認証
 
-すべてのAPI ViewModelは`ViewModels/API/`の下に住んでいます。SSR ViewModelと同じ`OnGet()`/`OnPost()`パターンに従います — 唯一の違いは、`Render()`の代わりに`WriteJSON()`を呼び出します。
+すべてのAPIエンドポイントには認証が必要です。HTMLルートが `/login` にリダイレクトするのと異なり、APIルートは認証されていないユーザーに対して **401 JSON エラー** を返します：
+
+```json
+{"error":"Authentication required"}
+```
+
+すべてのAPI ViewModelは最初の行として `RequireLoginJSON()` を呼び出します：
+
+```xojo
+Sub OnGet()
+  If RequireLoginJSON() Then Return  // 401 if no valid mvvm_auth cookie
+  // ... rest of handler
+End Sub
+```
+
+APIクライアントは、リクエストに `mvvm_auth` クッキーを含める必要があります。ブラウザベースのJavaScript（`fetch`）の場合、`credentials: 'same-origin'` を使用する際に自動的に実行されます。外部クライアントの場合、クッキーはログインエンドポイントを経由して取得し、その後のリクエストで送信する必要があります。
+
+---
+
+## API ViewModels
+
+すべてのAPI ViewModelは `ViewModels/API/` 配下に置かれます。SSR ViewModelと同じ `OnGet()`/`OnPost()` パターンに従います — 唯一の違いは `Render()` の代わりに `WriteJSON()` を呼び出す点です。
 
 <!-- diagram -->
 <!-- nomnoml
@@ -80,42 +101,52 @@ End Sub
 #spacing: 44
 #padding: 10
 #lineWidth: 1.5
-[GET /api/notes] -> [NotesAPIListVM|model.GetAll()\nArrayToJSON()]
-[GET /api/notes/:id] -> [NotesAPIDetailVM|model.GetByID(id)\nGetTagsForNote(id)\nembed tags in JSON]
-[POST /api/notes] -> [NotesAPICreateVM|validate\nmodel.Create()\n201 Created]
-[GET /api/tags] -> [TagsAPIListVM|model.GetAll()\nArrayToJSON()]
-[GET /api/tags/:id] -> [TagsAPIDetailVM|model.GetByID(id)\nDictToJSON()]
+[GET /api/notes] -> [NotesAPIListVM|RequireLoginJSON()\nmodel.GetAll(userID)\nArrayToJSON()]
+[GET /api/notes/:id] -> [NotesAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id, userID)\nembed tags in JSON]
+[POST /api/notes] -> [NotesAPICreateVM|RequireLoginJSON()\nvalidate\nmodel.Create(title, body, userID)\n201 Created]
+[GET /api/tags] -> [TagsAPIListVM|RequireLoginJSON()\nmodel.GetAll()\nArrayToJSON()]
+[GET /api/tags/:id] -> [TagsAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id)\nDictToJSON()]
 -->
 <!-- ascii
-GET  /api/notes       → NotesAPIListVM   → ArrayToJSON(notes)
-GET  /api/notes/:id   → NotesAPIDetailVM → note + embedded tags array
-POST /api/notes       → NotesAPICreateVM → 201 Created + new note JSON
-GET  /api/tags        → TagsAPIListVM    → ArrayToJSON(tags)
-GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)
+GET  /api/notes       -> NotesAPIListVM   -> RequireLoginJSON() -> ArrayToJSON(notes)
+GET  /api/notes/:id   -> NotesAPIDetailVM -> RequireLoginJSON() -> note + embedded tags array
+POST /api/notes       -> NotesAPICreateVM -> RequireLoginJSON() -> 201 Created + new note JSON
+GET  /api/tags        -> TagsAPIListVM    -> RequireLoginJSON() -> ArrayToJSON(tags)
+GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(tag)
 -->
 <!-- /diagram -->
 
 ### NotesAPIListVM — `GET /api/notes`
 
+認証されたユーザーのすべてのノートを返します：
+
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var notes() As Variant = model.GetAll()
+  Var notes() As Variant = model.GetAll(userID)
   WriteJSON(JSONSerializer.ArrayToJSON(notes))
 End Sub
 ```
 
-レスポンス：`[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"..."},...]`
+レスポンス: `[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"...","user_id":"5"},...]`
+
+ノートは認証されたユーザーにスコープされます — 各ユーザーは自身のノートのみを表示します。
 
 ### NotesAPIDetailVM — `GET /api/notes/:id`
 
-埋め込まれた`tags`配列を持つnoteを返します：
+ノートを埋め込み `tags` 配列とともに返します。ノートが存在しないか別のユーザーに属する場合は404を返します：
 
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var id As Integer = Val(GetParam("id"))
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var note As Dictionary = model.GetByID(id)
+  Var note As Dictionary = model.GetByID(id, userID)
 
   If note = Nil Then
     Response.Status = 404
@@ -132,39 +163,46 @@ Sub OnGet()
 End Sub
 ```
 
-タグ配列は文字列操作により埋め込まれます — 閉じ`}`を削除し、再度クローズする前に`,"tags":[...]}`を追加します。これは意図的です：`JSONSerializer.DictToJSON`はフラット文字列ディクショナリのみを処理します。ネストされた配列を埋め込むには、手動での構成が必要です。
+タグ配列は文字列操作により挿入されます — 閉じ `}` を削除し、再度閉じる前に `,"tags":[...]}` を追加します。これは意図的です：`JSONSerializer.DictToJSON` はフラットな文字列辞書のみを処理します。ネストされた配列を埋め込むには手動の構成が必要です。
 
 !!! note
-    このアプローチは確実に機能します。なぜなら`DictToJSON`は常に`}`で終わる有効なJSONオブジェクトを生成するからです。シリアライザーが変わる場合は、この埋め込みポイントをレビューする必要があります。
+    `DictToJSON` は常に `}` で終わる有効なJSONオブジェクトを生成するため、このアプローチは確実に機能します。シリアライザが変更された場合は、この挿入ポイントを見直す必要があります。
 
 ### NotesAPICreateVM — `POST /api/notes`
 
 ```xojo
 Sub OnPost()
+  If RequireLoginJSON() Then Return
+
   Var title As String = GetFormValue("title").Trim()
   Var body As String = GetFormValue("body")
 
   If title.Length = 0 Then
-    Response.Status = 422      // Unprocessable Entity — validation error
+    Response.Status = 422      // Unprocessable Entity -- validation error
     WriteJSON("{""error"":""Title is required""}")
     Return
   End If
 
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var newID As Integer = model.Create(title, body)
-  Var note As Dictionary = model.GetByID(newID)
+  Var newID As Integer = model.Create(title, body, userID)
+  Var note As Dictionary = model.GetByID(newID, userID)
 
   Response.Status = 201        // Created
   WriteJSON(JSONSerializer.DictToJSON(note))
 End Sub
 ```
 
-APIで使用されるステータスコード：成功したよみのための**200**、成功した作成のための**201**、見つからないための**404**、検証失敗のための**422**。
+APIが使用するステータスコード：**200** は読み込み成功時、**201** は作成成功時、**401** は未認証時、**404** は見つからない時、**422** は検証失敗時。
 
 ### TagsAPIListVM — `GET /api/tags`
 
+タグはグローバル（ユーザースコープなし）ですが、それでも認証が必要です：
+
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var model As New TagModel()
   Var tags() As Variant = model.GetAll()
   WriteJSON(JSONSerializer.ArrayToJSON(tags))
@@ -175,6 +213,8 @@ End Sub
 
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var id As Integer = Val(GetParam("id"))
   Var model As New TagModel()
   Var tag As Dictionary = model.GetByID(id)
@@ -193,7 +233,7 @@ End Sub
 
 ## APIルート
 
-SSRルートと並行して`App.Opening`に登録：
+`App.Opening` でSSRルートと共に登録されます：
 
 ```xojo
 // JSON API routes
@@ -204,17 +244,17 @@ mRouter.Get("/api/tags",        AddressOf CreateTagsAPIListVM)
 mRouter.Get("/api/tags/:id",    AddressOf CreateTagsAPIDetailVM)
 ```
 
-`/api/`プリフィックスは、APIルートをSSRルートから慣例で分離します — ルーターは同じように扱います。
+`/api/` プリフィックスは慣例によってAPIルートとSSRルートを分けます — Routerはそれらを同じように扱います。
 
 ---
 
 ## 静的ファイルサーバー
 
-**File:** `App.xojo_code` （`ServeStatic`メソッド + `HandleURL`ディスパッチ）
+**ファイル:** `App.xojo_code` (`ServeStatic` メソッド + `HandleURL` ディスパッチ)
 
-静的ファイルサーバーは、`/dist/*`で実行中のアプリから開発者ドキュメントサイトに直接アクセス可能にします。ファイルは`templates/dist/`から提供されます — `build.py`スクリプトが出力するのと同じフォルダ。
+静的ファイルサーバーにより、開発者ドキュメントサイトは実行中のアプリから `/dist/*` でアクセス可能になります。ファイルは `templates/dist/` から提供されます — `build.py` スクリプトが出力するのと同じフォルダです。
 
-### HandleURLディスパッチ
+### HandleURL ディスパッチ
 
 ```xojo
 // Redirect bare /dist to /dist/
@@ -229,7 +269,7 @@ If p.Left(6) = "/dist/" Then
 End If
 ```
 
-`p.Middle(6)`は`/dist/`プリフィックス（6文字、0ベース）をストリップし、残りを`ServeStatic`に渡します。
+`p.Middle(6)` は `/dist/` プリフィックス（6文字、0ベース）を削除し、残りを `ServeStatic` に渡します。
 
 ### ServeStatic — パストラバーサル防止
 
@@ -238,7 +278,7 @@ Private Function ServeStatic(relativePath As String, response As WebResponse) As
   // Start from the known safe root
   Var f As FolderItem = App.ExecutableFile.Parent.Child("templates").Child("dist")
 
-  // Walk each path segment individually — never concatenate raw user input
+  // Walk each path segment individually -- never concatenate raw user input
   Var parts() As String = relativePath.Split("/")
   For Each part As String In parts
     If part = "" Or part = "." Or part = ".." Then Continue  // skip dangerous segments
@@ -251,7 +291,7 @@ Private Function ServeStatic(relativePath As String, response As WebResponse) As
     End If
   Next
 
-  // Directory → try index.html automatically
+  // Directory -> try index.html automatically
   If f.IsFolder Then
     f = f.Child("index.html")
     If f Is Nil Or Not f.Exists Then
@@ -265,9 +305,9 @@ End Function
 ```
 
 !!! warning
-    **決して**生のURL文字列を連結してファイルパスを構築しないでください。`/dist/../data/notes.sqlite`へのリクエストは、パスが直接連結されている場合、データベースファイルを提供します。`Child()`を経由して各セグメントをウォークし、`..`と`.`を拒否することで、パストラバーサル攻撃を完全に防ぎます。
+    **決して** 生のURL文字列を連結してファイルパスを構築しないでください。`/dist/../data/notes.sqlite` へのリクエストは、パスが直接連結される場合、データベースファイルを提供してしまいます。`Child()` 経由で各セグメントをウォークし、`..` と `.` を拒否することで、パストラバーサル攻撃を完全に防止します。
 
-### Content-Typeマッピング
+### Content-Type マッピング
 
 ```xojo
 Var ext As String = f.Name.Lowercase
@@ -281,11 +321,11 @@ If ext.EndsWith(".ico")   Then ct = "image/x-icon"
 If ext.EndsWith(".woff2") Then ct = "font/woff2"
 ```
 
-不明な拡張子は`application/octet-stream`にフォールバックします。追加ファイルタイプを提供する場合は、ここに新しいエントリを追加してください。
+未知の拡張子は `application/octet-stream` にフォールバックします。追加のファイルタイプを提供する場合は、ここに新しいエントリを追加してください。
 
 ### ドキュメントへのアクセス
 
-ポート8080でアプリを実行すると、開発者ドキュメントは以下で利用可能です：
+アプリがポート8080で実行されている場合、開発者ドキュメントは以下で利用可能です：
 
 ```
 http://localhost:8080/dist/en/index.html
@@ -293,4 +333,4 @@ http://localhost:8080/dist/th/index.html
 http://localhost:8080/dist/jp/index.html
 ```
 
-`/dist/`ルートはSSRルーターの前に処理されるため、静的サーバーはそのプリフィックスに対して常に優先されます。
+`/dist/` ルートはSSR ルーターの前に処理されるため、静的サーバーは常にそのプリフィックスに対して優先されます。

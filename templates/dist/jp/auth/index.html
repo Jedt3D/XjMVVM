@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>認証システム — MVVM Docs</title>
-  <meta name="description" content="XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、リクエストごとの認証ガードをどのように処理するか。" />
+  <meta name="description" content="XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、SSRモード用のクッキーベース認証をどのように処理するか。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.9.0</span>
+        <span class="logo-version">v0.9.3</span>
       </a>
 
       <!-- Language switcher -->
@@ -307,6 +307,21 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Security</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../protected-routes/">
+                Protected Routes & User Scoping
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -329,11 +344,15 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">認証システム</h1>
-          <p class="page-description">XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、リクエストごとの認証ガードをどのように処理するか。</p>
+          <p class="page-description">XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、SSRモード用のクッキーベース認証をどのように処理するか。</p>
         </div>
 
         <h1 id="_1">認証システム<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>XjMVVMの認証は3つのレイヤーに構築されています：<strong><code>UserModel</code></strong>は認証情報を格納して検証し、<strong><code>Session</code></strong>クラスはログインしているユーザーを追跡し、<strong><code>BaseViewModel</code></strong>はルートを保護し、現在のユーザーをテンプレートに公開するヘルパーを提供します。</p>
+<p>XjMVVMの認証は3つのレイヤーで構築されています：<strong><code>UserModel</code></strong>が認証情報を保存・検証し、<strong><code>BaseViewModel</code></strong>がクッキーベースの認証ヘルパーを提供してルートを保護し、テンプレートに現在のユーザーを公開し、<strong>ブラウザ側のJavaScript</strong>がSSRセッションギャップをnav状態とフラッシュメッセージのために橋渡しします。</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong><code>Self.Session</code>はSSRモードでは常にNilです。</strong> Xojo Web 2の<code>WebSession</code>は永続的なWebSocket接続を必要とします。純粋なSSR（<code>HandleURL</code>が常に<code>True</code>を返す）では、WebSocketもセッションもありません。すべての認証の代わりにHMAC署名付きクッキーを使用します。</p>
+</div>
 <h2 id="_2">概要<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
@@ -341,7 +360,7 @@
     <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
   </div>
   <div class="diagram-panel diagram-nomnoml">
-    <svg version="1.1" baseProfile="full" width="1274.0" height="348.0" viewBox="0 0 1274 348" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <svg version="1.1" baseProfile="full" width="1300.0" height="348.0" viewBox="0 0 1300 348" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
     <desc >#fill: white
     #stroke: black
     #direction: down
@@ -351,44 +370,48 @@
     [POST /login or /signup] -&gt; [LoginVM / SignupVM]
     [LoginVM / SignupVM] verify -&gt; [UserModel|FindByUsername()\nVerifyPassword()\nCreate()]
     [UserModel] result -&gt; [LoginVM / SignupVM]
-    [LoginVM / SignupVM] LogIn(id, username) -&gt; [Session|CurrentUserID\nCurrentUsername\nIsLoggedIn()]
-    [Session] -&gt; [Redirect to /]
+    [LoginVM / SignupVM] RedirectWithAuth() -&gt; [Set-Cookie: mvvm_auth=...|JS intermediate page:\nlocalStorage + sessionStorage]
+    [Set-Cookie: mvvm_auth=...|JS intermediate page:\nlocalStorage + sessionStorage] -&gt; [Redirect to /notes]
     [GET any protected route] -&gt; [BaseViewModel.RequireLogin()]
-    [BaseViewModel.RequireLogin()] not logged in -&gt; [Redirect /login]
-    [BaseViewModel.RequireLogin()] logged in -&gt; [OnGet() / OnPost()]</desc>
+    [BaseViewModel.RequireLogin()] ParseAuthCookie() -&gt; [Cookie valid?]
+    [Cookie valid?] no -&gt; [Redirect /login?next=url]
+    [Cookie valid?] yes -&gt; [OnGet() / OnPost()]</desc>
     <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
         <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
             <g stroke="transparent" fill="transparent">
-                <rect x="0.0" y="0.0" height="348.0" width="1274.0" stroke="none"></rect>
+                <rect x="0.0" y="0.0" height="348.0" width="1300.0" stroke="none"></rect>
             </g>
             <g transform="translate(10, 10)" fill="black">
                 <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
-                    <path d="M400.0 36.0 L400 54 L400 66 L400.0 66.0 " fill="none"></path>
-                    <path d="M395.2 60.0 L400.0 66.0 L404.8 60.0 L400.0 72.0 Z"></path>
-                    <text x="318.0" y="127.1" stroke="none">verify</text>
-                    <path d="M308.0 105.1 L181 126 L185.10263340389898 138.3079002116969 L185.1 138.3 " fill="none"></path>
+                    <path d="M411.3 36.0 L411.25 54 L411.25 66 L411.3 66.0 " fill="none"></path>
+                    <path d="M406.4 60.0 L411.3 66.0 L416.1 60.0 L411.3 72.0 Z"></path>
+                    <text x="329.3" y="126.4" stroke="none">verify</text>
+                    <path d="M319.3 104.4 L181 126 L185.10263340389898 138.3079002116969 L185.1 138.3 " fill="none"></path>
                     <path d="M178.7 134.1 L185.1 138.3 L187.8 131.1 L187.0 144.0 Z"></path>
-                    <text x="279.0" y="134.0" stroke="none">result</text>
-                    <path d="M333.0 144.0 L400 126 L400 114 L400.0 114.0 " fill="none"></path>
-                    <path d="M404.8 120.0 L400.0 114.0 L395.2 120.0 L400.0 108.0 Z"></path>
-                    <text x="322.0" y="126.0" stroke="none">LogIn(id, username)</text>
-                    <path d="M492.0 104.0 L637 126 L637 138 L637.0 138.0 " fill="none"></path>
-                    <path d="M632.2 132.0 L637.0 138.0 L641.8 132.0 L637.0 144.0 Z"></path>
-                    <path d="M637.0 216.0 L637 234 L637 246 L637.0 246.0 " fill="none"></path>
-                    <path d="M632.2 240.0 L637.0 246.0 L641.8 240.0 L637.0 252.0 Z"></path>
-                    <path d="M1036.5 36.0 L1036.5 54 L1036.5 66 L1036.5 66.0 " fill="none"></path>
-                    <path d="M1031.7 60.0 L1036.5 66.0 L1041.3 60.0 L1036.5 72.0 Z"></path>
-                    <text x="999.8" y="130.0" stroke="none">not logged in</text>
-                    <path d="M989.8 108.0 L943 126 L943 156 L943.0 156.0 " fill="none"></path>
-                    <path d="M938.2 150.0 L943.0 156.0 L947.8 150.0 L943.0 162.0 Z"></path>
-                    <text x="1000.3" y="130.0" stroke="none">logged in</text>
-                    <path d="M1083.3 108.0 L1130 126 L1130 156 L1130.0 156.0 " fill="none"></path>
-                    <path d="M1125.2 150.0 L1130.0 156.0 L1134.8 150.0 L1130.0 162.0 Z"></path>
+                    <text x="286.5" y="134.0" stroke="none">result</text>
+                    <path d="M340.5 144.0 L411.25 126 L411.25 114 L411.3 114.0 " fill="none"></path>
+                    <path d="M416.1 120.0 L411.3 114.0 L406.4 120.0 L411.3 108.0 Z"></path>
+                    <text x="344.3" y="125.3" stroke="none">RedirectWithAuth()</text>
+                    <path d="M503.3 103.3 L659.5 126 L659.5 138 L659.5 138.0 " fill="none"></path>
+                    <path d="M654.7 132.0 L659.5 138.0 L664.3 132.0 L659.5 144.0 Z"></path>
+                    <path d="M659.5 216.0 L659.5 234 L659.5 246 L659.5 246.0 " fill="none"></path>
+                    <path d="M654.7 240.0 L659.5 246.0 L664.3 240.0 L659.5 252.0 Z"></path>
+                    <path d="M1044.0 36.0 L1044 54 L1044 66 L1044.0 66.0 " fill="none"></path>
+                    <path d="M1039.2 60.0 L1044.0 66.0 L1048.8 60.0 L1044.0 72.0 Z"></path>
+                    <text x="1054.0" y="130.0" stroke="none">ParseAuthCookie()</text>
+                    <path d="M1044.0 108.0 L1044 126 L1044 156 L1044.0 156.0 " fill="none"></path>
+                    <path d="M1039.2 150.0 L1044.0 156.0 L1048.8 150.0 L1044.0 162.0 Z"></path>
+                    <text x="1016.7" y="220.0" stroke="none">no</text>
+                    <path d="M1006.7 198.0 L932 234 L932 246 L932.0 246.0 " fill="none"></path>
+                    <path d="M927.2 240.0 L932.0 246.0 L936.8 240.0 L932.0 252.0 Z"></path>
+                    <text x="1043.3" y="220.0" stroke="none">yes</text>
+                    <path d="M1081.3 198.0 L1156 234 L1156 246 L1156.0 246.0 " fill="none"></path>
+                    <path d="M1151.2 240.0 L1156.0 246.0 L1160.8 240.0 L1156.0 252.0 Z"></path>
                     <g data-name="POST /login or /signup">
                         <g fill="white" stroke="black" data-name="POST /login or /signup">
-                            <rect x="301.5" y="0.0" height="36.0" width="197.0" data-name="POST /login or /signup"></rect>
+                            <rect x="312.8" y="0.0" height="36.0" width="197.0" data-name="POST /login or /signup"></rect>
                         </g>
-                        <g transform="translate(301.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="POST /login or /signup" data-compartment="0">
+                        <g transform="translate(312.75, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="POST /login or /signup" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="POST /login or /signup" data-compartment="0">
                                 <text x="88.5" y="14.1" stroke="none" text-anchor="middle" data-name="POST /login or /signup" data-compartment="0">POST /login or /signup</text>
 
@@ -397,9 +420,9 @@
                     </g>
                     <g data-name="LoginVM / SignupVM">
                         <g fill="white" stroke="black" data-name="LoginVM / SignupVM">
-                            <rect x="308.0" y="72.0" height="36.0" width="184.0" data-name="LoginVM / SignupVM"></rect>
+                            <rect x="319.3" y="72.0" height="36.0" width="184.0" data-name="LoginVM / SignupVM"></rect>
                         </g>
-                        <g transform="translate(308, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LoginVM / SignupVM" data-compartment="0">
+                        <g transform="translate(319.25, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LoginVM / SignupVM" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="LoginVM / SignupVM" data-compartment="0">
                                 <text x="82.0" y="14.1" stroke="none" text-anchor="middle" data-name="LoginVM / SignupVM" data-compartment="0">LoginVM / SignupVM</text>
 
@@ -426,42 +449,41 @@
                             </g>
                         </g>
                     </g>
-                    <g data-name="Session">
-                        <g fill="white" stroke="black" data-name="Session">
-                            <rect x="434.0" y="144.0" height="72.0" width="406.0" data-name="Session"></rect>
-                            <path d="M434.0 180.0 L840.0 180.0" fill="none" data-name="Session"></path>
+                    <g data-name="Set-Cookie: mvvm_auth=...">
+                        <g fill="white" stroke="black" data-name="Set-Cookie: mvvm_auth=...">
+                            <rect x="434.0" y="144.0" height="72.0" width="451.0" data-name="Set-Cookie: mvvm_auth=..."></rect>
+                            <path d="M434.0 180.0 L885.0 180.0" fill="none" data-name="Set-Cookie: mvvm_auth=..."></path>
                         </g>
-                        <g transform="translate(434, 144)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Session" data-compartment="0">
-                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Session" data-compartment="0">
-                                <text x="193.0" y="14.1" stroke="none" text-anchor="middle" data-name="Session" data-compartment="0">Session</text>
+                        <g transform="translate(434, 144)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Set-Cookie: mvvm_auth=..." data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Set-Cookie: mvvm_auth=..." data-compartment="0">
+                                <text x="215.5" y="14.1" stroke="none" text-anchor="middle" data-name="Set-Cookie: mvvm_auth=..." data-compartment="0">Set-Cookie: mvvm_auth=...</text>
 
                             </g>
                         </g>
-                        <g transform="translate(434, 180)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Session" data-compartment="1">
-                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="Session" data-compartment="1">
-                                <text x="0.0" y="14.1" stroke="none" data-name="Session" data-compartment="1">CurrentUserID
-                                CurrentUsername
-                                IsLoggedIn()</text>
+                        <g transform="translate(434, 180)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Set-Cookie: mvvm_auth=..." data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="Set-Cookie: mvvm_auth=..." data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="Set-Cookie: mvvm_auth=..." data-compartment="1">JS intermediate page:
+                                localStorage + sessionStorage</text>
 
                             </g>
                         </g>
                     </g>
-                    <g data-name="Redirect to /">
-                        <g fill="white" stroke="black" data-name="Redirect to /">
-                            <rect x="579.0" y="252.0" height="36.0" width="116.0" data-name="Redirect to /"></rect>
+                    <g data-name="Redirect to /notes">
+                        <g fill="white" stroke="black" data-name="Redirect to /notes">
+                            <rect x="579.5" y="252.0" height="36.0" width="160.0" data-name="Redirect to /notes"></rect>
                         </g>
-                        <g transform="translate(579, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect to /" data-compartment="0">
-                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect to /" data-compartment="0">
-                                <text x="48.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect to /" data-compartment="0">Redirect to /</text>
+                        <g transform="translate(579.5, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect to /notes" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect to /notes" data-compartment="0">
+                                <text x="70.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect to /notes" data-compartment="0">Redirect to /notes</text>
 
                             </g>
                         </g>
                     </g>
                     <g data-name="GET any protected route">
                         <g fill="white" stroke="black" data-name="GET any protected route">
-                            <rect x="929.5" y="0.0" height="36.0" width="214.0" data-name="GET any protected route"></rect>
+                            <rect x="937.0" y="0.0" height="36.0" width="214.0" data-name="GET any protected route"></rect>
                         </g>
-                        <g transform="translate(929.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET any protected route" data-compartment="0">
+                        <g transform="translate(937, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET any protected route" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="GET any protected route" data-compartment="0">
                                 <text x="97.0" y="14.1" stroke="none" text-anchor="middle" data-name="GET any protected route" data-compartment="0">GET any protected route</text>
 
@@ -470,31 +492,42 @@
                     </g>
                     <g data-name="BaseViewModel.RequireLogin()">
                         <g fill="white" stroke="black" data-name="BaseViewModel.RequireLogin()">
-                            <rect x="902.5" y="72.0" height="36.0" width="268.0" data-name="BaseViewModel.RequireLogin()"></rect>
+                            <rect x="910.0" y="72.0" height="36.0" width="268.0" data-name="BaseViewModel.RequireLogin()"></rect>
                         </g>
-                        <g transform="translate(902.5, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
+                        <g transform="translate(910, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
                                 <text x="124.0" y="14.1" stroke="none" text-anchor="middle" data-name="BaseViewModel.RequireLogin()" data-compartment="0">BaseViewModel.RequireLogin()</text>
 
                             </g>
                         </g>
                     </g>
-                    <g data-name="Redirect /login">
-                        <g fill="white" stroke="black" data-name="Redirect /login">
-                            <rect x="876.0" y="162.0" height="36.0" width="134.0" data-name="Redirect /login"></rect>
+                    <g data-name="Cookie valid?">
+                        <g fill="white" stroke="black" data-name="Cookie valid?">
+                            <rect x="980.5" y="162.0" height="36.0" width="127.0" data-name="Cookie valid?"></rect>
                         </g>
-                        <g transform="translate(876, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect /login" data-compartment="0">
-                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect /login" data-compartment="0">
-                                <text x="57.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect /login" data-compartment="0">Redirect /login</text>
+                        <g transform="translate(980.5, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Cookie valid?" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Cookie valid?" data-compartment="0">
+                                <text x="53.5" y="14.1" stroke="none" text-anchor="middle" data-name="Cookie valid?" data-compartment="0">Cookie valid?</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Redirect /login?next=url">
+                        <g fill="white" stroke="black" data-name="Redirect /login?next=url">
+                            <rect x="828.0" y="252.0" height="36.0" width="208.0" data-name="Redirect /login?next=url"></rect>
+                        </g>
+                        <g transform="translate(828, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect /login?next=url" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect /login?next=url" data-compartment="0">
+                                <text x="94.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect /login?next=url" data-compartment="0">Redirect /login?next=url</text>
 
                             </g>
                         </g>
                     </g>
                     <g data-name="OnGet() / OnPost()">
                         <g fill="white" stroke="black" data-name="OnGet() / OnPost()">
-                            <rect x="1046.0" y="162.0" height="36.0" width="168.0" data-name="OnGet() / OnPost()"></rect>
+                            <rect x="1072.0" y="252.0" height="36.0" width="168.0" data-name="OnGet() / OnPost()"></rect>
                         </g>
-                        <g transform="translate(1046, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="OnGet() / OnPost()" data-compartment="0">
+                        <g transform="translate(1072, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="OnGet() / OnPost()" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="OnGet() / OnPost()" data-compartment="0">
                                 <text x="74.0" y="14.1" stroke="none" text-anchor="middle" data-name="OnGet() / OnPost()" data-compartment="0">OnGet() / OnPost()</text>
 
@@ -509,42 +542,69 @@
   </div>
   <div class="diagram-panel diagram-ascii" style="display:none">
     <pre class="ascii-diagram"><code>POST /login or /signup
-  └── LoginVM / SignupVM
-        ├── UserModel.VerifyPassword() or .Create()
-        └── Session.LogIn(id, username) → Redirect /
+  +-- LoginVM / SignupVM
+        +-- UserModel.VerifyPassword() or .Create()
+        +-- RedirectWithAuth()
+              +-- Set-Cookie: mvvm_auth=userID:username:HMAC
+              +-- JS intermediate page sets localStorage + sessionStorage
+              +-- Redirect to /notes
 
 GET protected route
-  └── BaseViewModel.RequireLogin()
-        ├── not logged in → Redirect /login
-        └── logged in → OnGet() / OnPost()</code></pre>
+  +-- BaseViewModel.RequireLogin()
+        +-- ParseAuthCookie() reads + verifies cookie
+              +-- invalid -> Redirect /login?next=url
+              +-- valid   -> OnGet() / OnPost()</code></pre>
   </div>
 </div>
 
 <hr />
 <h2 id="usermodel">UserModel<a class="headerlink" href="#usermodel" title="Permanent link">&para;</a></h2>
-<p><strong>File:</strong> <code>Models/UserModel.xojo_code</code></p>
-<p><code>UserModel</code>は<code>BaseModel</code>を継承します。そのテーブルは<code>users(id, username, password_hash, created_at)</code>です。<code>password_hash</code>列は<code>hash:salt</code>形式の単一文字列を格納します。</p>
-<h3 id="_3">パスワードハッシング<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>Xojoはその標準ライブラリにbcryptバインディングを持ちません。フレームワークは<strong>SHA-256とランダムソルト</strong>を使用します — ソルトが無作為で、ユーザーあたり格納されている場合、よく理解される安全な代替案。</p>
-<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">GenerateSalt</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
-<span class="w">  </span><span class="c1">// Time + random number — unique per call</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="n">Ticks</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">Rnd</span><span class="p">)</span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+<p><strong>ファイル:</strong> <code>Models/UserModel.xojo_code</code></p>
+<p><code>UserModel</code>は<code>BaseModel</code>を継承します。そのテーブルは<code>users(id, username, password_hash, created_at)</code>です。<code>password_hash</code>カラムは<code>hash:salt</code>形式の単一文字列を保存します。</p>
+<h3 id="sha-256">クライアント側のSHA-256ハッシング<a class="headerlink" href="#sha-256" title="Permanent link">&para;</a></h3>
+<p>ログインまたはサインアップフォームが送信される前に、ブラウザは<a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest">Web Crypto API</a>を使用してパスワードをハッシュするため、平文パスワードはネットワークを横切りません：</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">subtle</span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;SHA-256&#39;</span><span class="p">,</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TextEncoder</span><span class="p">().</span><span class="nx">encode</span><span class="p">(</span><span class="nx">str</span><span class="p">));</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nb">Array</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Uint8Array</span><span class="p">(</span><span class="nx">buf</span><span class="p">))</span>
+<span class="w">    </span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">b</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">b</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mf">16</span><span class="p">).</span><span class="nx">padStart</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="p">)).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</code></pre></div>
 
-<span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">HashPassword</span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">salt</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<p>Alpine.jsはフォーム送信をインターセプトし、パスワードをハッシュしてから送信します：</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/login&quot;</span>
+      <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
+<span class="s">        hashed: false,</span>
+<span class="s">        async handleSubmit(e) {</span>
+<span class="s">          if (this.hashed) return;</span>
+<span class="s">          const pwEl = document.getElementById(&#39;password&#39;);</span>
+<span class="s">          pwEl.value = await sha256hex(pwEl.value);</span>
+<span class="s">          this.hashed = true;</span>
+<span class="s">          e.target.submit();</span>
+<span class="s">        }</span>
+<span class="s">      }&quot;</span>
+      <span class="err">@</span><span class="na">submit</span><span class="err">.</span><span class="na">prevent</span><span class="o">=</span><span class="s">&quot;handleSubmit($event)&quot;</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<p><code>hashed</code>フラグは、<code>e.target.submit()</code>が何らかの理由でイベントを再度発火する場合の再処理を防止します。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>crypto.subtle</code>はすべてのモダンブラウザで利用可能で、ライブラリは不要です。セキュアなコンテキスト（HTTPSまたはlocalhost）でのみ利用可能です。</p>
+</div>
+<h3 id="_3">サーバー側のパスワード保存<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>サーバーはクライアント側のSHA-256ハッシュ（<code>SHA256(plaintext)</code>）をパスワードフィールドとして受け取ります。その後、ランダムなユーザーごとのソルトで2番目のハッシュを適用してから保存します：</p>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">HashPassword</span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">salt</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="c1">// password is already SHA256(plaintext) from the browser</span>
 <span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">salt</span><span class="p">))</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ハッシュとソルトは<code>:</code>セパレータで1つの列に結合されます：</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">stored</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">salt</span><span class="w">  </span><span class="c1">// e.g. &quot;a3f9...b2:e7c1...44&quot;</span>
-</code></pre></div>
-
-<p>これはスキーマをシンプルに保ちます — 別の<code>salt</code>列はありません — そして<code>VerifyPassword</code>を自己完結させます。</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>SHA-256 + ユーザーごとのランダムソルトを使用することは、ほとんどの内部またはリスクの低いアプリケーションに適切です。高セキュリティまたは公開向けアプリの場合、プラットフォームで利用可能な場合はbcryptまたはArgon2バインディングを使用する必要があります。</p>
+<p>保存値：<code>SHA256(SHA256(plaintext) + salt) : salt</code></p>
+<p>このダブルハッシュモデルは、攻撃者がサーバーソースを持っていても、データベースがユーザーの元のパスワードを見ないことを意味します。<code>EncodeHex(Crypto.SHA256(...))</code>は64文字の16進数文字列を返します — <code>.Hex</code>プロパティを持つ文字列ではありません。<code>EncodeHex()</code>グローバル関数が必要です。</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>SHA-256 +ユーザーごとのランダムソルトの使用はほとんどの内部またはローリスクアプリケーションに対して十分です。高セキュリティまたはパブリックフェーシングアプリケーションの場合、プラットフォームで利用可能であればbcryptまたはArgon2バインディングを使用する必要があります。</p>
 </div>
 <h3 id="_4">ユーザーの作成<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
@@ -563,8 +623,8 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>成功時に新しい<code>id</code>を返すか、ユーザー名が既に取られている場合は<code>0</code>を返します。一意性チェックはデータベース<code>UNIQUE</code>制約のみに依存するのではなく、アプリケーションレイヤー（<code>FindByUsername</code>）で実行されます — これはデータベース例外をキャッチすることなく、クリーンな信号（<code>0</code>戻り値）を与えます。</p>
-<h3 id="_5">パスワード検証<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<p>成功時に新しい<code>id</code>を返すか、ユーザー名がすでに取得されている場合は<code>0</code>を返します。</p>
+<h3 id="_5">パスワードの検証<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">VerifyPassword</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FindByUsername</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
@@ -581,117 +641,284 @@ GET protected route
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>stored.Middle(colonPos + 1)</code>は0ベースです（<code>String.Middle</code>は<code>IndexOf</code>と同じです）。ここで<code>Mid()</code>を使用しないでください — 1ベースのレガシー関数はオフバイワンを生成し、ソルト抽出を破損させます。</p>
+<p><code>stored.Middle(colonPos + 1)</code>は0ベース（<code>String.Middle</code>は<code>IndexOf</code>と連携）です。ここで<code>Mid()</code>を決して使用しないでください — 1ベースのレガシー関数は1つオフになり、ソルト抽出を破損します。</p>
 </div>
 <hr />
-<h2 id="session">Session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h2>
-<p><strong>File:</strong> <code>Session.xojo_code</code> （extends <code>WebSession</code>）</p>
-<p><code>Session</code>は認証されたユーザーのIDを<strong>セッションプロパティ</strong>として格納します — 一時変数ではなく。WebSessionプロパティは自動的にユーザーごとにスコープされ、WebSocket接続のライフタイム全体にわたって永続化されます。</p>
-<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">Session</span>
-<span class="k">Inherits</span><span class="w"> </span><span class="n">WebSession</span>
-
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">LogIn</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
-<span class="w">    </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userID</span>
-<span class="w">    </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
-
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">LogOut</span><span class="p">()</span>
-<span class="w">    </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
-<span class="w">    </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
-
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">IsLoggedIn</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
-
-<span class="w">  </span><span class="c1">// ...flash message methods unchanged from v0.2.0...</span>
-
-<span class="w">  </span><span class="n">CurrentUserID</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w">   </span><span class="c1">// 0 = not logged in</span>
-<span class="w">  </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
+<h2 id="_6">クッキーベース認証<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>SSRモードでは<code>Self.Session</code>は常にNilであるため、XjMVVMはHMAC署名付きHTTPクッキーを認証に使用します。クッキーは<code>Set-Cookie</code> HTTPヘッダーを介して設定され、すべてのリクエストで検証されます。</p>
+<h3 id="_7">クッキー形式<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>mvvm_auth=&lt;userID&gt;:&lt;username&gt;:&lt;HMAC&gt;
 </code></pre></div>
 
-<p><code>CurrentUserID = 0</code>は「ログインしていない」のセンチネルです — ゼロはSQLite <code>AUTOINCREMENT</code>主キー値では有効ではありません。</p>
-<hr />
-<h2 id="baseviewmodel">BaseViewModel認証ヘルパー<a class="headerlink" href="#baseviewmodel" title="Permanent link">&para;</a></h2>
-<p>3つのメソッドが<code>BaseViewModel</code>に追加され、任意のViewModelから直接<code>Session</code>をキャストすることなく認証にアクセスできます：</p>
-<h3 id="requirelogin-as-boolean"><code>RequireLogin() As Boolean</code><a class="headerlink" href="#requirelogin-as-boolean" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">sess</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">sess</span><span class="p">.</span><span class="n">IsLoggedIn</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">      </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Please log in to continue&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;info&quot;</span><span class="p">)</span>
-<span class="w">      </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">)</span>
-<span class="w">      </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span><span class="w">  </span><span class="c1">// ← caller must check this and return</span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+<p>HMACは次のように計算されます：</p>
+<div class="highlight"><pre><span></span><code>SHA256(userID + &quot;:&quot; + username + &quot;:&quot; + App.mAuthSecret)
+</code></pre></div>
+
+<p><code>App.mAuthSecret</code>は起動時に<code>Crypto.GenerateRandomBytes(32)</code>を介して1回生成されたランダムな32バイトの16進数文字列です。再起動のたびに変わり、既存のすべての認証クッキーを実質的に無効にします。</p>
+<h3 id="authcookievalue">AuthCookieValue — クッキーの生成<a class="headerlink" href="#authcookievalue" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">userID</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">hmac</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">mAuthSecret</span><span class="p">))</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">hmac</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>保護されたViewModelでの使用パターン：</p>
+<h3 id="parseauthcookie">ParseAuthCookie — クッキーの検証<a class="headerlink" href="#parseauthcookie" title="Permanent link">&para;</a></h3>
+<p>すべてのリクエストで呼び出されて認証されたユーザーを抽出・検証します。結果は<code>mAuthParsed</code> / <code>mAuthCache</code>プロパティ経由でリクエスト単位でキャッシュされるため、複数の呼び出し（<code>RequireLogin</code>、<code>CurrentUserID</code>、<code>Render</code>から）は再解析されません。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">mAuthParsed</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">mAuthCache</span>
+
+<span class="w">  </span><span class="n">mAuthParsed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span>
+<span class="w">  </span><span class="n">mAuthCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="c1">// Read the Cookie header</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">cookieHeader</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cookie&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">cookieHeader</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="c1">// Find mvvm_auth=... value</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w">  </span><span class="c1">// ... extract from cookie header ...</span>
+
+<span class="w">  </span><span class="c1">// Parse userID:username:hmac</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">firstColon</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">lastColon</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">65</span><span class="w">  </span><span class="c1">// HMAC is always 64 hex chars</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">firstColon</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">lastColon</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">firstColon</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">firstColon</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">lastColon</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">firstColon</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">receivedHMAC</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">lastColon</span><span class="p">)</span>
+
+<span class="w">  </span><span class="c1">// Verify HMAC</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">expectedHMAC</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">mAuthSecret</span><span class="p">))</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">receivedHMAC</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">expectedHMAC</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="c1">// Valid — cache and return</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">  </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userID</span>
+<span class="w">  </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span>
+<span class="w">  </span><span class="n">mAuthCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>HMAC検証により、クッキーは偽造されません。攻撃者は任意のユーザーの有効なクッキーを生成するために<code>App.mAuthSecret</code>が必要です。</p>
+</div>
+<h3 id="redirectwithauth">RedirectWithAuth — ログイン/サインアップ時のクッキー設定<a class="headerlink" href="#redirectwithauth" title="Permanent link">&para;</a></h3>
+<p>認証に成功した後、<code>RedirectWithAuth</code>は1つのレスポンスで3つのことを行います：</p>
+<ol>
+<li>HTTP<code>Set-Cookie</code>ヘッダー経由で<code>mvvm_auth</code>クッキーを設定</li>
+<li>ユーザー名を<code>localStorage</code>に、フラッシュメッセージを<code>sessionStorage</code>に保存するJSの中間ページを送信</li>
+<li>ブラウザをターゲットURLにリダイレクト</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithAuth</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">cookieVal</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Set-Cookie&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mvvm_auth=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cookieVal</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;; Path=/; SameSite=Lax&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;&lt;html&gt;&lt;body&gt;&lt;script&gt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;localStorage.setItem(&#39;_auth_user&#39;,&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;sessionStorage.setItem(&#39;_flash_msg&#39;,&#39;Welcome, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;!&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;sessionStorage.setItem(&#39;_flash_type&#39;,&#39;success&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;window.location.href=&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">targetURL</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p>JSの中間ページが必要なのは以下の理由です：</p>
+<ul>
+<li><code>Set-Cookie</code>はHTTPクッキーを設定します（その後のリクエストでサーバー側認証用）</li>
+<li><code>localStorage</code>はユーザー名を保存します（Alpine.js経由でクライアント側nav状態表示用）</li>
+<li><code>sessionStorage</code>はフラッシュメッセージを保存します（リダイレクト後のワンタイム表示用）</li>
+</ul>
+<p>これら3つのストレージメカニズムは異なる目的を果たし、互いに置き換えることはできません。</p>
+<h3 id="redirectwithlogout">RedirectWithLogout — クッキーのクリア<a class="headerlink" href="#redirectwithlogout" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithLogout</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Set-Cookie&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mvvm_auth=; Path=/; Max-Age=0; SameSite=Lax&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;&lt;html&gt;&lt;body&gt;&lt;script&gt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;localStorage.removeItem(&#39;_auth_user&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;window.location.href=&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">targetURL</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p><code>Max-Age=0</code>はブラウザにクッキーをすぐに削除するよう指示します。</p>
+<hr />
+<h2 id="baseviewmodel">BaseViewModel認証ヘルパー<a class="headerlink" href="#baseviewmodel" title="Permanent link">&para;</a></h2>
+<p><code>BaseViewModel</code>の4つのメソッドは、クッキーを直接処理することなく、任意のViewModelから認証にアクセスできます：</p>
+<h3 id="currentuserid-as-integer"><code>CurrentUserID() As Integer</code><a class="headerlink" href="#currentuserid-as-integer" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Val</span><span class="p">(</span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="m">0</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>認証されていないときは<code>0</code>を返します — ゼロはSQLite<code>AUTOINCREMENT</code>主キーで有効なIDではありません。</p>
+<h3 id="currentusername-as-string"><code>CurrentUsername() As String</code><a class="headerlink" href="#currentusername-as-string" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<h3 id="requirelogin-as-boolean"><code>RequireLogin() As Boolean</code><a class="headerlink" href="#requirelogin-as-boolean" title="Permanent link">&para;</a></h3>
+<p>HTMLルートを保護します。認証されていないユーザーをログインページにリダイレクトし、<code>next</code>パラメーターを使用して、ログイン後に元のURLに戻すことができます。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login?next=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EncodeURLComponent</span><span class="p">(</span><span class="n">Request</span><span class="p">.</span><span class="n">Path</span><span class="p">))</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>保護されたViewModelの使用パターン：</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// guard — stops execution if redirect issued</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// guard -- stops execution if redirect issued</span>
 <span class="w">  </span><span class="c1">// ... rest of handler</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>RequireLogin()</code>はリダイレクトを発行しますが、<strong>実行を停止することはできません</strong> — これは呼び出し側に信号を返すため<code>True</code>を返します。常に<code>If RequireLogin() Then Return</code>と対にしてください。<code>Return</code>を忘れると、ハンドラーはリダイレクトが既に送信された後に実行を続け、おそらくダブルライトエラーが発生します。</p>
+<p><code>RequireLogin()</code>はリダイレクトを発行しますが、<strong>実行を停止することはできません</strong> — リダイレクトが発行されたことを示すために<code>True</code>を返します。常に<code>If RequireLogin() Then Return</code>とペアにしてください。<code>Return</code>を忘れると、ハンドラーはリダイレクトが既に送信された後に実行を続けます。</p>
 </div>
-<h3 id="currentuseridcurrentusername"><code>CurrentUserID()</code>と<code>CurrentUsername()</code><a class="headerlink" href="#currentuseridcurrentusername" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">).</span><span class="n">CurrentUserID</span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="m">0</span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
-
-<span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">).</span><span class="n">CurrentUsername</span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<h3 id="requireloginjson-as-boolean"><code>RequireLoginJSON() As Boolean</code><a class="headerlink" href="#requireloginjson-as-boolean" title="Permanent link">&para;</a></h3>
+<p>APIルートを保護します。HTMLリダイレクトの代わりに401 JSONエラーを返します（APIクライアントはHTMLリダイレクトに従うことができません）。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">401</span>
+<span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="s2">&quot;{&quot;&quot;error&quot;&quot;:&quot;&quot;Authentication required&quot;&quot;}&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>これらは呼び出し側が手動で<code>WebSession</code>を<code>Session</code>にキャストする必要なく、セッション状態への安全なアクセスを提供します。</p>
-<h3 id="current_user">自動注入<code>current_user</code>コンテキスト<a class="headerlink" href="#current_user" title="Permanent link">&para;</a></h3>
-<p><code>BaseViewModel.Render()</code>はすべてのテンプレートコンテキストに<code>current_user</code>ディクショナリを自動的に注入します：</p>
+<p>使用法：</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
+<span class="w">  </span><span class="c1">// ... rest of API handler</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<h3 id="current_user">自動注入コンテキスト — <code>current_user</code><a class="headerlink" href="#current_user" title="Permanent link">&para;</a></h3>
+<p><code>BaseViewModel.Render()</code>は常にすべてのテンプレートコンテキストに<code>current_user</code> dictionaryを注入し、安全なデフォルト値を使用するため、テンプレートは<code>UndefinedVariableException</code>をスローしません：</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">userCtx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
-<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">sess</span><span class="p">.</span><span class="n">CurrentUserID</span><span class="p">)</span>
-<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">sess</span><span class="p">.</span><span class="n">CurrentUsername</span>
-<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;logged_in&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">If</span><span class="p">(</span><span class="n">sess</span><span class="p">.</span><span class="n">IsLoggedIn</span><span class="p">(),</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
-<span class="n">context</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;current_user&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userCtx</span>
-</code></pre></div>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0&quot;</span>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;logged_in&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0&quot;</span>
 
-<p>したがって、すべてのテンプレートは、ViewModelが明示的にそれを渡すことなく、ログイン状態を分岐させることができます：</p>
-<div class="highlight"><pre><span></span><code>{% if current_user.logged_in == &quot;1&quot; %}
-  <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>{{ current_user.username }}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
-  <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/logout&quot;</span><span class="p">&gt;</span>
-    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Log out<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-  <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
-{% else %}
-  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/login&quot;</span><span class="p">&gt;</span>Log in<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-{% endif %}
+<span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
+<span class="k">If</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;logged_in&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="n">context</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;current_user&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userCtx</span>
 </code></pre></div>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>logged_in</code>は文字列<code>"1"</code>または<code>"0"</code>です — ブール値ではなく — なぜなら、JinjaXテンプレート内の<code>Dictionary</code>値はすべて文字列だからです。<code>== True</code>ではなく<code>== "1"</code>と比較してください。</p>
+<p><code>logged_in</code>は文字列<code>"1"</code>または<code>"0"</code> — ブール値ではありません — JinjaXテンプレートの<code>Dictionary</code>値はすべて文字列だからです。<code>== True</code>ではなく<code>== "1"</code>で比較してください。</p>
 </div>
+<hr />
+<h2 id="ssr">SSRセッション制限とクライアント側の回避方法<a class="headerlink" href="#ssr" title="Permanent link">&para;</a></h2>
+<p>Xojo Web 2では、<code>WebSession</code>状態は永続的なWebSocket接続に結びついています。純粋なSSRモード（<code>HandleURL</code>が常に<code>True</code>を返し、WebSocketが確立されない）では、各HTTPリクエストにセッションがありません。これは以下を意味します：</p>
+<ul>
+<li><code>POST</code>中に保存されたフラッシュメッセージは、リダイレクト<code>GET</code>が到着するまでに<strong>失われます</strong>。</li>
+<li>ログインしたユーザー名はセッション状態から<strong>テンプレートレンダラーに利用できません</strong>。</li>
+<li><strong><code>SetFlash()</code>と<code>Session.LogIn()</code>はサイレントに何もしません</strong> — Nilセッションに書き込みます。</li>
+</ul>
+<p>XjMVVMはこれらの制限を3つのメカニズムで回避します：</p>
+<table>
+<thead>
+<tr>
+<th>メカニズム</th>
+<th>ストレージ</th>
+<th>目的</th>
+<th>生涯</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mvvm_auth</code> cookie</td>
+<td>HTTPクッキー</td>
+<td>サーバー側認証</td>
+<td>ブラウザがクリアするか<code>Max-Age=0</code>まで</td>
+</tr>
+<tr>
+<td><code>localStorage._auth_user</code></td>
+<td>ブラウザlocalStorage</td>
+<td>クライアント側nav表示</td>
+<td>タブ/再起動を超えて永続的</td>
+</tr>
+<tr>
+<td><code>sessionStorage._flash_msg</code></td>
+<td>ブラウザsessionStorage</td>
+<td>ワンショットフラッシュメッセージ</td>
+<td>現在のタブのみ、リダイレクトを超えて</td>
+</tr>
+</tbody>
+</table>
+<h3 id="sessionstorage">フラッシュメッセージ — <code>sessionStorage</code><a class="headerlink" href="#sessionstorage" title="Permanent link">&para;</a></h3>
+<p>（<code>RedirectWithAuth</code>によって送信される）JSの中間ページは成功メッセージを<code>sessionStorage</code>に書き込みます。Alpine.jsはそれを次のページ読み込みで読み取って表示します：</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
+<span class="s">  msg: &#39;&#39;,</span>
+<span class="s">  type: &#39;success&#39;,</span>
+<span class="s">  init() {</span>
+<span class="s">    var m = sessionStorage.getItem(&#39;_flash_msg&#39;);</span>
+<span class="s">    var t = sessionStorage.getItem(&#39;_flash_type&#39;) || &#39;success&#39;;</span>
+<span class="s">    sessionStorage.removeItem(&#39;_flash_msg&#39;);</span>
+<span class="s">    sessionStorage.removeItem(&#39;_flash_type&#39;);</span>
+<span class="s">    if (m &amp;&amp; !document.querySelector(&#39;.flash&#39;)) { this.msg = m; this.type = t; }</span>
+<span class="s">  }</span>
+<span class="s">}&quot;</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">:class</span><span class="o">=</span><span class="s">&quot;&#39;flash flash-&#39; + type&quot;</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<h3 id="_8">インラインエラー表示<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
+<p>ログインとサインアップエラーはフラッシュメッセージを使用できません（リダイレクトはそれらを失うでしょう）。代わりに、ViewModelは<code>error_message</code>テンプレート変数でフォームを再レンダリングします：</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In LoginVM.OnPost() — on failed login:</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;error_message&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Invalid username or password.&quot;</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;next_url&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nextURL</span>
+<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;auth/login.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
+</code></pre></div>
+
+<p>テンプレートはそれをインラインで表示します：</p>
+<div class="highlight"><pre><span></span><code>{% if error_message %}
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flash flash-error&quot;</span><span class="p">&gt;</span>{{ error_message }}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+{% endif %}
+</code></pre></div>
+
+<h3 id="nav-localstorage">nav認証状態 — <code>localStorage</code><a class="headerlink" href="#nav-localstorage" title="Permanent link">&para;</a></h3>
+<p>Alpine.jsは<code>localStorage._auth_user</code>を読んで正しいnav状態を表示します：</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{ user: localStorage.getItem(&#39;_auth_user&#39;) }&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;!user&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/login&quot;</span><span class="p">&gt;</span>Log In<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/signup&quot;</span><span class="p">&gt;</span>Sign Up<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;user&quot;</span> <span class="na">x-cloak</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;user&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/logout&quot;</span>
+          <span class="err">@</span><span class="na">submit</span><span class="o">=</span><span class="s">&quot;localStorage.removeItem(&#39;_auth_user&#39;)&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Log Out<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+</code></pre></div>
+
 <hr />
 <h2 id="viewmodel">認証ViewModel<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
 <h3 id="loginvm">LoginVM<a class="headerlink" href="#loginvm" title="Permanent link">&para;</a></h3>
-<p><code>GET /login</code> — ログインフォームをレンダリングします。既にログインしている場合は、<code>/</code>にリダイレクトします。</p>
-<p><code>POST /login</code> — ユーザー名+パスワードが空でないことを検証し、<code>UserModel.VerifyPassword()</code>を呼び出します。成功時に、<code>Session.LogIn()</code>を呼び出し、フラッシュメッセージと共にホームにリダイレクトします。失敗時に、エラーフラッシュで<code>/login</code>に戻ります。</p>
+<p><code>GET /login</code> — ログインフォームを<code>error_message = ""</code>でレンダリングし、ログイン後のリダイレクト用に<code>next</code>クエリパラメーターを読み取ります。</p>
+<p><code>POST /login</code> — ユーザー名 +パスワードが空でないことを検証し、<code>UserModel.VerifyPassword()</code>を呼び出します。成功時に<code>RedirectWithAuth(nextURL, userID, username)</code>を呼び出します。失敗時にインラインエラーメッセージでログインフォームを再レンダリングします（フラッシュではなく — <code>SetFlash</code>はSSRで壊れています）。</p>
 <h3 id="signupvm">SignupVM<a class="headerlink" href="#signupvm" title="Permanent link">&para;</a></h3>
-<p><code>GET /signup</code> — サインアップフォームをレンダリングします。既にログインしている場合は、<code>/</code>にリダイレクトします。</p>
-<p><code>POST /signup</code> — 検証：ユーザー名が必須、3文字以上。パスワード6文字以上。パスワードが一致します。<code>UserModel.Create()</code>を呼び出します。<code>0</code>を返す場合（ユーザー名が取られている）、エラーと共に戻ります。成功時に、すぐに<code>Session.LogIn()</code>を呼び出し、ユーザーはアカウント作成直後にサインインします。</p>
+<p><code>GET /signup</code> — <code>error_message = ""</code>でサインアップフォームをレンダリングします。</p>
+<p><code>POST /signup</code> — 検証：ユーザー名が必須（3文字以上）、パスワード（6文字以上）、パスワードが一致。<code>UserModel.Create()</code>を呼び出します。<code>0</code>を返す場合（ユーザー名は取得済み）、エラーで再レンダリングします。成功時に<code>RedirectWithAuth("/notes", newID, username)</code>を呼び出します。</p>
 <h3 id="logoutvm">LogoutVM<a class="headerlink" href="#logoutvm" title="Permanent link">&para;</a></h3>
-<p><code>POST /logout</code>のみ — GETはサポートされません。<code>Session.LogOut()</code>を呼び出し、ホームにリダイレクトします。ログアウトにPOSTを使用することは、プリフェッチまたはリンクプリロードを通じた偶発的なログアウトを防ぎます。</p>
+<p><code>POST /logout</code>のみ — GETはサポートされていません。<code>RedirectWithLogout("/login")</code>を呼び出します。ログアウトにPOSTを使用することで、プリフェッチまたはリンクプリロード経由の誤ったログアウトを防止します。</p>
 <hr />
-<h2 id="_6">認証ルート<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_9">認証ルート<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w">   </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLoginVM</span><span class="p">)</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w">  </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLoginVM</span><span class="p">)</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/logout&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLogoutVM</span><span class="p">)</span>
@@ -699,10 +926,10 @@ GET protected route
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateSignupVM</span><span class="p">)</span>
 </code></pre></div>
 
-<p>ログインとサインアップの両方にとって<code>GET</code>と<code>POST</code>は同じViewModelファクトリーを共有します — ViewModelそのものが<code>Request.Method</code>に基づいて<code>OnGet()</code>または<code>OnPost()</code>にディスパッチします。</p>
+<p>ログインとサインアップの両方の<code>GET</code>と<code>POST</code>は同じViewModelファクトリーを共有します — ViewModelそのものは<code>Request.Method</code>に基づいて<code>OnGet()</code>または<code>OnPost()</code>にディスパッチします。</p>
 <hr />
-<h2 id="_7">スキーマ<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<p><code>users</code>テーブルは<code>DBAdapter.InitDB()</code>に作成されます：</p>
+<h2 id="_10">スキーマ<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
+<p><code>users</code>テーブルは<code>DBAdapter.InitDB()</code>で作成されます：</p>
 <div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS users (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;id            INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;username      TEXT NOT NULL UNIQUE, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
@@ -710,7 +937,7 @@ GET protected route
 <span class="w">  </span><span class="s2">&quot;created_at    TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><code>username</code>の<code>UNIQUE</code>制約はデータベースレベルのセーフティネットです。<code>UserModel.Create()</code>のアプリケーションレベルチェックは、ViewModelsが「ユーザー名は既に取られています」フラッシュを表示するために使用するクリーンな信号（<code>0</code>戻り値）を提供します。</p>
+<p><code>username</code>の<code>UNIQUE</code>制約はデータベースレベルのセーフティネットです。<code>UserModel.Create()</code>のアプリケーションレベルチェックは、ViewModelsがエラーメッセージを表示するために使用するより明確なシグナル（<code>0</code>リターン）を提供します。</p>
 
         <!-- Prev / Next navigation -->
         
@@ -752,7 +979,11 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#パスワードハッシング">パスワードハッシング</a>
+            <a class="toc-link" href="#クライアント側のsha-256ハッシング">クライアント側のSHA-256ハッシング</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#サーバー側のパスワード保存">サーバー側のパスワード保存</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -760,11 +991,31 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#パスワード検証">パスワード検証</a>
+            <a class="toc-link" href="#パスワードの検証">パスワードの検証</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#session">Session</a>
+            <a class="toc-link" href="#クッキーベース認証">クッキーベース認証</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#クッキー形式">クッキー形式</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#authcookievalue-クッキーの生成">AuthCookieValue — クッキーの生成</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#parseauthcookie-クッキーの検証">ParseAuthCookie — クッキーの検証</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#redirectwithauth-ログインサインアップ時のクッキー設定">RedirectWithAuth — ログイン/サインアップ時のクッキー設定</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#redirectwithlogout-クッキーのクリア">RedirectWithLogout — クッキーのクリア</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -772,15 +1023,39 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#currentuserid-as-integer">`CurrentUserID() As Integer`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#currentusername-as-string">`CurrentUsername() As String`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
             <a class="toc-link" href="#requirelogin-as-boolean">`RequireLogin() As Boolean`</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#currentuseridとcurrentusername">`CurrentUserID()`と`CurrentUsername()`</a>
+            <a class="toc-link" href="#requireloginjson-as-boolean">`RequireLoginJSON() As Boolean`</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#自動注入current_userコンテキスト">自動注入`current_user`コンテキスト</a>
+            <a class="toc-link" href="#自動注入コンテキスト-current_user">自動注入コンテキスト — `current_user`</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ssrセッション制限とクライアント側の回避方法">SSRセッション制限とクライアント側の回避方法</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#フラッシュメッセージ-sessionstorage">フラッシュメッセージ — `sessionStorage`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#インラインエラー表示">インラインエラー表示</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#nav認証状態-localstorage">nav認証状態 — `localStorage`</a>
           </li>
           
           <li class="toc-item toc-level-2">

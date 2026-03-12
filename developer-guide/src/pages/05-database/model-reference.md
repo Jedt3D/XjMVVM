@@ -278,7 +278,7 @@ Maps the current RowSet row to a `Dictionary` using the column names from `Colum
 
 **File:** `Models/NoteModel.xojo_code`
 
-The concrete resource model. Only ~20 lines because `BaseModel` handles everything generic.
+The concrete resource model. All methods require a `userID` parameter to scope notes per user — each user can only see and modify their own notes.
 
 ```xojo
 Protected Class NoteModel
@@ -289,57 +289,93 @@ Inherits BaseModel
   End Function
 
   Protected Function Columns() As String
-    Return "id, title, body, created_at, updated_at"
+    Return "id, title, body, created_at, updated_at, user_id"
   End Function
 
-  // Delegation — zero boilerplate
-  Function GetAll() As Variant()
-    Return FindAll("updated_at DESC")
-  End Function
-
-  Function GetByID(id As Integer) As Dictionary
-    Return FindByID(id)
-  End Function
-
-  Sub Delete(id As Integer)
-    DeleteByID(id)
-  End Sub
-
-  // Escape hatch — SQLite expressions required for timestamps
-  Function Create(title As String, body As String) As Integer
+  // All methods require userID for per-user scoping
+  Function GetAll(userID As Integer) As Variant()
+    Var results() As Variant
     Var db As SQLiteDatabase = OpenDB()
-    db.ExecuteSQL("INSERT INTO notes (title, body) VALUES (?, ?)", title, body)
+    Var rs As RowSet = db.SelectSQL( _
+      "SELECT " + Columns() + " FROM notes WHERE user_id = ? ORDER BY updated_at DESC", userID)
+    While Not rs.AfterLastRow
+      results.Add(RowToDict(rs))
+      rs.MoveToNextRow()
+    Wend
+    rs.Close()
+    db.Close()
+    Return results
+  End Function
+
+  Function GetByID(id As Integer, userID As Integer) As Dictionary
+    Var db As SQLiteDatabase = OpenDB()
+    Var rs As RowSet = db.SelectSQL( _
+      "SELECT " + Columns() + " FROM notes WHERE id = ? AND user_id = ?", id, userID)
+    If rs.AfterLastRow Then
+      rs.Close()
+      db.Close()
+      Return Nil
+    End If
+    Var row As Dictionary = RowToDict(rs)
+    rs.Close()
+    db.Close()
+    Return row
+  End Function
+
+  Function Create(title As String, body As String, userID As Integer) As Integer
+    Var db As SQLiteDatabase = OpenDB()
+    db.ExecuteSQL("INSERT INTO notes (title, body, user_id) VALUES (?, ?, ?)", title, body, userID)
     Var newID As Integer = db.LastRowID
     db.Close()
     Return newID
   End Function
 
-  Sub Update(id As Integer, title As String, body As String)
+  Sub Update(id As Integer, title As String, body As String, userID As Integer)
     Var db As SQLiteDatabase = OpenDB()
     db.ExecuteSQL( _
-      "UPDATE notes SET title = ?, body = ?, updated_at = datetime('now') WHERE id = ?", _
-      title, body, id)
+      "UPDATE notes SET title = ?, body = ?, updated_at = datetime('now') " + _
+      "WHERE id = ? AND user_id = ?", title, body, id, userID)
     db.Close()
   End Sub
+
+  Sub Delete(id As Integer, userID As Integer)
+    Var db As SQLiteDatabase = OpenDB()
+    db.ExecuteSQL("DELETE FROM notes WHERE id = ? AND user_id = ?", id, userID)
+    db.Close()
+  End Sub
+
+  Function CountForUser(userID As Integer) As Integer
+    Var db As SQLiteDatabase = OpenDB()
+    Var rs As RowSet = db.SelectSQL( _
+      "SELECT COUNT(*) AS cnt FROM notes WHERE user_id = ?", userID)
+    Var count As Integer = rs.Column("cnt").IntegerValue
+    rs.Close()
+    db.Close()
+    Return count
+  End Function
 
 End Class
 ```
 
 `Create` and `Update` use the escape hatch because `datetime('now')` is a SQLite-evaluated expression — binding the string `"datetime('now')"` as a `?` parameter would store the literal text, not a timestamp.
 
+Every query includes `WHERE user_id = ?` to enforce ownership at the SQL level. See [Protected Routes & User Scoping](../protected-routes/index.html) for the full pattern.
+
 ---
 
 ## CRUD Task Mapping
 
+All Notes routes require authentication. Every model call includes `userID` to scope data per user.
+
 | User action | HTTP | ViewModel | Model call | SQL |
 |-------------|------|-----------|------------|-----|
-| View list | `GET /notes` | `NotesListVM` | `NoteModel.GetAll()` | `SELECT … ORDER BY updated_at DESC` |
-| View one | `GET /notes/:id` | `NotesDetailVM` | `NoteModel.GetByID(id)` | `SELECT … WHERE id = ?` |
+| View list | `GET /notes` | `NotesListVM` | `NoteModel.GetAll(userID)` | `SELECT … WHERE user_id = ? ORDER BY updated_at DESC` |
+| View one | `GET /notes/:id` | `NotesDetailVM` | `NoteModel.GetByID(id, userID)` | `SELECT … WHERE id = ? AND user_id = ?` |
 | New form | `GET /notes/new` | `NotesNewVM` | — | — |
-| Create | `POST /notes` | `NotesCreateVM` | `NoteModel.Create(title, body)` | `INSERT INTO notes (title, body) VALUES (?, ?)` |
-| Edit form | `GET /notes/:id/edit` | `NotesEditVM` | `NoteModel.GetByID(id)` | `SELECT … WHERE id = ?` |
-| Update | `POST /notes/:id` | `NotesUpdateVM` | `NoteModel.Update(id, title, body)` | `UPDATE notes SET … WHERE id = ?` |
-| Delete | `POST /notes/:id/delete` | `NotesDeleteVM` | `NoteModel.Delete(id)` | `DELETE FROM notes WHERE id = ?` |
+| Create | `POST /notes` | `NotesCreateVM` | `NoteModel.Create(title, body, userID)` | `INSERT INTO notes (title, body, user_id) VALUES (?, ?, ?)` |
+| Edit form | `GET /notes/:id/edit` | `NotesEditVM` | `NoteModel.GetByID(id, userID)` | `SELECT … WHERE id = ? AND user_id = ?` |
+| Update | `POST /notes/:id` | `NotesUpdateVM` | `NoteModel.Update(id, title, body, userID)` | `UPDATE notes SET … WHERE id = ? AND user_id = ?` |
+| Delete | `POST /notes/:id/delete` | `NotesDeleteVM` | `NoteModel.Delete(id, userID)` | `DELETE FROM notes WHERE id = ? AND user_id = ?` |
 
 ---
 

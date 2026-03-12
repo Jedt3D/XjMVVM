@@ -1,11 +1,11 @@
 ---
-title: "JSON API & Static Serving"
-description: วิธีการ XjMVVM เปิดเผย JSON API พร้อมกับเส้นทาง SSR และวิธีการเซิร์ฟเวอร์ไฟล์สแตติกในตัวทำงาน
+title: "JSON API และการเสิร์ฟไฟล์สแตติก"
+description: วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการตรวจสอบสิทธิ์พร้อมกับเส้นทาง SSR และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์สแตติกในตัว
 ---
 
-# JSON API & Static Serving
+# JSON API และการเสิร์ฟไฟล์สแตติก
 
-XjMVVM สามารถให้บริการทั้ง **หน้า HTML ที่แสดงบนเซิร์ฟเวอร์** **และ** JSON API จากแอปพลิเคชันเดียวกัน — ไม่มีกระบวนการแยกต่างหากหรือเฟรมเวิร์ก API ใช้ Router เดียวกัน รูปแบบ ViewModels เดียวกัน และ Models เดียวกัน ความแตกต่างเพียงอย่างเดียวคือรูปแบบการตอบสนอง
+XjMVVM สามารถเสิร์ฟหน้า HTML ที่เรนเดอร์ด้วยเซิร์ฟเวอร์ **และ** JSON API จากแอปพลิเคชันเดียวกัน — ไม่ต้องใช้กระบวนการแยกหรือเฟรมเวิร์กอื่น API ใช้ Router เดียวกัน ลวดลายโปรแกรม ViewModel เดียวกัน และ Models เดียวกัน ความแตกต่างเพียงอย่างเดียวคือรูปแบบการตอบกลับและการป้องกันการตรวจสอบสิทธิ์
 
 ---
 
@@ -13,7 +13,7 @@ XjMVVM สามารถให้บริการทั้ง **หน้า 
 
 **ไฟล์:** `Framework/JSONSerializer.xojo_code`
 
-โมดูลง่าย ๆ ที่แปลง `Dictionary` และ `Variant()` ของ `Dictionary` เป็นสตริง JSON ไม่ขึ้นอยู่กับไลบรารีภายนอก — เพียงแค่การจัดการสตริง
+โมดูลง่ายๆ ที่แปลง `Dictionary` และ `Variant()` ของ `Dictionary` เป็นสตริง JSON ไม่ขึ้นอยู่กับไลบรารีภายนอกใด ๆ — เพียงการจัดการสตริง
 
 ```xojo
 Module JSONSerializer
@@ -53,9 +53,9 @@ End Module
 ```
 
 !!! note
-    ค่าทั้งหมดถูกทำให้เป็นอนุกรมเป็นสตริง JSON — ไม่มีประเภทตัวเลขหรือบูลีน นี่สอดคล้องกับวิธี `RowToDict` ทำงาน: ค่าฐานข้อมูลทั้งหมดถูกเก็บเป็น `StringValue` ผู้บริโภค API ควรแยกตัวเลขจากสตริงตามต้องการ
+    ค่าทั้งหมดจะถูกลำดับเป็นสตริง JSON — ไม่มีประเภทตัวเลขหรือบูลีน นี่สอดคล้องกับวิธีที่ `RowToDict` ทำงาน: ค่าฐานข้อมูลทั้งหมดเก็บไว้เป็น `StringValue` ผู้บริโภค API ควรแยกวิเคราะห์ตัวเลขจากสตริงตามความจำเป็น
 
-### `WriteJSON` ใน BaseViewModel
+### `WriteJSON` บน BaseViewModel
 
 ```xojo
 Sub WriteJSON(jsonString As String)
@@ -64,13 +64,34 @@ Sub WriteJSON(jsonString As String)
 End Sub
 ```
 
-ประเภทเนื้อหาสัญญาณ JSON ให้ลูกค้า ไม่มี ViewModel ต้องตั้งค่า headers โดยตรง — เพียงแค่เรียก `WriteJSON(...)` ด้วยสตริง serialized
+ประเภทเนื้อหาส่งสัญญาณ JSON ไปยังลูกค้า ไม่มี ViewModel ใดจำเป็นต้องตั้งค่าส่วนหัวโดยตรง — เพียงเรียก `WriteJSON(...)` ด้วยสตริงที่เรียงลำดับ
 
 ---
 
-## API ViewModels
+## การตรวจสอบสิทธิ์ของ API
 
-ทั้งหมด API ViewModels อาศัยอยู่ใต้ `ViewModels/API/` ตามรูปแบบ `OnGet()`/`OnPost()` เดียวกับ ViewModels SSR — ความแตกต่างเพียงอย่างเดียวคือว่าพวกเขาเรียก `WriteJSON()` แทน `Render()`
+จุดปลายทาง API ทั้งหมดต้องการการตรวจสอบสิทธิ์ ต่างจากเส้นทาง HTML ที่เปลี่ยนเส้นทางไปยัง `/login` เส้นทาง API จะคืนค่า **ข้อผิดพลาด 401 JSON** เมื่อผู้ใช้ไม่ได้รับการตรวจสอบสิทธิ์:
+
+```json
+{"error":"Authentication required"}
+```
+
+ViewModel API ทุกตัวเรียก `RequireLoginJSON()` เป็นบรรทัดแรก:
+
+```xojo
+Sub OnGet()
+  If RequireLoginJSON() Then Return  // 401 if no valid mvvm_auth cookie
+  // ... rest of handler
+End Sub
+```
+
+ลูกค้า API ต้องรวมคุกกี้ `mvvm_auth` ในคำขอของพวกเขา สำหรับ JavaScript บนเบราว์เซอร์ (`fetch`) นี่จะเกิดขึ้นโดยอัตโนมัติเมื่อใช้ `credentials: 'same-origin'` สำหรับลูกค้าภายนอก คุกกี้ต้องได้รับผ่านจุดปลายทางการเข้าสู่ระบบและส่งไปพร้อมกับคำขอในภายหลัง
+
+---
+
+## ViewModel API
+
+ViewModel API ทั้งหมดอยู่ใต้ `ViewModels/API/` พวกเขาทำตามลวดลายเดียวกัน `OnGet()`/`OnPost()` เช่นเดียวกับ ViewModel SSR — ความแตกต่างเพียงอย่างเดียวคือพวกเขาเรียก `WriteJSON()` แทน `Render()`
 
 <!-- diagram -->
 <!-- nomnoml
@@ -80,42 +101,52 @@ End Sub
 #spacing: 44
 #padding: 10
 #lineWidth: 1.5
-[GET /api/notes] -> [NotesAPIListVM|model.GetAll()\nArrayToJSON()]
-[GET /api/notes/:id] -> [NotesAPIDetailVM|model.GetByID(id)\nGetTagsForNote(id)\nembed tags in JSON]
-[POST /api/notes] -> [NotesAPICreateVM|validate\nmodel.Create()\n201 Created]
-[GET /api/tags] -> [TagsAPIListVM|model.GetAll()\nArrayToJSON()]
-[GET /api/tags/:id] -> [TagsAPIDetailVM|model.GetByID(id)\nDictToJSON()]
+[GET /api/notes] -> [NotesAPIListVM|RequireLoginJSON()\nmodel.GetAll(userID)\nArrayToJSON()]
+[GET /api/notes/:id] -> [NotesAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id, userID)\nembed tags in JSON]
+[POST /api/notes] -> [NotesAPICreateVM|RequireLoginJSON()\nvalidate\nmodel.Create(title, body, userID)\n201 Created]
+[GET /api/tags] -> [TagsAPIListVM|RequireLoginJSON()\nmodel.GetAll()\nArrayToJSON()]
+[GET /api/tags/:id] -> [TagsAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id)\nDictToJSON()]
 -->
 <!-- ascii
-GET  /api/notes       → NotesAPIListVM   → ArrayToJSON(notes)
-GET  /api/notes/:id   → NotesAPIDetailVM → note + embedded tags array
-POST /api/notes       → NotesAPICreateVM → 201 Created + new note JSON
-GET  /api/tags        → TagsAPIListVM    → ArrayToJSON(tags)
-GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)
+GET  /api/notes       -> NotesAPIListVM   -> RequireLoginJSON() -> ArrayToJSON(notes)
+GET  /api/notes/:id   -> NotesAPIDetailVM -> RequireLoginJSON() -> note + embedded tags array
+POST /api/notes       -> NotesAPICreateVM -> RequireLoginJSON() -> 201 Created + new note JSON
+GET  /api/tags        -> TagsAPIListVM    -> RequireLoginJSON() -> ArrayToJSON(tags)
+GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(tag)
 -->
 <!-- /diagram -->
 
 ### NotesAPIListVM — `GET /api/notes`
 
+ส่งคืนบันทึกทั้งหมดสำหรับผู้ใช้ที่ได้รับการตรวจสอบสิทธิ์:
+
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var notes() As Variant = model.GetAll()
+  Var notes() As Variant = model.GetAll(userID)
   WriteJSON(JSONSerializer.ArrayToJSON(notes))
 End Sub
 ```
 
-ปฏิกิริยา: `[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"..."},...]`
+การตอบสนอง: `[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"...","user_id":"5"},...]`
+
+บันทึกมีขอบเขตของผู้ใช้ที่ได้รับการตรวจสอบสิทธิ์ — ผู้ใช้แต่ละคนจะเห็นเฉพาะบันทึกของตนเอง
 
 ### NotesAPIDetailVM — `GET /api/notes/:id`
 
-ส่งคืนโน้ตด้วย `tags` array ที่ฝัง:
+ส่งคืนบันทึกพร้อมอาร์เรย์ `tags` ที่ฝังอยู่ ส่งคืน 404 หากบันทึกไม่มีอยู่หรือเป็นของผู้ใช้อื่น:
 
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var id As Integer = Val(GetParam("id"))
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var note As Dictionary = model.GetByID(id)
+  Var note As Dictionary = model.GetByID(id, userID)
 
   If note = Nil Then
     Response.Status = 404
@@ -132,39 +163,46 @@ Sub OnGet()
 End Sub
 ```
 
-อาร์เรย์แท็กถูกฉีดโดยการจัดการสตริง — ลบปิดการ `}` และผนวก `,"tags":[...]}` ก่อนปิดอีกครั้ง นี่เจตนา: `JSONSerializer.DictToJSON` จัดการเฉพาะดิกชันนารีสตริงแบบสม่ำเสมอเท่านั้น การฝัง array ที่ซ้อนกันต้องใช้องค์ประกอบด้วยตนเอง
+อาร์เรย์แท็กถูกฉีดโดยการจัดการสตริง — ลบ `}` ปิดและเพิ่ม `,"tags":[...]}`  ก่อนปิดอีกครั้ง นี่คือจุดประสงค์: `JSONSerializer.DictToJSON` จัดการเฉพาะพจนานุกรมสตริงแบบเรียบ การฝังอาร์เรย์ที่ซ้อนกันต้องใช้การประกอบแบบฉาก
 
 !!! note
-    วิธีนี้ใช้งานได้อย่างน่าเชื่อถือเพราะ `DictToJSON` ทำให้ JSON object ที่ถูกต้องเสมอจบด้วย `}` หากตัวจำหน่ายเปลี่ยน จุดฉีดนี้ต้องตรวจสอบ
+    วิธีนี้ใช้งานได้เชื่อถือได้เนื่องจาก `DictToJSON` มักสร้างวัตถุ JSON ที่ถูกต้องลงท้ายด้วย `}` หากเครื่องจัดลำดับเปลี่ยน จุดฉีดนี้จะต้องตรวจสอบ
 
 ### NotesAPICreateVM — `POST /api/notes`
 
 ```xojo
 Sub OnPost()
+  If RequireLoginJSON() Then Return
+
   Var title As String = GetFormValue("title").Trim()
   Var body As String = GetFormValue("body")
 
   If title.Length = 0 Then
-    Response.Status = 422      // Unprocessable Entity — validation error
+    Response.Status = 422      // Unprocessable Entity -- validation error
     WriteJSON("{""error"":""Title is required""}")
     Return
   End If
 
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var newID As Integer = model.Create(title, body)
-  Var note As Dictionary = model.GetByID(newID)
+  Var newID As Integer = model.Create(title, body, userID)
+  Var note As Dictionary = model.GetByID(newID, userID)
 
   Response.Status = 201        // Created
   WriteJSON(JSONSerializer.DictToJSON(note))
 End Sub
 ```
 
-รหัสสถานะที่ใช้โดย API: **200** สำหรับการอ่านที่สำเร็จ **201** สำหรับการสร้างที่สำเร็จ **404** สำหรับไม่พบ **422** สำหรับความล้มเหลวในการตรวจสอบ
+รหัสสถานะที่ใช้โดย API: **200** สำหรับการอ่านที่สำเร็จ **201** สำหรับการสร้างที่สำเร็จ **401** สำหรับไม่ได้รับการตรวจสอบสิทธิ์ **404** สำหรับไม่พบ **422** สำหรับความล้มเหลวในการตรวจสอบความถูกต้อง
 
 ### TagsAPIListVM — `GET /api/tags`
 
+แท็กเป็นแบบส่วนกลาง (ไม่มีขอบเขตผู้ใช้) แต่ยังคงต้องการการตรวจสอบสิทธิ์:
+
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var model As New TagModel()
   Var tags() As Variant = model.GetAll()
   WriteJSON(JSONSerializer.ArrayToJSON(tags))
@@ -175,6 +213,8 @@ End Sub
 
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var id As Integer = Val(GetParam("id"))
   Var model As New TagModel()
   Var tag As Dictionary = model.GetByID(id)
@@ -204,17 +244,17 @@ mRouter.Get("/api/tags",        AddressOf CreateTagsAPIListVM)
 mRouter.Get("/api/tags/:id",    AddressOf CreateTagsAPIDetailVM)
 ```
 
-คำนำหน้า `/api/` แยก API routes จาก SSR routes ตามอนุสัญญา — Router ปฏิบัติต่อพวกเขาเหมือนกัน
+คำนำหน้า `/api/` แยกเส้นทาง API จากเส้นทาง SSR ตามอนุสัญญา — Router ปฏิบัติต่อพวกเขาเหมือนกัน
 
 ---
 
 ## เซิร์ฟเวอร์ไฟล์สแตติก
 
-**ไฟล์:** `App.xojo_code` (วิธี `ServeStatic` + การส่ง `HandleURL`)
+**ไฟล์:** `App.xojo_code` (เมธอด `ServeStatic` + การส่งจ่าย `HandleURL`)
 
-เซิร์ฟเวอร์ไฟล์สแตติกทำให้ไซต์เอกสารพัฒนาเข้าถึงได้โดยตรงจากแอปที่ทำงานอยู่ที่ `/dist/*` ไฟล์ให้บริการจาก `templates/dist/` — โฟลเดอร์เดียวกับที่สคริปต์ `build.py` ส่งออก
+เซิร์ฟเวอร์ไฟล์สแตติกทำให้เว็บไซต์เอกสารของนักพัฒนาเข้าถึงได้โดยตรงจากแอปที่กำลังทำงานที่ `/dist/*` ไฟล์จะถูกเสิร์ฟจาก `templates/dist/` — โฟลเดอร์เดียวกันที่สคริปต์ `build.py` ส่งออกไป
 
-### การส่ง HandleURL
+### การส่งจ่าย HandleURL
 
 ```xojo
 // Redirect bare /dist to /dist/
@@ -229,16 +269,16 @@ If p.Left(6) = "/dist/" Then
 End If
 ```
 
-`p.Middle(6)` ลบ คำนำหน้า `/dist/` (6 อักขระ 0-based) และส่งส่วนที่เหลือไปยัง `ServeStatic`
+`p.Middle(6)` ลบคำนำหน้า `/dist/` (6 อักขระ ฐาน 0) และส่งส่วนที่เหลือไปที่ `ServeStatic`
 
-### ServeStatic — การป้องกัน path traversal
+### ServeStatic — การป้องกันการข้ามเส้นทาง
 
 ```xojo
 Private Function ServeStatic(relativePath As String, response As WebResponse) As Boolean
   // Start from the known safe root
   Var f As FolderItem = App.ExecutableFile.Parent.Child("templates").Child("dist")
 
-  // Walk each path segment individually — never concatenate raw user input
+  // Walk each path segment individually -- never concatenate raw user input
   Var parts() As String = relativePath.Split("/")
   For Each part As String In parts
     If part = "" Or part = "." Or part = ".." Then Continue  // skip dangerous segments
@@ -251,7 +291,7 @@ Private Function ServeStatic(relativePath As String, response As WebResponse) As
     End If
   Next
 
-  // Directory → try index.html automatically
+  // Directory -> try index.html automatically
   If f.IsFolder Then
     f = f.Child("index.html")
     If f Is Nil Or Not f.Exists Then
@@ -265,9 +305,9 @@ End Function
 ```
 
 !!! warning
-    **ไม่เคย** สร้างเส้นทางไฟล์โดยการต่อสตริง URL ดิบ คำขอสำหรับ `/dist/../data/notes.sqlite` จะให้บริการไฟล์ฐานข้อมูลหากเส้นทางสร้างขึ้นโดยตรง การเดินผ่านแต่ละส่วนผ่าน `Child()` และปฏิเสธ `..` และ `.` ป้องกันการโจมตีการเดินทาง path ทั้งหมด
+    **ไม่เคย** สร้างเส้นทางไฟล์โดยการต่อสตริง URL ดิบ คำขอ `/dist/../data/notes.sqlite` จะเสิร์ฟไฟล์ฐานข้อมูลหากเส้นทางต่อเพิ่มเติม การเดินผ่านแต่ละส่วนผ่าน `Child()` และปฏิเสธ `..` และ `.` จะป้องกันการโจมตีการข้ามเส้นทางโดยสิ้นเชิง
 
-### การแมป Content-Type
+### การแมปประเภทเนื้อหา
 
 ```xojo
 Var ext As String = f.Name.Lowercase
@@ -281,11 +321,11 @@ If ext.EndsWith(".ico")   Then ct = "image/x-icon"
 If ext.EndsWith(".woff2") Then ct = "font/woff2"
 ```
 
-ส่วนขยายที่ไม่รู้จักตกอยู่ `application/octet-stream` เพิ่มรายการใหม่ที่นี่หากให้บริการประเภทไฟล์เพิ่มเติม
+นามสกุลที่ไม่รู้จักจะกลับไป `application/octet-stream` เพิ่มรายการใหม่ที่นี่หากเสิร์ฟไฟล์ประเภทเพิ่มเติม
 
 ### การเข้าถึงเอกสาร
 
-พร้อมแอปที่ทำงานบนพอร์ต 8080 เอกสารพัฒนาจะพร้อมใช้ที่:
+เมื่อแอปทำงานบนพอร์ต 8080 เอกสารนักพัฒนาจะพร้อมใช้งานที่:
 
 ```
 http://localhost:8080/dist/en/index.html
@@ -293,4 +333,4 @@ http://localhost:8080/dist/th/index.html
 http://localhost:8080/dist/jp/index.html
 ```
 
-เส้นทาง `/dist/` ถูกจัดการก่อนเส้นทาง SSR ดังนั้นเซิร์ฟเวอร์สแตติกจึงมีลำดับความสำคัญเสมอสำหรับคำนำหน้านั้น
+เส้นทาง `/dist/` ได้รับการจัดการก่อน SSR router ดังนั้นเซิร์ฟเวอร์สแตติกจึงให้ความสำคัญก่อนเสมอสำหรับคำนำหน้านั้น

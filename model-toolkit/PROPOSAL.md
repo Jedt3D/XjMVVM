@@ -28,9 +28,11 @@ Before finalizing the design, these questions will shape critical decisions:
 
 **Q1. Single-project or multi-project?**
 Should the toolkit manage only the MVVM project's database, or be a general-purpose tool that can target any Xojo project (or even non-Xojo projects)?
+**A1.** it should be used with the only MVVM project's database
 
 **Q2. SQLite-only or multi-database from day one?**
 Your current MVVM app uses SQLite. Do you want PostgreSQL/MySQL support immediately, or should we start SQLite-only and add others later? This affects the migration engine complexity significantly.
+**A2** No, only SQLite3 support at this moment
 
 **Q3. Schema source of truth — where should it live?**
 Options:
@@ -38,8 +40,8 @@ Options:
 - **B) The Xojo Model classes themselves** — reverse-engineer from existing `TableName()` + `Columns()` + custom SQL
 - **C) A schema DSL file** (like Prisma's `.prisma` or DBML) — a text file in the repo that both humans and AI can read/edit
 - **D) The database itself** — inspect the live SQLite file and generate from that
-
 My recommendation: **Option C** — a `.schema` or `.dbml`-like text file. It's version-controllable, AI-readable, human-editable, and can generate both Xojo code AND SQL. But your preference matters here.
+**A3** C) A Schema DSL file 
 
 **Q4. How important is visual ER diagramming?**
 TMS Data Modeler's ER diagrams are a major feature. Do you want:
@@ -47,6 +49,7 @@ TMS Data Modeler's ER diagrams are a major feature. Do you want:
 - **B) Auto-generated diagrams** (read-only, from schema file) — like nomnoml/dbdiagram renders
 - **C) Text-based schema definition with optional diagram export** — simpler, CLI-friendly
 - **D) Skip diagrams for now** — focus on code generation and migration first
+**A4** A) Full visual D&D ER Editor or Viewer at least for the first phase.
 
 ### Code Generation
 
@@ -56,12 +59,14 @@ Currently your models follow a pattern (override `TableName()`, `Columns()`, add
 - **B) Model + ViewModel stubs** (CRUD ViewModels for each model)
 - **C) Model + ViewModel + Templates** (full resource scaffolding, like Rails `scaffold`)
 - **D) Only migration SQL** (leave Xojo code to the developer)
+**A5** B) Model + ViewModel stubs
 
 **Q6. Should generated code be editable after generation?**
 Two philosophies:
 - **Rails-style**: Generate once, then the developer owns the file. Re-generation overwrites.
 - **Prisma-style**: Generated code is in a separate "do not edit" layer. Custom logic goes in a different file.
 Your current models mix generated-like patterns with custom methods (e.g., `GetTagsForNote` in NoteModel). How should that work?
+**A6** Prisma style
 
 ### Migration & Versioning
 
@@ -72,10 +77,12 @@ Your current models mix generated-like patterns with custom methods (e.g., `GetT
 - **D) Simple** (current approach): `CREATE TABLE IF NOT EXISTS` with no alter support
 
 My recommendation: **Option C** — auto-generate + review. It matches your AI-assisted workflow and gives safety.
+**A7** Option C Hybrid
 
 **Q8. Version tracking granularity?**
 - Track every schema change as a version (like git commits)?
 - Or snapshot-based (like TMS — archive at meaningful milestones)?
+**A8** snapshot-based like TMS Data Modeler
 
 ### AI Integration
 
@@ -88,12 +95,14 @@ Potential AI tasks, ranked by value:
 5. **Generate test data** — create realistic seed data
 6. **Explain migrations** — "This migration adds a foreign key from notes to users"
 Which of these matter most to you?
+**A9** 1, 2, 3, 4, 5 (important) and 6 when everything else are done
 
 **Q10. MCP server — build one or use existing?**
 Options:
 - **Use existing SQLite MCP server** — works today, gives AI read/write access to your DB
 - **Build a custom MCP server** that exposes your schema file, migration history, and code generation as tools — more powerful but more work
 - **Both** — existing for DB access, custom for schema management
+**A10** Use existing SQLite MCP Server + track record what we need to `improvement-sqlite-mcp.md` if possible
 
 ### Platform
 
@@ -110,6 +119,10 @@ You mentioned three options. My assessment:
 My recommendation: **Start CLI (Python), graduate to Xojo Desktop.** The core engine (schema parsing, diffing, code generation, migration) should be a library that works headless. Then build the Xojo GUI on top for visual features. The CLI also becomes an MCP server trivially.
 
 What's your preference?
+**A11** CLI using `xojo-ttytoolkit` (xojo lib) and generate report with `JinjaX` (xojo lib) then view on default browser.
+> `xojo-ttytoolkit` - `'/Users/worajedt/Xojo Projects/xojo-ttytoolkit'`
+> `JinjaX` - `/Users/worajedt/Xojo Projects/JinjaX_Implementation/JinjaX_Project/JinjaX`
+
 
 ---
 
@@ -459,6 +472,8 @@ The Python CLI becomes the **engine** that the Xojo Desktop app calls via shell.
 - Regeneration with custom-code preservation (marker comments for safe zones)
 
 **Key decisions:** Code generation templates, custom-code preservation strategy
+
+**Question to be answered:** Should the templates of .xojo_code can be save in Jinja format? Since we already have JinjaX for Xojo already. May be useful if it's not too slow.
 
 ---
 

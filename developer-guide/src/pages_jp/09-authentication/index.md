@@ -1,11 +1,14 @@
 ---
-title: 認証システム
-description: XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、リクエストごとの認証ガードをどのように処理するか。
+title: "認証システム"
+description: XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、SSRモード用のクッキーベース認証をどのように処理するか。
 ---
 
 # 認証システム
 
-XjMVVMの認証は3つのレイヤーに構築されています：**`UserModel`**は認証情報を格納して検証し、**`Session`**クラスはログインしているユーザーを追跡し、**`BaseViewModel`**はルートを保護し、現在のユーザーをテンプレートに公開するヘルパーを提供します。
+XjMVVMの認証は3つのレイヤーで構築されています：**`UserModel`**が認証情報を保存・検証し、**`BaseViewModel`**がクッキーベースの認証ヘルパーを提供してルートを保護し、テンプレートに現在のユーザーを公開し、**ブラウザ側のJavaScript**がSSRセッションギャップをnav状態とフラッシュメッセージのために橋渡しします。
+
+!!! warning
+    **`Self.Session`はSSRモードでは常にNilです。** Xojo Web 2の`WebSession`は永続的なWebSocket接続を必要とします。純粋なSSR（`HandleURL`が常に`True`を返す）では、WebSocketもセッションもありません。すべての認証の代わりにHMAC署名付きクッキーを使用します。
 
 ## 概要
 
@@ -20,22 +23,27 @@ XjMVVMの認証は3つのレイヤーに構築されています：**`UserModel`
 [POST /login or /signup] -> [LoginVM / SignupVM]
 [LoginVM / SignupVM] verify -> [UserModel|FindByUsername()\nVerifyPassword()\nCreate()]
 [UserModel] result -> [LoginVM / SignupVM]
-[LoginVM / SignupVM] LogIn(id, username) -> [Session|CurrentUserID\nCurrentUsername\nIsLoggedIn()]
-[Session] -> [Redirect to /]
+[LoginVM / SignupVM] RedirectWithAuth() -> [Set-Cookie: mvvm_auth=...|JS intermediate page:\nlocalStorage + sessionStorage]
+[Set-Cookie: mvvm_auth=...|JS intermediate page:\nlocalStorage + sessionStorage] -> [Redirect to /notes]
 [GET any protected route] -> [BaseViewModel.RequireLogin()]
-[BaseViewModel.RequireLogin()] not logged in -> [Redirect /login]
-[BaseViewModel.RequireLogin()] logged in -> [OnGet() / OnPost()]
+[BaseViewModel.RequireLogin()] ParseAuthCookie() -> [Cookie valid?]
+[Cookie valid?] no -> [Redirect /login?next=url]
+[Cookie valid?] yes -> [OnGet() / OnPost()]
 -->
 <!-- ascii
 POST /login or /signup
-  └── LoginVM / SignupVM
-        ├── UserModel.VerifyPassword() or .Create()
-        └── Session.LogIn(id, username) → Redirect /
+  +-- LoginVM / SignupVM
+        +-- UserModel.VerifyPassword() or .Create()
+        +-- RedirectWithAuth()
+              +-- Set-Cookie: mvvm_auth=userID:username:HMAC
+              +-- JS intermediate page sets localStorage + sessionStorage
+              +-- Redirect to /notes
 
 GET protected route
-  └── BaseViewModel.RequireLogin()
-        ├── not logged in → Redirect /login
-        └── logged in → OnGet() / OnPost()
+  +-- BaseViewModel.RequireLogin()
+        +-- ParseAuthCookie() reads + verifies cookie
+              +-- invalid -> Redirect /login?next=url
+              +-- valid   -> OnGet() / OnPost()
 -->
 <!-- /diagram -->
 
@@ -43,36 +51,63 @@ GET protected route
 
 ## UserModel
 
-**File:** `Models/UserModel.xojo_code`
+**ファイル:** `Models/UserModel.xojo_code`
 
-`UserModel`は`BaseModel`を継承します。そのテーブルは`users(id, username, password_hash, created_at)`です。`password_hash`列は`hash:salt`形式の単一文字列を格納します。
+`UserModel`は`BaseModel`を継承します。そのテーブルは`users(id, username, password_hash, created_at)`です。`password_hash`カラムは`hash:salt`形式の単一文字列を保存します。
 
-### パスワードハッシング
+### クライアント側のSHA-256ハッシング
 
-Xojoはその標準ライブラリにbcryptバインディングを持ちません。フレームワークは**SHA-256とランダムソルト**を使用します — ソルトが無作為で、ユーザーあたり格納されている場合、よく理解される安全な代替案。
+ログインまたはサインアップフォームが送信される前に、ブラウザは[Web Crypto API](https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest)を使用してパスワードをハッシュするため、平文パスワードはネットワークを横切りません：
+
+```html
+<script>
+async function sha256hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+</script>
+```
+
+Alpine.jsはフォーム送信をインターセプトし、パスワードをハッシュしてから送信します：
+
+```html
+<form method="post" action="/login"
+      x-data="{
+        hashed: false,
+        async handleSubmit(e) {
+          if (this.hashed) return;
+          const pwEl = document.getElementById('password');
+          pwEl.value = await sha256hex(pwEl.value);
+          this.hashed = true;
+          e.target.submit();
+        }
+      }"
+      @submit.prevent="handleSubmit($event)">
+```
+
+`hashed`フラグは、`e.target.submit()`が何らかの理由でイベントを再度発火する場合の再処理を防止します。
+
+!!! note
+    `crypto.subtle`はすべてのモダンブラウザで利用可能で、ライブラリは不要です。セキュアなコンテキスト（HTTPSまたはlocalhost）でのみ利用可能です。
+
+### サーバー側のパスワード保存
+
+サーバーはクライアント側のSHA-256ハッシュ（`SHA256(plaintext)`）をパスワードフィールドとして受け取ります。その後、ランダムなユーザーごとのソルトで2番目のハッシュを適用してから保存します：
 
 ```xojo
-Private Function GenerateSalt() As String
-  // Time + random number — unique per call
-  Var raw As String = Str(System.Ticks) + Str(Rnd)
-  Return EncodeHex(Crypto.SHA256(raw))
-End Function
-
 Private Function HashPassword(password As String, salt As String) As String
+  // password is already SHA256(plaintext) from the browser
   Return EncodeHex(Crypto.SHA256(password + salt))
 End Function
 ```
 
-ハッシュとソルトは`:`セパレータで1つの列に結合されます：
+保存値：`SHA256(SHA256(plaintext) + salt) : salt`
 
-```xojo
-Var stored As String = hash + ":" + salt  // e.g. "a3f9...b2:e7c1...44"
-```
+このダブルハッシュモデルは、攻撃者がサーバーソースを持っていても、データベースがユーザーの元のパスワードを見ないことを意味します。`EncodeHex(Crypto.SHA256(...))`は64文字の16進数文字列を返します — `.Hex`プロパティを持つ文字列ではありません。`EncodeHex()`グローバル関数が必要です。
 
-これはスキーマをシンプルに保ちます — 別の`salt`列はありません — そして`VerifyPassword`を自己完結させます。
-
-!!! note
-    SHA-256 + ユーザーごとのランダムソルトを使用することは、ほとんどの内部またはリスクの低いアプリケーションに適切です。高セキュリティまたは公開向けアプリの場合、プラットフォームで利用可能な場合はbcryptまたはArgon2バインディングを使用する必要があります。
+!!! warning
+    SHA-256 +ユーザーごとのランダムソルトの使用はほとんどの内部またはローリスクアプリケーションに対して十分です。高セキュリティまたはパブリックフェーシングアプリケーションの場合、プラットフォームで利用可能であればbcryptまたはArgon2バインディングを使用する必要があります。
 
 ### ユーザーの作成
 
@@ -93,9 +128,9 @@ Function Create(username As String, password As String) As Integer
 End Function
 ```
 
-成功時に新しい`id`を返すか、ユーザー名が既に取られている場合は`0`を返します。一意性チェックはデータベース`UNIQUE`制約のみに依存するのではなく、アプリケーションレイヤー（`FindByUsername`）で実行されます — これはデータベース例外をキャッチすることなく、クリーンな信号（`0`戻り値）を与えます。
+成功時に新しい`id`を返すか、ユーザー名がすでに取得されている場合は`0`を返します。
 
-### パスワード検証
+### パスワードの検証
 
 ```xojo
 Function VerifyPassword(username As String, password As String) As Boolean
@@ -113,123 +148,298 @@ End Function
 ```
 
 !!! warning
-    `stored.Middle(colonPos + 1)`は0ベースです（`String.Middle`は`IndexOf`と同じです）。ここで`Mid()`を使用しないでください — 1ベースのレガシー関数はオフバイワンを生成し、ソルト抽出を破損させます。
+    `stored.Middle(colonPos + 1)`は0ベース（`String.Middle`は`IndexOf`と連携）です。ここで`Mid()`を決して使用しないでください — 1ベースのレガシー関数は1つオフになり、ソルト抽出を破損します。
 
 ---
 
-## Session
+## クッキーベース認証
 
-**File:** `Session.xojo_code` （extends `WebSession`）
+SSRモードでは`Self.Session`は常にNilであるため、XjMVVMはHMAC署名付きHTTPクッキーを認証に使用します。クッキーは`Set-Cookie` HTTPヘッダーを介して設定され、すべてのリクエストで検証されます。
 
-`Session`は認証されたユーザーのIDを**セッションプロパティ**として格納します — 一時変数ではなく。WebSessionプロパティは自動的にユーザーごとにスコープされ、WebSocket接続のライフタイム全体にわたって永続化されます。
+### クッキー形式
 
-```xojo
-Protected Class Session
-Inherits WebSession
-
-  Sub LogIn(userID As Integer, username As String)
-    CurrentUserID = userID
-    CurrentUsername = username
-  End Sub
-
-  Sub LogOut()
-    CurrentUserID = 0
-    CurrentUsername = ""
-  End Sub
-
-  Function IsLoggedIn() As Boolean
-    Return CurrentUserID > 0
-  End Function
-
-  // ...flash message methods unchanged from v0.2.0...
-
-  CurrentUserID   As Integer   // 0 = not logged in
-  CurrentUsername As String
-End Class
+```
+mvvm_auth=<userID>:<username>:<HMAC>
 ```
 
-`CurrentUserID = 0`は「ログインしていない」のセンチネルです — ゼロはSQLite `AUTOINCREMENT`主キー値では有効ではありません。
+HMACは次のように計算されます：
+
+```
+SHA256(userID + ":" + username + ":" + App.mAuthSecret)
+```
+
+`App.mAuthSecret`は起動時に`Crypto.GenerateRandomBytes(32)`を介して1回生成されたランダムな32バイトの16進数文字列です。再起動のたびに変わり、既存のすべての認証クッキーを実質的に無効にします。
+
+### AuthCookieValue — クッキーの生成
+
+```xojo
+Function AuthCookieValue(userID As Integer, username As String) As String
+  Var payload As String = Str(userID) + ":" + username
+  Var hmac As String = EncodeHex(Crypto.SHA256(payload + ":" + App.mAuthSecret))
+  Return payload + ":" + hmac
+End Function
+```
+
+### ParseAuthCookie — クッキーの検証
+
+すべてのリクエストで呼び出されて認証されたユーザーを抽出・検証します。結果は`mAuthParsed` / `mAuthCache`プロパティ経由でリクエスト単位でキャッシュされるため、複数の呼び出し（`RequireLogin`、`CurrentUserID`、`Render`から）は再解析されません。
+
+```xojo
+Private Function ParseAuthCookie() As Dictionary
+  If mAuthParsed Then Return mAuthCache
+
+  mAuthParsed = True
+  mAuthCache = Nil
+
+  // Read the Cookie header
+  Var cookieHeader As String = Request.Header("Cookie")
+  If cookieHeader.Length = 0 Then Return Nil
+
+  // Find mvvm_auth=... value
+  Var value As String = ""  // ... extract from cookie header ...
+
+  // Parse userID:username:hmac
+  Var firstColon As Integer = value.IndexOf(":")
+  Var lastColon As Integer = value.Length - 65  // HMAC is always 64 hex chars
+  If firstColon < 0 Or lastColon < 0 Then Return Nil
+
+  Var userID As String = value.Left(firstColon)
+  Var username As String = value.Middle(firstColon + 1, lastColon - firstColon - 2)
+  Var receivedHMAC As String = value.Middle(lastColon)
+
+  // Verify HMAC
+  Var payload As String = userID + ":" + username
+  Var expectedHMAC As String = EncodeHex(Crypto.SHA256(payload + ":" + App.mAuthSecret))
+  If receivedHMAC <> expectedHMAC Then Return Nil
+
+  // Valid — cache and return
+  Var result As New Dictionary
+  result.Value("user_id") = userID
+  result.Value("username") = username
+  mAuthCache = result
+  Return result
+End Function
+```
+
+!!! note
+    HMAC検証により、クッキーは偽造されません。攻撃者は任意のユーザーの有効なクッキーを生成するために`App.mAuthSecret`が必要です。
+
+### RedirectWithAuth — ログイン/サインアップ時のクッキー設定
+
+認証に成功した後、`RedirectWithAuth`は1つのレスポンスで3つのことを行います：
+
+1. HTTP`Set-Cookie`ヘッダー経由で`mvvm_auth`クッキーを設定
+2. ユーザー名を`localStorage`に、フラッシュメッセージを`sessionStorage`に保存するJSの中間ページを送信
+3. ブラウザをターゲットURLにリダイレクト
+
+```xojo
+Sub RedirectWithAuth(targetURL As String, userID As Integer, username As String)
+  Var cookieVal As String = AuthCookieValue(userID, username)
+  Response.Header("Set-Cookie") = "mvvm_auth=" + cookieVal + "; Path=/; SameSite=Lax"
+  Response.Header("Content-Type") = "text/html; charset=utf-8"
+  Response.Write("<html><body><script>" + _
+    "localStorage.setItem('_auth_user','" + username + "');" + _
+    "sessionStorage.setItem('_flash_msg','Welcome, " + username + "!');" + _
+    "sessionStorage.setItem('_flash_type','success');" + _
+    "window.location.href='" + targetURL + "';" + _
+    "</script></body></html>")
+End Sub
+```
+
+JSの中間ページが必要なのは以下の理由です：
+
+- `Set-Cookie`はHTTPクッキーを設定します（その後のリクエストでサーバー側認証用）
+- `localStorage`はユーザー名を保存します（Alpine.js経由でクライアント側nav状態表示用）
+- `sessionStorage`はフラッシュメッセージを保存します（リダイレクト後のワンタイム表示用）
+
+これら3つのストレージメカニズムは異なる目的を果たし、互いに置き換えることはできません。
+
+### RedirectWithLogout — クッキーのクリア
+
+```xojo
+Sub RedirectWithLogout(targetURL As String)
+  Response.Header("Set-Cookie") = "mvvm_auth=; Path=/; Max-Age=0; SameSite=Lax"
+  Response.Header("Content-Type") = "text/html; charset=utf-8"
+  Response.Write("<html><body><script>" + _
+    "localStorage.removeItem('_auth_user');" + _
+    "window.location.href='" + targetURL + "';" + _
+    "</script></body></html>")
+End Sub
+```
+
+`Max-Age=0`はブラウザにクッキーをすぐに削除するよう指示します。
 
 ---
 
 ## BaseViewModel認証ヘルパー
 
-3つのメソッドが`BaseViewModel`に追加され、任意のViewModelから直接`Session`をキャストすることなく認証にアクセスできます：
+`BaseViewModel`の4つのメソッドは、クッキーを直接処理することなく、任意のViewModelから認証にアクセスできます：
 
-### `RequireLogin() As Boolean`
+### `CurrentUserID() As Integer`
 
 ```xojo
-Function RequireLogin() As Boolean
-  Var ws As WebSession = Self.Session
-  If ws IsA Session Then
-    Var sess As Session = Session(ws)
-    If Not sess.IsLoggedIn() Then
-      SetFlash("Please log in to continue", "info")
-      Redirect("/login")
-      Return True  // ← caller must check this and return
-    End If
-  End If
-  Return False
+Function CurrentUserID() As Integer
+  Var auth As Dictionary = ParseAuthCookie()
+  If auth <> Nil Then Return Val(auth.Value("user_id").StringValue)
+  Return 0
 End Function
 ```
 
-保護されたViewModelでの使用パターン：
+認証されていないときは`0`を返します — ゼロはSQLite`AUTOINCREMENT`主キーで有効なIDではありません。
+
+### `CurrentUsername() As String`
+
+```xojo
+Function CurrentUsername() As String
+  Var auth As Dictionary = ParseAuthCookie()
+  If auth <> Nil Then Return auth.Value("username").StringValue
+  Return ""
+End Function
+```
+
+### `RequireLogin() As Boolean`
+
+HTMLルートを保護します。認証されていないユーザーをログインページにリダイレクトし、`next`パラメーターを使用して、ログイン後に元のURLに戻すことができます。
+
+```xojo
+Function RequireLogin() As Boolean
+  If CurrentUserID() > 0 Then Return False
+  Redirect("/login?next=" + EncodeURLComponent(Request.Path))
+  Return True
+End Function
+```
+
+保護されたViewModelの使用パターン：
 
 ```xojo
 Sub OnGet()
-  If RequireLogin() Then Return  // guard — stops execution if redirect issued
+  If RequireLogin() Then Return  // guard -- stops execution if redirect issued
   // ... rest of handler
 End Sub
 ```
 
 !!! warning
-    `RequireLogin()`はリダイレクトを発行しますが、**実行を停止することはできません** — これは呼び出し側に信号を返すため`True`を返します。常に`If RequireLogin() Then Return`と対にしてください。`Return`を忘れると、ハンドラーはリダイレクトが既に送信された後に実行を続け、おそらくダブルライトエラーが発生します。
+    `RequireLogin()`はリダイレクトを発行しますが、**実行を停止することはできません** — リダイレクトが発行されたことを示すために`True`を返します。常に`If RequireLogin() Then Return`とペアにしてください。`Return`を忘れると、ハンドラーはリダイレクトが既に送信された後に実行を続けます。
 
-### `CurrentUserID()`と`CurrentUsername()`
+### `RequireLoginJSON() As Boolean`
+
+APIルートを保護します。HTMLリダイレクトの代わりに401 JSONエラーを返します（APIクライアントはHTMLリダイレクトに従うことができません）。
 
 ```xojo
-Function CurrentUserID() As Integer
-  Var ws As WebSession = Self.Session
-  If ws IsA Session Then Return Session(ws).CurrentUserID
-  Return 0
-End Function
-
-Function CurrentUsername() As String
-  Var ws As WebSession = Self.Session
-  If ws IsA Session Then Return Session(ws).CurrentUsername
-  Return ""
+Function RequireLoginJSON() As Boolean
+  If CurrentUserID() > 0 Then Return False
+  Response.Status = 401
+  WriteJSON("{""error"":""Authentication required""}")
+  Return True
 End Function
 ```
 
-これらは呼び出し側が手動で`WebSession`を`Session`にキャストする必要なく、セッション状態への安全なアクセスを提供します。
+使用法：
 
-### 自動注入`current_user`コンテキスト
+```xojo
+Sub OnGet()
+  If RequireLoginJSON() Then Return
+  // ... rest of API handler
+End Sub
+```
 
-`BaseViewModel.Render()`はすべてのテンプレートコンテキストに`current_user`ディクショナリを自動的に注入します：
+### 自動注入コンテキスト — `current_user`
+
+`BaseViewModel.Render()`は常にすべてのテンプレートコンテキストに`current_user` dictionaryを注入し、安全なデフォルト値を使用するため、テンプレートは`UndefinedVariableException`をスローしません：
 
 ```xojo
 Var userCtx As New Dictionary()
-userCtx.Value("id")        = Str(sess.CurrentUserID)
-userCtx.Value("username")  = sess.CurrentUsername
-userCtx.Value("logged_in") = If(sess.IsLoggedIn(), "1", "0")
+userCtx.Value("id") = "0"
+userCtx.Value("username") = ""
+userCtx.Value("logged_in") = "0"
+
+Var auth As Dictionary = ParseAuthCookie()
+If auth <> Nil Then
+  userCtx.Value("id") = auth.Value("user_id").StringValue
+  userCtx.Value("username") = auth.Value("username").StringValue
+  userCtx.Value("logged_in") = "1"
+End If
 context.Value("current_user") = userCtx
 ```
 
-したがって、すべてのテンプレートは、ViewModelが明示的にそれを渡すことなく、ログイン状態を分岐させることができます：
+!!! note
+    `logged_in`は文字列`"1"`または`"0"` — ブール値ではありません — JinjaXテンプレートの`Dictionary`値はすべて文字列だからです。`== True`ではなく`== "1"`で比較してください。
+
+---
+
+## SSRセッション制限とクライアント側の回避方法
+
+Xojo Web 2では、`WebSession`状態は永続的なWebSocket接続に結びついています。純粋なSSRモード（`HandleURL`が常に`True`を返し、WebSocketが確立されない）では、各HTTPリクエストにセッションがありません。これは以下を意味します：
+
+- `POST`中に保存されたフラッシュメッセージは、リダイレクト`GET`が到着するまでに**失われます**。
+- ログインしたユーザー名はセッション状態から**テンプレートレンダラーに利用できません**。
+- **`SetFlash()`と`Session.LogIn()`はサイレントに何もしません** — Nilセッションに書き込みます。
+
+XjMVVMはこれらの制限を3つのメカニズムで回避します：
+
+| メカニズム | ストレージ | 目的 | 生涯 |
+|-----------|---------|------|------|
+| `mvvm_auth` cookie | HTTPクッキー | サーバー側認証 | ブラウザがクリアするか`Max-Age=0`まで |
+| `localStorage._auth_user` | ブラウザlocalStorage | クライアント側nav表示 | タブ/再起動を超えて永続的 |
+| `sessionStorage._flash_msg` | ブラウザsessionStorage | ワンショットフラッシュメッセージ | 現在のタブのみ、リダイレクトを超えて |
+
+### フラッシュメッセージ — `sessionStorage`
+
+（`RedirectWithAuth`によって送信される）JSの中間ページは成功メッセージを`sessionStorage`に書き込みます。Alpine.jsはそれを次のページ読み込みで読み取って表示します：
 
 ```html
-{% if current_user.logged_in == "1" %}
-  <span>{{ current_user.username }}</span>
-  <form method="post" action="/logout">
-    <button type="submit">Log out</button>
-  </form>
-{% else %}
-  <a href="/login">Log in</a>
+<div x-data="{
+  msg: '',
+  type: 'success',
+  init() {
+    var m = sessionStorage.getItem('_flash_msg');
+    var t = sessionStorage.getItem('_flash_type') || 'success';
+    sessionStorage.removeItem('_flash_msg');
+    sessionStorage.removeItem('_flash_type');
+    if (m && !document.querySelector('.flash')) { this.msg = m; this.type = t; }
+  }
+}" x-show="msg" :class="'flash flash-' + type" x-text="msg" style="display:none"></div>
+```
+
+### インラインエラー表示
+
+ログインとサインアップエラーはフラッシュメッセージを使用できません（リダイレクトはそれらを失うでしょう）。代わりに、ViewModelは`error_message`テンプレート変数でフォームを再レンダリングします：
+
+```xojo
+// In LoginVM.OnPost() — on failed login:
+Var ctx As New Dictionary
+ctx.Value("error_message") = "Invalid username or password."
+ctx.Value("next_url") = nextURL
+Render("auth/login.html", ctx)
+```
+
+テンプレートはそれをインラインで表示します：
+
+```html
+{% if error_message %}
+<div class="flash flash-error">{{ error_message }}</div>
 {% endif %}
 ```
 
-!!! note
-    `logged_in`は文字列`"1"`または`"0"`です — ブール値ではなく — なぜなら、JinjaXテンプレート内の`Dictionary`値はすべて文字列だからです。`== True`ではなく`== "1"`と比較してください。
+### nav認証状態 — `localStorage`
+
+Alpine.jsは`localStorage._auth_user`を読んで正しいnav状態を表示します：
+
+```html
+<nav x-data="{ user: localStorage.getItem('_auth_user') }">
+  <span x-show="!user">
+    <a href="/login">Log In</a>
+    <a href="/signup">Sign Up</a>
+  </span>
+  <span x-show="user" x-cloak>
+    <span x-text="user"></span>
+    <form method="post" action="/logout"
+          @submit="localStorage.removeItem('_auth_user')">
+      <button type="submit">Log Out</button>
+    </form>
+  </span>
+</nav>
+```
 
 ---
 
@@ -237,19 +447,19 @@ context.Value("current_user") = userCtx
 
 ### LoginVM
 
-`GET /login` — ログインフォームをレンダリングします。既にログインしている場合は、`/`にリダイレクトします。
+`GET /login` — ログインフォームを`error_message = ""`でレンダリングし、ログイン後のリダイレクト用に`next`クエリパラメーターを読み取ります。
 
-`POST /login` — ユーザー名+パスワードが空でないことを検証し、`UserModel.VerifyPassword()`を呼び出します。成功時に、`Session.LogIn()`を呼び出し、フラッシュメッセージと共にホームにリダイレクトします。失敗時に、エラーフラッシュで`/login`に戻ります。
+`POST /login` — ユーザー名 +パスワードが空でないことを検証し、`UserModel.VerifyPassword()`を呼び出します。成功時に`RedirectWithAuth(nextURL, userID, username)`を呼び出します。失敗時にインラインエラーメッセージでログインフォームを再レンダリングします（フラッシュではなく — `SetFlash`はSSRで壊れています）。
 
 ### SignupVM
 
-`GET /signup` — サインアップフォームをレンダリングします。既にログインしている場合は、`/`にリダイレクトします。
+`GET /signup` — `error_message = ""`でサインアップフォームをレンダリングします。
 
-`POST /signup` — 検証：ユーザー名が必須、3文字以上。パスワード6文字以上。パスワードが一致します。`UserModel.Create()`を呼び出します。`0`を返す場合（ユーザー名が取られている）、エラーと共に戻ります。成功時に、すぐに`Session.LogIn()`を呼び出し、ユーザーはアカウント作成直後にサインインします。
+`POST /signup` — 検証：ユーザー名が必須（3文字以上）、パスワード（6文字以上）、パスワードが一致。`UserModel.Create()`を呼び出します。`0`を返す場合（ユーザー名は取得済み）、エラーで再レンダリングします。成功時に`RedirectWithAuth("/notes", newID, username)`を呼び出します。
 
 ### LogoutVM
 
-`POST /logout`のみ — GETはサポートされません。`Session.LogOut()`を呼び出し、ホームにリダイレクトします。ログアウトにPOSTを使用することは、プリフェッチまたはリンクプリロードを通じた偶発的なログアウトを防ぎます。
+`POST /logout`のみ — GETはサポートされていません。`RedirectWithLogout("/login")`を呼び出します。ログアウトにPOSTを使用することで、プリフェッチまたはリンクプリロード経由の誤ったログアウトを防止します。
 
 ---
 
@@ -263,13 +473,13 @@ mRouter.Get("/signup",  AddressOf CreateSignupVM)
 mRouter.Post("/signup", AddressOf CreateSignupVM)
 ```
 
-ログインとサインアップの両方にとって`GET`と`POST`は同じViewModelファクトリーを共有します — ViewModelそのものが`Request.Method`に基づいて`OnGet()`または`OnPost()`にディスパッチします。
+ログインとサインアップの両方の`GET`と`POST`は同じViewModelファクトリーを共有します — ViewModelそのものは`Request.Method`に基づいて`OnGet()`または`OnPost()`にディスパッチします。
 
 ---
 
 ## スキーマ
 
-`users`テーブルは`DBAdapter.InitDB()`に作成されます：
+`users`テーブルは`DBAdapter.InitDB()`で作成されます：
 
 ```xojo
 db.ExecuteSQL("CREATE TABLE IF NOT EXISTS users (" + _
@@ -279,4 +489,4 @@ db.ExecuteSQL("CREATE TABLE IF NOT EXISTS users (" + _
   "created_at    TEXT DEFAULT (datetime('now')))")
 ```
 
-`username`の`UNIQUE`制約はデータベースレベルのセーフティネットです。`UserModel.Create()`のアプリケーションレベルチェックは、ViewModelsが「ユーザー名は既に取られています」フラッシュを表示するために使用するクリーンな信号（`0`戻り値）を提供します。
+`username`の`UNIQUE`制約はデータベースレベルのセーフティネットです。`UserModel.Create()`のアプリケーションレベルチェックは、ViewModelsがエラーメッセージを表示するために使用するより明確なシグナル（`0`リターン）を提供します。

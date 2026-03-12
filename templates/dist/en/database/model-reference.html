@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.9.0</span>
+        <span class="logo-version">v0.9.3</span>
       </a>
 
       <!-- Language switcher -->
@@ -300,6 +300,21 @@
               <a class="nav-link"
                  href="../alpine/">
                 Alpine.js
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Security</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../protected-routes/">
+                Protected Routes & User Scoping
               </a>
             </li>
             
@@ -876,7 +891,7 @@ Per-request (concurrent, independent)
 <hr />
 <h2 id="notemodel-class">NoteModel (Class)<a class="headerlink" href="#notemodel-class" title="Permanent link">&para;</a></h2>
 <p><strong>File:</strong> <code>Models/NoteModel.xojo_code</code></p>
-<p>The concrete resource model. Only ~20 lines because <code>BaseModel</code> handles everything generic.</p>
+<p>The concrete resource model. All methods require a <code>userID</code> parameter to scope notes per user — each user can only see and modify their own notes.</p>
 <div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">NoteModel</span>
 <span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span>
 
@@ -885,45 +900,79 @@ Per-request (concurrent, independent)
 <span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
 <span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, title, body, created_at, updated_at&quot;</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, title, body, created_at, updated_at, user_id&quot;</span>
 <span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="c1">// Delegation — zero boilerplate</span>
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
-
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
-
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
-<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
-
-<span class="w">  </span><span class="c1">// Escape hatch — SQLite expressions required for timestamps</span>
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">  </span><span class="c1">// All methods require userID for per-user scoping</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">results</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
 <span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">RowSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="s2">&quot;SELECT &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; FROM notes WHERE user_id = ? ORDER BY updated_at DESC&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
+<span class="w">    </span><span class="k">While</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">AfterLastRow</span>
+<span class="w">      </span><span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">RowToDict</span><span class="p">(</span><span class="n">rs</span><span class="p">))</span>
+<span class="w">      </span><span class="n">rs</span><span class="p">.</span><span class="n">MoveToNextRow</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Wend</span>
+<span class="w">    </span><span class="n">rs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">results</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">RowSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="s2">&quot;SELECT &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot; FROM notes WHERE id = ? AND user_id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">AfterLastRow</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">rs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">      </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">      </span><span class="k">Return</span><span class="w"> </span><span class="kc">Nil</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RowToDict</span><span class="p">(</span><span class="n">rs</span><span class="p">)</span>
+<span class="w">    </span><span class="n">rs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">row</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body, user_id) VALUES (?, ?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
 <span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span>
 <span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
 <span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span>
 <span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
 <span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
 <span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
-<span class="w">      </span><span class="s2">&quot;UPDATE notes SET title = ?, body = ?, updated_at = datetime(&#39;now&#39;) WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_</span>
-<span class="w">      </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span>
+<span class="w">      </span><span class="s2">&quot;UPDATE notes SET title = ?, body = ?, updated_at = datetime(&#39;now&#39;) &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="s2">&quot;WHERE id = ? AND user_id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
 <span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
 <span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;DELETE FROM notes WHERE id = ? AND user_id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">CountForUser</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">RowSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="s2">&quot;SELECT COUNT(*) AS cnt FROM notes WHERE user_id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;cnt&quot;</span><span class="p">).</span><span class="n">IntegerValue</span>
+<span class="w">    </span><span class="n">rs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">count</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
 <span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
 <p><code>Create</code> and <code>Update</code> use the escape hatch because <code>datetime('now')</code> is a SQLite-evaluated expression — binding the string <code>"datetime('now')"</code> as a <code>?</code> parameter would store the literal text, not a timestamp.</p>
+<p>Every query includes <code>WHERE user_id = ?</code> to enforce ownership at the SQL level. See <a href="../protected-routes/index.html">Protected Routes &amp; User Scoping</a> for the full pattern.</p>
 <hr />
 <h2 id="crud-task-mapping">CRUD Task Mapping<a class="headerlink" href="#crud-task-mapping" title="Permanent link">&para;</a></h2>
+<p>All Notes routes require authentication. Every model call includes <code>userID</code> to scope data per user.</p>
 <table>
 <thead>
 <tr>
@@ -939,15 +988,15 @@ Per-request (concurrent, independent)
 <td>View list</td>
 <td><code>GET /notes</code></td>
 <td><code>NotesListVM</code></td>
-<td><code>NoteModel.GetAll()</code></td>
-<td><code>SELECT … ORDER BY updated_at DESC</code></td>
+<td><code>NoteModel.GetAll(userID)</code></td>
+<td><code>SELECT … WHERE user_id = ? ORDER BY updated_at DESC</code></td>
 </tr>
 <tr>
 <td>View one</td>
 <td><code>GET /notes/:id</code></td>
 <td><code>NotesDetailVM</code></td>
-<td><code>NoteModel.GetByID(id)</code></td>
-<td><code>SELECT … WHERE id = ?</code></td>
+<td><code>NoteModel.GetByID(id, userID)</code></td>
+<td><code>SELECT … WHERE id = ? AND user_id = ?</code></td>
 </tr>
 <tr>
 <td>New form</td>
@@ -960,29 +1009,29 @@ Per-request (concurrent, independent)
 <td>Create</td>
 <td><code>POST /notes</code></td>
 <td><code>NotesCreateVM</code></td>
-<td><code>NoteModel.Create(title, body)</code></td>
-<td><code>INSERT INTO notes (title, body) VALUES (?, ?)</code></td>
+<td><code>NoteModel.Create(title, body, userID)</code></td>
+<td><code>INSERT INTO notes (title, body, user_id) VALUES (?, ?, ?)</code></td>
 </tr>
 <tr>
 <td>Edit form</td>
 <td><code>GET /notes/:id/edit</code></td>
 <td><code>NotesEditVM</code></td>
-<td><code>NoteModel.GetByID(id)</code></td>
-<td><code>SELECT … WHERE id = ?</code></td>
+<td><code>NoteModel.GetByID(id, userID)</code></td>
+<td><code>SELECT … WHERE id = ? AND user_id = ?</code></td>
 </tr>
 <tr>
 <td>Update</td>
 <td><code>POST /notes/:id</code></td>
 <td><code>NotesUpdateVM</code></td>
-<td><code>NoteModel.Update(id, title, body)</code></td>
-<td><code>UPDATE notes SET … WHERE id = ?</code></td>
+<td><code>NoteModel.Update(id, title, body, userID)</code></td>
+<td><code>UPDATE notes SET … WHERE id = ? AND user_id = ?</code></td>
 </tr>
 <tr>
 <td>Delete</td>
 <td><code>POST /notes/:id/delete</code></td>
 <td><code>NotesDeleteVM</code></td>
-<td><code>NoteModel.Delete(id)</code></td>
-<td><code>DELETE FROM notes WHERE id = ?</code></td>
+<td><code>NoteModel.Delete(id, userID)</code></td>
+<td><code>DELETE FROM notes WHERE id = ? AND user_id = ?</code></td>
 </tr>
 </tbody>
 </table>

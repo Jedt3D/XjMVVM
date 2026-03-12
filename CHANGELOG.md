@@ -1,5 +1,53 @@
 # Changelog
 
+## [0.9.3-docs] — 2026-03-13
+
+### Changed
+- **Developer guide updated for v0.9.3** — all Phase 3+4 features now documented across EN/TH/JP (60 pages total)
+  - **Auth System** (`09-authentication`) — fully rewritten: session-based auth replaced with cookie-based auth (HMAC-signed `mvvm_auth` cookie, `ParseAuthCookie()`, `RedirectWithAuth/Logout()`, inline error rendering)
+  - **JSON API** (`10-api`) — all 5 endpoints now show `RequireLoginJSON()` guards and user-scoped NoteModel calls
+  - **DB Layer Reference** (`05-database/model-reference`) — NoteModel rewritten with `user_id` column, all methods take `userID`, CRUD mapping updated
+  - **Introduction** (`index`) — version bumped to v0.9.3, added Alpine.js and Protected Routes to section table
+- **nav.yaml** — version updated to v0.9.3, added "Security" section
+
+### Added
+- **New page: "Protected Routes & User Scoping"** (`12-protected-routes`) — route guards (`RequireLogin`/`RequireLoginJSON`), user-scoped data pattern, DB migration, ownership enforcement, testing patterns
+- 10 new translations (5 TH + 5 JP) via Claude Haiku 4.5
+
+---
+
+## [0.9.3] — 2026-03-13
+
+### Added
+- **User-scoped notes** (Phase 4): notes are now isolated per user via `user_id` column
+  - DB migration auto-adds `user_id INTEGER NOT NULL DEFAULT 0` + index to existing `notes` table
+  - `NoteModel` methods all require `userID` parameter: `Create`, `GetAll`, `GetByID`, `Update`, `Delete`
+  - New methods: `CountForUser(userID)`, `FindPaginatedForUser(userID, limit, offset, orderBy)`
+- **Protected routes**: all 19 ViewModel routes (7 Notes, 7 Tags, 5 API) require authentication
+  - `RequireLogin()` — redirects to `/login?next=<encoded-url>` with post-login return
+  - `RequireLoginJSON()` — returns 401 JSON `{"error":"Authentication required"}` for API endpoints
+- **Cookie-based authentication** — replaces session-based auth (SSR has no WebSocket session)
+  - HMAC-signed `mvvm_auth` cookie: `userID:username:SHA256(payload:secret)`
+  - `App.mAuthSecret` — random 32-byte key generated at startup
+  - `RedirectWithAuth()` — HTTP `Set-Cookie` header + JS intermediate page for localStorage
+  - `RedirectWithLogout()` — `Set-Cookie: Max-Age=0` + JS clears localStorage
+  - `ParseAuthCookie()` — reads/verifies cookie from `Request.Header("Cookie")`
+- **NoteOwnershipTests** — 2 tests verifying cross-user isolation (wrong user can't read/delete)
+- **Inline error rendering** on login/signup — `error_message` template variable replaces broken `SetFlash`
+
+### Changed
+- `BaseViewModel.CurrentUserID()` / `CurrentUsername()` now read from cookie, not session
+- `BaseViewModel.Render()` injects `current_user` from cookie
+- Login/signup error handling: re-renders form with error instead of redirect+flash (SetFlash is Nil in SSR)
+- Signup template no longer sets localStorage optimistically — `RedirectWithAuth` handles it
+- All 5 existing test files updated with `kTestUserID = 999` for user-scoped model calls
+
+### Fixed
+- **`Self.Session` is always Nil in SSR** — discovered that Xojo Web 2 HandleURL has no WebSocket session. Session-based auth (`Session.LogIn`, `SetFlash`) silently failed. Replaced with cookie-based auth.
+- **Login failures were invisible** — `SetFlash()` + `Redirect()` showed no error because session was Nil. Now renders login page with inline error message.
+
+---
+
 ## [0.9.2] — 2026-03-12
 
 ### Changed

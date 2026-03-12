@@ -1,5 +1,5 @@
 title: "MVVM Docs"
-version: "v0.9.0"
+version: "v0.9.3"
 repo: "https://github.com/worajedt/mvvm"
 
 sections:
@@ -89,6 +89,12 @@ sections:
       - title: "Alpine.js"
         slug: "alpine/index"
         src: "pages/11-alpine/index.md"
+
+  - title: "Security"
+    pages:
+      - title: "Protected Routes & User Scoping"
+        slug: "protected-routes/index"
+        src: "pages/12-protected-routes/index.md"
 
   - title: "Encoding"
     pages:

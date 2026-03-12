@@ -1,11 +1,11 @@
 ---
 title: "JSON API & Static Serving"
-description: How XjMVVM exposes a JSON API alongside its SSR routes, and how the built-in static file server works.
+description: How XjMVVM exposes an authenticated JSON API alongside its SSR routes, and how the built-in static file server works.
 ---
 
 # JSON API & Static Serving
 
-XjMVVM can serve both server-rendered HTML pages **and** a JSON API from the same application — no separate process or framework needed. The API uses the same Router, the same ViewModels pattern, and the same Models. The only difference is the response format.
+XjMVVM can serve both server-rendered HTML pages **and** a JSON API from the same application — no separate process or framework needed. The API uses the same Router, the same ViewModels pattern, and the same Models. The only differences are the response format and the auth guard.
 
 ---
 
@@ -68,6 +68,27 @@ The content-type signals JSON to clients. No ViewModel needs to set headers dire
 
 ---
 
+## API Authentication
+
+All API endpoints require authentication. Unlike HTML routes that redirect to `/login`, API routes return a **401 JSON error** when the user is not authenticated:
+
+```json
+{"error":"Authentication required"}
+```
+
+Every API ViewModel calls `RequireLoginJSON()` as its first line:
+
+```xojo
+Sub OnGet()
+  If RequireLoginJSON() Then Return  // 401 if no valid mvvm_auth cookie
+  // ... rest of handler
+End Sub
+```
+
+API clients must include the `mvvm_auth` cookie in their requests. For browser-based JavaScript (`fetch`), this happens automatically when using `credentials: 'same-origin'`. For external clients, the cookie must be obtained via the login endpoint and sent with subsequent requests.
+
+---
+
 ## API ViewModels
 
 All API ViewModels live under `ViewModels/API/`. They follow the same `OnGet()`/`OnPost()` pattern as SSR ViewModels — the only difference is that they call `WriteJSON()` instead of `Render()`.
@@ -80,42 +101,52 @@ All API ViewModels live under `ViewModels/API/`. They follow the same `OnGet()`/
 #spacing: 44
 #padding: 10
 #lineWidth: 1.5
-[GET /api/notes] -> [NotesAPIListVM|model.GetAll()\nArrayToJSON()]
-[GET /api/notes/:id] -> [NotesAPIDetailVM|model.GetByID(id)\nGetTagsForNote(id)\nembed tags in JSON]
-[POST /api/notes] -> [NotesAPICreateVM|validate\nmodel.Create()\n201 Created]
-[GET /api/tags] -> [TagsAPIListVM|model.GetAll()\nArrayToJSON()]
-[GET /api/tags/:id] -> [TagsAPIDetailVM|model.GetByID(id)\nDictToJSON()]
+[GET /api/notes] -> [NotesAPIListVM|RequireLoginJSON()\nmodel.GetAll(userID)\nArrayToJSON()]
+[GET /api/notes/:id] -> [NotesAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id, userID)\nembed tags in JSON]
+[POST /api/notes] -> [NotesAPICreateVM|RequireLoginJSON()\nvalidate\nmodel.Create(title, body, userID)\n201 Created]
+[GET /api/tags] -> [TagsAPIListVM|RequireLoginJSON()\nmodel.GetAll()\nArrayToJSON()]
+[GET /api/tags/:id] -> [TagsAPIDetailVM|RequireLoginJSON()\nmodel.GetByID(id)\nDictToJSON()]
 -->
 <!-- ascii
-GET  /api/notes       → NotesAPIListVM   → ArrayToJSON(notes)
-GET  /api/notes/:id   → NotesAPIDetailVM → note + embedded tags array
-POST /api/notes       → NotesAPICreateVM → 201 Created + new note JSON
-GET  /api/tags        → TagsAPIListVM    → ArrayToJSON(tags)
-GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)
+GET  /api/notes       -> NotesAPIListVM   -> RequireLoginJSON() -> ArrayToJSON(notes)
+GET  /api/notes/:id   -> NotesAPIDetailVM -> RequireLoginJSON() -> note + embedded tags array
+POST /api/notes       -> NotesAPICreateVM -> RequireLoginJSON() -> 201 Created + new note JSON
+GET  /api/tags        -> TagsAPIListVM    -> RequireLoginJSON() -> ArrayToJSON(tags)
+GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(tag)
 -->
 <!-- /diagram -->
 
 ### NotesAPIListVM — `GET /api/notes`
 
+Returns all notes for the authenticated user:
+
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var notes() As Variant = model.GetAll()
+  Var notes() As Variant = model.GetAll(userID)
   WriteJSON(JSONSerializer.ArrayToJSON(notes))
 End Sub
 ```
 
-Response: `[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"..."},...]`
+Response: `[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"...","user_id":"5"},...]`
+
+Notes are scoped to the authenticated user — each user only sees their own notes.
 
 ### NotesAPIDetailVM — `GET /api/notes/:id`
 
-Returns the note with an embedded `tags` array:
+Returns the note with an embedded `tags` array. Returns 404 if the note does not exist or belongs to a different user:
 
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var id As Integer = Val(GetParam("id"))
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var note As Dictionary = model.GetByID(id)
+  Var note As Dictionary = model.GetByID(id, userID)
 
   If note = Nil Then
     Response.Status = 404
@@ -141,30 +172,37 @@ The tags array is injected by string manipulation — removing the closing `}` a
 
 ```xojo
 Sub OnPost()
+  If RequireLoginJSON() Then Return
+
   Var title As String = GetFormValue("title").Trim()
   Var body As String = GetFormValue("body")
 
   If title.Length = 0 Then
-    Response.Status = 422      // Unprocessable Entity — validation error
+    Response.Status = 422      // Unprocessable Entity -- validation error
     WriteJSON("{""error"":""Title is required""}")
     Return
   End If
 
+  Var userID As Integer = CurrentUserID()
   Var model As New NoteModel()
-  Var newID As Integer = model.Create(title, body)
-  Var note As Dictionary = model.GetByID(newID)
+  Var newID As Integer = model.Create(title, body, userID)
+  Var note As Dictionary = model.GetByID(newID, userID)
 
   Response.Status = 201        // Created
   WriteJSON(JSONSerializer.DictToJSON(note))
 End Sub
 ```
 
-Status codes used by the API: **200** for successful reads, **201** for successful creation, **404** for not found, **422** for validation failure.
+Status codes used by the API: **200** for successful reads, **201** for successful creation, **401** for unauthenticated, **404** for not found, **422** for validation failure.
 
 ### TagsAPIListVM — `GET /api/tags`
 
+Tags are global (not user-scoped) but still require authentication:
+
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var model As New TagModel()
   Var tags() As Variant = model.GetAll()
   WriteJSON(JSONSerializer.ArrayToJSON(tags))
@@ -175,6 +213,8 @@ End Sub
 
 ```xojo
 Sub OnGet()
+  If RequireLoginJSON() Then Return
+
   Var id As Integer = Val(GetParam("id"))
   Var model As New TagModel()
   Var tag As Dictionary = model.GetByID(id)
@@ -238,7 +278,7 @@ Private Function ServeStatic(relativePath As String, response As WebResponse) As
   // Start from the known safe root
   Var f As FolderItem = App.ExecutableFile.Parent.Child("templates").Child("dist")
 
-  // Walk each path segment individually — never concatenate raw user input
+  // Walk each path segment individually -- never concatenate raw user input
   Var parts() As String = relativePath.Split("/")
   For Each part As String In parts
     If part = "" Or part = "." Or part = ".." Then Continue  // skip dangerous segments
@@ -251,7 +291,7 @@ Private Function ServeStatic(relativePath As String, response As WebResponse) As
     End If
   Next
 
-  // Directory → try index.html automatically
+  // Directory -> try index.html automatically
   If f.IsFolder Then
     f = f.Child("index.html")
     If f Is Nil Or Not f.Exists Then

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Auth System — MVVM Docs</title>
-  <meta name="description" content="How XjMVVM handles user registration, login, logout, password hashing, and client-side session workarounds for SSR mode." />
+  <meta name="description" content="How XjMVVM handles user registration, login, logout, password hashing, and cookie-based authentication for SSR mode." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.9.0</span>
+        <span class="logo-version">v0.9.3</span>
       </a>
 
       <!-- Language switcher -->
@@ -307,6 +307,21 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Security</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../protected-routes/">
+                Protected Routes & User Scoping
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -329,11 +344,15 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">Auth System</h1>
-          <p class="page-description">How XjMVVM handles user registration, login, logout, password hashing, and client-side session workarounds for SSR mode.</p>
+          <p class="page-description">How XjMVVM handles user registration, login, logout, password hashing, and cookie-based authentication for SSR mode.</p>
         </div>
 
         <h1 id="auth-system">Auth System<a class="headerlink" href="#auth-system" title="Permanent link">&para;</a></h1>
-<p>Authentication in XjMVVM is built across three layers: the <strong><code>UserModel</code></strong> stores and verifies credentials, the <strong><code>Session</code></strong> class tracks who is logged in, and <strong><code>BaseViewModel</code></strong> provides helpers that protect routes and expose the current user to templates.</p>
+<p>Authentication in XjMVVM is built across three layers: the <strong><code>UserModel</code></strong> stores and verifies credentials, <strong><code>BaseViewModel</code></strong> provides cookie-based auth helpers that protect routes and expose the current user to templates, and <strong>browser-side JavaScript</strong> bridges the SSR session gap for nav state and flash messages.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong><code>Self.Session</code> is always Nil in SSR mode.</strong> Xojo Web 2&rsquo;s <code>WebSession</code> requires a persistent WebSocket connection. In pure SSR — where <code>HandleURL</code> always returns <code>True</code> — there is no WebSocket and no session. All auth uses HMAC-signed cookies instead.</p>
+</div>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
@@ -341,7 +360,7 @@
     <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
   </div>
   <div class="diagram-panel diagram-nomnoml">
-    <svg version="1.1" baseProfile="full" width="1274.0" height="348.0" viewBox="0 0 1274 348" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <svg version="1.1" baseProfile="full" width="1300.0" height="348.0" viewBox="0 0 1300 348" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
     <desc >#fill: white
     #stroke: black
     #direction: down
@@ -351,44 +370,48 @@
     [POST /login or /signup] -&gt; [LoginVM / SignupVM]
     [LoginVM / SignupVM] verify -&gt; [UserModel|FindByUsername()\nVerifyPassword()\nCreate()]
     [UserModel] result -&gt; [LoginVM / SignupVM]
-    [LoginVM / SignupVM] LogIn(id, username) -&gt; [Session|CurrentUserID\nCurrentUsername\nIsLoggedIn()]
-    [Session] -&gt; [Redirect to /notes]
+    [LoginVM / SignupVM] RedirectWithAuth() -&gt; [Set-Cookie: mvvm_auth=...|JS intermediate page:\nlocalStorage + sessionStorage]
+    [Set-Cookie: mvvm_auth=...|JS intermediate page:\nlocalStorage + sessionStorage] -&gt; [Redirect to /notes]
     [GET any protected route] -&gt; [BaseViewModel.RequireLogin()]
-    [BaseViewModel.RequireLogin()] not logged in -&gt; [Redirect /login]
-    [BaseViewModel.RequireLogin()] logged in -&gt; [OnGet() / OnPost()]</desc>
+    [BaseViewModel.RequireLogin()] ParseAuthCookie() -&gt; [Cookie valid?]
+    [Cookie valid?] no -&gt; [Redirect /login?next=url]
+    [Cookie valid?] yes -&gt; [OnGet() / OnPost()]</desc>
     <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
         <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
             <g stroke="transparent" fill="transparent">
-                <rect x="0.0" y="0.0" height="348.0" width="1274.0" stroke="none"></rect>
+                <rect x="0.0" y="0.0" height="348.0" width="1300.0" stroke="none"></rect>
             </g>
             <g transform="translate(10, 10)" fill="black">
                 <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
-                    <path d="M400.0 36.0 L400 54 L400 66 L400.0 66.0 " fill="none"></path>
-                    <path d="M395.2 60.0 L400.0 66.0 L404.8 60.0 L400.0 72.0 Z"></path>
-                    <text x="318.0" y="127.1" stroke="none">verify</text>
-                    <path d="M308.0 105.1 L181 126 L185.10263340389898 138.3079002116969 L185.1 138.3 " fill="none"></path>
+                    <path d="M411.3 36.0 L411.25 54 L411.25 66 L411.3 66.0 " fill="none"></path>
+                    <path d="M406.4 60.0 L411.3 66.0 L416.1 60.0 L411.3 72.0 Z"></path>
+                    <text x="329.3" y="126.4" stroke="none">verify</text>
+                    <path d="M319.3 104.4 L181 126 L185.10263340389898 138.3079002116969 L185.1 138.3 " fill="none"></path>
                     <path d="M178.7 134.1 L185.1 138.3 L187.8 131.1 L187.0 144.0 Z"></path>
-                    <text x="279.0" y="134.0" stroke="none">result</text>
-                    <path d="M333.0 144.0 L400 126 L400 114 L400.0 114.0 " fill="none"></path>
-                    <path d="M404.8 120.0 L400.0 114.0 L395.2 120.0 L400.0 108.0 Z"></path>
-                    <text x="322.0" y="126.0" stroke="none">LogIn(id, username)</text>
-                    <path d="M492.0 104.0 L637 126 L637 138 L637.0 138.0 " fill="none"></path>
-                    <path d="M632.2 132.0 L637.0 138.0 L641.8 132.0 L637.0 144.0 Z"></path>
-                    <path d="M637.0 216.0 L637 234 L637 246 L637.0 246.0 " fill="none"></path>
-                    <path d="M632.2 240.0 L637.0 246.0 L641.8 240.0 L637.0 252.0 Z"></path>
-                    <path d="M1036.5 36.0 L1036.5 54 L1036.5 66 L1036.5 66.0 " fill="none"></path>
-                    <path d="M1031.7 60.0 L1036.5 66.0 L1041.3 60.0 L1036.5 72.0 Z"></path>
-                    <text x="999.8" y="130.0" stroke="none">not logged in</text>
-                    <path d="M989.8 108.0 L943 126 L943 156 L943.0 156.0 " fill="none"></path>
-                    <path d="M938.2 150.0 L943.0 156.0 L947.8 150.0 L943.0 162.0 Z"></path>
-                    <text x="1000.3" y="130.0" stroke="none">logged in</text>
-                    <path d="M1083.3 108.0 L1130 126 L1130 156 L1130.0 156.0 " fill="none"></path>
-                    <path d="M1125.2 150.0 L1130.0 156.0 L1134.8 150.0 L1130.0 162.0 Z"></path>
+                    <text x="286.5" y="134.0" stroke="none">result</text>
+                    <path d="M340.5 144.0 L411.25 126 L411.25 114 L411.3 114.0 " fill="none"></path>
+                    <path d="M416.1 120.0 L411.3 114.0 L406.4 120.0 L411.3 108.0 Z"></path>
+                    <text x="344.3" y="125.3" stroke="none">RedirectWithAuth()</text>
+                    <path d="M503.3 103.3 L659.5 126 L659.5 138 L659.5 138.0 " fill="none"></path>
+                    <path d="M654.7 132.0 L659.5 138.0 L664.3 132.0 L659.5 144.0 Z"></path>
+                    <path d="M659.5 216.0 L659.5 234 L659.5 246 L659.5 246.0 " fill="none"></path>
+                    <path d="M654.7 240.0 L659.5 246.0 L664.3 240.0 L659.5 252.0 Z"></path>
+                    <path d="M1044.0 36.0 L1044 54 L1044 66 L1044.0 66.0 " fill="none"></path>
+                    <path d="M1039.2 60.0 L1044.0 66.0 L1048.8 60.0 L1044.0 72.0 Z"></path>
+                    <text x="1054.0" y="130.0" stroke="none">ParseAuthCookie()</text>
+                    <path d="M1044.0 108.0 L1044 126 L1044 156 L1044.0 156.0 " fill="none"></path>
+                    <path d="M1039.2 150.0 L1044.0 156.0 L1048.8 150.0 L1044.0 162.0 Z"></path>
+                    <text x="1016.7" y="220.0" stroke="none">no</text>
+                    <path d="M1006.7 198.0 L932 234 L932 246 L932.0 246.0 " fill="none"></path>
+                    <path d="M927.2 240.0 L932.0 246.0 L936.8 240.0 L932.0 252.0 Z"></path>
+                    <text x="1043.3" y="220.0" stroke="none">yes</text>
+                    <path d="M1081.3 198.0 L1156 234 L1156 246 L1156.0 246.0 " fill="none"></path>
+                    <path d="M1151.2 240.0 L1156.0 246.0 L1160.8 240.0 L1156.0 252.0 Z"></path>
                     <g data-name="POST /login or /signup">
                         <g fill="white" stroke="black" data-name="POST /login or /signup">
-                            <rect x="301.5" y="0.0" height="36.0" width="197.0" data-name="POST /login or /signup"></rect>
+                            <rect x="312.8" y="0.0" height="36.0" width="197.0" data-name="POST /login or /signup"></rect>
                         </g>
-                        <g transform="translate(301.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="POST /login or /signup" data-compartment="0">
+                        <g transform="translate(312.75, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="POST /login or /signup" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="POST /login or /signup" data-compartment="0">
                                 <text x="88.5" y="14.1" stroke="none" text-anchor="middle" data-name="POST /login or /signup" data-compartment="0">POST /login or /signup</text>
 
@@ -397,9 +420,9 @@
                     </g>
                     <g data-name="LoginVM / SignupVM">
                         <g fill="white" stroke="black" data-name="LoginVM / SignupVM">
-                            <rect x="308.0" y="72.0" height="36.0" width="184.0" data-name="LoginVM / SignupVM"></rect>
+                            <rect x="319.3" y="72.0" height="36.0" width="184.0" data-name="LoginVM / SignupVM"></rect>
                         </g>
-                        <g transform="translate(308, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LoginVM / SignupVM" data-compartment="0">
+                        <g transform="translate(319.25, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LoginVM / SignupVM" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="LoginVM / SignupVM" data-compartment="0">
                                 <text x="82.0" y="14.1" stroke="none" text-anchor="middle" data-name="LoginVM / SignupVM" data-compartment="0">LoginVM / SignupVM</text>
 
@@ -426,31 +449,30 @@
                             </g>
                         </g>
                     </g>
-                    <g data-name="Session">
-                        <g fill="white" stroke="black" data-name="Session">
-                            <rect x="434.0" y="144.0" height="72.0" width="406.0" data-name="Session"></rect>
-                            <path d="M434.0 180.0 L840.0 180.0" fill="none" data-name="Session"></path>
+                    <g data-name="Set-Cookie: mvvm_auth=...">
+                        <g fill="white" stroke="black" data-name="Set-Cookie: mvvm_auth=...">
+                            <rect x="434.0" y="144.0" height="72.0" width="451.0" data-name="Set-Cookie: mvvm_auth=..."></rect>
+                            <path d="M434.0 180.0 L885.0 180.0" fill="none" data-name="Set-Cookie: mvvm_auth=..."></path>
                         </g>
-                        <g transform="translate(434, 144)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Session" data-compartment="0">
-                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Session" data-compartment="0">
-                                <text x="193.0" y="14.1" stroke="none" text-anchor="middle" data-name="Session" data-compartment="0">Session</text>
+                        <g transform="translate(434, 144)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Set-Cookie: mvvm_auth=..." data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Set-Cookie: mvvm_auth=..." data-compartment="0">
+                                <text x="215.5" y="14.1" stroke="none" text-anchor="middle" data-name="Set-Cookie: mvvm_auth=..." data-compartment="0">Set-Cookie: mvvm_auth=...</text>
 
                             </g>
                         </g>
-                        <g transform="translate(434, 180)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Session" data-compartment="1">
-                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="Session" data-compartment="1">
-                                <text x="0.0" y="14.1" stroke="none" data-name="Session" data-compartment="1">CurrentUserID
-                                CurrentUsername
-                                IsLoggedIn()</text>
+                        <g transform="translate(434, 180)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Set-Cookie: mvvm_auth=..." data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="Set-Cookie: mvvm_auth=..." data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="Set-Cookie: mvvm_auth=..." data-compartment="1">JS intermediate page:
+                                localStorage + sessionStorage</text>
 
                             </g>
                         </g>
                     </g>
                     <g data-name="Redirect to /notes">
                         <g fill="white" stroke="black" data-name="Redirect to /notes">
-                            <rect x="557.0" y="252.0" height="36.0" width="160.0" data-name="Redirect to /notes"></rect>
+                            <rect x="579.5" y="252.0" height="36.0" width="160.0" data-name="Redirect to /notes"></rect>
                         </g>
-                        <g transform="translate(557, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect to /notes" data-compartment="0">
+                        <g transform="translate(579.5, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect to /notes" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect to /notes" data-compartment="0">
                                 <text x="70.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect to /notes" data-compartment="0">Redirect to /notes</text>
 
@@ -459,9 +481,9 @@
                     </g>
                     <g data-name="GET any protected route">
                         <g fill="white" stroke="black" data-name="GET any protected route">
-                            <rect x="929.5" y="0.0" height="36.0" width="214.0" data-name="GET any protected route"></rect>
+                            <rect x="937.0" y="0.0" height="36.0" width="214.0" data-name="GET any protected route"></rect>
                         </g>
-                        <g transform="translate(929.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET any protected route" data-compartment="0">
+                        <g transform="translate(937, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET any protected route" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="GET any protected route" data-compartment="0">
                                 <text x="97.0" y="14.1" stroke="none" text-anchor="middle" data-name="GET any protected route" data-compartment="0">GET any protected route</text>
 
@@ -470,31 +492,42 @@
                     </g>
                     <g data-name="BaseViewModel.RequireLogin()">
                         <g fill="white" stroke="black" data-name="BaseViewModel.RequireLogin()">
-                            <rect x="902.5" y="72.0" height="36.0" width="268.0" data-name="BaseViewModel.RequireLogin()"></rect>
+                            <rect x="910.0" y="72.0" height="36.0" width="268.0" data-name="BaseViewModel.RequireLogin()"></rect>
                         </g>
-                        <g transform="translate(902.5, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
+                        <g transform="translate(910, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
                                 <text x="124.0" y="14.1" stroke="none" text-anchor="middle" data-name="BaseViewModel.RequireLogin()" data-compartment="0">BaseViewModel.RequireLogin()</text>
 
                             </g>
                         </g>
                     </g>
-                    <g data-name="Redirect /login">
-                        <g fill="white" stroke="black" data-name="Redirect /login">
-                            <rect x="876.0" y="162.0" height="36.0" width="134.0" data-name="Redirect /login"></rect>
+                    <g data-name="Cookie valid?">
+                        <g fill="white" stroke="black" data-name="Cookie valid?">
+                            <rect x="980.5" y="162.0" height="36.0" width="127.0" data-name="Cookie valid?"></rect>
                         </g>
-                        <g transform="translate(876, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect /login" data-compartment="0">
-                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect /login" data-compartment="0">
-                                <text x="57.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect /login" data-compartment="0">Redirect /login</text>
+                        <g transform="translate(980.5, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Cookie valid?" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Cookie valid?" data-compartment="0">
+                                <text x="53.5" y="14.1" stroke="none" text-anchor="middle" data-name="Cookie valid?" data-compartment="0">Cookie valid?</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Redirect /login?next=url">
+                        <g fill="white" stroke="black" data-name="Redirect /login?next=url">
+                            <rect x="828.0" y="252.0" height="36.0" width="208.0" data-name="Redirect /login?next=url"></rect>
+                        </g>
+                        <g transform="translate(828, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect /login?next=url" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect /login?next=url" data-compartment="0">
+                                <text x="94.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect /login?next=url" data-compartment="0">Redirect /login?next=url</text>
 
                             </g>
                         </g>
                     </g>
                     <g data-name="OnGet() / OnPost()">
                         <g fill="white" stroke="black" data-name="OnGet() / OnPost()">
-                            <rect x="1046.0" y="162.0" height="36.0" width="168.0" data-name="OnGet() / OnPost()"></rect>
+                            <rect x="1072.0" y="252.0" height="36.0" width="168.0" data-name="OnGet() / OnPost()"></rect>
                         </g>
-                        <g transform="translate(1046, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="OnGet() / OnPost()" data-compartment="0">
+                        <g transform="translate(1072, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="OnGet() / OnPost()" data-compartment="0">
                             <g transform="translate(10, 10)" fill="black" text-align="center" data-name="OnGet() / OnPost()" data-compartment="0">
                                 <text x="74.0" y="14.1" stroke="none" text-anchor="middle" data-name="OnGet() / OnPost()" data-compartment="0">OnGet() / OnPost()</text>
 
@@ -509,14 +542,18 @@
   </div>
   <div class="diagram-panel diagram-ascii" style="display:none">
     <pre class="ascii-diagram"><code>POST /login or /signup
-  └── LoginVM / SignupVM
-        ├── UserModel.VerifyPassword() or .Create()
-        └── Session.LogIn(id, username) → Redirect /notes
+  +-- LoginVM / SignupVM
+        +-- UserModel.VerifyPassword() or .Create()
+        +-- RedirectWithAuth()
+              +-- Set-Cookie: mvvm_auth=userID:username:HMAC
+              +-- JS intermediate page sets localStorage + sessionStorage
+              +-- Redirect to /notes
 
 GET protected route
-  └── BaseViewModel.RequireLogin()
-        ├── not logged in → Redirect /login
-        └── logged in → OnGet() / OnPost()</code></pre>
+  +-- BaseViewModel.RequireLogin()
+        +-- ParseAuthCookie() reads + verifies cookie
+              +-- invalid -> Redirect /login?next=url
+              +-- valid   -> OnGet() / OnPost()</code></pre>
   </div>
 </div>
 
@@ -532,27 +569,25 @@ GET protected route
 <span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nb">Array</span><span class="p">.</span><span class="kr">from</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">Uint8Array</span><span class="p">(</span><span class="nx">buf</span><span class="p">))</span>
 <span class="w">    </span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">b</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">b</span><span class="p">.</span><span class="nx">toString</span><span class="p">(</span><span class="mf">16</span><span class="p">).</span><span class="nx">padStart</span><span class="p">(</span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;0&#39;</span><span class="p">)).</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">);</span>
 <span class="p">}</span>
-
-<span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;login-form&#39;</span><span class="p">).</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span><span class="w"> </span><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">dataset</span><span class="p">.</span><span class="nx">hashed</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w">   </span><span class="c1">// already processed — let it through</span>
-<span class="w">  </span><span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-<span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">pwEl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">);</span>
-<span class="w">  </span><span class="nx">pwEl</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">pwEl</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">dataset</span><span class="p">.</span><span class="nx">hashed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;1&#39;</span><span class="p">;</span>
-<span class="w">  </span><span class="k">this</span><span class="p">.</span><span class="nx">submit</span><span class="p">();</span>
-<span class="p">});</span>
 <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>The <code>dataset.hashed</code> flag prevents the <code>submit</code> event handler from running again when <code>form.submit()</code> is called programmatically (which would re-hash the already-hashed value).</p>
-<p>The signup form adds password-match validation before hashing:</p>
-<div class="highlight"><pre><span></span><code><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">pw</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">6</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="cm">/* show inline error */</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">pw</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="nx">cf</span><span class="p">)</span><span class="w">     </span><span class="p">{</span><span class="w"> </span><span class="cm">/* show inline error */</span><span class="w"> </span><span class="k">return</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<span class="kd">const</span><span class="w"> </span><span class="nx">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">pw</span><span class="p">);</span>
-<span class="nx">pwEl</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">hash</span><span class="p">;</span>
-<span class="nx">cfEl</span><span class="p">.</span><span class="nx">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">hash</span><span class="p">;</span><span class="w">   </span><span class="c1">// keep confirm field in sync so server check passes</span>
+<p>Alpine.js intercepts the form submit, hashes the password, then submits:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/login&quot;</span>
+      <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
+<span class="s">        hashed: false,</span>
+<span class="s">        async handleSubmit(e) {</span>
+<span class="s">          if (this.hashed) return;</span>
+<span class="s">          const pwEl = document.getElementById(&#39;password&#39;);</span>
+<span class="s">          pwEl.value = await sha256hex(pwEl.value);</span>
+<span class="s">          this.hashed = true;</span>
+<span class="s">          e.target.submit();</span>
+<span class="s">        }</span>
+<span class="s">      }&quot;</span>
+      <span class="err">@</span><span class="na">submit</span><span class="err">.</span><span class="na">prevent</span><span class="o">=</span><span class="s">&quot;handleSubmit($event)&quot;</span><span class="p">&gt;</span>
 </code></pre></div>
 
+<p>The <code>hashed</code> flag prevents re-processing if <code>e.target.submit()</code> somehow re-fires the event.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code>crypto.subtle</code> is available in all modern browsers and does not require any library. It is only available on secure contexts (HTTPS or localhost).</p>
@@ -588,7 +623,7 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>Returns the new <code>id</code> on success, or <code>0</code> if the username was already taken. The uniqueness check is done at the application layer (<code>FindByUsername</code>) rather than relying solely on the <code>UNIQUE</code> constraint — this gives a clean signal (<code>0</code> return) without needing to catch a database exception.</p>
+<p>Returns the new <code>id</code> on success, or <code>0</code> if the username was already taken.</p>
 <h3 id="verifying-a-password">Verifying a password<a class="headerlink" href="#verifying-a-password" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">VerifyPassword</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FindByUsername</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
@@ -609,150 +644,175 @@ GET protected route
 <p><code>stored.Middle(colonPos + 1)</code> is 0-based (<code>String.Middle</code> aligns with <code>IndexOf</code>). Never use <code>Mid()</code> here — the 1-based legacy function would produce an off-by-one and corrupt the salt extraction.</p>
 </div>
 <hr />
-<h2 id="session">Session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h2>
-<p><strong>File:</strong> <code>Session.xojo_code</code> (extends <code>WebSession</code>)</p>
-<p><code>Session</code> stores the authenticated user&rsquo;s identity as <strong>session properties</strong> — not temporary variables. WebSession properties are automatically scoped per user.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">Session</span>
-<span class="k">Inherits</span><span class="w"> </span><span class="n">WebSession</span>
-
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">LogIn</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
-<span class="w">    </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userID</span>
-<span class="w">    </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
-
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">LogOut</span><span class="p">()</span>
-<span class="w">    </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
-<span class="w">    </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
-
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">IsLoggedIn</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
-
-<span class="w">  </span><span class="n">CurrentUserID</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w">   </span><span class="c1">// 0 = not logged in</span>
-<span class="w">  </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
+<h2 id="cookie-based-authentication">Cookie-Based Authentication<a class="headerlink" href="#cookie-based-authentication" title="Permanent link">&para;</a></h2>
+<p>Since <code>Self.Session</code> is always Nil in SSR mode, XjMVVM uses HMAC-signed HTTP cookies for authentication. The cookie is set via the <code>Set-Cookie</code> HTTP header and verified on every request.</p>
+<h3 id="cookie-format">Cookie format<a class="headerlink" href="#cookie-format" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>mvvm_auth=&lt;userID&gt;:&lt;username&gt;:&lt;HMAC&gt;
 </code></pre></div>
 
-<p><code>CurrentUserID = 0</code> is the sentinel for &ldquo;not logged in&rdquo; — zero is never a valid SQLite <code>AUTOINCREMENT</code> primary key value.</p>
-<hr />
-<h2 id="ssr-session-limitations-client-side-workarounds">SSR session limitations &amp; client-side workarounds<a class="headerlink" href="#ssr-session-limitations-client-side-workarounds" title="Permanent link">&para;</a></h2>
-<p>In Xojo Web 2, <code>WebSession</code> state is tied to a persistent WebSocket connection. In pure SSR mode — where <code>HandleURL</code> always returns <code>True</code> and no WebSocket is established — each HTTP request may receive a fresh session with no shared state. This means:</p>
+<p>The HMAC is computed as:</p>
+<div class="highlight"><pre><span></span><code>SHA256(userID + &quot;:&quot; + username + &quot;:&quot; + App.mAuthSecret)
+</code></pre></div>
+
+<p><code>App.mAuthSecret</code> is a random 32-byte hex string generated once at startup via <code>Crypto.GenerateRandomBytes(32)</code>. It changes on every restart, effectively invalidating all existing auth cookies.</p>
+<h3 id="authcookievalue-generating-the-cookie">AuthCookieValue — generating the cookie<a class="headerlink" href="#authcookievalue-generating-the-cookie" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">userID</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">hmac</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">mAuthSecret</span><span class="p">))</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">hmac</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<h3 id="parseauthcookie-verifying-the-cookie">ParseAuthCookie — verifying the cookie<a class="headerlink" href="#parseauthcookie-verifying-the-cookie" title="Permanent link">&para;</a></h3>
+<p>Called on every request to extract and verify the authenticated user. Results are cached per request via <code>mAuthParsed</code> / <code>mAuthCache</code> properties so multiple calls (from <code>RequireLogin</code>, <code>CurrentUserID</code>, <code>Render</code>) do not re-parse.</p>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">mAuthParsed</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">mAuthCache</span>
+
+<span class="w">  </span><span class="n">mAuthParsed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span>
+<span class="w">  </span><span class="n">mAuthCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="c1">// Read the Cookie header</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">cookieHeader</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cookie&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">cookieHeader</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="c1">// Find mvvm_auth=... value</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w">  </span><span class="c1">// ... extract from cookie header ...</span>
+
+<span class="w">  </span><span class="c1">// Parse userID:username:hmac</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">firstColon</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">lastColon</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">65</span><span class="w">  </span><span class="c1">// HMAC is always 64 hex chars</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">firstColon</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">lastColon</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">firstColon</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">firstColon</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">lastColon</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">firstColon</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">2</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">receivedHMAC</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">lastColon</span><span class="p">)</span>
+
+<span class="w">  </span><span class="c1">// Verify HMAC</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">expectedHMAC</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">payload</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">mAuthSecret</span><span class="p">))</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">receivedHMAC</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="n">expectedHMAC</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">Nil</span>
+
+<span class="w">  </span><span class="c1">// Valid — cache and return</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">  </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userID</span>
+<span class="w">  </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span>
+<span class="w">  </span><span class="n">mAuthCache</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The HMAC verification ensures cookies cannot be forged. An attacker would need <code>App.mAuthSecret</code> to generate a valid cookie for any user.</p>
+</div>
+<h3 id="redirectwithauth-setting-the-cookie-on-loginsignup">RedirectWithAuth — setting the cookie on login/signup<a class="headerlink" href="#redirectwithauth-setting-the-cookie-on-loginsignup" title="Permanent link">&para;</a></h3>
+<p>After successful authentication, <code>RedirectWithAuth</code> does three things in one response:</p>
+<ol>
+<li>Sets the <code>mvvm_auth</code> cookie via HTTP <code>Set-Cookie</code> header</li>
+<li>Sends a JS intermediate page that stores username in <code>localStorage</code> and flash message in <code>sessionStorage</code></li>
+<li>Redirects the browser to the target URL</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithAuth</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">cookieVal</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Set-Cookie&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mvvm_auth=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">cookieVal</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;; Path=/; SameSite=Lax&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;&lt;html&gt;&lt;body&gt;&lt;script&gt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;localStorage.setItem(&#39;_auth_user&#39;,&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;sessionStorage.setItem(&#39;_flash_msg&#39;,&#39;Welcome, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;!&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;sessionStorage.setItem(&#39;_flash_type&#39;,&#39;success&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;window.location.href=&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">targetURL</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p>The JS intermediate page is necessary because:</p>
 <ul>
-<li>Flash messages stored during a <code>POST</code> are <strong>lost</strong> by the time the redirect <code>GET</code> arrives.</li>
-<li>The logged-in username is <strong>not available</strong> to the template renderer via <code>current_user</code>.</li>
+<li><code>Set-Cookie</code> sets the HTTP cookie (for server-side auth on subsequent requests)</li>
+<li><code>localStorage</code> stores the username (for client-side nav state display via Alpine.js)</li>
+<li><code>sessionStorage</code> stores the flash message (for one-time display after redirect)</li>
 </ul>
-<p>XjMVVM works around both limitations using browser-side storage.</p>
-<h3 id="flash-messages-sessionstorage">Flash messages — <code>sessionStorage</code><a class="headerlink" href="#flash-messages-sessionstorage" title="Permanent link">&para;</a></h3>
-<p>Before <code>form.submit()</code>, the signup and login scripts write the success message to <code>sessionStorage</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_flash_msg&#39;</span><span class="p">,</span><span class="w">  </span><span class="s1">&#39;Account created! Welcome, &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">username</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;!&#39;</span><span class="p">);</span>
-<span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_flash_type&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;success&#39;</span><span class="p">);</span>
-<span class="k">this</span><span class="p">.</span><span class="nx">submit</span><span class="p">();</span>
+<p>These three storage mechanisms serve different purposes and cannot replace each other.</p>
+<h3 id="redirectwithlogout-clearing-the-cookie">RedirectWithLogout — clearing the cookie<a class="headerlink" href="#redirectwithlogout-clearing-the-cookie" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithLogout</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Set-Cookie&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mvvm_auth=; Path=/; Max-Age=0; SameSite=Lax&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;&lt;html&gt;&lt;body&gt;&lt;script&gt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;localStorage.removeItem(&#39;_auth_user&#39;);&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;window.location.href=&#39;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">targetURL</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&#39;;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;&quot;</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p><code>sessionStorage</code> survives across the redirect within the same tab but is cleared when the tab closes. The base layout (<code>layouts/base.html</code>) reads and displays it on every page load:</p>
-<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">msg</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_flash_msg&#39;</span><span class="p">);</span>
-<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_flash_type&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39;success&#39;</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s1">&#39;_flash_msg&#39;</span><span class="p">);</span>
-<span class="w">  </span><span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s1">&#39;_flash_type&#39;</span><span class="p">);</span>
-<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">msg</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="nb">document</span><span class="p">.</span><span class="nx">querySelector</span><span class="p">(</span><span class="s1">&#39;.flash&#39;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">el</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;_client-flash&#39;</span><span class="p">);</span>
-<span class="w">    </span><span class="nx">el</span><span class="p">.</span><span class="nx">className</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;flash flash-&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">type</span><span class="p">;</span>
-<span class="w">    </span><span class="nx">el</span><span class="p">.</span><span class="nx">textContent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">msg</span><span class="p">;</span>
-<span class="w">    </span><span class="nx">el</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span>
-<span class="w">  </span><span class="p">}</span>
-<span class="p">})();</span>
-</code></pre></div>
-
-<p>The <code>!document.querySelector('.flash')</code> guard prevents a double-flash if the Xojo server-side session happens to work (e.g., in a future WebSocket-enabled mode).</p>
-<h3 id="nav-auth-state-localstorage">Nav auth state — <code>localStorage</code><a class="headerlink" href="#nav-auth-state-localstorage" title="Permanent link">&para;</a></h3>
-<p><code>localStorage</code> persists across tabs and browser restarts (until the user clears storage). The username is stored on login/signup and cleared on logout:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// In signup.html / login.html — before form.submit():</span>
-<span class="nx">localStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_auth_user&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">username</span><span class="p">);</span>
-
-<span class="c1">// In base.html logout form submit handler:</span>
-<span class="nx">localStorage</span><span class="p">.</span><span class="nx">removeItem</span><span class="p">(</span><span class="s1">&#39;_auth_user&#39;</span><span class="p">);</span>
-<span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_flash_msg&#39;</span><span class="p">,</span><span class="w">  </span><span class="s1">&#39;You have been logged out.&#39;</span><span class="p">);</span>
-<span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">setItem</span><span class="p">(</span><span class="s1">&#39;_flash_type&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;success&#39;</span><span class="p">);</span>
-</code></pre></div>
-
-<p>The base layout renders two nav spans — one for the logged-out state, one for logged-in — and JavaScript shows the correct one:</p>
-<div class="highlight"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="nx">user</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nx">localStorage</span><span class="p">.</span><span class="nx">getItem</span><span class="p">(</span><span class="s1">&#39;_auth_user&#39;</span><span class="p">);</span>
-<span class="kd">var</span><span class="w"> </span><span class="nx">navOut</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;nav-out&#39;</span><span class="p">);</span>
-<span class="kd">var</span><span class="w"> </span><span class="nx">navIn</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;nav-in&#39;</span><span class="p">);</span>
-<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">user</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;nav-username&#39;</span><span class="p">).</span><span class="nx">textContent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">user</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">navOut</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;none&#39;</span><span class="p">;</span>
-<span class="w">  </span><span class="nx">navIn</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;flex&#39;</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div>
-
+<p><code>Max-Age=0</code> tells the browser to delete the cookie immediately.</p>
 <hr />
-<h2 id="baseviewmodel-auth-helpers">BaseViewModel auth helpers<a class="headerlink" href="#baseviewmodel-auth-helpers" title="Permanent link">&para;</a></h2>
-<p>Three methods were added to <code>BaseViewModel</code> to make auth accessible from any ViewModel without directly casting <code>Session</code>:</p>
+<h2 id="baseviewmodel-auth-helpers">BaseViewModel Auth Helpers<a class="headerlink" href="#baseviewmodel-auth-helpers" title="Permanent link">&para;</a></h2>
+<p>Four methods on <code>BaseViewModel</code> make auth accessible from any ViewModel without directly handling cookies:</p>
+<h3 id="currentuserid-as-integer"><code>CurrentUserID() As Integer</code><a class="headerlink" href="#currentuserid-as-integer" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Val</span><span class="p">(</span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="m">0</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>Returns <code>0</code> when not authenticated — zero is never a valid SQLite <code>AUTOINCREMENT</code> primary key.</p>
+<h3 id="currentusername-as-string"><code>CurrentUsername() As String</code><a class="headerlink" href="#currentusername-as-string" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
 <h3 id="requirelogin-as-boolean"><code>RequireLogin() As Boolean</code><a class="headerlink" href="#requirelogin-as-boolean" title="Permanent link">&para;</a></h3>
+<p>Guards HTML routes. Redirects unauthenticated users to the login page with a <code>next</code> parameter so they return to the original URL after login.</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">sess</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">sess</span><span class="p">.</span><span class="n">IsLoggedIn</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">      </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Please log in to continue&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;info&quot;</span><span class="p">)</span>
-<span class="w">      </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">)</span>
-<span class="w">      </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span><span class="w">  </span><span class="c1">// ← caller must check this and return</span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login?next=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EncodeURLComponent</span><span class="p">(</span><span class="n">Request</span><span class="p">.</span><span class="n">Path</span><span class="p">))</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
 <p>Usage pattern in any protected ViewModel:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// guard — stops execution if redirect issued</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// guard -- stops execution if redirect issued</span>
 <span class="w">  </span><span class="c1">// ... rest of handler</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>RequireLogin()</code> issues the redirect but <strong>cannot stop execution</strong> — it returns <code>True</code> to signal the caller. Always pair it with <code>If RequireLogin() Then Return</code>. Forgetting the <code>Return</code> will cause the handler to continue executing after the redirect is already sent, likely resulting in a double-write error.</p>
+<p><code>RequireLogin()</code> issues the redirect but <strong>cannot stop execution</strong> — it returns <code>True</code> to signal the caller. Always pair it with <code>If RequireLogin() Then Return</code>. Forgetting the <code>Return</code> will cause the handler to continue executing after the redirect is already sent.</p>
 </div>
-<h3 id="currentuserid-and-currentusername"><code>CurrentUserID()</code> and <code>CurrentUsername()</code><a class="headerlink" href="#currentuserid-and-currentusername" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">).</span><span class="n">CurrentUserID</span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="m">0</span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
-
-<span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">).</span><span class="n">CurrentUsername</span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<h3 id="requireloginjson-as-boolean"><code>RequireLoginJSON() As Boolean</code><a class="headerlink" href="#requireloginjson-as-boolean" title="Permanent link">&para;</a></h3>
+<p>Guards API routes. Returns a 401 JSON error instead of redirecting (API clients cannot follow HTML redirects).</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">401</span>
+<span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="s2">&quot;{&quot;&quot;error&quot;&quot;:&quot;&quot;Authentication required&quot;&quot;}&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span>
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<h3 id="auto-injected-context-flash-and-current_user">Auto-injected context — <code>flash</code> and <code>current_user</code><a class="headerlink" href="#auto-injected-context-flash-and-current_user" title="Permanent link">&para;</a></h3>
-<p><code>BaseViewModel.Render()</code> always injects both keys into every template context with safe defaults, so templates never throw <code>UndefinedVariableException</code> even when the session is unavailable:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// flash — default to empty string (falsy in JinjaX {% if %})</span>
-<span class="n">context</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
-<span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">sess</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">flash</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sess</span><span class="p">.</span><span class="n">GetFlash</span><span class="p">()</span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">flash</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">context</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">flash</span>
-<span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<p>Usage:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
+<span class="w">  </span><span class="c1">// ... rest of API handler</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
 
-<span class="c1">// current_user — default to logged-out state</span>
-<span class="k">Var</span><span class="w"> </span><span class="n">userCtx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
-<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0&quot;</span>
-<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<h3 id="auto-injected-context-current_user">Auto-injected context — <code>current_user</code><a class="headerlink" href="#auto-injected-context-current_user" title="Permanent link">&para;</a></h3>
+<p><code>BaseViewModel.Render()</code> always injects a <code>current_user</code> dictionary into every template context with safe defaults, so templates never throw <code>UndefinedVariableException</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">userCtx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0&quot;</span>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 <span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;logged_in&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0&quot;</span>
-<span class="k">Var</span><span class="w"> </span><span class="n">ws2</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
-<span class="k">If</span><span class="w"> </span><span class="n">ws2</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">sess2</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws2</span><span class="p">)</span>
-<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">sess2</span><span class="p">.</span><span class="n">CurrentUserID</span><span class="p">)</span>
-<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">sess2</span><span class="p">.</span><span class="n">CurrentUsername</span>
-<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;logged_in&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">If</span><span class="p">(</span><span class="n">sess2</span><span class="p">.</span><span class="n">IsLoggedIn</span><span class="p">(),</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+
+<span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
+<span class="k">If</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">auth</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;logged_in&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;1&quot;</span>
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 <span class="n">context</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;current_user&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userCtx</span>
 </code></pre></div>
@@ -762,17 +822,103 @@ GET protected route
 <p><code>logged_in</code> is the string <code>"1"</code> or <code>"0"</code> — not a boolean — because <code>Dictionary</code> values in JinjaX templates are all strings. Compare with <code>== "1"</code>, not <code>== True</code>.</p>
 </div>
 <hr />
+<h2 id="ssr-session-limitations-client-side-workarounds">SSR Session Limitations &amp; Client-Side Workarounds<a class="headerlink" href="#ssr-session-limitations-client-side-workarounds" title="Permanent link">&para;</a></h2>
+<p>In Xojo Web 2, <code>WebSession</code> state is tied to a persistent WebSocket connection. In pure SSR mode — where <code>HandleURL</code> always returns <code>True</code> and no WebSocket is established — each HTTP request gets no session. This means:</p>
+<ul>
+<li>Flash messages stored during a <code>POST</code> are <strong>lost</strong> by the time the redirect <code>GET</code> arrives.</li>
+<li>The logged-in username is <strong>not available</strong> to the template renderer from session state.</li>
+<li><strong><code>SetFlash()</code> and <code>Session.LogIn()</code> silently do nothing</strong> — they write to a Nil session.</li>
+</ul>
+<p>XjMVVM works around these limitations with three mechanisms:</p>
+<table>
+<thead>
+<tr>
+<th>Mechanism</th>
+<th>Storage</th>
+<th>Purpose</th>
+<th>Lifetime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mvvm_auth</code> cookie</td>
+<td>HTTP cookie</td>
+<td>Server-side authentication</td>
+<td>Until browser clears or <code>Max-Age=0</code></td>
+</tr>
+<tr>
+<td><code>localStorage._auth_user</code></td>
+<td>Browser localStorage</td>
+<td>Client-side nav display</td>
+<td>Persistent across tabs/restarts</td>
+</tr>
+<tr>
+<td><code>sessionStorage._flash_msg</code></td>
+<td>Browser sessionStorage</td>
+<td>One-shot flash messages</td>
+<td>Current tab only, survives redirect</td>
+</tr>
+</tbody>
+</table>
+<h3 id="flash-messages-sessionstorage">Flash messages — <code>sessionStorage</code><a class="headerlink" href="#flash-messages-sessionstorage" title="Permanent link">&para;</a></h3>
+<p>The JS intermediate page (sent by <code>RedirectWithAuth</code>) writes the success message to <code>sessionStorage</code>. Alpine.js reads and displays it on the next page load:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
+<span class="s">  msg: &#39;&#39;,</span>
+<span class="s">  type: &#39;success&#39;,</span>
+<span class="s">  init() {</span>
+<span class="s">    var m = sessionStorage.getItem(&#39;_flash_msg&#39;);</span>
+<span class="s">    var t = sessionStorage.getItem(&#39;_flash_type&#39;) || &#39;success&#39;;</span>
+<span class="s">    sessionStorage.removeItem(&#39;_flash_msg&#39;);</span>
+<span class="s">    sessionStorage.removeItem(&#39;_flash_type&#39;);</span>
+<span class="s">    if (m &amp;&amp; !document.querySelector(&#39;.flash&#39;)) { this.msg = m; this.type = t; }</span>
+<span class="s">  }</span>
+<span class="s">}&quot;</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">:class</span><span class="o">=</span><span class="s">&quot;&#39;flash flash-&#39; + type&quot;</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<h3 id="inline-error-rendering">Inline error rendering<a class="headerlink" href="#inline-error-rendering" title="Permanent link">&para;</a></h3>
+<p>Login and signup errors cannot use flash messages (the redirect would lose them). Instead, the ViewModel re-renders the form with an <code>error_message</code> template variable:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// In LoginVM.OnPost() — on failed login:</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;error_message&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Invalid username or password.&quot;</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;next_url&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nextURL</span>
+<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;auth/login.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The template displays it inline:</p>
+<div class="highlight"><pre><span></span><code>{% if error_message %}
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;flash flash-error&quot;</span><span class="p">&gt;</span>{{ error_message }}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+{% endif %}
+</code></pre></div>
+
+<h3 id="nav-auth-state-localstorage">Nav auth state — <code>localStorage</code><a class="headerlink" href="#nav-auth-state-localstorage" title="Permanent link">&para;</a></h3>
+<p>Alpine.js reads <code>localStorage._auth_user</code> to show the correct nav state:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{ user: localStorage.getItem(&#39;_auth_user&#39;) }&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;!user&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/login&quot;</span><span class="p">&gt;</span>Log In<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/signup&quot;</span><span class="p">&gt;</span>Sign Up<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;user&quot;</span> <span class="na">x-cloak</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;user&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/logout&quot;</span>
+          <span class="err">@</span><span class="na">submit</span><span class="o">=</span><span class="s">&quot;localStorage.removeItem(&#39;_auth_user&#39;)&quot;</span><span class="p">&gt;</span>
+      <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Log Out<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
+</code></pre></div>
+
+<hr />
 <h2 id="auth-viewmodels">Auth ViewModels<a class="headerlink" href="#auth-viewmodels" title="Permanent link">&para;</a></h2>
 <h3 id="loginvm">LoginVM<a class="headerlink" href="#loginvm" title="Permanent link">&para;</a></h3>
-<p><code>GET /login</code> — renders the login form. If already logged in, redirects to <code>/</code>.</p>
-<p><code>POST /login</code> — validates username + password are non-empty, then calls <code>UserModel.VerifyPassword()</code>. On success, calls <code>Session.LogIn()</code> and redirects to <code>/notes</code>. On failure, redirects back to <code>/login</code> with an error flash.</p>
+<p><code>GET /login</code> — renders the login form with <code>error_message = ""</code> and reads <code>next</code> query param for post-login redirect.</p>
+<p><code>POST /login</code> — validates username + password are non-empty, calls <code>UserModel.VerifyPassword()</code>. On success, calls <code>RedirectWithAuth(nextURL, userID, username)</code>. On failure, re-renders the login form with an inline error message (not a flash — <code>SetFlash</code> is broken in SSR).</p>
 <h3 id="signupvm">SignupVM<a class="headerlink" href="#signupvm" title="Permanent link">&para;</a></h3>
-<p><code>GET /signup</code> — renders the signup form. If already logged in, redirects to <code>/</code>.</p>
-<p><code>POST /signup</code> — validates: username required, ≥3 characters; password ≥6 characters; passwords match. Calls <code>UserModel.Create()</code>. If it returns <code>0</code> (username taken), redirects back with error. On success, immediately calls <code>Session.LogIn()</code> so the user is signed in right after creating their account, then redirects to <code>/notes</code>.</p>
+<p><code>GET /signup</code> — renders the signup form with <code>error_message = ""</code>.</p>
+<p><code>POST /signup</code> — validates: username required (3+ characters), password (6+ characters), passwords match. Calls <code>UserModel.Create()</code>. If it returns <code>0</code> (username taken), re-renders with error. On success, calls <code>RedirectWithAuth("/notes", newID, username)</code>.</p>
 <h3 id="logoutvm">LogoutVM<a class="headerlink" href="#logoutvm" title="Permanent link">&para;</a></h3>
-<p><code>POST /logout</code> only — GET is not supported. Calls <code>Session.LogOut()</code> and redirects to <code>/notes</code>. Using POST for logout prevents accidental logout via prefetch or link pre-loading.</p>
+<p><code>POST /logout</code> only — GET is not supported. Calls <code>RedirectWithLogout("/login")</code>. Using POST for logout prevents accidental logout via prefetch or link pre-loading.</p>
 <hr />
-<h2 id="auth-routes">Auth routes<a class="headerlink" href="#auth-routes" title="Permanent link">&para;</a></h2>
+<h2 id="auth-routes">Auth Routes<a class="headerlink" href="#auth-routes" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w">   </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLoginVM</span><span class="p">)</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w">  </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLoginVM</span><span class="p">)</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/logout&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLogoutVM</span><span class="p">)</span>
@@ -791,7 +937,7 @@ GET protected route
 <span class="w">  </span><span class="s2">&quot;created_at    TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p>The <code>UNIQUE</code> constraint on <code>username</code> is a database-level safety net. The application-level check in <code>UserModel.Create()</code> provides the cleaner signal (return <code>0</code>) used by ViewModels to display the &ldquo;username already taken&rdquo; flash.</p>
+<p>The <code>UNIQUE</code> constraint on <code>username</code> is a database-level safety net. The application-level check in <code>UserModel.Create()</code> provides the cleaner signal (<code>0</code> return) used by ViewModels to display the error message.</p>
 
         <!-- Prev / Next navigation -->
         
@@ -849,23 +995,39 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#session">Session</a>
-          </li>
-          
-          <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ssr-session-limitations-client-side-workarounds">SSR session limitations & client-side workarounds</a>
+            <a class="toc-link" href="#cookie-based-authentication">Cookie-Based Authentication</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#flash-messages-sessionstorage">Flash messages — `sessionStorage`</a>
+            <a class="toc-link" href="#cookie-format">Cookie format</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#nav-auth-state-localstorage">Nav auth state — `localStorage`</a>
+            <a class="toc-link" href="#authcookievalue-generating-the-cookie">AuthCookieValue — generating the cookie</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#parseauthcookie-verifying-the-cookie">ParseAuthCookie — verifying the cookie</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#redirectwithauth-setting-the-cookie-on-loginsignup">RedirectWithAuth — setting the cookie on login/signup</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#redirectwithlogout-clearing-the-cookie">RedirectWithLogout — clearing the cookie</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#baseviewmodel-auth-helpers">BaseViewModel auth helpers</a>
+            <a class="toc-link" href="#baseviewmodel-auth-helpers">BaseViewModel Auth Helpers</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#currentuserid-as-integer">`CurrentUserID() As Integer`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#currentusername-as-string">`CurrentUsername() As String`</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -873,11 +1035,27 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#currentuserid-and-currentusername">`CurrentUserID()` and `CurrentUsername()`</a>
+            <a class="toc-link" href="#requireloginjson-as-boolean">`RequireLoginJSON() As Boolean`</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#auto-injected-context-flash-and-current_user">Auto-injected context — `flash` and `current_user`</a>
+            <a class="toc-link" href="#auto-injected-context-current_user">Auto-injected context — `current_user`</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#ssr-session-limitations-client-side-workarounds">SSR Session Limitations & Client-Side Workarounds</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#flash-messages-sessionstorage">Flash messages — `sessionStorage`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#inline-error-rendering">Inline error rendering</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#nav-auth-state-localstorage">Nav auth state — `localStorage`</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -897,7 +1075,7 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#auth-routes">Auth routes</a>
+            <a class="toc-link" href="#auth-routes">Auth Routes</a>
           </li>
           
           <li class="toc-item toc-level-2">
