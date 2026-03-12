@@ -348,11 +348,11 @@
         </div>
 
         <h1 id="json-api">JSON API &amp; 静的ファイル配信<a class="headerlink" href="#json-api" title="Permanent link">&para;</a></h1>
-<p>XjMVVMは、同じアプリケーションからサーバーレンダリングされたHTMLページ<strong>と</strong> JSON APIの両方を提供でき、別々のプロセスやフレームワークは必要ありません。APIは同じRouter、同じViewModelsパターン、同じModelsを使用します。唯一の違いはレスポンス形式と認証ガードです。</p>
+<p>XjMVVM は、同じアプリケーションからサーバーレンダリングされた HTML ページ<strong>と</strong> JSON API の両方を提供でき、別プロセスやフレームワークは不要です。API は同じ Router、同じ ViewModel パターン、同じ Model を使用します。唯一の違いはレスポンス形式と認証ガードです。</p>
 <hr />
 <h2 id="jsonserializer">JSONSerializer モジュール<a class="headerlink" href="#jsonserializer" title="Permanent link">&para;</a></h2>
 <p><strong>ファイル:</strong> <code>Framework/JSONSerializer.xojo_code</code></p>
-<p><code>Dictionary</code> と <code>Variant()</code> of <code>Dictionary</code> をJSON文字列に変換する単純なモジュールです。外部ライブラリには依存せず、文字列操作のみを使用します。</p>
+<p><code>Dictionary</code> と <code>Variant()</code> の <code>Dictionary</code> を JSON 文字列に変換するシンプルなモジュールです。外部ライブラリに依存せず、文字列操作のみを使用します。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Module</span><span class="w"> </span><span class="n">JSONSerializer</span>
 
 <span class="w">  </span><span class="c1">// Escape a value for use inside a JSON string literal</span>
@@ -391,7 +391,7 @@
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>すべての値はJSON文字列としてシリアライズされます — 数値型またはブール型はありません。これは <code>RowToDict</code> の動作方法と一致しており、すべてのデータベース値は <code>StringValue</code> として保存されます。APIの利用者は必要に応じて文字列から数値をパースするべきです。</p>
+<p>すべての値は JSON 文字列としてシリアライズされます — 数値型やブール型はありません。これは <code>RowToDict</code> の動作と一致しており、すべてのデータベース値は <code>StringValue</code> として保存されます。API の利用者は必要に応じて文字列から数値をパースしてください。</p>
 </div>
 <h3 id="baseviewmodel-writejson">BaseViewModel の <code>WriteJSON</code><a class="headerlink" href="#baseviewmodel-writejson" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">jsonString</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
@@ -400,7 +400,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>Content-TypeはクライアントにJSONを通知します。ViewModelがヘッダを直接設定する必要はありません — シリアライズされた文字列で <code>WriteJSON(...)</code> を呼び出すだけです。</p>
+<p>Content-Type はクライアントに JSON であることを通知します。ViewModel がヘッダを直接設定する必要はありません — シリアライズされた文字列で <code>WriteJSON(...)</code> を呼び出すだけです。</p>
 <hr />
 <h2 id="api">API認証<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
 <p>すべてのAPIエンドポイントには認証が必要です。HTMLルートが <code>/login</code> にリダイレクトするのと異なり、APIルートは認証されていないユーザーに対して <strong>401 JSON エラー</strong> を返します：</p>
@@ -414,7 +414,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>APIクライアントは、リクエストに <code>mvvm_auth</code> クッキーを含める必要があります。ブラウザベースのJavaScript（<code>fetch</code>）の場合、<code>credentials: 'same-origin'</code> を使用する際に自動的に実行されます。外部クライアントの場合、クッキーはログインエンドポイントを経由して取得し、その後のリクエストで送信する必要があります。</p>
+<p>API クライアントはリクエストに <code>mvvm_auth</code> クッキーを含める必要があります。ブラウザベースの JavaScript（<code>fetch</code>）の場合、<code>credentials: 'same-origin'</code> を使用すると自動的に送信されます。外部クライアントの場合、ログインエンドポイントでクッキーを取得し、以降のリクエストで送信してください。</p>
 <hr />
 <h2 id="api-viewmodels">API ViewModels<a class="headerlink" href="#api-viewmodels" title="Permanent link">&para;</a></h2>
 <p>すべてのAPI ViewModelは <code>ViewModels/API/</code> 配下に置かれます。SSR ViewModelと同じ <code>OnGet()</code>/<code>OnPost()</code> パターンに従います — 唯一の違いは <code>Render()</code> の代わりに <code>WriteJSON()</code> を呼び出す点です。</p>
@@ -663,7 +663,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>タグ配列は文字列操作により挿入されます — 閉じ <code>}</code> を削除し、再度閉じる前に <code>,"tags":[...]}</code> を追加します。これは意図的です：<code>JSONSerializer.DictToJSON</code> はフラットな文字列辞書のみを処理します。ネストされた配列を埋め込むには手動の構成が必要です。</p>
+<p>タグ配列は文字列操作で挿入されます — 閉じ <code>}</code> を削除し、<code>,"tags":[...]}</code> を追加して再度閉じます。これは意図的な設計です: <code>JSONSerializer.DictToJSON</code> はフラットな文字列 Dictionary のみを処理します。ネストされた配列を埋め込むには手動の構築が必要です。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code>DictToJSON</code> は常に <code>}</code> で終わる有効なJSONオブジェクトを生成するため、このアプローチは確実に機能します。シリアライザが変更された場合は、この挿入ポイントを見直す必要があります。</p>
@@ -691,7 +691,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>APIが使用するステータスコード：<strong>200</strong> は読み込み成功時、<strong>201</strong> は作成成功時、<strong>401</strong> は未認証時、<strong>404</strong> は見つからない時、<strong>422</strong> は検証失敗時。</p>
+<p>API が使用するステータスコード: <strong>200</strong> は読み取り成功、<strong>201</strong> は作成成功、<strong>401</strong> は未認証、<strong>404</strong> は見つからない場合、<strong>422</strong> は検証失敗。</p>
 <h3 id="tagsapilistvm-get-apitags">TagsAPIListVM — <code>GET /api/tags</code><a class="headerlink" href="#tagsapilistvm-get-apitags" title="Permanent link">&para;</a></h3>
 <p>タグはグローバル（ユーザースコープなし）ですが、それでも認証が必要です：</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
@@ -732,11 +732,11 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/api/tags/:id&quot;</span><span class="p">,</span><span class="w">    </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateTagsAPIDetailVM</span><span class="p">)</span>
 </code></pre></div>
 
-<p><code>/api/</code> プリフィックスは慣例によってAPIルートとSSRルートを分けます — Routerはそれらを同じように扱います。</p>
+<p><code>/api/</code> プレフィックスは慣例により API ルートと SSR ルートを区別します — Router はどちらも同様に扱います。</p>
 <hr />
 <h2 id="_1">静的ファイルサーバー<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p><strong>ファイル:</strong> <code>App.xojo_code</code> (<code>ServeStatic</code> メソッド + <code>HandleURL</code> ディスパッチ)</p>
-<p>静的ファイルサーバーにより、開発者ドキュメントサイトは実行中のアプリから <code>/dist/*</code> でアクセス可能になります。ファイルは <code>templates/dist/</code> から提供されます — <code>build.py</code> スクリプトが出力するのと同じフォルダです。</p>
+<p>静的ファイルサーバーにより、開発者ドキュメントサイトは実行中のアプリから <code>/dist/*</code> でアクセス可能になります。ファイルは <code>templates/dist/</code> から提供されます — <code>build.py</code> スクリプトの出力先と同じフォルダです。</p>
 <h3 id="handleurl">HandleURL ディスパッチ<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// Redirect bare /dist to /dist/</span>
 <span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/dist&quot;</span><span class="w"> </span><span class="k">Then</span>
@@ -784,7 +784,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong>決して</strong> 生のURL文字列を連結してファイルパスを構築しないでください。<code>/dist/../data/notes.sqlite</code> へのリクエストは、パスが直接連結される場合、データベースファイルを提供してしまいます。<code>Child()</code> 経由で各セグメントをウォークし、<code>..</code> と <code>.</code> を拒否することで、パストラバーサル攻撃を完全に防止します。</p>
+<p><strong>決して</strong>生の URL 文字列を連結してファイルパスを構築しないでください。パスを直接連結した場合、<code>/dist/../data/notes.sqlite</code> へのリクエストでデータベースファイルが公開されてしまいます。<code>Child()</code> で各セグメントを一つずつ辿り、<code>..</code> と <code>.</code> を拒否することで、パストラバーサル攻撃を完全に防止します。</p>
 </div>
 <h3 id="content-type">Content-Type マッピング<a class="headerlink" href="#content-type" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">Lowercase</span>
@@ -798,7 +798,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.woff2&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span>
 </code></pre></div>
 
-<p>未知の拡張子は <code>application/octet-stream</code> にフォールバックします。追加のファイルタイプを提供する場合は、ここに新しいエントリを追加してください。</p>
+<p>未知の拡張子は <code>application/octet-stream</code> にフォールバックします。追加のファイルタイプを配信する場合は、ここに新しいエントリを追加してください。</p>
 <h3 id="_2">ドキュメントへのアクセス<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>アプリがポート8080で実行されている場合、開発者ドキュメントは以下で利用可能です：</p>
 <div class="highlight"><pre><span></span><code>http://localhost:8080/dist/en/index.html

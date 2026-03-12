@@ -348,10 +348,10 @@
         </div>
 
         <h1 id="_1">認証システム<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>XjMVVMの認証は3つのレイヤーで構築されています：<strong><code>UserModel</code></strong>が認証情報を保存・検証し、<strong><code>BaseViewModel</code></strong>がクッキーベースの認証ヘルパーを提供してルートを保護し、テンプレートに現在のユーザーを公開し、<strong>ブラウザ側のJavaScript</strong>がSSRセッションギャップをnav状態とフラッシュメッセージのために橋渡しします。</p>
+<p>XjMVVM の認証は 3 つのレイヤーで構築されています: <strong><code>UserModel</code></strong> が認証情報を保存・検証し、<strong><code>BaseViewModel</code></strong> がクッキーベースの認証ヘルパーを提供してルートを保護し、テンプレートに現在のユーザーを公開し、<strong>ブラウザ側の JavaScript</strong> が SSR セッションギャップを nav 状態とフラッシュメッセージのために橋渡しします。</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong><code>Self.Session</code>はSSRモードでは常にNilです。</strong> Xojo Web 2の<code>WebSession</code>は永続的なWebSocket接続を必要とします。純粋なSSR（<code>HandleURL</code>が常に<code>True</code>を返す）では、WebSocketもセッションもありません。すべての認証の代わりにHMAC署名付きクッキーを使用します。</p>
+<p><strong><code>Self.Session</code> は SSR モードでは常に Nil です。</strong> Xojo Web 2 の <code>WebSession</code> は永続的な WebSocket 接続を必要とします。純粋な SSR（<code>HandleURL</code> が常に <code>True</code> を返す）では、WebSocket もセッションも存在しません。認証にはすべて HMAC 署名付きクッキーを使用します。</p>
 </div>
 <h2 id="_2">概要<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <div class="diagram-tabs" id="diag1">
@@ -587,7 +587,7 @@ GET protected route
       <span class="err">@</span><span class="na">submit</span><span class="err">.</span><span class="na">prevent</span><span class="o">=</span><span class="s">&quot;handleSubmit($event)&quot;</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>hashed</code>フラグは、<code>e.target.submit()</code>が何らかの理由でイベントを再度発火する場合の再処理を防止します。</p>
+<p><code>hashed</code> フラグは、<code>e.target.submit()</code> が何らかの理由でイベントを再発火した場合の二重処理を防ぎます。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p><code>crypto.subtle</code>はすべてのモダンブラウザで利用可能で、ライブラリは不要です。セキュアなコンテキスト（HTTPSまたはlocalhost）でのみ利用可能です。</p>
@@ -600,11 +600,11 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>保存値：<code>SHA256(SHA256(plaintext) + salt) : salt</code></p>
-<p>このダブルハッシュモデルは、攻撃者がサーバーソースを持っていても、データベースがユーザーの元のパスワードを見ないことを意味します。<code>EncodeHex(Crypto.SHA256(...))</code>は64文字の16進数文字列を返します — <code>.Hex</code>プロパティを持つ文字列ではありません。<code>EncodeHex()</code>グローバル関数が必要です。</p>
+<p>保存値: <code>SHA256(SHA256(plaintext) + salt) : salt</code></p>
+<p>このダブルハッシュモデルにより、攻撃者がサーバーソースを入手しても、データベースにはユーザーの元のパスワードが保存されていません。<code>EncodeHex(Crypto.SHA256(...))</code> は 64 文字の 16 進数文字列を返します — <code>.Hex</code> プロパティを持つ文字列ではありません。<code>EncodeHex()</code> グローバル関数が必要です。</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>SHA-256 +ユーザーごとのランダムソルトの使用はほとんどの内部またはローリスクアプリケーションに対して十分です。高セキュリティまたはパブリックフェーシングアプリケーションの場合、プラットフォームで利用可能であればbcryptまたはArgon2バインディングを使用する必要があります。</p>
+<p>SHA-256 + ユーザーごとのランダムソルトの使用は、ほとんどの内部またはローリスクアプリケーションに対して十分です。高セキュリティまたは一般公開されるアプリケーションの場合は、プラットフォームで利用可能であれば bcrypt または Argon2 バインディングを使用してください。</p>
 </div>
 <h3 id="_4">ユーザーの作成<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
@@ -623,7 +623,7 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>成功時に新しい<code>id</code>を返すか、ユーザー名がすでに取得されている場合は<code>0</code>を返します。</p>
+<p>成功時は新しい <code>id</code> を返し、ユーザー名がすでに使用されている場合は <code>0</code> を返します。</p>
 <h3 id="_5">パスワードの検証<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">VerifyPassword</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FindByUsername</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
@@ -641,7 +641,7 @@ GET protected route
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>stored.Middle(colonPos + 1)</code>は0ベース（<code>String.Middle</code>は<code>IndexOf</code>と連携）です。ここで<code>Mid()</code>を決して使用しないでください — 1ベースのレガシー関数は1つオフになり、ソルト抽出を破損します。</p>
+<p><code>stored.Middle(colonPos + 1)</code> は 0-based です（<code>String.Middle</code> は <code>IndexOf</code> と整合します）。ここで <code>Mid()</code> を決して使用しないでください — 1-based のレガシー関数は 1 つずれ、ソルト抽出を破損します。</p>
 </div>
 <hr />
 <h2 id="_6">クッキーベース認証<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
@@ -654,7 +654,7 @@ GET protected route
 <div class="highlight"><pre><span></span><code>SHA256(userID + &quot;:&quot; + username + &quot;:&quot; + App.mAuthSecret)
 </code></pre></div>
 
-<p><code>App.mAuthSecret</code>は起動時に<code>Crypto.GenerateRandomBytes(32)</code>を介して1回生成されたランダムな32バイトの16進数文字列です。再起動のたびに変わり、既存のすべての認証クッキーを実質的に無効にします。</p>
+<p><code>App.mAuthSecret</code> は起動時に <code>Crypto.GenerateRandomBytes(32)</code> で 1 回生成されるランダムな 32 バイトの 16 進数文字列です。再起動のたびに変わり、既存のすべての認証クッキーを実質的に無効化します。</p>
 <h3 id="authcookievalue">AuthCookieValue — クッキーの生成<a class="headerlink" href="#authcookievalue" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">userID</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span>
@@ -664,7 +664,7 @@ GET protected route
 </code></pre></div>
 
 <h3 id="parseauthcookie">ParseAuthCookie — クッキーの検証<a class="headerlink" href="#parseauthcookie" title="Permanent link">&para;</a></h3>
-<p>すべてのリクエストで呼び出されて認証されたユーザーを抽出・検証します。結果は<code>mAuthParsed</code> / <code>mAuthCache</code>プロパティ経由でリクエスト単位でキャッシュされるため、複数の呼び出し（<code>RequireLogin</code>、<code>CurrentUserID</code>、<code>Render</code>から）は再解析されません。</p>
+<p>すべてのリクエストで呼び出され、認証済みユーザーを抽出・検証します。結果は <code>mAuthParsed</code> / <code>mAuthCache</code> プロパティ経由でリクエスト単位でキャッシュされるため、複数回の呼び出し（<code>RequireLogin</code>、<code>CurrentUserID</code>、<code>Render</code> から）で再解析は不要です。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">mAuthParsed</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">mAuthCache</span>
 
@@ -706,11 +706,11 @@ GET protected route
 <p>HMAC検証により、クッキーは偽造されません。攻撃者は任意のユーザーの有効なクッキーを生成するために<code>App.mAuthSecret</code>が必要です。</p>
 </div>
 <h3 id="redirectwithauth">RedirectWithAuth — ログイン/サインアップ時のクッキー設定<a class="headerlink" href="#redirectwithauth" title="Permanent link">&para;</a></h3>
-<p>認証に成功した後、<code>RedirectWithAuth</code>は1つのレスポンスで3つのことを行います：</p>
+<p>認証に成功した後、<code>RedirectWithAuth</code> は 1 つのレスポンスで 3 つのことを行います:</p>
 <ol>
-<li>HTTP<code>Set-Cookie</code>ヘッダー経由で<code>mvvm_auth</code>クッキーを設定</li>
-<li>ユーザー名を<code>localStorage</code>に、フラッシュメッセージを<code>sessionStorage</code>に保存するJSの中間ページを送信</li>
-<li>ブラウザをターゲットURLにリダイレクト</li>
+<li>HTTP <code>Set-Cookie</code> ヘッダー経由で <code>mvvm_auth</code> クッキーを設定</li>
+<li>ユーザー名を <code>localStorage</code> に、フラッシュメッセージを <code>sessionStorage</code> に保存する JS 中間ページを送信</li>
+<li>ブラウザをターゲット URL にリダイレクト</li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithAuth</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">cookieVal</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span>
@@ -725,13 +725,13 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>JSの中間ページが必要なのは以下の理由です：</p>
+<p>JS 中間ページが必要な理由:</p>
 <ul>
-<li><code>Set-Cookie</code>はHTTPクッキーを設定します（その後のリクエストでサーバー側認証用）</li>
-<li><code>localStorage</code>はユーザー名を保存します（Alpine.js経由でクライアント側nav状態表示用）</li>
-<li><code>sessionStorage</code>はフラッシュメッセージを保存します（リダイレクト後のワンタイム表示用）</li>
+<li><code>Set-Cookie</code> は HTTP クッキーを設定します（以降のリクエストでサーバー側認証に使用）</li>
+<li><code>localStorage</code> はユーザー名を保存します（Alpine.js 経由のクライアント側 nav 状態表示用）</li>
+<li><code>sessionStorage</code> はフラッシュメッセージを保存します（リダイレクト後のワンタイム表示用）</li>
 </ul>
-<p>これら3つのストレージメカニズムは異なる目的を果たし、互いに置き換えることはできません。</p>
+<p>この 3 つのストレージメカニズムはそれぞれ異なる目的を果たしており、互いに置き換えることはできません。</p>
 <h3 id="redirectwithlogout">RedirectWithLogout — クッキーのクリア<a class="headerlink" href="#redirectwithlogout" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithLogout</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 <span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Set-Cookie&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;mvvm_auth=; Path=/; Max-Age=0; SameSite=Lax&quot;</span>
@@ -755,7 +755,7 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>認証されていないときは<code>0</code>を返します — ゼロはSQLite<code>AUTOINCREMENT</code>主キーで有効なIDではありません。</p>
+<p>未認証時は <code>0</code> を返します — ゼロは SQLite <code>AUTOINCREMENT</code> 主キーでは有効な ID ではありません。</p>
 <h3 id="currentusername-as-string"><code>CurrentUsername() As String</code><a class="headerlink" href="#currentusername-as-string" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
@@ -765,7 +765,7 @@ GET protected route
 </code></pre></div>
 
 <h3 id="requirelogin-as-boolean"><code>RequireLogin() As Boolean</code><a class="headerlink" href="#requirelogin-as-boolean" title="Permanent link">&para;</a></h3>
-<p>HTMLルートを保護します。認証されていないユーザーをログインページにリダイレクトし、<code>next</code>パラメーターを使用して、ログイン後に元のURLに戻すことができます。</p>
+<p>HTML ルートを保護します。未認証ユーザーをログインページにリダイレクトし、<code>next</code> パラメータを使ってログイン後に元の URL へ戻せます。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
 <span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login?next=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EncodeURLComponent</span><span class="p">(</span><span class="n">Request</span><span class="p">.</span><span class="n">Path</span><span class="p">))</span>
@@ -782,10 +782,10 @@ GET protected route
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>RequireLogin()</code>はリダイレクトを発行しますが、<strong>実行を停止することはできません</strong> — リダイレクトが発行されたことを示すために<code>True</code>を返します。常に<code>If RequireLogin() Then Return</code>とペアにしてください。<code>Return</code>を忘れると、ハンドラーはリダイレクトが既に送信された後に実行を続けます。</p>
+<p><code>RequireLogin()</code> はリダイレクトを発行しますが、<strong>実行を自動停止しません</strong> — リダイレクト済みであることを示すために <code>True</code> を返します。常に <code>If RequireLogin() Then Return</code> とペアで使用してください。<code>Return</code> を忘れると、リダイレクト送信後もハンドラーが実行を続けてしまいます。</p>
 </div>
 <h3 id="requireloginjson-as-boolean"><code>RequireLoginJSON() As Boolean</code><a class="headerlink" href="#requireloginjson-as-boolean" title="Permanent link">&para;</a></h3>
-<p>APIルートを保護します。HTMLリダイレクトの代わりに401 JSONエラーを返します（APIクライアントはHTMLリダイレクトに従うことができません）。</p>
+<p>API ルートを保護します。HTML リダイレクトの代わりに 401 JSON エラーを返します（API クライアントは HTML リダイレクトに従うことができません）。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
 <span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">401</span>
@@ -802,7 +802,7 @@ GET protected route
 </code></pre></div>
 
 <h3 id="current_user">自動注入コンテキスト — <code>current_user</code><a class="headerlink" href="#current_user" title="Permanent link">&para;</a></h3>
-<p><code>BaseViewModel.Render()</code>は常にすべてのテンプレートコンテキストに<code>current_user</code> dictionaryを注入し、安全なデフォルト値を使用するため、テンプレートは<code>UndefinedVariableException</code>をスローしません：</p>
+<p><code>BaseViewModel.Render()</code> は常にすべてのテンプレートコンテキストに <code>current_user</code> Dictionary を注入し、安全なデフォルト値を使用するため、テンプレートは <code>UndefinedVariableException</code> をスローしません:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">userCtx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
 <span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0&quot;</span>
 <span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
@@ -819,17 +819,17 @@ GET protected route
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>logged_in</code>は文字列<code>"1"</code>または<code>"0"</code> — ブール値ではありません — JinjaXテンプレートの<code>Dictionary</code>値はすべて文字列だからです。<code>== True</code>ではなく<code>== "1"</code>で比較してください。</p>
+<p><code>logged_in</code> は文字列 <code>"1"</code> または <code>"0"</code> です — ブール値ではありません。JinjaX テンプレートの <code>Dictionary</code> 値はすべて文字列であるためです。<code>== True</code> ではなく <code>== "1"</code> で比較してください。</p>
 </div>
 <hr />
 <h2 id="ssr">SSRセッション制限とクライアント側の回避方法<a class="headerlink" href="#ssr" title="Permanent link">&para;</a></h2>
-<p>Xojo Web 2では、<code>WebSession</code>状態は永続的なWebSocket接続に結びついています。純粋なSSRモード（<code>HandleURL</code>が常に<code>True</code>を返し、WebSocketが確立されない）では、各HTTPリクエストにセッションがありません。これは以下を意味します：</p>
+<p>Xojo Web 2 では、<code>WebSession</code> 状態は永続的な WebSocket 接続に結びついています。純粋な SSR モード（<code>HandleURL</code> が常に <code>True</code> を返し、WebSocket が確立されない）では、各 HTTP リクエストにセッションがありません。これは以下を意味します:</p>
 <ul>
-<li><code>POST</code>中に保存されたフラッシュメッセージは、リダイレクト<code>GET</code>が到着するまでに<strong>失われます</strong>。</li>
-<li>ログインしたユーザー名はセッション状態から<strong>テンプレートレンダラーに利用できません</strong>。</li>
-<li><strong><code>SetFlash()</code>と<code>Session.LogIn()</code>はサイレントに何もしません</strong> — Nilセッションに書き込みます。</li>
+<li><code>POST</code> 中に保存されたフラッシュメッセージは、リダイレクト後の <code>GET</code> が到着する前に<strong>失われます</strong>。</li>
+<li>ログイン済みのユーザー名はセッション状態から<strong>テンプレートレンダラーに渡せません</strong>。</li>
+<li><strong><code>SetFlash()</code> と <code>Session.LogIn()</code> はサイレントに何もしません</strong> — Nil セッションに書き込もうとするためです。</li>
 </ul>
-<p>XjMVVMはこれらの制限を3つのメカニズムで回避します：</p>
+<p>XjMVVM はこれらの制限を 3 つのメカニズムで回避します:</p>
 <table>
 <thead>
 <tr>
@@ -861,7 +861,7 @@ GET protected route
 </tbody>
 </table>
 <h3 id="sessionstorage">フラッシュメッセージ — <code>sessionStorage</code><a class="headerlink" href="#sessionstorage" title="Permanent link">&para;</a></h3>
-<p>（<code>RedirectWithAuth</code>によって送信される）JSの中間ページは成功メッセージを<code>sessionStorage</code>に書き込みます。Alpine.jsはそれを次のページ読み込みで読み取って表示します：</p>
+<p><code>RedirectWithAuth</code> によって送信される JS 中間ページは成功メッセージを <code>sessionStorage</code> に書き込みます。Alpine.js はそれを次のページロード時に読み取って表示します:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
 <span class="s">  msg: &#39;&#39;,</span>
 <span class="s">  type: &#39;success&#39;,</span>
@@ -876,7 +876,7 @@ GET protected route
 </code></pre></div>
 
 <h3 id="_8">インラインエラー表示<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h3>
-<p>ログインとサインアップエラーはフラッシュメッセージを使用できません（リダイレクトはそれらを失うでしょう）。代わりに、ViewModelは<code>error_message</code>テンプレート変数でフォームを再レンダリングします：</p>
+<p>ログインとサインアップのエラーはフラッシュメッセージを使用できません（リダイレクトにより失われてしまうため）。代わりに、ViewModel は <code>error_message</code> テンプレート変数を使ってフォームを再レンダリングします:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// In LoginVM.OnPost() — on failed login:</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;error_message&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Invalid username or password.&quot;</span>
@@ -910,13 +910,13 @@ GET protected route
 <hr />
 <h2 id="viewmodel">認証ViewModel<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
 <h3 id="loginvm">LoginVM<a class="headerlink" href="#loginvm" title="Permanent link">&para;</a></h3>
-<p><code>GET /login</code> — ログインフォームを<code>error_message = ""</code>でレンダリングし、ログイン後のリダイレクト用に<code>next</code>クエリパラメーターを読み取ります。</p>
-<p><code>POST /login</code> — ユーザー名 +パスワードが空でないことを検証し、<code>UserModel.VerifyPassword()</code>を呼び出します。成功時に<code>RedirectWithAuth(nextURL, userID, username)</code>を呼び出します。失敗時にインラインエラーメッセージでログインフォームを再レンダリングします（フラッシュではなく — <code>SetFlash</code>はSSRで壊れています）。</p>
+<p><code>GET /login</code> — ログインフォームを <code>error_message = ""</code> でレンダリングし、ログイン後のリダイレクト用に <code>next</code> クエリパラメータを読み取ります。</p>
+<p><code>POST /login</code> — ユーザー名とパスワードが空でないことを検証し、<code>UserModel.VerifyPassword()</code> を呼び出します。成功時は <code>RedirectWithAuth(nextURL, userID, username)</code> を呼び出します。失敗時はインラインエラーメッセージでログインフォームを再レンダリングします（フラッシュではなく — <code>SetFlash</code> は SSR では機能しません）。</p>
 <h3 id="signupvm">SignupVM<a class="headerlink" href="#signupvm" title="Permanent link">&para;</a></h3>
-<p><code>GET /signup</code> — <code>error_message = ""</code>でサインアップフォームをレンダリングします。</p>
-<p><code>POST /signup</code> — 検証：ユーザー名が必須（3文字以上）、パスワード（6文字以上）、パスワードが一致。<code>UserModel.Create()</code>を呼び出します。<code>0</code>を返す場合（ユーザー名は取得済み）、エラーで再レンダリングします。成功時に<code>RedirectWithAuth("/notes", newID, username)</code>を呼び出します。</p>
+<p><code>GET /signup</code> — <code>error_message = ""</code> でサインアップフォームをレンダリングします。</p>
+<p><code>POST /signup</code> — 検証: ユーザー名必須（3 文字以上）、パスワード（6 文字以上）、パスワード一致。<code>UserModel.Create()</code> を呼び出します。<code>0</code> が返る場合（ユーザー名がすでに使用済み）はエラーで再レンダリングします。成功時は <code>RedirectWithAuth("/notes", newID, username)</code> を呼び出します。</p>
 <h3 id="logoutvm">LogoutVM<a class="headerlink" href="#logoutvm" title="Permanent link">&para;</a></h3>
-<p><code>POST /logout</code>のみ — GETはサポートされていません。<code>RedirectWithLogout("/login")</code>を呼び出します。ログアウトにPOSTを使用することで、プリフェッチまたはリンクプリロード経由の誤ったログアウトを防止します。</p>
+<p><code>POST /logout</code> のみ — GET はサポートされていません。<code>RedirectWithLogout("/login")</code> を呼び出します。ログアウトに POST を使用することで、プリフェッチやリンクプリロード経由の意図しないログアウトを防止します。</p>
 <hr />
 <h2 id="_9">認証ルート<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w">   </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLoginVM</span><span class="p">)</span>
@@ -926,7 +926,7 @@ GET protected route
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateSignupVM</span><span class="p">)</span>
 </code></pre></div>
 
-<p>ログインとサインアップの両方の<code>GET</code>と<code>POST</code>は同じViewModelファクトリーを共有します — ViewModelそのものは<code>Request.Method</code>に基づいて<code>OnGet()</code>または<code>OnPost()</code>にディスパッチします。</p>
+<p>ログインとサインアップの <code>GET</code> と <code>POST</code> は同じ ViewModel ファクトリーを共有します — ViewModel 自体が <code>Request.Method</code> に基づいて <code>OnGet()</code> または <code>OnPost()</code> にディスパッチします。</p>
 <hr />
 <h2 id="_10">スキーマ<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h2>
 <p><code>users</code>テーブルは<code>DBAdapter.InitDB()</code>で作成されます：</p>
@@ -937,7 +937,7 @@ GET protected route
 <span class="w">  </span><span class="s2">&quot;created_at    TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><code>username</code>の<code>UNIQUE</code>制約はデータベースレベルのセーフティネットです。<code>UserModel.Create()</code>のアプリケーションレベルチェックは、ViewModelsがエラーメッセージを表示するために使用するより明確なシグナル（<code>0</code>リターン）を提供します。</p>
+<p><code>username</code> の <code>UNIQUE</code> 制約はデータベースレベルのセーフティネットです。<code>UserModel.Create()</code> のアプリケーションレベルチェックは、ViewModel がエラーメッセージを表示するためのより明確なシグナル（<code>0</code> 返却）を提供します。</p>
 
         <!-- Prev / Next navigation -->
         

@@ -522,7 +522,7 @@
 <p>การส่งแบบฟอร์มทั้งหมดทำตามแบบ <strong>Post/Redirect/Get (PRG)</strong>:</p>
 <ol>
 <li>เบราว์เซอร์ส่งแบบฟอร์ม → <code>POST /notes</code> (จัดการโดย <code>NotesCreateVM</code>)</li>
-<li>ViewModel ตรวจสอบและสร้างหมายเหตุ</li>
+<li>ViewModel ตรวจสอบและสร้างบันทึก</li>
 <li>ViewModel เรียก <code>Redirect("/notes")</code> — HTTP 302</li>
 <li>เบราว์เซอร์ตามเส้นทางการเปลี่ยนเส้นทาง → <code>GET /notes</code> (จัดการโดย <code>NotesListVM</code>)</li>
 <li>เบราว์เซอร์เรนเดอร์หน้าลิสต์</li>
@@ -537,7 +537,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<h2 id="_1">แยกการระบุตัวตนของเซสชัน<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h2 id="session">การแยกข้อมูลระหว่าง Session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h2>
 <p><code>App</code> เป็น shared singleton — ร้องขอของผู้ใช้ทั้งหมดทำงานในอินสแตนซ์ <code>App</code> เดียวกัน ไม่เคยเก็บข้อมูลเฉพาะผู้ใช้ในคุณสมบัติ <code>App</code></p>
 <p>สถานะต่อผู้ใช้ไปในคลาส <code>Session</code> (ซึ่งสืบทอดจาก <code>WebSession</code>) เบราว์เซอร์แต่ละเซสชันจะได้รับอินสแตนซ์ <code>Session</code> ของตัวเองโดยอัตโนมัติโดยรันไทม์ของ Xojo:</p>
 <div class="highlight"><pre><span></span><code>App.mRouter      → shared แบบอ่านอย่างเดียวหลังจาก Opening()  ✅ ปลอดภัย
@@ -598,7 +598,7 @@ App.currentUser  → shared ในผู้ใช้ทั้งหมด       
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#แยกการระบตวตนของเซสชน">แยกการระบุตัวตนของเซสชัน</a>
+            <a class="toc-link" href="#การแยกขอมลระหวาง-session">การแยกข้อมูลระหว่าง Session</a>
           </li>
           
         </ul>

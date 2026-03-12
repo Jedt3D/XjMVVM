@@ -348,7 +348,7 @@
         </div>
 
         <h1 id="_1">静的アセットの提供<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p><code>HandleURL</code> がすべてのリクエストをインターセプトするため、静的アセット (<code>.css</code>、<code>.js</code>、画像) のリクエストを明示的に処理する必要があります。最も単純から最も柔軟な順序でソートされた 3 つのアプローチがあります。</p>
+<p><code>HandleURL</code> がすべてのリクエストをインターセプトするため、静的アセット（<code>.css</code>、<code>.js</code>、画像）のリクエストを明示的に処理する必要があります。シンプルな順から柔軟な順に並べた 3 つのアプローチがあります。</p>
 <h2 id="1-cdn">オプション 1 — CDN リンク (ライブラリに推奨)<a class="headerlink" href="#1-cdn" title="Permanent link">&para;</a></h2>
 <p>サードパーティのライブラリ (Tailwind、Alpine.js、チャートライブラリ) の場合、CDN から直接リンクします。Xojo コードは不要です。</p>
 <div class="highlight"><pre><span></span><code>{# templates/layouts/base.html #}
@@ -358,9 +358,9 @@
 <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>変更しないライブラリにこれを使用します。デプロイメント複雑さはゼロです。</p>
+<p>更新しないライブラリにはこの方法を使用します。デプロイの複雑さはゼロです。</p>
 <h2 id="2-viewmodel">オプション 2 — 静的ファイル ViewModel<a class="headerlink" href="#2-viewmodel" title="Permanent link">&para;</a></h2>
-<p>独自の CSS、JS、画像の場合、ディスクからファイルを読み取り、レスポンスに書き込む <code>/static/:file</code> ルートを登録します。</p>
+<p>独自の CSS・JS・画像の場合、ディスクからファイルを読み取ってレスポンスに書き込む <code>/static/:file</code> ルートを登録します。</p>
 <h3 id="1-viewmodel">1. ViewModel を作成<a class="headerlink" href="#1-viewmodel" title="Permanent link">&para;</a></h3>
 <p><code>ViewModels/StaticFileVM.xojo_code</code> を作成:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Class</span><span class="w"> </span><span class="n">StaticFileVM</span>
@@ -419,7 +419,7 @@
 </code></pre></div>
 
 <h3 id="2">2. ルートを登録<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
-<p><code>App.Opening()</code> で、すべての他のルート <strong>後に</strong> 静的ルートを登録して、アプリケーションパスと誤ってマッチするのを避けます:</p>
+<p><code>App.Opening()</code> で、他のすべてのルートの<strong>後に</strong>静的ルートを登録して、アプリケーションパスと誤ってマッチするのを避けます:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// アプリケーションルートを最初に登録</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span>
@@ -445,7 +445,7 @@
 
 <div class="admonition warning">
 <p class="admonition-title">セキュリティ</p>
-<p>ディスクから読み取る前に常にファイル名を検証します。上の例の path traversal チェック (<code>..</code>, <code>/</code>, <code>\</code>) は最小限の必須です。ユーザー入力なしでファイルパスを構築しないでください。</p>
+<p>ディスクから読み取る前に必ずファイル名を検証してください。上記のパストラバーサルチェック（<code>..</code>、<code>/</code>、<code>\</code>）は最低限必須です。ユーザー入力を直接使ってファイルパスを構築しないでください。</p>
 </div>
 <h2 id="3-xojo-copy-files">オプション 3 — Xojo Copy Files ビルドステップ<a class="headerlink" href="#3-xojo-copy-files" title="Permanent link">&para;</a></h2>
 <p>アプリケーションバイナリでバンドルする必要があるファイル (フォント、デフォルト画像) の場合、Xojo の <strong>Copy Files</strong> ビルドステップを使用してそれらをアプリケーションの Resources フォルダに含めます。</p>
@@ -454,7 +454,7 @@
 <span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resourceDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 </code></pre></div>
 
-<p>このアプローチは、アプリケーションで出荷され、実行時に決して変わらないファイルに最適です。開発中に頻繁に編集する開発者アセットの場合、オプション 2 がより便利です。</p>
+<p>このアプローチは、アプリケーションに同梱され、実行時に変化しないファイルに最適です。開発中に頻繁に編集する開発用アセットの場合は、オプション 2 の方が便利です。</p>
 <h2 id="mime">MIME タイプリファレンス<a class="headerlink" href="#mime" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

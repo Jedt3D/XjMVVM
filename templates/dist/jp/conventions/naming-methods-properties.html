@@ -354,7 +354,7 @@
 <span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span><span class="w">  </span><span class="c1">// POST リクエストを処理</span>
 </code></pre></div>
 
-<p>これらは意図的にイベントハンドラーのように命名されています — それらは HTTP メソッドに <strong>応答します</strong>、何も開始しません。<code>OnGet()</code> のみをオーバーライドする場合、そのルートへの <code>POST</code> は基本クラスから自動的に 405 レスポンスを取得します。</p>
+<p>これらは意図的にイベントハンドラーのように命名されています — HTTP メソッドに<strong>応答する</strong>ものであり、自ら何かを開始するものではありません。<code>OnGet()</code> のみをオーバーライドした場合、そのルートへの <code>POST</code> は基底クラスから自動的に 405 レスポンスを返します。</p>
 <p>ViewModel 内のプライベートヘルパーメソッドは説明的な動詞優先名を使用します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ✅ 良好 — 英語を読むように、何をするかを説明する</span>
 <span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">FindNoteOrRedirect</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
@@ -371,7 +371,7 @@
 <span class="k">Private</span><span class="w"> </span><span class="n">mRawBody</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w">       </span><span class="c1">// 生の POST ボディバイト</span>
 </code></pre></div>
 
-<p>パブリックプロパティ (<code>BaseViewModel</code> によって継承または設定されたもの) は接頭辞がありません:</p>
+<p>パブリックプロパティ（<code>BaseViewModel</code> によって継承または設定されるもの）はプレフィックスなしです:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// これらは Handle() が呼ばれる前にルーターで設定されます</span>
 <span class="n">Request</span><span class="w">    </span><span class="k">As</span><span class="w"> </span><span class="n">WebRequest</span>
 <span class="n">Response</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="n">WebResponse</span>
@@ -418,7 +418,7 @@
 </tr>
 </tbody>
 </table>
-<p>モデルメソッドは <code>Shared</code> です — モデルクラスをインスタンス化する必要はありません:</p>
+<p>モデルメソッドは <code>Shared</code> です — モデルクラスをインスタンス化する必要はありません。クラスを直接呼び出せます:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ✅ クラスで直接呼び出す</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">notes</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
@@ -430,7 +430,7 @@
 </code></pre></div>
 
 <h2 id="dictionary">Dictionary キー<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h2>
-<p><code>Dictionary</code> オブジェクト内のキー — テンプレートのコンテキスト辞書とモデルの戻り値の両方 — は <code>snake_case</code> 文字列を使用します。これは SQLite のカラム名と Jinja2 テンプレートで使用される変数名に一致します:</p>
+<p><code>Dictionary</code> オブジェクト内のキー — テンプレートのコンテキスト Dictionary とモデルの戻り値の両方 — は <code>snake_case</code> 文字列を使用します。これは SQLite のカラム名と Jinja2 テンプレートで使用される変数名に一致します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// モデル → Dictionary</span>
 <span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">IntegerValue</span>
 <span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
@@ -440,7 +440,7 @@
 <span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w">    </span><span class="c1">// Variant() of Dictionary</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;page_title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;All Notes&quot;</span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w">                   </span><span class="c1">// Render() で自動的に注入</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w">                   </span><span class="c1">// Render() によって自動的に注入</span>
 </code></pre></div>
 
 <p>テンプレートでは、同じ <code>snake_case</code> キー名がドット記法でアクセスされます:</p>
@@ -451,7 +451,7 @@
 
 <h2 id="baseviewmodel">BaseViewModel ヘルパーメソッド<a class="headerlink" href="#baseviewmodel" title="Permanent link">&para;</a></h2>
 <p>これらのメソッドは常に任意の ViewModel 内で利用可能です:</p>
-<p><code>GetFormValue(key)</code> — URL エンコードされた POST ボディからフィールドを読み取ります。初回呼び出しでボディを遅延的に解析し、結果をキャッシュします。</p>
+<p><code>GetFormValue(key)</code> — URL エンコードされた POST ボディからフィールドを読み取ります。初回呼び出し時にボディを遅延解析し、結果をキャッシュします。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">body</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
 </code></pre></div>
@@ -464,7 +464,7 @@
 <span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><code>Render(templateName, context)</code> — テンプレートをコンパイルしてレンダリング、フラッシュメッセージを自動注入、HTML レスポンスを書き込みます。</p>
+<p><code>Render(templateName, context)</code> — テンプレートをコンパイルしてレンダリングし、フラッシュメッセージを自動注入して、HTML レスポンスを書き込みます。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
 <span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
@@ -475,7 +475,7 @@
 <span class="k">Return</span>
 </code></pre></div>
 
-<p><code>SetFlash(message, type)</code> — セッションにフラッシュメッセージを保存します。任意の ViewModel での次の <code>Render()</code> 呼び出しはそれをテンプレートコンテキストに自動的に注入します。タイプは <code>"success"</code>、<code>"error"</code>、または <code>"info"</code>。</p>
+<p><code>SetFlash(message, type)</code> — セッションにフラッシュメッセージを保存します。次の <code>Render()</code> 呼び出し時に自動的にテンプレートコンテキストへ注入されます。タイプは <code>"success"</code>、<code>"error"</code>、または <code>"info"</code> です。</p>
 <div class="highlight"><pre><span></span><code><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Note created.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">)</span>
 <span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">)</span>
 <span class="k">Return</span>

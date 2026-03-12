@@ -349,9 +349,9 @@
 
         <h1 id="_1">タグ &amp; フィルターリファレンス<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <h2 id="_2">タグ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>タグは <code>{% %}</code> デリミターを使用し、テンプレートロジックを制御します。すべての標準的な Jinja2 ブロックタグは JinjaX でサポートされています。</p>
+<p>タグは <code>{% %}</code> デリミタを使用し、テンプレートのロジックを制御します。すべての標準的な Jinja2 ブロックタグは JinjaX でサポートされています。</p>
 <h3 id="extends"><code>{% extends %}</code><a class="headerlink" href="#extends" title="Permanent link">&para;</a></h3>
-<p>親テンプレートから継承します。ファイルの <strong>最初</strong> のタグである必要があります。</p>
+<p>親テンプレートを継承します。ファイルの<strong>先頭</strong>のタグである必要があります。</p>
 <div class="highlight"><pre><span></span><code>{% extends &quot;layouts/base.html&quot; %}
 </code></pre></div>
 
@@ -371,7 +371,7 @@
 </code></pre></div>
 
 <h3 id="include"><code>{% include %}</code><a class="headerlink" href="#include" title="Permanent link">&para;</a></h3>
-<p>この時点で別のテンプレートを挿入します。含まれたファイルは現在のコンテキストを共有します。</p>
+<p>その位置に別のテンプレートを挿入します。インクルードされたファイルは現在のコンテキストを共有します。</p>
 <div class="highlight"><pre><span></span><code>{% include &quot;partials/pagination.html&quot; %}
 {% include &quot;partials/nav.html&quot; %}
 </code></pre></div>
@@ -490,7 +490,7 @@
 
 <hr />
 <h2 id="_3">フィルター<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>フィルターは <code>|</code> pipe オペレータを使用して値を変換します。複数のフィルターをチェーンできます。</p>
+<p>フィルターはパイプ <code>|</code> 演算子を使用して値を変換します。複数のフィルターをチェーンできます。</p>
 <h3 id="_4">文字列フィルター<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -596,7 +596,7 @@
 <tbody>
 <tr>
 <td><code>safe</code></td>
-<td>HTML を信頼できるものとしてマーク — 自動エスケープをバイパス。ユーザー入力では決に使用しないでください。</td>
+<td>HTML を信頼済みとしてマーク — 自動エスケープをバイパス。ユーザー入力には決して使用しないでください。</td>
 </tr>
 <tr>
 <td><code>int</code></td>
@@ -626,11 +626,11 @@
 
 <hr />
 <h2 id="xojo">Xojo 固有の制約<a class="headerlink" href="#xojo" title="Permanent link">&para;</a></h2>
-<p>これらは完全な Python Jinja2 との比較での制限です — サイレントエラーを避けるためにそれらを知りましょう。</p>
+<p>以下は完全な Python Jinja2 と比較した場合の制限です — サイレントなエラーを避けるために把握しておいてください。</p>
 <p><strong>Dictionary のみのドット記法。</strong> <code>{{ obj.key }}</code> は <code>obj</code> が <code>Dictionary</code> の場合にのみ機能します。カスタムクラスインスタンスはサポートされていません — それらのプロパティはテンプレートのドット記法でアクセスできません。</p>
-<p><strong>オブジェクトのメソッド呼び出しはありません。</strong> <code>{{ note.title.upper() }}</code> は機能しません。代わりにフィルターを使用: <code>{{ note.title | upper }}</code>。</p>
-<p><strong>Python ビルトインはありません。</strong> <code>range()</code>、<code>enumerate()</code>、<code>zip()</code> および同様の Python ビルトインは利用できません。テンプレートに渡す前に、ViewModel で必要なデータをビルドします。</p>
-<p><strong>配列は <code>Variant()</code> である必要があります。</strong> 配列を <code>Variant()</code> として渡す (型付き配列ではなく <code>String()</code> または <code>Integer()</code> のような)。JinjaX の <code>RenderFor</code> は <code>Variant()</code> を期待します。</p>
+<p><strong>オブジェクトのメソッド呼び出しは不可。</strong> <code>{{ note.title.upper() }}</code> は機能しません。代わりにフィルターを使用してください: <code>{{ note.title | upper }}</code>。</p>
+<p><strong>Python 組み込み関数は利用不可。</strong> <code>range()</code>、<code>enumerate()</code>、<code>zip()</code> などの Python 組み込み関数は使用できません。テンプレートに渡す前に、ViewModel で必要なデータを構築してください。</p>
+<p><strong>配列は <code>Variant()</code> である必要があります。</strong> 配列は <code>Variant()</code> として渡してください（<code>String()</code> や <code>Integer()</code> のような型付き配列ではありません）。JinjaX の <code>RenderFor</code> は <code>Variant()</code> を期待します。</p>
 <p><strong><code>Nil</code> はフォルシーです。</strong> 値が <code>Nil</code> である Dictionary キーは <code>{% if %}</code> テストでフォルシーと評価されます。存在しないキーもフォルシーと評価されます (エラーではありません)。</p>
 
         <!-- Prev / Next navigation -->

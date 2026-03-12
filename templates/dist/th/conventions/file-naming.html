@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>การตั้งชื่อไฟล์ — MVVM Docs</title>
-  <meta name="description" content="การตั้งชื่อไฟล์ตามแบบแผนสำหรับไฟล์ ViewModel ไฟล์ Model และไฟล์แม่แบบ" />
+  <meta name="description" content="การตั้งชื่อไฟล์ตามแบบแผนสำหรับไฟล์ ViewModel ไฟล์ Model และเทมเพลต" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -344,7 +344,7 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">การตั้งชื่อไฟล์</h1>
-          <p class="page-description">การตั้งชื่อไฟล์ตามแบบแผนสำหรับไฟล์ ViewModel ไฟล์ Model และไฟล์แม่แบบ</p>
+          <p class="page-description">การตั้งชื่อไฟล์ตามแบบแผนสำหรับไฟล์ ViewModel ไฟล์ Model และเทมเพลต</p>
         </div>
 
         <h1 id="_1">การตั้งชื่อไฟล์<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
@@ -410,7 +410,7 @@
 </tr>
 </tbody>
 </table>
-<p>ไม่ใช่ทรัพยากรทั้งหมดจำเป็นต้องมีทั้งเจ็ด ทรัพยากรแบบอ่านอย่างเดียวอาจมีเพียง <code>ListVM</code> และ <code>DetailVM</code> เท่านั้น หน้าที่ไม่ใช่ REST (เช่นหน้าแรมหรือแดชบอร์ด) จะได้รับชื่ออธิบายอย่างง่าย: <code>HomeViewModel.xojo_code</code></p>
+<p>ไม่ใช่ทรัพยากรทั้งหมดจำเป็นต้องมีทั้งเจ็ด ทรัพยากรแบบอ่านอย่างเดียวอาจมีเพียง <code>ListVM</code> และ <code>DetailVM</code> เท่านั้น หน้าที่ไม่ใช่ REST (เช่นหน้าหลักหรือ dashboard) จะได้รับชื่ออธิบายอย่างง่าย: <code>HomeViewModel.xojo_code</code></p>
 <h3 id="_2">ชื่อคลาสตรงกับชื่อไฟล์<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <p>ชื่อคลาสในไฟล์จะต้องตรงกับชื่อไฟล์ทุกประการ:</p>
 <div class="highlight"><pre><span></span><code>NotesCreateVM.xojo_code  →  Class NotesCreateVM
@@ -427,7 +427,7 @@ ProductModel.xojo_code  # ในอนาคต
 
 <p>ใช้รูปแบบ <strong>เอกพจน์</strong> ของคำนาม — Model แทนเอนทิตีเอง ไม่ใช่คอลเลกชันของมัน</p>
 <h2 id="templates">Templates<a class="headerlink" href="#templates" title="Permanent link">&para;</a></h2>
-<p>ไฟล์แม่แบบใช้ชื่อ lowercase <code>snake_case</code> และนามสกุล <code>.html</code></p>
+<p>เทมเพลตใช้ชื่อ lowercase <code>snake_case</code> และนามสกุล <code>.html</code></p>
 <p>ชื่อโฟลเดอร์ตรงกับฟีเจอร์ (พหูพจน์ lowercase):</p>
 <div class="highlight"><pre><span></span><code>templates/
   notes/
@@ -446,7 +446,7 @@ ProductModel.xojo_code  # ในอนาคต
 </code></pre></div>
 
 <h3 id="_3">แม่แบบแบบฟอร์มที่ใช้ร่วมกัน<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
-<p>เมื่อแบบฟอร์มสร้างและแบบฟอร์มแก้ไขเกือบเหมือนกัน ให้ใช้ <code>form.html</code> ไฟล์เดี่ยวและสลับไปมาตามการมีอยู่ของตัวแปรบริบท:</p>
+<p>เมื่อแบบฟอร์มสร้างและแบบฟอร์มแก้ไขเกือบเหมือนกัน ให้ใช้ <code>form.html</code> ไฟล์เดี่ยวและสลับไปมาโดยตรวจสอบว่าตัวแปร context มีค่าหรือไม่:</p>
 <div class="highlight"><pre><span></span><code>{# templates/notes/form.html #}
 {% if note %}
   {# โหมดแก้ไข — note.id มีอยู่ #}

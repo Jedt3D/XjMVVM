@@ -42,7 +42,7 @@ SQLite database file
 
 - **リソースモデルにボイラープレートなし** — `NoteModel`は約20行です。テーブルと列を宣言し、汎用操作を`BaseModel`に委譲し、カスタムSQLが必要な場合のみ記述します。
 - **接続ロジックの変更が一箇所** — SQLiteからPostgreSQLへの移行は`DBAdapter.Connect()`のみに影響します。
-- **明確なエスケープハッチ** — `BaseModel.OpenDB()`はサブクラスに生DB アクセスを提供し、汎用層を破壊しません。
+- **明確なエスケープハッチ** — `BaseModel.OpenDB()` はサブクラスに生の DB アクセスを提供し、汎用層を壊しません。
 
 ---
 
@@ -63,7 +63,7 @@ ctx.Value("note") = myNoteInstance
 ```
 
 !!! warning
-    すべてのモデルメソッドは`Dictionary`または`Variant()`の`Dictionary`を返す必要があります。これはデータレイヤーにおける最も重要なアーキテクチャルルールです。カスタムクラスインスタンスはJinjaXテンプレートで使用できません。
+    すべてのモデルメソッドは `Dictionary` または `Variant()` の `Dictionary` を返す必要があります。これはデータレイヤーにおける最も重要なアーキテクチャルールです。カスタムクラスインスタンスは JinjaX テンプレートで使用できません。
 
 ### なぜリクエストごとに1つの接続なのか?
 
@@ -137,11 +137,11 @@ App.Opening (1回)
 
 **ファイル:** `Framework/DBAdapter.xojo_code`
 
-モジュール — インスタンス化は不要 — で、接続ファクトリとスキーマセットアップを所有しています。
+モジュールです（インスタンス化不要）。接続ファクトリとスキーマセットアップを担当します。
 
 ### `Connect() As SQLiteDatabase`
 
-新しい接続を開いて返します。呼び出し元が`db.Close()`を実行する責務があります。
+新しい接続を開いて返します。呼び出し元が `db.Close()` を実行する責任があります。
 
 データベースファイルは、実行可能ファイルの**隣の** `data/`フォルダに配置されます — `App.ExecutableFile.Parent`経由で解決されます。Xojoデバッガと構築された本番バイナリで同じように動作します。`data/`ディレクトリが存在しない場合は自動作成されます。
 
@@ -163,9 +163,9 @@ End Function
 
 ### `InitDB()`
 
-テーブルが存在しない場合は作成します。`App.Opening`から1回呼ばれます。すべてのスタートアップで呼び出しても安全です — `CREATE TABLE IF NOT EXISTS`はべき等です。
+テーブルが存在しない場合に作成します。`App.Opening` から 1 回呼ばれます。起動のたびに呼び出しても安全です — `CREATE TABLE IF NOT EXISTS` はべき等です。
 
-新しいテーブルを追加するには、`db.Close()`前にここに別の`ExecuteSQL`を追加します。
+新しいテーブルを追加するには、`db.Close()` の前にここへ別の `ExecuteSQL` を追加します。
 
 ### App.Opening — スタートアップパス
 
@@ -186,7 +186,7 @@ Sub Opening()
 End Sub
 ```
 
-`templates/`と`data/`の両方は実行可能ファイルと同じ場所にあります。つまり、バイナリとそれら2つのフォルダを一緒にコピーすることでアプリをデプロイできます — 絶対パスや環境変数は不要です。
+`templates/` と `data/` の両方は実行可能ファイルと同じ場所に置かれます。つまり、バイナリとこの 2 つのフォルダをまとめてコピーするだけでアプリをデプロイできます — 絶対パスや環境変数は不要です。
 
 ---
 
@@ -194,7 +194,7 @@ End Sub
 
 **ファイル:** `Framework/BaseModel.xojo_code`
 
-汎用CRUDベースクラス。サブクラスは2つのメソッドをオーバーライドし、すべての操作を継承します。
+汎用 CRUD 基底クラス。サブクラスは 2 つのメソッドをオーバーライドするだけで、すべての操作を継承します。
 
 ### サブクラスコントラクト
 
@@ -260,17 +260,17 @@ model.DeleteByID(42)
 
 #### `OpenDB() As SQLiteDatabase`
 
-カスタムSQLが必要なサブクラス用の生接続を返します。サブクラスが`db.Close()`を実行する責務があります。
+カスタム SQL が必要なサブクラス向けに生の接続を返します。サブクラスが `db.Close()` を実行する責任があります。
 
-使用時機:
-- SQLite式(`datetime('now')`, `strftime(...)`)がSQLで必要 — `?`パラメータにはできない
-- `JOIN`, `GROUP BY`, `HAVING`またはサブクエリを含む複雑なクエリ
-- `INSERT`後の`db.LastRowID`が必要
-- 複数のステートメントが1つの接続を共有する必要がある
+使用する場面:
+- SQL で SQLite 式（`datetime('now')`、`strftime(...)`）が必要な場合 — `?` パラメータでは渡せない
+- `JOIN`、`GROUP BY`、`HAVING` やサブクエリを含む複雑なクエリ
+- `INSERT` 後に `db.LastRowID` が必要な場合
+- 複数のステートメントが 1 つの接続を共有する必要がある場合
 
 #### `RowToDict(rs As RowSet) As Dictionary`
 
-現在のRowSet行を`Columns()`の列名を使用して`Dictionary`にマップします。すべての値は`StringValue`として保存されます — 意図的です。JinjaXはすべてをテキストとしてレンダリングします。ViewModelsは必要に応じて`Val()`経由で整数にキャストします。
+現在の RowSet 行を `Columns()` の列名を使用して `Dictionary` にマップします。すべての値は `StringValue` として保存されます — これは意図的な設計です。JinjaX はすべてをテキストとしてレンダリングします。ViewModel は必要に応じて `Val()` で整数にキャストします。
 
 ---
 
@@ -399,9 +399,9 @@ End Class
 
 ### 継承されたCRUD対エスケープハッチ使用時
 
-操作が単純な`SELECT`, `INSERT`, `UPDATE`, または`DELETE`でプレーンなバインド値のみ場合は`BaseModel`継承メソッドを使用します。
+操作がプレーンなバインド値のみを使うシンプルな `SELECT`、`INSERT`、`UPDATE`、または `DELETE` の場合は、`BaseModel` の継承メソッドを使用します。
 
-SQLite式(`datetime('now')`, `strftime(...)`)が必要、複雑なクエリ(`JOIN`, `GROUP BY`, サブクエリ)、カスタムinsert後の`db.LastRowID`、または1つの接続で複数のステートメントを共有する必要がある場合は`OpenDB()`を使用します。
+SQLite 式（`datetime('now')`、`strftime(...)`）が必要な場合、複雑なクエリ（`JOIN`、`GROUP BY`、サブクエリ）、カスタム INSERT 後の `db.LastRowID`、または 1 つの接続で複数のステートメントを共有する必要がある場合は `OpenDB()` を使用します。
 
 ---
 
@@ -456,6 +456,6 @@ db.ExecuteSQL( _
   "created_at TEXT DEFAULT (datetime('now')))")
 ```
 
-**3. 登録** `Models/TagModel.xojo_code`を`mvvm.xojo_project`のModelsフォルダに登録します (Xojo IDE: ファイルをプロジェクトパネルにドラッグ)。
+**3. 登録:** `Models/TagModel.xojo_code` を `mvvm.xojo_project` の Models フォルダに登録します（Xojo IDE: ファイルをプロジェクトパネルにドラッグ）。
 
-**4. ViewModelsを作成** `ViewModels/Tags/`に、**テンプレート**を`templates/tags/`に、`Notes`と同じパターンに従って作成します。
+**4. ViewModel とテンプレートを作成:** `ViewModels/Tags/` に ViewModel を、`templates/tags/` にテンプレートを、`Notes` と同じパターンに従って作成します。

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>なぜ XjMVVM? — MVVM Docs</title>
-  <meta name="description" content="XjMVVM の背後にある建築的な決定 — なぜ Xojo の WebPage システムを回避し、なぜ JinjaX を使用した MVVM パターンなのか。" />
+  <meta name="description" content="XjMVVM の背後にあるアーキテクチャ上の決定 — なぜ Xojo の WebPage システムを回避し、なぜ JinjaX を使用した MVVM パターンなのか。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -344,18 +344,18 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">なぜ XjMVVM?</h1>
-          <p class="page-description">XjMVVM の背後にある建築的な決定 — なぜ Xojo の WebPage システムを回避し、なぜ JinjaX を使用した MVVM パターンなのか。</p>
+          <p class="page-description">XjMVVM の背後にあるアーキテクチャ上の決定 — なぜ Xojo の WebPage システムを回避し、なぜ JinjaX を使用した MVVM パターンなのか。</p>
         </div>
 
         <h1 id="xjmvvm">なぜ XjMVVM?<a class="headerlink" href="#xjmvvm" title="Permanent link">&para;</a></h1>
-<p>このページはフレームワークデザイン背後の主要な決定を説明します。<em>なぜ</em>を理解することで、このガイド内の他のすべての規約が意味をなします。</p>
+<p>このページではフレームワーク設計の背後にある主要な意思決定を説明します。<em>なぜ</em>を理解することで、このガイド内の他のすべての規約が意味をなします。</p>
 <h2 id="xojo-webpage">なぜ Xojo の WebPage システムを回避するのか?<a class="headerlink" href="#xojo-webpage" title="Permanent link">&para;</a></h2>
 <p>Xojo Web 2 は完全な GUI ウィジェットシステムを提供します: <code>WebPage</code>、<code>WebButton</code>、<code>WebTextField</code>、<code>WebListBox</code> など。これらのコントロールは WebSocket を介して通信し、状態を自動的に管理します。Xojo のウィジェットモデルに密接に対応する単純な内部ツールの場合、うまく機能します。</p>
 <p>このプロジェクトはそのシステムを完全に回避します。理由はこちらです:</p>
 <p><strong>完全な HTML/CSS コントロール。</strong> WebControl は独自の HTML を独自のクラス名と構造でレンダリングします。Tailwind のような CSS フレームワークを統合することなく、カスタムデザインシステムを簡単に適用することはできません。JinjaX テンプレートでは、HTML を自分で書きます — すべてのタグ、すべてのクラス、すべてのデータ属性はあなたのものです。</p>
 <p><strong>標準的な HTTP セマンティクス。</strong> WebControl ページはステートフル WebSocket セッションです。標準的な HTTP アプリのように動作しません: ブックマークは信頼できず、ブラウザ履歴は厄介で、REST API は追加するのが難しくなります。SSR アプローチは、すべての URL が適切な HTTP エンドポイントを意味します — 予測可能、キャッシュ可能、リンク可能。</p>
-<p><strong>デザイナーフレンドリーなテンプレート。</strong> HTML テンプレートは <code>templates/</code> フォルダに存在します。デザイナーまたはフロントエンド開発者は、完全な IDE サポート (構文ハイライト、Emmet、Prettier) を備えたテキストエディタを使用して編集できます。彼らは Xojo コードに触れることはありません。</p>
-<p><strong>UI レイヤーにセッション状態がない。</strong> Xojo WebControl は暗黙的なセッション状態を持ちます。私たちの ViewModel はリクエストごとにステートレスです — リクエストを受け取り、作業し、レスポンスを書きます。唯一の永続的なコストは <code>Session</code> (<code>WebSession</code> クラス) とデータベースです。</p>
+<p><strong>デザイナーフレンドリーなテンプレート。</strong> HTML テンプレートは <code>templates/</code> フォルダに存在します。デザイナーやフロントエンド開発者は、完全な IDE サポート（構文ハイライト、Emmet、Prettier）を備えたテキストエディタを使って編集できます。Xojo コードに触れる必要は一切ありません。</p>
+<p><strong>UI レイヤーにセッション状態がない。</strong> Xojo WebControl は暗黙的なセッション状態を持ちます。ViewModel はリクエストごとにステートレスです — リクエストを受け取り、処理して、レスポンスを返します。唯一の永続的なコストは <code>Session</code>（<code>WebSession</code> クラス）とデータベースです。</p>
 <h2 id="mvc-mvvm">なぜ MVC ではなく MVVM?<a class="headerlink" href="#mvc-mvvm" title="Permanent link">&para;</a></h2>
 <p>クラシック MVC (Model-View-Controller) では、コントローラーはルーティングロジックとモデルのオーケストレーションの両方を担当します。Xojo では、これはすべてのルートを処理する 1 つの大きなコントローラークラスを意味します。</p>
 <p>XjMVVM は MVVM を使用して、ルートごとのアーキテクチャの関心をより明確に分離します。</p>
@@ -490,14 +490,14 @@
 
 <p>ViewModel はテンプレート名をビジネスロジックで参照しません。モデルは ViewModel を参照しません。これにより、各レイヤーは独立してテスト可能で置き換え可能になります。</p>
 <h2 id="jinjax">なぜ JinjaX?<a class="headerlink" href="#jinjax" title="Permanent link">&para;</a></h2>
-<p>JinjaX は Python の Jinja2 テンプレートエンジンを純粋な Xojo で実装したものです。選択された理由は:</p>
+<p>JinjaX は Python の Jinja2 テンプレートエンジンの純粋な Xojo 実装です。選ばれた理由は次のとおりです:</p>
 <p><strong>Jinja2 はデファクトスタンダードです。</strong> Flask、Django、Ansible、または Saltstack に慣れた開発者は既に構文を知っています。学習曲線は最小限です。</p>
-<p><strong>それは純粋な Xojo ソースです。</strong> 完全な JinjaX ソースツリーは <code>JinjaXLib/</code> の下に存在します。バイナリ <code>.xojo_library</code> 依存性はないため、Xojo の text プロジェクト形式 (<code>.xojo_code</code> ファイル) で機能し、完全に検査可能でデバッグ可能です。</p>
+<p><strong>純粋な Xojo ソースです。</strong> 完全な JinjaX ソースツリーは <code>JinjaXLib/</code> 配下に存在します。バイナリの <code>.xojo_library</code> 依存性がないため、Xojo のテキストプロジェクト形式（<code>.xojo_code</code> ファイル）で動作し、完全に検査・デバッグ可能です。</p>
 <p><strong>セットアップ後はスレッドセーフです。</strong> <code>JinjaEnvironment</code> は <code>App.Opening()</code> で 1 回初期化され、その後は読み取り専用です。各リクエストは新しい <code>CompiledTemplate</code> と <code>JinjaContext</code> を作成します — これらはリクエストごとのオブジェクトで、決して共有されません。</p>
 <p><strong>テンプレート継承が機能します。</strong> <code>{% extends %}</code>、<code>{% block %}</code>、および <code>{% include %}</code> を使用すると、ベースレイアウトを一度構築してすべてのページをそこから構成できます。</p>
 <h2 id="dictionary">Dictionary データコントラクト<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h2>
 <p>これはシステム全体の最も重要な規則です。</p>
-<p>JinjaX はドット記法 (<code>{{ note.title }}</code>) をオブジェクトの <code>EvaluateGetAttr</code> を呼び出すことで解決します。Xojo では、<code>EvaluateGetAttr</code> は <code>Dictionary</code> に対してのみ実装されており、名前でキーを検索します。カスタム Xojo クラスインスタンスは <code>EvaluateGetAttr</code> をサポートしないため、ドットアクセスはサイレントに空として レンダリングされます。</p>
+<p>JinjaX はドット記法（<code>{{ note.title }}</code>）をオブジェクトの <code>EvaluateGetAttr</code> を呼び出すことで解決します。Xojo では、<code>EvaluateGetAttr</code> は <code>Dictionary</code> に対してのみ実装されており、名前でキーを検索します。カスタム Xojo クラスインスタンスは <code>EvaluateGetAttr</code> をサポートしないため、ドットアクセスはサイレントに空文字列としてレンダリングされます。</p>
 <p><strong>規則:</strong> テンプレートに渡されるすべてのデータは <code>Dictionary</code> または <code>Variant()</code> の <code>Dictionary</code> オブジェクトの配列である必要があります。モデルは常にこれら 2 つのタイプのいずれかを返します — カスタムクラスインスタンスを返しません。</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — Dictionary キーはテンプレートのドット記法で動作</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
@@ -528,8 +528,8 @@
 <li>ブラウザはリストページをレンダリング</li>
 </ol>
 <p>これにより、ブラウザがリロードでフォームを再送信することを防ぎます (&ldquo;このページをリロードしますか?&rdquo; ダイアログ)。また、ユーザーが見るすべてのページが GET リクエストで作成されたことを意味します — ブラウザ履歴、ブックマーク、戻るボタンはすべて正しく機能します。</p>
-<p>検証が失敗した場合、ViewModel はリダイレクト <strong>しません</strong> — 同じ GET テンプレートを使用してエラーフラッシュメッセージでフォームを再レンダリングします:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 検証失敗 — リエンダー、リダイレクトなし</span>
+<p>検証が失敗した場合、ViewModel はリダイレクト<strong>しません</strong> — 同じ GET テンプレートを使用してエラーメッセージとともにフォームを再レンダリングします:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// 検証失敗 — 再レンダリング、リダイレクトなし</span>
 <span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Trim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">Then</span>
 <span class="w">  </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Title is required&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
 <span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">)</span>
@@ -539,7 +539,7 @@
 
 <h2 id="_1">セッション分離<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p><code>App</code> は共有シングルトン — すべてのユーザーのリクエストは同じ <code>App</code> インスタンスで実行されます。<code>App</code> プロパティにユーザー固有のデータを保存しないでください。</p>
-<p>ユーザーごとの状態は <code>Session</code> クラス (<code>WebSession</code> から継承) にあります。各ブラウザセッションは、Xojo のランタイムによって自動的に独自の <code>Session</code> インスタンスを取得します:</p>
+<p>ユーザーごとの状態は <code>Session</code> クラス（<code>WebSession</code> を継承）にあります。各ブラウザセッションは、Xojo のランタイムによって自動的に独自の <code>Session</code> インスタンスを取得します:</p>
 <div class="highlight"><pre><span></span><code>App.mRouter      → 共有、Opening() 後読み取り専用  ✅ 安全
 App.mJinja       → 共有、Opening() 後読み取り専用  ✅ 安全
 Session.userID   → ユーザーごと、ブラウザごとに 1 インスタンス  ✅ 安全

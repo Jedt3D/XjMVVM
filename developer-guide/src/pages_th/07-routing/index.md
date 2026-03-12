@@ -45,9 +45,9 @@ App.HandleURL
 
 ---
 
-## ต้นไม้การตัดสินใจ HandleURL
+## แผนผังการตัดสินใจ HandleURL
 
-`HandleURL` ใช้ลำดับการตรวจสอบที่ตายตัวก่อนส่งคำขอใดๆ ปกติการเส้นทาง path มาก่อน — ทุกการเปรียบเทียบขึ้นอยู่กับมัน
+`HandleURL` ใช้ลำดับการตรวจสอบที่ตายตัวก่อนส่งคำขอใดๆ การ normalize path มาก่อนเสมอ — ทุกการเปรียบเทียบขึ้นอยู่กับมัน
 
 <!-- diagram -->
 <!-- nomnoml
@@ -87,7 +87,7 @@ Normalize: prepend "/" if missing, strip trailing "/"
 -->
 <!-- /diagram -->
 
-### เอกลักษณ์ `request.Path`
+### พฤติกรรมพิเศษของ `request.Path`
 
 !!! warning
     Xojo Web 2 ละเว้น `/` นำหน้าจาก `request.Path` คำขอไป `/notes` มาถึงพร้อม `request.Path = "notes"` ไม่ใช่ `"/notes"` ทุกการเปรียบเทียบเส้นทางล้มเหลวเงียบๆ โดยไม่มีการปกติ
@@ -104,7 +104,7 @@ If p.Length > 1 And p.Right(1) = "/" Then p = p.Left(p.Length - 1)
 
 ---
 
-## ท่อ MVVM Request
+## MVVM Request Pipeline
 
 สำหรับเส้นทาง SSR ที่จับคู่ได้ ท่อ pipeline เต็มรูปแบบจาก `HandleURL` ไปยังการตอบสนอง HTML:
 
@@ -230,7 +230,7 @@ End Sub
 | จาก | ถึง | วิธี | หมายเหตุ |
 |------|----|--------|-------|
 | MVVM template | MVVM route | `<a href="/notes">` | HTML anchor มาตรฐาน |
-| MVVM template | Xojo WebPage | `<a href="/tests">` | ปลิดทริกเกอร์เต้นรำเปลี่ยนเส้นทาง |
+| MVVM template | Xojo WebPage | `<a href="/tests">` | กระตุ้นลำดับ redirect dance |
 | Xojo WebPage | MVVM route | `Session.GoToURL("/")` | นำทางระดับเบราว์เซอร์ ปล่อย WebSocket |
 | Xojo WebPage | Xojo WebPage | `page.Show()` | ภายใน WebSocket ไม่มีการเปลี่ยน URL |
 
@@ -255,7 +255,7 @@ Return mRouter.Route(request, response, session, mJinja)
 
 | ไฟล์ | บทบาท |
 |------|------|
-| `App.xojo_code` | `HandleURL` — ปกติเส้นทาง การปลี่ยนเส้นทาง `/tests` การผ่าน `/?_xojo=1` การส่งตัว Router |
+| `App.xojo_code` | `HandleURL` — normalize path การเปลี่ยนเส้นทาง `/tests` การผ่าน `/?_xojo=1` การส่งตัว Router |
 | `Framework/Router.xojo_code` | การลงทะเบียนเส้นทาง (`Get` `Post` `Any`) การจับคู่เส้นทาง (`ParsePath`) การส่งตัว หน้าข้อผิดพลาด |
 | `Default.xojo_code` | Trampoline `WebPage` — เหตุการณ์ `Shown` สร้าง instance `XojoUnitTestPage` หลังจากเซสชันพร้อม |
 | `mvvm.xojo_project` | `DefaultWindow=Default` — ต้องเป็น `Default` ไม่ใช่ `XojoUnitTestPage` |

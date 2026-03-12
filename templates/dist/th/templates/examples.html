@@ -382,7 +382,7 @@
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>ตัวแปร <code>flash</code> เป็น <code>Dictionary</code> ที่มีกุญแจสองตัว: <code>type</code> (<code>"success"</code>, <code>"error"</code>, <code>"info"</code>) และ <code>message</code> (สตริงข้อความ) ตัวแปรนี้ถูกฉีดเข้าโดยอัตโนมัติ — ViewModel ใดๆ สามารถเรียก <code>SetFlash()</code> และข้อความจะปรากฏบนหน้าที่แสดงผลครั้งต่อไป</p>
+<p>ตัวแปร <code>flash</code> เป็น <code>Dictionary</code> ที่มี key สองตัว: <code>type</code> (<code>"success"</code>, <code>"error"</code>, <code>"info"</code>) และ <code>message</code> (สตริงข้อความ) ตัวแปรนี้ถูกฉีดเข้าโดยอัตโนมัติ — ViewModel ใดๆ สามารถเรียก <code>SetFlash()</code> และข้อความจะปรากฏบนหน้าที่แสดงผลครั้งต่อไป</p>
 <h2 id="_3">รายการบันทึกย่อ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>{# templates/notes/list.html #}
 {% extends &quot;layouts/base.html&quot; %}
@@ -420,7 +420,7 @@
 {% endblock %}
 </code></pre></div>
 
-<p>จุดสำคัญคือ <code>note.id</code>, <code>note.title</code>, <code>note.body</code>, <code>note.updated_at</code> เป็นกุญแจของ Dictionary การลบทำผ่าน <code>POST</code> form เพราะแบบฟอร์ม HTML รองรับเพียง GET และ POST เท่านั้น — ไม่มี HTTP DELETE ในแบบฟอร์มบราวเซอร์</p>
+<p>จุดสำคัญคือ <code>note.id</code>, <code>note.title</code>, <code>note.body</code>, <code>note.updated_at</code> เป็น key ของ Dictionary การลบทำผ่าน <code>POST</code> form เพราะแบบฟอร์ม HTML รองรับเพียง GET และ POST เท่านั้น — ไม่มี HTTP DELETE ในแบบฟอร์มบราวเซอร์</p>
 <h2 id="_4">แบบฟอร์มที่ใช้ร่วมกันสำหรับการสร้างและแก้ไข<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>เทมเพลตเดียวสามารถใช้สำหรับทั้งแบบฟอร์มสร้างบันทึกใหม่และแบบฟอร์มแก้ไข การมีอยู่ของตัวแปร <code>note</code> จะกำหนดว่าโหมดใดเป็นโหมดที่ใช้งาน:</p>
 <div class="highlight"><pre><span></span><code>{# templates/notes/form.html #}
@@ -452,7 +452,7 @@
 {% endblock %}
 </code></pre></div>
 
-<p><code>NotesNewVM</code> ไม่ส่งกุญแจ <code>note</code> (หรือส่ง <code>Nil</code>) — เทมเพลตแสดงผลในโหมดสร้าง <code>NotesEditVM</code> ส่ง Dictionary <code>note</code> ที่โหลดแล้ว — เทมเพลตจะเติมค่าที่มีอยู่แล้วล่วงหน้า</p>
+<p><code>NotesNewVM</code> ไม่ส่ง key <code>note</code> (หรือส่ง <code>Nil</code>) — เทมเพลตแสดงผลในโหมดสร้าง <code>NotesEditVM</code> ส่ง Dictionary <code>note</code> ที่โหลดแล้ว — เทมเพลตจะเติมค่าที่มีอยู่แล้วล่วงหน้า</p>
 <h2 id="_5">รายละเอียดบันทึกย่อ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>{# templates/notes/detail.html #}
 {% extends &quot;layouts/base.html&quot; %}

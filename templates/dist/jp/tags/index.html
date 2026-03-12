@@ -348,7 +348,7 @@
         </div>
 
         <h1 id="_1">タグと多対多<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>Tagsを追加することにより、同時に2つのことが導入されました：<strong>2番目の完全なリソース</strong>（Notes以上にCRUDパターンが一般化されることを証明する）と、結合テーブルを経由したNotesとTagsの<strong>多対多リレーションシップ</strong>です。</p>
+<p>Tags の追加により、2 つのことが同時に導入されました：<strong>2 番目の完全なリソース</strong>（CRUD パターンが Notes 以外にも一般化できることを証明する）と、結合テーブルを介した Notes と Tags の<strong>多対多リレーションシップ</strong>です。</p>
 <h2 id="tag">Tagリソース<a class="headerlink" href="#tag" title="Permanent link">&para;</a></h2>
 <p><code>TagModel</code>は<code>NoteModel</code>と同じ3層パターンに従います。</p>
 <div class="diagram-tabs" id="diag1">
@@ -681,7 +681,7 @@ A tag can appear on zero or many notes.</code></pre>
 <span class="w">  </span><span class="s2">&quot;PRIMARY KEY (note_id, tag_id))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p>複合主キー<code>(note_id, tag_id)</code>はデータベースレベルで一意性を強制します — noteは同じtagと2回関連付けられることはできません。</p>
+<p>複合主キー <code>(note_id, tag_id)</code> はデータベースレベルで一意性を強制します — ノートは同じタグと 2 回関連付けられることはありません。</p>
 <hr />
 <h2 id="note">noteのタグの読み取り<a class="headerlink" href="#note" title="Permanent link">&para;</a></h2>
 <p><code>NoteModel.GetTagsForNote()</code>は<code>JOIN</code>で結合テーブルをクエリします：</p>
@@ -709,7 +709,7 @@ A tag can appear on zero or many notes.</code></pre>
 <p>戻り値は<code>Variant()</code>の<code>Dictionary</code>です — JinjaXテンプレートとJSON APIと完全に互換性があります。</p>
 <hr />
 <h2 id="note_1">noteのタグの書き込み<a class="headerlink" href="#note_1" title="Permanent link">&para;</a></h2>
-<p><code>NoteModel.SetTagsForNote()</code>は<strong>削除してから挿入する</strong>パターンを使用してタグセット全体をアトミックに置き換えます：</p>
+<p><code>NoteModel.SetTagsForNote()</code> は<strong>削除してから挿入する</strong>パターンを使ってタグセット全体をアトミックに置き換えます:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">SetTagsForNote</span><span class="p">(</span><span class="n">noteID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">tagIDs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
 <span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;DELETE FROM note_tags WHERE note_id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">noteID</span><span class="p">)</span>
@@ -726,7 +726,7 @@ A tag can appear on zero or many notes.</code></pre>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>削除してから挿入するパターンはタグセット全体を扱います — これは古いセットと新しいセットをディフェレンシエートしません。これはシンプルで、ほとんどのユースケースに正しいです。各関連付けのメタデータを保持する必要がある場合（例：タグ割り当てごとのタイムスタンプ）は、ディフェレンシエートアプローチが必要です。</p>
+<p>削除してから挿入するパターンはタグセット全体を一括で扱います — 古いセットと新しいセットを差分比較しません。シンプルで、ほとんどのユースケースで正しく機能します。各関連付けのメタデータ（例: タグ割り当てごとのタイムスタンプ）を保持する必要がある場合は、差分比較アプローチが必要です。</p>
 </div>
 <hr />
 <h2 id="_2">新しい多対多リレーションシップを追加<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -738,8 +738,8 @@ A tag can appear on zero or many notes.</code></pre>
 <span class="w">  </span><span class="s2">&quot;PRIMARY KEY (note_id, category_id))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><strong>2.</strong> <code>GetCategoriesForNote()</code>と<code>SetCategoriesForNote()</code>を、同じJOINおよび削除-挿入パターンを使用して関連するモデルに追加してください。</p>
-<p><strong>3.</strong> noteの詳細またはフォーム編集をレンダリングするViewModelで、両方のメソッドを呼び出し、結果をコンテキストディクショナリにマージしてください。</p>
+<p><strong>2.</strong> 同じ JOIN および削除-挿入パターンを使用して、<code>GetCategoriesForNote()</code> と <code>SetCategoriesForNote()</code> を関連するモデルに追加してください。</p>
+<p><strong>3.</strong> ノートの詳細または編集フォームをレンダリングする ViewModel で両方のメソッドを呼び出し、結果をコンテキスト Dictionary にマージしてください。</p>
 
         <!-- Prev / Next navigation -->
         

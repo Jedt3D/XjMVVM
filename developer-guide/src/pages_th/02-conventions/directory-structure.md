@@ -60,13 +60,13 @@ mvvm/
     └── dist/
 ```
 
-## Framework vs. ViewModels
+## Framework กับ ViewModels
 
 โฟลเดอร์ `Framework/` ประกอบด้วยโค้ดที่เราเขียนครั้งเดียวและแทบไม่ต้องแก้ไขอีก มันคือ "เครื่องยนต์" — routing, base ViewModel lifecycle, และ helper สำหรับ request/response สิ่งสำคัญคือเมื่อเพิ่มฟีเจอร์ใหม่ เราจะไม่ต้องแก้ไขไฟล์ใดๆ ใน `Framework/` เลย
 
 `ViewModels/` คือตำแหน่งที่ทำงานเฉพาะของแอปพลิเคชัน ทุกเส้นทาง (route) ใหม่จะได้ไฟล์ ViewModel ใหม่อยู่ในโฟลเดอร์ฟีเจอร์ที่เกี่ยวข้อง
 
-## Feature folders ใน ViewModels
+## โฟลเดอร์ Feature ใน ViewModels
 
 จัดกลุ่ม ViewModels ตามฟีเจอร์ ไม่ใช่ตามเมธอด HTTP:
 
@@ -79,7 +79,7 @@ ViewModels/
 
 วิธีนี้ช่วยให้ไฟล์ที่เกี่ยวข้องอยู่ด้วยกัน และทำให้ค้นหาทุกอย่างเกี่ยวกับฟีเจอร์ในที่เดียวได้ง่าย
 
-## Template mirroring
+## Template สะท้อนโครงสร้าง URL
 
 โครงสร้าง `templates/` สะท้อนให้เห็นลำดับชั้นของ URL:
 

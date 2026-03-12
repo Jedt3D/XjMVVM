@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ระบบการตรวจสอบอัตลักษณ์ — MVVM Docs</title>
-  <meta name="description" content="วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้, การเข้าสู่ระบบ, การออกจากระบบ, การแฮชรหัสผ่าน, และการตรวจสอบอัตลักษณ์แบบ cookie สำหรับโหมด SSR" />
+  <title>ระบบยืนยันตัวตน — MVVM Docs</title>
+  <meta name="description" content="วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้, การเข้าสู่ระบบ, การออกจากระบบ, การแฮชรหัสผ่าน, และการยืนยันตัวตนแบบ cookie สำหรับโหมด SSR" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -343,15 +343,15 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">ระบบการตรวจสอบอัตลักษณ์</h1>
-          <p class="page-description">วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้, การเข้าสู่ระบบ, การออกจากระบบ, การแฮชรหัสผ่าน, และการตรวจสอบอัตลักษณ์แบบ cookie สำหรับโหมด SSR</p>
+          <h1 class="page-title">ระบบยืนยันตัวตน</h1>
+          <p class="page-description">วิธีที่ XjMVVM จัดการการลงทะเบียนผู้ใช้, การเข้าสู่ระบบ, การออกจากระบบ, การแฮชรหัสผ่าน, และการยืนยันตัวตนแบบ cookie สำหรับโหมด SSR</p>
         </div>
 
-        <h1 id="_1">ระบบการตรวจสอบอัตลักษณ์<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>การตรวจสอบอัตลักษณ์ใน XjMVVM สร้างขึ้นจากสามชั้น: <strong><code>UserModel</code></strong> จัดเก็บและตรวจสอบข้อมูลประจำตัว, <strong><code>BaseViewModel</code></strong> มีเมธอด auth ที่ใช้ cookie เพื่อปกป้องเส้นทางและเปิดเผยผู้ใช้ปัจจุบันให้กับเทมเพลต, และ <strong>JavaScript ฝั่งเบราวเซอร์</strong> เชื่อมช่องว่างเซสชัน SSR สำหรับสถานะเนวิเกชันและข้อความแฟลช</p>
+        <h1 id="_1">ระบบยืนยันตัวตน<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>การยืนยันตัวตนใน XjMVVM สร้างขึ้นจากสามชั้น: <strong><code>UserModel</code></strong> จัดเก็บและตรวจสอบข้อมูลประจำตัว, <strong><code>BaseViewModel</code></strong> มีเมธอด auth ที่ใช้ cookie เพื่อปกป้องเส้นทางและเปิดเผยผู้ใช้ปัจจุบันให้กับเทมเพลต, และ <strong>JavaScript ฝั่งเบราว์เซอร์</strong> เชื่อมช่องว่างเซสชัน SSR สำหรับสถานะเนวิเกชันและข้อความแฟลช</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><strong><code>Self.Session</code> มีค่าเป็น Nil เสมอในโหมด SSR</strong> Xojo Web 2 ของ <code>WebSession</code> ต้องการการเชื่อมต่อ WebSocket ที่คงอยู่ ในโหมด SSR บริสุทธิ์ — ซึ่ง <code>HandleURL</code> จะคืนค่า <code>True</code> เสมอ — ไม่มี WebSocket และไม่มีเซสชัน การตรวจสอบอัตลักษณ์ทั้งหมดใช้ cookie ที่ลงนาม HMAC แทน</p>
+<p><strong><code>Self.Session</code> มีค่าเป็น Nil เสมอในโหมด SSR</strong> Xojo Web 2 ของ <code>WebSession</code> ต้องการการเชื่อมต่อ WebSocket ที่คงอยู่ ในโหมด SSR บริสุทธิ์ — ซึ่ง <code>HandleURL</code> จะคืนค่า <code>True</code> เสมอ — ไม่มี WebSocket และไม่มีเซสชัน การยืนยันตัวตนทั้งหมดใช้ cookie ที่ลงนาม HMAC แทน</p>
 </div>
 <h2 id="_2">ภาพรวม<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <div class="diagram-tabs" id="diag1">
@@ -562,7 +562,7 @@ GET protected route
 <p><strong>ไฟล์:</strong> <code>Models/UserModel.xojo_code</code></p>
 <p><code>UserModel</code> สืบทอดจาก <code>BaseModel</code> ตารางของมันคือ <code>users(id, username, password_hash, created_at)</code> คอลัมน์ <code>password_hash</code> จัดเก็บสตริงเดียวในรูปแบบ <code>hash:salt</code></p>
 <h3 id="sha-256">การแฮช SHA-256 ฝั่งไคลเอนต์<a class="headerlink" href="#sha-256" title="Permanent link">&para;</a></h3>
-<p>ก่อนฟอร์มการเข้าสู่ระบบหรือการลงทะเบียนถูกส่ง เบราวเซอร์จะแฮชรหัสผ่านโดยใช้ <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest">Web Crypto API</a> เพื่อไม่ให้รหัสผ่านเป็นข้อความธรรมชาติข้ามเครือข่าย:</p>
+<p>ก่อนฟอร์มการเข้าสู่ระบบหรือการลงทะเบียนถูกส่ง เบราว์เซอร์จะแฮชรหัสผ่านโดยใช้ <a href="https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest">Web Crypto API</a> เพื่อไม่ให้รหัสผ่านเป็นข้อความธรรมชาติข้ามเครือข่าย:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">subtle</span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;SHA-256&#39;</span><span class="p">,</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TextEncoder</span><span class="p">().</span><span class="nx">encode</span><span class="p">(</span><span class="nx">str</span><span class="p">));</span>
@@ -587,10 +587,10 @@ GET protected route
       <span class="err">@</span><span class="na">submit</span><span class="err">.</span><span class="na">prevent</span><span class="o">=</span><span class="s">&quot;handleSubmit($event)&quot;</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>แฟล็ก <code>hashed</code> ป้องกันการประมวลผลซ้ำถ้า <code>e.target.submit()</code> ไม่ว่าด้วยเหตุใดก็ตามจะไฟ <code>e.target.submit()</code> ใหม่</p>
+<p><code>hashed</code> flag ป้องกันการประมวลผลซ้ำ ในกรณีที่ <code>e.target.submit()</code> ทำให้ submit event ถูก fire ขึ้นมาอีกครั้งด้วยเหตุใดก็ตาม</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>crypto.subtle</code> พร้อมใช้งานในเบราวเซอร์สมัยใหม่ทั้งหมด และไม่ต้องการไลบรารี่ใด ๆ มันพร้อมใช้งานเฉพาะในบริบทที่ปลอดภัย (HTTPS หรือ localhost)</p>
+<p><code>crypto.subtle</code> พร้อมใช้งานในเบราว์เซอร์สมัยใหม่ทั้งหมด และไม่ต้องการไลบรารี่ใด ๆ มันพร้อมใช้งานเฉพาะในบริบทที่ปลอดภัย (HTTPS หรือ localhost)</p>
 </div>
 <h3 id="_3">การจัดเก็บรหัสผ่านฝั่งเซิร์ฟเวอร์<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>เซิร์ฟเวอร์รับแฮช SHA-256 ฝั่งไคลเอนต์ (<code>SHA256(plaintext)</code>) เป็นฟิลด์รหัสผ่าน จากนั้นจะใช้แฮชที่สองกับเกลือสุ่มต่อผู้ใช้ก่อนจัดเก็บ:</p>
@@ -644,8 +644,8 @@ GET protected route
 <p><code>stored.Middle(colonPos + 1)</code> เป็นแบบ 0-based (<code>String.Middle</code> จัดตำแหน่งกับ <code>IndexOf</code>) ไม่เคยใช้ <code>Mid()</code> ที่นี่ — ฟังก์ชันเดิมที่มีพื้นฐาน 1 จะสร้างออฟ-บาย-วันและทำให้การแยกเกลือเสียหาย</p>
 </div>
 <hr />
-<h2 id="cookie">การตรวจสอบอัตลักษณ์โดยใช้ Cookie<a class="headerlink" href="#cookie" title="Permanent link">&para;</a></h2>
-<p>เนื่องจาก <code>Self.Session</code> มีค่าเป็น Nil เสมอในโหมด SSR, XjMVVM ใช้ cookie HTTP ที่ลงนาม HMAC สำหรับการตรวจสอบอัตลักษณ์ cookie ถูกตั้งค่าผ่านส่วนหัว HTTP <code>Set-Cookie</code> และตรวจสอบในทุกคำขอ</p>
+<h2 id="cookie">การยืนยันตัวตนโดยใช้ Cookie<a class="headerlink" href="#cookie" title="Permanent link">&para;</a></h2>
+<p>เนื่องจาก <code>Self.Session</code> มีค่าเป็น Nil เสมอในโหมด SSR, XjMVVM ใช้ cookie HTTP ที่ลงนาม HMAC สำหรับการยืนยันตัวตน cookie ถูกตั้งค่าผ่านส่วนหัว HTTP <code>Set-Cookie</code> และตรวจสอบในทุกคำขอ</p>
 <h3 id="cookie_1">รูปแบบ Cookie<a class="headerlink" href="#cookie_1" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>mvvm_auth=&lt;userID&gt;:&lt;username&gt;:&lt;HMAC&gt;
 </code></pre></div>
@@ -654,7 +654,7 @@ GET protected route
 <div class="highlight"><pre><span></span><code>SHA256(userID + &quot;:&quot; + username + &quot;:&quot; + App.mAuthSecret)
 </code></pre></div>
 
-<p><code>App.mAuthSecret</code> เป็นสตริงเลขฐานสิบหก 32 ไบต์แบบสุ่มที่สร้างครั้งเดียวในตอนเริ่มต้นผ่าน <code>Crypto.GenerateRandomBytes(32)</code> มันเปลี่ยนแปลงในทุกการรีสตาร์ท ซึ่งมีผลเอาสิ่งอื่นออกจากการตรวจสอบอัตลักษณ์ cookie ที่มีอยู่ทั้งหมด</p>
+<p><code>App.mAuthSecret</code> เป็นสตริงเลขฐานสิบหก 32 ไบต์แบบสุ่มที่สร้างครั้งเดียวในตอนเริ่มต้นผ่าน <code>Crypto.GenerateRandomBytes(32)</code> มันเปลี่ยนแปลงในทุกการรีสตาร์ท ซึ่งทำให้ auth cookie ที่มีอยู่ทั้งหมดหมดอายุทันที</p>
 <h3 id="authcookievalue-cookie">AuthCookieValue — สร้าง Cookie<a class="headerlink" href="#authcookievalue-cookie" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">userID</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">username</span>
@@ -664,7 +664,7 @@ GET protected route
 </code></pre></div>
 
 <h3 id="parseauthcookie-cookie">ParseAuthCookie — ตรวจสอบ Cookie<a class="headerlink" href="#parseauthcookie-cookie" title="Permanent link">&para;</a></h3>
-<p>เรียกในทุกคำขอเพื่อแยกและตรวจสอบผู้ใช้ที่ได้รับการตรวจสอบอัตลักษณ์ ผลลัพธ์ถูกแคชต่อคำขอผ่านคุณสมบัติ <code>mAuthParsed</code> / <code>mAuthCache</code> เพื่อหลายการเรียก (จาก <code>RequireLogin</code>, <code>CurrentUserID</code>, <code>Render</code>) ไม่ต้องแยกวิเคราะห์ใหม่</p>
+<p>เรียกในทุกคำขอเพื่อแยกและตรวจสอบผู้ใช้ที่ได้รับการยืนยันตัวตน ผลลัพธ์ถูกแคชต่อคำขอผ่านคุณสมบัติ <code>mAuthParsed</code> / <code>mAuthCache</code> เพื่อหลายการเรียก (จาก <code>RequireLogin</code>, <code>CurrentUserID</code>, <code>Render</code>) ไม่ต้องแยกวิเคราะห์ใหม่</p>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">mAuthParsed</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">mAuthCache</span>
 
@@ -706,11 +706,11 @@ GET protected route
 <p>การตรวจสอบ HMAC ช่วยให้ cookie ไม่สามารถปลอมแปลงได้ ผู้โจมตีจะต้องได้ <code>App.mAuthSecret</code> เพื่อสร้าง cookie ที่ถูกต้องสำหรับผู้ใช้ใด ๆ</p>
 </div>
 <h3 id="redirectwithauth-cookie">RedirectWithAuth — ตั้งค่า Cookie เมื่อเข้าสู่ระบบ/ลงทะเบียน<a class="headerlink" href="#redirectwithauth-cookie" title="Permanent link">&para;</a></h3>
-<p>หลังจากการตรวจสอบอัตลักษณ์สำเร็จ <code>RedirectWithAuth</code> ทำสามสิ่งในการตอบสนองเดียว:</p>
+<p>หลังจากการยืนยันตัวตนสำเร็จ <code>RedirectWithAuth</code> ทำสามสิ่งในการตอบสนองเดียว:</p>
 <ol>
 <li>ตั้งค่า cookie <code>mvvm_auth</code> ผ่านส่วนหัว HTTP <code>Set-Cookie</code></li>
 <li>ส่งหน้า JS กลางที่เก็บชื่อผู้ใช้ใน <code>localStorage</code> และข้อความแฟลชใน <code>sessionStorage</code></li>
-<li>เปลี่ยนเส้นทางเบราวเซอร์ไปยัง URL เป้าหมาย</li>
+<li>เปลี่ยนเส้นทางเบราว์เซอร์ไปยัง URL เป้าหมาย</li>
 </ol>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">RedirectWithAuth</span><span class="p">(</span><span class="n">targetURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">cookieVal</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthCookieValue</span><span class="p">(</span><span class="n">userID</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span>
@@ -727,7 +727,7 @@ GET protected route
 
 <p>หน้า JS กลางจำเป็นเพราะ:</p>
 <ul>
-<li><code>Set-Cookie</code> ตั้งค่า cookie HTTP (สำหรับการตรวจสอบอัตลักษณ์ฝั่งเซิร์ฟเวอร์ในคำขอต่อมา)</li>
+<li><code>Set-Cookie</code> ตั้งค่า cookie HTTP (สำหรับการยืนยันตัวตนฝั่งเซิร์ฟเวอร์ในคำขอต่อมา)</li>
 <li><code>localStorage</code> เก็บชื่อผู้ใช้ (สำหรับการแสดงสถานะเนวิเกชันฝั่งไคลเอนต์ผ่าน Alpine.js)</li>
 <li><code>sessionStorage</code> เก็บข้อความแฟลช (สำหรับการแสดงครั้งเดียวหลังจากเปลี่ยนเส้นทาง)</li>
 </ul>
@@ -743,10 +743,10 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p><code>Max-Age=0</code> บอกเบราวเซอร์ให้ลบ cookie ทันที</p>
+<p><code>Max-Age=0</code> บอกเบราว์เซอร์ให้ลบ cookie ทันที</p>
 <hr />
 <h2 id="baseviewmodel-auth">ตัวช่วย BaseViewModel Auth<a class="headerlink" href="#baseviewmodel-auth" title="Permanent link">&para;</a></h2>
-<p>สี่เมธอดบน <code>BaseViewModel</code> ทำให้การตรวจสอบอัตลักษณ์เข้าถึงได้จาก ViewModel ใด ๆ โดยไม่จัดการ cookie โดยตรง:</p>
+<p>สี่เมธอดบน <code>BaseViewModel</code> ทำให้การยืนยันตัวตนเข้าถึงได้จาก ViewModel ใด ๆ โดยไม่จัดการ cookie โดยตรง:</p>
 <h3 id="currentuserid-as-integer"><code>CurrentUserID() As Integer</code><a class="headerlink" href="#currentuserid-as-integer" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
@@ -755,7 +755,7 @@ GET protected route
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ส่งกลับ <code>0</code> เมื่อไม่ได้รับการตรวจสอบอัตลักษณ์ — ศูนย์ไม่เคยเป็นคีย์หลักฐานอุปสรรค <code>AUTOINCREMENT</code> ของ SQLite ที่ถูกต้อง</p>
+<p>ส่งกลับ <code>0</code> เมื่อไม่ได้รับการยืนยันตัวตน — ศูนย์ไม่เคยเป็นคีย์หลักฐานอุปสรรค <code>AUTOINCREMENT</code> ของ SQLite ที่ถูกต้อง</p>
 <h3 id="currentusername-as-string"><code>CurrentUsername() As String</code><a class="headerlink" href="#currentusername-as-string" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">auth</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ParseAuthCookie</span><span class="p">()</span>
@@ -765,7 +765,7 @@ GET protected route
 </code></pre></div>
 
 <h3 id="requirelogin-as-boolean"><code>RequireLogin() As Boolean</code><a class="headerlink" href="#requirelogin-as-boolean" title="Permanent link">&para;</a></h3>
-<p>ปกป้องเส้นทาง HTML เปลี่ยนเส้นทางผู้ใช้ที่ไม่ได้รับการตรวจสอบอัตลักษณ์ไปยังหน้าเข้าสู่ระบบพร้อมพารามิเตอร์ <code>next</code> เพื่อให้พวกเขากลับไป URL ดั้งเดิมหลังจากเข้าสู่ระบบ</p>
+<p>ปกป้องเส้นทาง HTML เปลี่ยนเส้นทางผู้ใช้ที่ไม่ได้รับการยืนยันตัวตนไปยังหน้าเข้าสู่ระบบพร้อมพารามิเตอร์ <code>next</code> เพื่อให้พวกเขากลับไป URL ดั้งเดิมหลังจากเข้าสู่ระบบ</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
 <span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login?next=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">EncodeURLComponent</span><span class="p">(</span><span class="n">Request</span><span class="p">.</span><span class="n">Path</span><span class="p">))</span>
@@ -843,18 +843,18 @@ GET protected route
 <tr>
 <td>cookie <code>mvvm_auth</code></td>
 <td>cookie HTTP</td>
-<td>การตรวจสอบอัตลักษณ์ฝั่งเซิร์ฟเวอร์</td>
-<td>จนกว่าเบราวเซอร์จะล้างหรือ <code>Max-Age=0</code></td>
+<td>การยืนยันตัวตนฝั่งเซิร์ฟเวอร์</td>
+<td>จนกว่าเบราว์เซอร์จะล้างหรือ <code>Max-Age=0</code></td>
 </tr>
 <tr>
 <td><code>localStorage._auth_user</code></td>
-<td>localStorage เบราวเซอร์</td>
+<td>localStorage เบราว์เซอร์</td>
 <td>การแสดงเนวิเกชันฝั่งไคลเอนต์</td>
 <td>คงอยู่ในแท็บ/การรีสตาร์ท</td>
 </tr>
 <tr>
 <td><code>sessionStorage._flash_msg</code></td>
-<td>sessionStorage เบราวเซอร์</td>
+<td>sessionStorage เบราว์เซอร์</td>
 <td>ข้อความแฟลชแบบครั้งเดียว</td>
 <td>แท็บปัจจุบันเท่านั้น อยู่รอดได้จากการเปลี่ยนเส้นทาง</td>
 </tr>
@@ -890,7 +890,7 @@ GET protected route
 {% endif %}
 </code></pre></div>
 
-<h3 id="localstorage">สถานะการตรวจสอบอัตลักษณ์เนวิเกชัน — <code>localStorage</code><a class="headerlink" href="#localstorage" title="Permanent link">&para;</a></h3>
+<h3 id="localstorage">สถานะการยืนยันตัวตนเนวิเกชัน — <code>localStorage</code><a class="headerlink" href="#localstorage" title="Permanent link">&para;</a></h3>
 <p>Alpine.js อ่าน <code>localStorage._auth_user</code> เพื่อแสดงสถานะเนวิเกชันที่ถูกต้อง:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{ user: localStorage.getItem(&#39;_auth_user&#39;) }&quot;</span><span class="p">&gt;</span>
   <span class="p">&lt;</span><span class="nt">span</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;!user&quot;</span><span class="p">&gt;</span>
@@ -971,7 +971,7 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การตรวจสอบอตลกษณโดยใช-cookie">การตรวจสอบอัตลักษณ์โดยใช้ Cookie</a>
+            <a class="toc-link" href="#การยนยนตวตนโดยใช-cookie">การยืนยันตัวตนโดยใช้ Cookie</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -1031,7 +1031,7 @@ GET protected route
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#สถานะการตรวจสอบอตลกษณเนวเกชน-localstorage">สถานะการตรวจสอบอัตลักษณ์เนวิเกชัน — `localStorage`</a>
+            <a class="toc-link" href="#สถานะการยนยนตวตนเนวเกชน-localstorage">สถานะการยืนยันตัวตนเนวิเกชัน — `localStorage`</a>
           </li>
           
           <li class="toc-item toc-level-2">

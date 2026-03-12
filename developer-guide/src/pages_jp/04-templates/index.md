@@ -47,7 +47,7 @@ mJinja.RegisterFilter("truncate80", AddressOf TruncateFilter)
 
 ## カスタムフィルターを登録
 
-フィルターは `Variant` を取り、`Variant` を返す Xojo メソッドです。テンプレートが pipe `|` オペレータで使用する文字列名で登録します:
+フィルターは `Variant` を受け取り `Variant` を返す Xojo メソッドです。テンプレートがパイプ `|` 演算子で使用する文字列名で登録します:
 
 ```xojo
 // App.xojo_code (またはモジュール) で
@@ -71,7 +71,7 @@ mJinja.RegisterFilter("truncate80", AddressOf TruncateFilter)
 
 ## ViewModel から環境にアクセス
 
-`JinjaEnvironment` は `Handle()` が呼ばれる前にルーターから各 ViewModel に渡されます。`BaseViewModel` はそれを `Jinja` プロパティとして保存します。決して直接アクセスしません — `Render()` を呼び出すだけです:
+`JinjaEnvironment` は `Handle()` が呼ばれる前にルーターから各 ViewModel に渡されます。`BaseViewModel` はそれを `Jinja` プロパティとして保存します。直接アクセスする必要はありません — `Render()` を呼び出すだけです:
 
 ```xojo
 // 任意の ViewModel で — Render() は内部的に Self.Jinja を使用
@@ -84,7 +84,7 @@ Render("notes/list.html", ctx)
 
 `JinjaEnvironment` は `Opening()` 完了後にスレッド間で共有するのは安全です。理由は:
 
-- `RegisterFilter` は `Opening()` 中にのみ呼ばれます — リクエスト中は決にしません
+- `RegisterFilter` は `Opening()` 中にのみ呼ばれます — リクエスト処理中には決して呼びません
 - `GetTemplate()` と `Render()` は環境から読み取るだけです
 - `CompiledTemplate` と `JinjaContext` はリクエストごとに新規作成されます (スタック割り当て、共有されません)
 

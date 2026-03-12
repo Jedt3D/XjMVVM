@@ -348,7 +348,7 @@
         </div>
 
         <h1 id="sqlite-dictionary-contract">SQLite &amp; Dictionary Contract<a class="headerlink" href="#sqlite-dictionary-contract" title="Permanent link">&para;</a></h1>
-<h2 id="the-core-pattern">The core pattern<a class="headerlink" href="#the-core-pattern" title="Permanent link">&para;</a></h2>
+<h2 id="_1">รูปแบบหลัก<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>ทุก Model method ยึดตามรูปแบบเดียวกัน: เปิด database connection ใหม่ รันคำสั่ง query แปลง <code>RowSet</code> แต่ละแถวเป็น <code>Dictionary</code> ปิดทุกอย่าง คืนค่า</p>
 <p>รูปแบบนี้ตั้งใจออกแบบเพื่อให้มั่นใจว่าปลอดภัยสำหรับหลายเธรด และบังคับใช้ Dictionary data contract ที่ JinjaX ต้องการ</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
@@ -377,7 +377,7 @@
 </code></pre></div>
 
 <p>Return type <code>Variant()</code> ที่บรรจุ <code>Dictionary</code> objects เป็นรูปแบบเดียวที่ JinjaX สามารถวนลูปใน <code>{% for %}</code> ได้</p>
-<h2 id="return-types">Return types<a class="headerlink" href="#return-types" title="Permanent link">&para;</a></h2>
+<h2 id="_2">ประเภทค่าที่ส่งกลับ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -418,7 +418,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<h2 id="per-request-database-connections">Per-request database connections<a class="headerlink" href="#per-request-database-connections" title="Permanent link">&para;</a></h2>
+<h2 id="connection-request">การเปิด connection ต่อ request<a class="headerlink" href="#connection-request" title="Permanent link">&para;</a></h2>
 <p>Method <code>OpenDB()</code> private เปิด connection <strong>ใหม่</strong> ทุกครั้งที่เรียก ไม่มี database connection ร่วมกันแบบยาวนาน บน <code>App</code></p>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="n">DB_PATH</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
@@ -429,9 +429,9 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p><strong>ทำไม per-request?</strong> Xojo จัดการคำขอพร้อมกันบนหลายเธรด SQLiteDatabase instance ร่วมกันต้องใช้ mutex การเปิด connection ใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อค — SQLite จัดการการเชื่อมต่อแบบอ่านพร้อมกันจากหลายกระบวนการเองได้</p>
-<p><strong>ทำไมไม่ connection pool?</strong> สำหรับปริมาณการใช้งานที่ framework นี้เป้าหมาย (ทีมเล็ก internal tools) overhead ของการเปิด connection นั้นน้อยมาก pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่สังเกตเห็นได้ในระดับนี้</p>
-<h2 id="database-initialization">Database initialization<a class="headerlink" href="#database-initialization" title="Permanent link">&para;</a></h2>
+<p><strong>ทำไมต้องเปิด connection ใหม่ต่อ request?</strong> Xojo จัดการคำขอพร้อมกันบนหลายเธรด SQLiteDatabase instance ร่วมกันต้องใช้ mutex การเปิด connection ใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อค — SQLite จัดการการเชื่อมต่อแบบอ่านพร้อมกันจากหลายกระบวนการเองได้</p>
+<p><strong>ทำไมไม่ใช้ connection pool?</strong> สำหรับปริมาณการใช้งานที่ framework นี้เป้าหมาย (ทีมเล็ก internal tools) overhead ของการเปิด connection นั้นน้อยมาก pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่สังเกตเห็นได้ในระดับนี้</p>
+<h2 id="_3">การเริ่มต้นฐานข้อมูล<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>Method แรกที่เรียกเมื่อแอปเริ่มต้นคือ <code>NoteModel.InitDB()</code> (จาก <code>App.Opening()</code>) มันสร้างไฟล์ database และรัน <code>CREATE TABLE IF NOT EXISTS</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Shared</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">InitDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="n">DB_PATH</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
@@ -455,7 +455,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>ปลอดภัยที่จะเรียกทุกครั้งเริ่มต้น — <code>IF NOT EXISTS</code> นั้น idempotent</p>
+<p>เรียกได้ทุกครั้งที่แอปเริ่มทำงาน — <code>IF NOT EXISTS</code> นั้น idempotent</p>
 <h2 id="parameterized-queries">Parameterized queries<a class="headerlink" href="#parameterized-queries" title="Permanent link">&para;</a></h2>
 <p>ใช้ <code>?</code> placeholders สำหรับค่าเสมอ ห้ามต่อ user input เข้าไปใน SQL strings — สิ่งนี้ป้องกัน SQL injection:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ✅ Correct — parameterized</span>
@@ -467,7 +467,7 @@
 </code></pre></div>
 
 <p><code>SelectSQL()</code> และ <code>ExecuteSQL()</code> ยอมรับ variadic <code>Variant</code> parameters หลังจาก SQL string</p>
-<h2 id="getting-the-last-inserted-row-id">Getting the last inserted row ID<a class="headerlink" href="#getting-the-last-inserted-row-id" title="Permanent link">&para;</a></h2>
+<h2 id="id">การดึง ID แถวล่าสุดที่เพิ่ม<a class="headerlink" href="#id" title="Permanent link">&para;</a></h2>
 <p>หลังจาก <code>INSERT</code> ดึง ID ของแถวใหม่โดยใช้ <code>db.LastRowID</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
@@ -485,7 +485,7 @@
 <span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">newID</span><span class="p">))</span>
 </code></pre></div>
 
-<h2 id="column-types">Column types<a class="headerlink" href="#column-types" title="Permanent link">&para;</a></h2>
+<h2 id="_4">ประเภทคอลัมน์<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>SQLite เป็น dynamically typed Xojo&rsquo;s <code>RowSet</code> column accessors แปลงค่าเมื่ออ่าน:</p>
 <table>
 <thead>
@@ -514,7 +514,7 @@
 </tbody>
 </table>
 <p>เก็บวันที่ทั้งหมดเป็น <code>TEXT</code> โดยใช้ SQLite&rsquo;s <code>datetime()</code> function ดึงและแสดงผลเป็นสตริง — format ในเทมเพลตหรือ ViewModel ตามความต้องการ</p>
-<h2 id="database-path-for-production">Database path for production<a class="headerlink" href="#database-path-for-production" title="Permanent link">&para;</a></h2>
+<h2 id="path-production">Path ฐานข้อมูลสำหรับ production<a class="headerlink" href="#path-production" title="Permanent link">&para;</a></h2>
 <p>Implementation ปัจจุบัน hardcode path สำหรับ development ในสำหรับ production builds ใช้ <code>SpecialFolder.ApplicationData</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Development (hardcoded — fine for IDE debug runs)</span>
 <span class="n">Const</span><span class="w"> </span><span class="n">DB_PATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/Users/worajedt/Xojo Projects/mvvm/data/notes.sqlite&quot;</span>
@@ -562,19 +562,19 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#the-core-pattern">The core pattern</a>
+            <a class="toc-link" href="#รปแบบหลก">รูปแบบหลัก</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#return-types">Return types</a>
+            <a class="toc-link" href="#ประเภทคาทสงกลบ">ประเภทค่าที่ส่งกลับ</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#per-request-database-connections">Per-request database connections</a>
+            <a class="toc-link" href="#การเปด-connection-ตอ-request">การเปิด connection ต่อ request</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#database-initialization">Database initialization</a>
+            <a class="toc-link" href="#การเรมตนฐานขอมล">การเริ่มต้นฐานข้อมูล</a>
           </li>
           
           <li class="toc-item toc-level-2">
@@ -582,15 +582,15 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#getting-the-last-inserted-row-id">Getting the last inserted row ID</a>
+            <a class="toc-link" href="#การดง-id-แถวลาสดทเพม">การดึง ID แถวล่าสุดที่เพิ่ม</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#column-types">Column types</a>
+            <a class="toc-link" href="#ประเภทคอลมน">ประเภทคอลัมน์</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#database-path-for-production">Database path for production</a>
+            <a class="toc-link" href="#path-ฐานขอมลสำหรบ-production">Path ฐานข้อมูลสำหรับ production</a>
           </li>
           
         </ul>

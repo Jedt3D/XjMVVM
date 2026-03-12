@@ -348,8 +348,8 @@
         </div>
 
         <h1 id="alpinejs">Alpine.js<a class="headerlink" href="#alpinejs" title="Permanent link">&para;</a></h1>
-<p>XjMVVMはサーバーレンダリングフレームワークです — HTMLはJSフレームワークではなくXojoから生成されます。Alpine.jsは、サーバーが状態を管理できない小さなギャップを埋めます。つまり、ブラウザのローカル状態(localStorage、sessionStorage)に応答して、ページ全体のリロードなしに動作する必要があるリアクティブなUI要素です。</p>
-<h2 id="philosophy">Philosophy<a class="headerlink" href="#philosophy" title="Permanent link">&para;</a></h2>
+<p>XjMVVM はサーバーレンダリングフレームワークです — HTML は JS フレームワークではなく Xojo から生成されます。Alpine.js は、サーバーが状態を管理できない小さなギャップを埋めます。つまり、ブラウザのローカル状態（localStorage、sessionStorage）に応答してページ全体をリロードせず動作する必要があるリアクティブな UI 要素です。</p>
+<h2 id="_1">設計思想<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <blockquote>
 <p><strong>サーバーが描画する。Alpine が反応する。htmx がフェッチする。</strong></p>
 </blockquote>
@@ -361,15 +361,15 @@
 </ol>
 <p>Alpineは決してサーバー側ロジックの置き換えとして使用されません。サーバーで実行できるすべてのビジネスルール、データ、検証はサーバーに留まります。</p>
 <hr />
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>AlpineはビルドステップなしでCDNから読み込まれます。<code>layouts/base.html</code>の<code>&lt;/body&gt;</code>の前に1行追加します:</p>
+<h2 id="_2">インストール<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Alpine はビルドステップなしで CDN から読み込まれます。<code>layouts/base.html</code> の <code>&lt;/body&gt;</code> の前に 1 行追加します:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span> <span class="na">defer</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </code></pre></div>
 
 <p><code>defer</code>属性は必須です — AlpineはDOMが解析された後に処理する必要があります。</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>@3</code>ではなく特定のバージョン(例: <code>@3.14.3</code>)に固定してください。ビルドが再現可能になり、アップストリームのCDN更新がアプリを破壊することはありません。</p>
+<p><code>@3</code> ではなく特定のバージョン（例: <code>@3.14.3</code>）に固定してください。ビルドが再現可能になり、アップストリームの CDN 更新がアプリを破壊することを防げます。</p>
 </div>
 <hr />
 <h2 id="xjmvvm">XjMVVMで使用されるコアディレクティブ<a class="headerlink" href="#xjmvvm" title="Permanent link">&para;</a></h2>
@@ -417,7 +417,7 @@
 </table>
 <hr />
 <h2 id="1">パターン1 — ナビゲーション認証状態<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
-<p>ナビゲーションバーは、<code>localStorage</code>で駆動される「ログイン/サインアップ」(ログアウト状態)または「ユーザー名 + ログアウト」(ログイン状態)を表示する必要があります。Xojo Web 2 SSRモードは平易なHTTPリクエスト間で<code>WebSession</code>状態を保持しないため、サーバーはこれを注入できません。</p>
+<p>ナビゲーションバーは、<code>localStorage</code> で制御される「ログイン/サインアップ」（ログアウト状態）または「ユーザー名 + ログアウト」（ログイン状態）を表示する必要があります。Xojo Web 2 SSR モードは通常の HTTP リクエスト間で <code>WebSession</code> 状態を保持しないため、サーバーはこれを注入できません。</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">nav</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{ user: localStorage.getItem(&#39;_auth_user&#39;) }&quot;</span><span class="p">&gt;</span>
 
   <span class="cm">&lt;!-- ログアウト状態: デフォルトで表示、ユーザーが設定されている場合はAlpineで非表示 --&gt;</span>
@@ -440,14 +440,14 @@
 <span class="p">&lt;/</span><span class="nt">nav</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>ログイン状態のspanの<code>x-cloak</code>は、Alpineが初期化される前に両方の状態がフラッシュするのを防ぎます。これを機能させるために必要なCSS規則はスタイルシートに入っている必要があります:</p>
+<p>ログイン状態の span の <code>x-cloak</code> は、Alpine が初期化される前に両方の状態がフラッシュするのを防ぎます。これを機能させるために必要な CSS ルールをスタイルシートに含めてください:</p>
 <div class="highlight"><pre><span></span><code><span class="o">[</span><span class="nt">x-cloak</span><span class="o">]</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="w"> </span><span class="cp">!important</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 
 <p>ログアウトフォームの<code>@submit</code>は、POSTが送信される前にlocalStorageをクリアし、フラッシュメッセージをキューイングします。別のイベントリスナーやスクリプトブロックは不要です。</p>
 <hr />
 <h2 id="2">パターン2 — クライアント側フラッシュメッセージ<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
-<p>POST→リダイレクト→GETサイクルのフラッシュメッセージは、SRRモードではXojoのセッションを使用できません — リダイレクトのGETが到着するまでセッションは消えています。回避策: フォーム送信前に<code>sessionStorage</code>に書き込み、次のページロード時に読み取ります。</p>
+<p>POST → リダイレクト → GET サイクルのフラッシュメッセージは、SSR モードでは Xojo のセッションを使用できません — リダイレクト後の GET が到着するまでにセッションは失われています。回避策: フォーム送信前に <code>sessionStorage</code> に書き込み、次のページロード時に読み取ります。</p>
 <p>Alpineは<code>init()</code>でキューイングされたメッセージを読み取って表示し、表示するものがない場合は<code>x-show</code>で非表示に保ちます:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
 <span class="s">  msg: &#39;&#39;,</span>
@@ -462,11 +462,11 @@
 <span class="s">}&quot;</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">:class</span><span class="o">=</span><span class="s">&quot;&#39;flash flash-&#39; + type&quot;</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;msg&quot;</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>!document.querySelector('.flash')</code>ガードは、Xojoサーバー側セッションがフラッシュを直接配信する場合のダブルフラッシュを防ぎます(WebSocketモードに対応しています)。</p>
+<p><code>!document.querySelector('.flash')</code> ガードは、Xojo サーバー側セッションがフラッシュを直接配信する場合（WebSocket モード対応）のダブルフラッシュを防ぎます。</p>
 <hr />
 <h2 id="3">パターン3 — 非同期前処理によるフォーム送信<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
-<p>認証フォームは、POSTが送信される前にWeb Crypto APIを使用してクライアント側でパスワードをハッシュする必要があります。これは本質的に非同期であり、送信イベントを傍受する必要があります。Alpineの<code>@submit.prevent</code> + <code>x-data</code>の非同期メソッドはこれを簡潔に処理し、別の<code>addEventListener</code>スクリプトブロックは不要です。</p>
-<p>SHA-256ヘルパーはフォームの上にある小さな<code>&lt;script&gt;</code>で定義されます(Alpineメソッドが実行されるときにスコープ内にある必要があります):</p>
+<p>認証フォームは、POST が送信される前に Web Crypto API を使用してクライアント側でパスワードをハッシュする必要があります。これは本質的に非同期であり、送信イベントをインターセプトする必要があります。Alpine の <code>@submit.prevent</code> + <code>x-data</code> の非同期メソッドはこれを簡潔に処理し、別途 <code>addEventListener</code> スクリプトブロックは不要です。</p>
+<p>SHA-256 ヘルパーはフォームの上にある小さな <code>&lt;script&gt;</code> で定義されます（Alpine メソッドが実行されるときにスコープ内にある必要があります）:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">buf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="nx">crypto</span><span class="p">.</span><span class="nx">subtle</span><span class="p">.</span><span class="nx">digest</span><span class="p">(</span><span class="s1">&#39;SHA-256&#39;</span><span class="p">,</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">TextEncoder</span><span class="p">().</span><span class="nx">encode</span><span class="p">(</span><span class="nx">str</span><span class="p">));</span>
@@ -493,8 +493,8 @@
 <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>hashed</code>フラグは、<code>e.target.submit()</code>がなんらかの理由でイベントを再発火させた場合の再処理を防ぎます。<code>e.target.submit()</code>(DOMメソッド)は<code>submit</code>イベントを完全にバイパスするため、フラグは主に安全ガードです。</p>
-<h3 id="_1">インライン検証の追加<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<p><code>hashed</code> フラグは、<code>e.target.submit()</code> が何らかの理由でイベントを再発火させた場合の二重処理を防ぎます。<code>e.target.submit()</code>（DOM メソッド）は <code>submit</code> イベントを完全にバイパスするため、このフラグは主に安全ガードとして機能します。</p>
+<h3 id="_3">インライン検証の追加<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <p>サインアップフォームはパスワード検証を追加します。<code>pwError</code>状態は、追加のDOM配線なしでインラインエラー段落を駆動します:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">p</span> <span class="na">x-show</span><span class="o">=</span><span class="s">&quot;pwError&quot;</span> <span class="na">x-text</span><span class="o">=</span><span class="s">&quot;pwError&quot;</span>
    <span class="na">style</span><span class="o">=</span><span class="s">&quot;display:none; color:#721c24; background:#f8d7da;</span>
@@ -510,7 +510,7 @@
 <p><code>document.getElementById</code>なし、手動の<code>style.display</code>切り替えなし。Alpineが要素を同期させたままにします。</p>
 <hr />
 <h2 id="4-alpine">パターン4 — 複数値チェックボックス(Alpineは不要)<a class="headerlink" href="#4-alpine" title="Permanent link">&para;</a></h2>
-<p>ノートフォームのタグチェックボックスは、以前はチェック済み値を非表示フィールドに集約するためのJSが必要でした。これは不要です — ネイティブHTMLフォームのシリアライゼーションは、同じ<code>name</code>を持つすべてのチェック済みチェックボックスを複数の値として送信します。Xojoの<code>FormParser</code>は既に重複キーのコンマ追加を処理します。</p>
+<p>ノートフォームのタグチェックボックスは、以前はチェック済みの値を非表示フィールドに集約するための JS が必要でした。しかしこれは不要です — ネイティブ HTML フォームのシリアライゼーションは、同じ <code>name</code> を持つすべてのチェック済みチェックボックスを複数の値として送信します。Xojo の <code>FormParser</code> はすでに重複キーのカンマ追加を処理しています。</p>
 <p>正しいパターンは<strong>JavaScriptを全く必要としません</strong>:</p>
 <div class="highlight"><pre><span></span><code>{% for tag in all_tags %}
 <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;tag_ids&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ tag.id }}&quot;</span>
@@ -522,7 +522,7 @@
 <p>フォームは<code>tag_ids=1&amp;tag_ids=3</code>を送信し、FormParserは<code>"1,3"</code>を格納し、ViewModelは前のように<code>","</code>で分割します。非表示フィールドなし、スクリプトブロックなし。</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>Alpineに手を出す前に(または任意のJS)、ブラウザのネイティブフォームシリアライゼーションが既に必要なことをやっているか確認してください。複数のチェックボックス、ラジオグループ、<code>&lt;select multiple&gt;</code>はすべてJavaScriptなしで機能します。</p>
+<p>Alpine（または任意の JS）を導入する前に、ブラウザのネイティブフォームシリアライゼーションがすでに必要なことをやっているか確認してください。複数チェックボックス、ラジオグループ、<code>&lt;select multiple&gt;</code> はすべて JavaScript なしで機能します。</p>
 </div>
 <hr />
 <h2 id="js">JSフットプリント比較<a class="headerlink" href="#js" title="Permanent link">&para;</a></h2>
@@ -567,11 +567,11 @@
 </tr>
 </tbody>
 </table>
-<p>削減不可能な16行はSHA-256ヘルパー関数です(ログインとサインアップで重複)。ビルドステップなしで共有ファイルに移動することはできません — ゼロのビルドツールを維持するための意図的なトレードオフです。</p>
+<p>削減不可能な 16 行は SHA-256 ヘルパー関数です（ログインとサインアップで重複）。ビルドステップなしで共有ファイルに移動することはできません — ビルドツールをゼロに保つための意図的なトレードオフです。</p>
 <hr />
 <h2 id="htmx">htmxに手を出すべき場合<a class="headerlink" href="#htmx" title="Permanent link">&para;</a></h2>
-<p>Alpineは<strong>ローカルブラウザ状態</strong>を管理します。インタラクションがサーバーからのフェッチとページの一部を更新する必要がある場合は、Alpineを拡張するのではなくhtmxを追加してください。</p>
-<p>htmxの追加が正当化される機能をトリガーします:</p>
+<p>Alpine は<strong>ローカルブラウザ状態</strong>を管理します。インタラクションがサーバーからのフェッチとページの一部の更新を必要とする場合は、Alpine を拡張するのではなく htmx を追加してください。</p>
+<p>htmx の追加が正当化される機能の例:</p>
 <ul>
 <li>インライン編集(ノートをクリック → フォームがインプレイスで表示され、リロードなしで保存)</li>
 <li>リロードなしで削除(リストから行を削除)</li>
@@ -579,7 +579,7 @@
 <li>ページネーション(リロードなし)</li>
 <li>リストビューのタグ切り替え</li>
 </ul>
-<p>htmxとAlpineは清潔に構成されます — Alpineはローカル状態を所有し、htmxはサーバーのラウンドトリップを所有します。2つのライブラリは競合しません。</p>
+<p>htmx と Alpine はきれいに組み合わせられます — Alpine はローカル状態を担当し、htmx はサーバーのラウンドトリップを担当します。2 つのライブラリは競合しません。</p>
 <hr />
 <h2 id="alpine">Alpineが決して置き換えることができないもの<a class="headerlink" href="#alpine" title="Permanent link">&para;</a></h2>
 <table>
@@ -595,12 +595,12 @@
 <td>ブラウザセキュリティAPI、Alpine相当物なし</td>
 </tr>
 <tr>
-<td><code>localStorage</code> / <code>sessionStorage</code>の読み書き</td>
-<td>引き続き必要です; Alpineは単に<code>x-data</code>内で整理するだけです</td>
+<td><code>localStorage</code> / <code>sessionStorage</code> の読み書き</td>
+<td>引き続き必要です。Alpine は単に <code>x-data</code> 内で整理するだけです</td>
 </tr>
 <tr>
 <td>サーバー側セッション永続性</td>
-<td>アーキテクチャ — クッキーベースの認証が必要で、Alpineとは無関係</td>
+<td>アーキテクチャ上の要件 — クッキーベース認証が必要であり、Alpine とは無関係</td>
 </tr>
 </tbody>
 </table>
@@ -637,11 +637,11 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#philosophy">Philosophy</a>
+            <a class="toc-link" href="#設計思想">設計思想</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#installation">Installation</a>
+            <a class="toc-link" href="#インストール">インストール</a>
           </li>
           
           <li class="toc-item toc-level-2">

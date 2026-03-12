@@ -382,7 +382,7 @@
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p>เทมเพลตลูกสามารถเขียนทับ (override) เฉพาะบล็อก (blocks) ที่ถูกกำหนดไว้ในพาเรนต์เท่านั้น เนื้อหาที่อยู่นอก <code>{% block %}</code> tags ในเทมเพลตลูกจะถูกไม่สนใจ</p>
+<p>เทมเพลตลูกสามารถเขียนทับ (override) เฉพาะบล็อก (blocks) ที่ถูกกำหนดไว้ในพาเรนต์เท่านั้น เนื้อหาที่อยู่นอก <code>{% block %}</code> tags ในเทมเพลตลูกจะถูกละเว้น</p>
 <h2 id="_3">ตัวแปร<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>แสดงผลตัวแปรด้วยวงเล็บปีกกาคู่ (double curly braces) HTML จะถูกหลีกเลี่ยงอัตโนมัติ — <code>&lt;script&gt;</code> จะกลายเป็น <code>&amp;lt;script&amp;gt;</code>:</p>
 <div class="highlight"><pre><span></span><code>{{ note.title }}
@@ -393,13 +393,13 @@
 <p>ตัวแปรมาจาก context <code>Dictionary</code> ที่คุณส่งไปยัง <code>Render()</code> คีย์ของ Dictionary จะกลายเป็นชื่อตัวแปรในเทมเพลต</p>
 <h3 id="dot-notation-dictionary">Dot-notation ของ Dictionary<a class="headerlink" href="#dot-notation-dictionary" title="Permanent link">&para;</a></h3>
 <p>JinjaX แก้ไข <code>{{ note.title }}</code> โดยเรียก <code>note.Value("title")</code> บน <code>Dictionary</code> นี่คือเหตุผลหลักว่าทำไมข้อมูลทั้งหมดต้องเป็น Dictionary objects — เพียงแต่ Dictionary เท่านั้นที่รองรับ dot-notation lookup ผ่าน <code>EvaluateGetAttr</code></p>
-<h3 id="_4">ผลลัพธ์แบบดิบ (ไม่หลีกเลี่ยง)<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<h3 id="escape">ผลลัพธ์แบบดิบ (ไม่ escape)<a class="headerlink" href="#escape" title="Permanent link">&para;</a></h3>
 <p>หากคุณต้องการแสดงผล HTML ที่ render ไว้ก่อนแล้ว (เฉพาะเนื้อหาที่เชื่อถือได้):</p>
 <div class="highlight"><pre><span></span><code>{{ content | safe }}
 </code></pre></div>
 
 <p>อย่าใช้ <code>| safe</code> กับเนื้อหาที่มาจากผู้ใช้</p>
-<h2 id="_5">เงื่อนไข<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_4">เงื่อนไข<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>{% if note %}
   <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Edit: {{ note.title }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 {% elif draft %}
@@ -410,7 +410,7 @@
 </code></pre></div>
 
 <p>ค่าที่ falsy ใน Jinja2: <code>False</code>, <code>0</code>, <code>""</code> (สตริงว่าง), <code>[]</code> (อาเรย์ว่าง), <code>None</code>/<code>Nil</code> คีย์ที่หายไปถือว่า falsy</p>
-<h2 id="_6">ลูป<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_5">ลูป<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
 <p>ทำซ้ำบนอาเรย์ <code>Variant()</code> ของ Dictionary objects:</p>
 <div class="highlight"><pre><span></span><code>{% for note in notes %}
   <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;note&quot;</span><span class="p">&gt;</span>
@@ -465,7 +465,7 @@
 {% endfor %}
 </code></pre></div>
 
-<h2 id="_7">ตัวกรอง<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_6">ตัวกรอง<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>ตัวกรองแปลงค่าโดยใช้ pipe <code>|</code> operator:</p>
 <div class="highlight"><pre><span></span><code>{{ note.title | upper }}
 {{ note.title | lower }}
@@ -565,7 +565,7 @@
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#ผลลพธแบบดบ-ไมหลกเลยง">ผลลัพธ์แบบดิบ (ไม่หลีกเลี่ยง)</a>
+            <a class="toc-link" href="#ผลลพธแบบดบ-ไม-escape">ผลลัพธ์แบบดิบ (ไม่ escape)</a>
           </li>
           
           <li class="toc-item toc-level-2">

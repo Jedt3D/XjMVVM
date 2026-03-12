@@ -504,7 +504,7 @@ App.HandleURL
 
 <hr />
 <h2 id="handleurl">HandleURL決定ツリー<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h2>
-<p><code>HandleURL</code>は、任意のリクエストをディスパッチする前に、固定順序の検査を適用します。パス正規化は最初に来ます — すべての比較はそれに依存します。</p>
+<p><code>HandleURL</code> は、リクエストをディスパッチする前に、固定順序で検査を適用します。パスの正規化が最初です — すべての比較はこれに依存します。</p>
 <div class="diagram-tabs" id="diag2">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
@@ -707,7 +707,7 @@ Normalize: prepend "/" if missing, strip trailing "/"
 <span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Right</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
 </code></pre></div>
 
-<p>これなしには、<code>"notes" &lt;&gt; "/notes"</code>はエラーなしで<code>True</code>と評価され — すべてのルートマッチはサイレントに失敗します。</p>
+<p>これがないと、<code>"notes" &lt;&gt; "/notes"</code> がエラーなしで <code>True</code> と評価され、すべてのルートマッチがサイレントに失敗します。</p>
 <hr />
 <h2 id="mvvm">MVVMリクエストパイプライン<a class="headerlink" href="#mvvm" title="Permanent link">&para;</a></h2>
 <p>マッチされたSSRルートの場合、<code>HandleURL</code>からHTML応答までの完全なパイプライン：</p>
@@ -853,14 +853,14 @@ response.Write(html)  →  Return True  →  Browser</code></pre>
   </div>
 </div>
 
-<p>SSRルートが<code>True</code>を返すため、Xojoはそれらに対してWebSocketセッションを確立することはありません。これは、Xojo WebPageコントロール（<code>WebLabel</code>、<code>WebListBox</code>など）をViewModelから使用することはできず、別途Server-Sent EventsまたはJSポーリングを追加しない限り、サーバーからブラウザへのリアルタイムプッシュはないことを意味します。</p>
+<p>SSR ルートが <code>True</code> を返すため、Xojo はそれらに対して WebSocket セッションを確立しません。つまり、ViewModel から Xojo WebPage コントロール（<code>WebLabel</code>、<code>WebListBox</code> など）を使用することはできず、Server-Sent Events や JS ポーリングを別途追加しない限り、サーバーからブラウザへのリアルタイムプッシュも不可能です。</p>
 <hr />
 <h2 id="tests"><code>/tests</code>リダイレクトダンス<a class="headerlink" href="#tests" title="Permanent link">&para;</a></h2>
 <p>テストランナー（<code>XojoUnitTestPage</code>）はXojo WebPageです — ライブWebSocketセッションが必要です。MVVMリンクからそこに到達するには、3ステップのダンスが必要です。</p>
 <h3 id="testsreturn-false">なぜ<code>/tests</code>で単に<code>Return False</code>できないのか<a class="headerlink" href="#testsreturn-false" title="Permanent link">&para;</a></h3>
 <p>Xojoはその<strong>ルートパス</strong> <code>/</code>でのみブートストラップHTMLを提供します。他のパスの場合、<code>False</code>を返すと、MVVMの404テンプレートではなく、ブラウザエラーページのみが生成されます。</p>
-<h3 id="defaultwindowxojounittestpage">なぜ<code>DefaultWindow=XojoUnitTestPage</code>がクラッシュするのか<a class="headerlink" href="#defaultwindowxojounittestpage" title="Permanent link">&para;</a></h3>
-<p>プロジェクトで<code>DefaultWindow=XojoUnitTestPage</code>を設定すると、セッションが接続するとき、Xojoはそれを最初のWebPageとしてインスタンス化します。しかし<code>XojoUnitTestPage.Opening</code>はツールバーセットアップとテスト登録を実行します — ページとセッションが完全にワイヤリングされていることを必要とするコード。ブートストラップ時点ではされていません。結果：実行時クラッシュ。</p>
+<h3 id="defaultwindowxojounittestpage">なぜ <code>DefaultWindow=XojoUnitTestPage</code> はクラッシュするのか<a class="headerlink" href="#defaultwindowxojounittestpage" title="Permanent link">&para;</a></h3>
+<p>プロジェクトで <code>DefaultWindow=XojoUnitTestPage</code> を設定すると、セッション接続時に Xojo がそれを最初の WebPage としてインスタンス化します。しかし <code>XojoUnitTestPage.Opening</code> はツールバーのセットアップとテスト登録を実行します — ページとセッションが完全に接続済みであることを前提とするコードです。ブートストラップ時点ではまだ接続されていません。結果：実行時クラッシュ。</p>
 <h3 id="_2">実際に機能すること<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <div class="diagram-tabs" id="diag4">
   <div class="diagram-tab-bar">
@@ -1023,7 +1023,7 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
   </div>
 </div>
 
-<p><code>Default</code>ページは自明に空のWebPageです。その<code>Shown</code>イベントはセッションが完全に確立された後に発火します — <code>XojoUnitTestPage</code>を表示するための安全な最も早いポイント：</p>
+<p><code>Default</code> ページはシンプルな空の WebPage です。その <code>Shown</code> イベントはセッションが完全に確立された後に発火します — <code>XojoUnitTestPage</code> を表示するための最も早い安全なタイミングです:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Default.xojo_code — Shown event</span>
 <span class="k">Sub</span><span class="w"> </span><span class="n">Shown</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">testPage</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">XojoUnitTestPage</span>
@@ -1031,9 +1031,9 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p><code>XojoUnitTestPage</code>は<code>ImplicitInstance=False</code>を持つため、<code>New XojoUnitTestPage</code>が必要です — <code>XojoUnitTestPage.Show()</code>を直接実行することはコンパイルエラーになります。</p>
-<h3 id="_xojo1">なぜ<code>/?_xojo=1</code>で単なる<code>/</code>ではなく？<a class="headerlink" href="#_xojo1" title="Permanent link">&para;</a></h3>
-<p><code>/</code>はMVVM登録ルートです。ルーターがマッチしてMVVMホームページを提供し、<code>Return True</code>を返します — <code>Return False</code>に到達することはありません。<code>_xojo=1</code>クエリパラメータは、<code>HandleURL</code>にRouterをスキップするように指示するセンチネルです。通常のブラウザが<code>/</code>を訪問するときは、<code>_xojo=1</code>を送信しないため、ホームページは影響を受けません。</p>
+<p><code>XojoUnitTestPage</code> は <code>ImplicitInstance=False</code> であるため、<code>New XojoUnitTestPage</code> が必要です — <code>XojoUnitTestPage.Show()</code> を直接呼び出すとコンパイルエラーになります。</p>
+<h3 id="_xojo1">なぜ <code>/?_xojo=1</code> で、単なる <code>/</code> ではないのか<a class="headerlink" href="#_xojo1" title="Permanent link">&para;</a></h3>
+<p><code>/</code> は MVVM 登録ルートです。ルーターがマッチして MVVM ホームページを提供し、<code>Return True</code> を返します — <code>Return False</code> に到達することはありません。<code>_xojo=1</code> クエリパラメータは、<code>HandleURL</code> に Router をスキップするよう指示するためのセンチネル値です。通常のブラウザが <code>/</code> を訪問するときは <code>_xojo=1</code> を送信しないため、ホームページには影響しません。</p>
 <hr />
 <h2 id="xojo-webpage-mvvm">リンクバック：Xojo WebPage → MVVM<a class="headerlink" href="#xojo-webpage-mvvm" title="Permanent link">&para;</a></h2>
 <p>Xojo WebPageからMVVMルートに戻ってナビゲートするには、<code>Session.GoToURL()</code>を使用します。これはブラウザレベルのナビゲーション指示を送信し、WebSocketセッション全体を完全に抜けます。</p>
@@ -1048,7 +1048,7 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p><code>WebToolbar.Pressed</code>イベント内で、<code>Me</code>はページではなく<code>WebToolbar</code>自体を指します。<code>Me.Session</code>は<code>WebToolbar</code>に存在しません。スレッドローカルグローバル<code>Session</code>を直接使用してください。</p>
+<p><code>WebToolbar.Pressed</code> イベント内では、<code>Me</code> はページではなく <code>WebToolbar</code> 自体を指します。<code>Me.Session</code> は <code>WebToolbar</code> には存在しません。スレッドローカルグローバルの <code>Session</code> を直接使用してください。</p>
 </div>
 <h3 id="api">ナビゲーション API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h3>
 <table>
@@ -1096,7 +1096,7 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 <span class="c1">// → Xojo serves Xojo.js, WebSocket frames, etc.</span>
 </code></pre></div>
 
-<p><code>Route()</code>が常に<code>True</code>を返した場合、Xojoの独自のJSとCSSファイルはブロックされ、WebSocketセッションは確立されず、<code>/tests</code>フローは完全に破壊されます。</p>
+<p><code>Route()</code> が常に <code>True</code> を返した場合、Xojo 独自の JS・CSS ファイルはブロックされ、WebSocket セッションは確立されず、<code>/tests</code> フローは完全に破壊されます。</p>
 <hr />
 <h2 id="_3">ファイルリファレンス<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
@@ -1186,7 +1186,7 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#なぜdefaultwindowxojounittestpageがクラッシュするのか">なぜ`DefaultWindow=XojoUnitTestPage`がクラッシュするのか</a>
+            <a class="toc-link" href="#なぜ-defaultwindowxojounittestpage-はクラッシュするのか">なぜ `DefaultWindow=XojoUnitTestPage` はクラッシュするのか</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -1194,7 +1194,7 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#なぜ_xojo1で単なるではなく">なぜ`/?_xojo=1`で単なる`/`ではなく？</a>
+            <a class="toc-link" href="#なぜ-_xojo1-で単なる-ではないのか">なぜ `/?_xojo=1` で、単なる `/` ではないのか</a>
           </li>
           
           <li class="toc-item toc-level-2">

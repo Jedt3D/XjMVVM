@@ -359,7 +359,7 @@
 <li><strong>มันตอบสนองต่อสถานะในเบราว์เซอร์หรือต้องการการอัปเดต DOM แบบอินไลน์หรือไม่</strong> → Alpine</li>
 <li><strong>มันต้องดึงข้อมูลจากเซิร์ฟเวอร์และอัปเดตส่วนของหน้าหรือไม่</strong> → htmx (ดูที่ <a href="#when-to-reach-for-htmx">แผนการนำ htmx มาใช้</a>)</li>
 </ol>
-<p>Alpine ไม่เคยถูกใช้เป็นตัวแทนของตรรมชาติเซิร์ฟเวอร์ กฎธุรกิจ ข้อมูล และการตรวจสอบทั้งหมดที่สามารถอยู่บนเซิร์ฟเวอร์นั้นสามารถอยู่บนเซิร์ฟเวอร์ได้</p>
+<p>Alpine ไม่ใช่เครื่องมือสำหรับแทน business logic ฝั่งเซิร์ฟเวอร์ กฎธุรกิจ ข้อมูล และการตรวจสอบทุกอย่างที่ทำได้บนเซิร์ฟเวอร์ ให้อยู่บนเซิร์ฟเวอร์</p>
 <hr />
 <h2 id="_2">การติดตั้ง<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>Alpine ถูกโหลดจาก CDN โดยไม่มีขั้นตอนการสร้าง บรรทัดเดียวที่ด้านล่างของ <code>layouts/base.html</code> ก่อน <code>&lt;/body&gt;</code>:</p>
@@ -444,10 +444,10 @@
 <div class="highlight"><pre><span></span><code><span class="o">[</span><span class="nt">x-cloak</span><span class="o">]</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="w"> </span><span class="cp">!important</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
 </code></pre></div>
 
-<p><code>@submit</code> บนแบบฟอร์มออกจากระบบล้างสมาชิกและคิวข้อความแฟลชก่อนที่จะส่ง POST หลังฟังก์ชันตัวฟังชายตัวสนับสนุนหรือบล็อกสคริปต์ที่แยกต่างหาก</p>
+<p><code>@submit</code> บนฟอร์ม logout ล้างข้อมูลใน localStorage และเตรียม flash message ก่อนที่ POST จะถูกส่ง โดยไม่ต้องเพิ่ม event listener หรือ script block แยกต่างหาก</p>
 <hr />
 <h2 id="2">รูปแบบ 2 — ข้อความแฟลชฝั่งไคลเอนต์<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
-<p>ข้อความแฟลชสำหรับวัฏจักร POST→ リダイเรกต์→GET ไม่สามารถใช้เซสชันของ Xojo ในโหมด SSR ได้ — เซสชันจะหายไปเมื่อเวลาที่ GET ของการเปลี่ยนเส้นทางมาถึง วิธีแก้ปัญหาคือ เขียนไปที่ <code>sessionStorage</code> ก่อนที่แบบฟอร์มจะส่ง อ่านในการโหลดหน้าต่อไป</p>
+<p>ข้อความแฟลชสำหรับวัฏจักร POST → redirect → GET ไม่สามารถใช้เซสชันของ Xojo ในโหมด SSR ได้ — เซสชันจะหายไปเมื่อเวลาที่ GET ของการเปลี่ยนเส้นทางมาถึง วิธีแก้ปัญหาคือ เขียนไปที่ <code>sessionStorage</code> ก่อนที่แบบฟอร์มจะส่ง อ่านในการโหลดหน้าต่อไป</p>
 <p>Alpine อ่านและแสดงข้อความในคิวใน <code>init()</code> จากนั้น <code>x-show</code> เก็บไว้ซ่อนถ้าไม่มีอะไรให้แสดง:</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">div</span> <span class="na">x-data</span><span class="o">=</span><span class="s">&quot;{</span>
 <span class="s">  msg: &#39;&#39;,</span>
@@ -464,8 +464,8 @@
 
 <p>การป้องกัน <code>!document.querySelector('.flash')</code> ป้องกันการแสดงแฟลชซ้ำหากเซสชันเซิร์ฟเวอร์ฝั่ง Xojo เกิดขึ้นเพื่อส่งแฟลชโดยตรง (ป้องกันล่วงหน้าสำหรับโหมด WebSocket)</p>
 <hr />
-<h2 id="3">รูปแบบ 3 — ส่งแบบฟอร์มพร้อมการประมวลผลก่อนอะแซงก์ก<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
-<p>แบบฟอร์มตรวจสอบสิทธิ์ต้องแฮชรหัสผ่านฝั่งไคลเอนต์ด้วย Web Crypto API ก่อนที่จะส่ง POST นี่เป็นสิ่งที่ไม่สามารถเลื่อนไปได้ตามธรรมชาติและต้องขัดขวางเหตุการณ์ submit Alpine&rsquo;s <code>@submit.prevent</code> + วิธีการแบบอะแซงก์ใน <code>x-data</code> จัดการสิ่งนี้อย่างสะอาด โดยไม่มีบล็อก <code>addEventListener</code> สคริปต์แยกต่างหาก</p>
+<h2 id="3-async">รูปแบบ 3 — ส่งแบบฟอร์มพร้อมการประมวลผลแบบ Async<a class="headerlink" href="#3-async" title="Permanent link">&para;</a></h2>
+<p>แบบฟอร์มยืนยันตัวตนต้องแฮชรหัสผ่านฝั่งไคลเอนต์ด้วย Web Crypto API ก่อนส่ง POST สิ่งนี้ทำแบบ synchronous ไม่ได้ จึงต้องดักจับ submit event ไว้ก่อน Alpine&rsquo;s <code>@submit.prevent</code> + async method ใน <code>x-data</code> จัดการได้อย่างเรียบร้อย โดยไม่ต้องใช้ <code>addEventListener</code> หรือ script block แยกต่างหาก</p>
 <p>ตัวช่วย SHA-256 ถูกกำหนดไว้ในคำสั่ง <code>&lt;script&gt;</code> เล็ก ๆ เหนือแบบฟอร์ม (จะต้องอยู่ในขอบเขตเมื่อวิธีการของ Alpine ทำงาน):</p>
 <div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
 <span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">sha256hex</span><span class="p">(</span><span class="nx">str</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
@@ -657,7 +657,7 @@
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#รปแบบ-3-สงแบบฟอรมพรอมการประมวลผลกอนอะแซงกก">รูปแบบ 3 — ส่งแบบฟอร์มพร้อมการประมวลผลก่อนอะแซงก์ก</a>
+            <a class="toc-link" href="#รปแบบ-3-สงแบบฟอรมพรอมการประมวลผลแบบ-async">รูปแบบ 3 — ส่งแบบฟอร์มพร้อมการประมวลผลแบบ Async</a>
           </li>
           
           <li class="toc-item toc-level-3">

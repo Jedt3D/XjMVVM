@@ -348,9 +348,9 @@
         </div>
 
         <h1 id="_1">保護されたルートとユーザースコーピング<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>XjMVVM v0.9.3 では 2 つの関連機能が導入されました：認証が必要な<strong>保護されたルート</strong>と、レコードをユーザーごとに分離する<strong>ユーザースコープデータ</strong>です。これら 2 つを組み合わせることで、ユーザーはアプリにアクセスするためにログインする必要があり、自分のノートのみを表示できます。</p>
+<p>XjMVVM v0.9.3 では 2 つの関連機能が導入されました: 認証を必要とする<strong>保護されたルート</strong>と、レコードをユーザーごとに分離する<strong>ユーザースコープデータ</strong>です。この 2 つを組み合わせることで、ユーザーはアプリにアクセスするためにログインが必要となり、自分のノートのみを表示できます。</p>
 <h2 id="_2">保護されたルート<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>認証が必要な ViewModel は、すべて <code>OnGet()</code> または <code>OnPost()</code> の最上部でガード メソッドを呼び出します。2 つのガード があります—1 つは HTML ルート用、もう 1 つは API ルート用です。</p>
+<p>認証が必要な ViewModel はすべて、<code>OnGet()</code> または <code>OnPost()</code> の先頭でガードメソッドを呼び出します。ガードは 2 つあります — 1 つは HTML ルート用、もう 1 つは API ルート用です。</p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -530,7 +530,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p><code>RequireLogin()</code> は <code>ParseAuthCookie()</code> を呼び出して HMAC 署名された <code>mvvm_auth</code> クッキーを検証します。無効または欠落している場合は、<code>/login?next=&lt;encoded-current-path&gt;</code> にリダイレクトされるため、ログイン後、ユーザーは元のアドレスに戻ります。</p>
+<p><code>RequireLogin()</code> は <code>ParseAuthCookie()</code> を呼び出して HMAC 署名済みの <code>mvvm_auth</code> クッキーを検証します。無効または存在しない場合は <code>/login?next=&lt;encoded-current-path&gt;</code> にリダイレクトされ、ログイン後にユーザーは元のページへ戻れます。</p>
 <h3 id="api-requireloginjson">API ルートガード — <code>RequireLoginJSON()</code><a class="headerlink" href="#api-requireloginjson" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
@@ -538,7 +538,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>API クライアント（JavaScript <code>fetch</code>、モバイル アプリ、CLI ツール）は HTML リダイレクトに従うことができません。<code>RequireLoginJSON()</code> は代わりに 401 ステータスと JSON エラー本文を返します：</p>
+<p>API クライアント（JavaScript <code>fetch</code>、モバイルアプリ、CLI ツール）は HTML リダイレクトに従うことができません。<code>RequireLoginJSON()</code> は代わりに 401 ステータスと JSON エラーボディを返します:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;Authentication required&quot;</span><span class="p">}</span>
 </code></pre></div>
 
@@ -570,13 +570,13 @@
 </tr>
 </tbody>
 </table>
-<p>Auth ルート（<code>/login</code>、<code>/signup</code>、<code>/logout</code>）は<strong>保護されていません</strong>—ユーザーはログインせずにこれらに到達できる必要があります。</p>
+<p>Auth ルート（<code>/login</code>、<code>/signup</code>、<code>/logout</code>）は<strong>保護されていません</strong> — ユーザーはログインせずにこれらにアクセスできる必要があります。</p>
 <h3 id="next">ログイン後の <code>next</code> パラメータによるリダイレクト<a class="headerlink" href="#next" title="Permanent link">&para;</a></h3>
-<p><code>RequireLogin()</code> が <code>/login</code> にリダイレクトするとき、現在の URL をクエリ パラメータとして追加します：</p>
+<p><code>RequireLogin()</code> が <code>/login</code> にリダイレクトするとき、現在の URL をクエリパラメータとして追加します:</p>
 <div class="highlight"><pre><span></span><code>/login?next=%2Fnotes%2F42%2Fedit
 </code></pre></div>
 
-<p><code>LoginVM</code> はこの <code>next</code> パラメータを読み取り、ログイン成功後に <code>RedirectWithAuth()</code> に渡し、ユーザーを戻ろうとしていた場所に送ります：</p>
+<p><code>LoginVM</code> はこの <code>next</code> パラメータを読み取り、ログイン成功後に <code>RedirectWithAuth()</code> に渡して、ユーザーを元の場所に戻します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// In LoginVM.OnPost() — after successful verification:</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">nextURL</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;next&quot;</span><span class="p">)</span>
 <span class="k">If</span><span class="w"> </span><span class="n">nextURL</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">nextURL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/notes&quot;</span>
@@ -585,13 +585,13 @@
 
 <hr />
 <h2 id="_4">ユーザースコープデータ<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>ノートはユーザーごとにスコープされます—各ユーザーは独自のノート セットを持ちます。タグは引き続きグローバル（すべてのユーザー間で共有）ですが、アクセスするには引き続きログインが必要です。</p>
+<p>ノートはユーザーごとにスコープされます — 各ユーザーは独自のノートセットを持ちます。タグは引き続きグローバル（すべてのユーザー間で共有）ですが、アクセスにはログインが必要です。</p>
 <h3 id="_5">データベース スキーマの変更<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <p><code>notes</code> テーブルは <code>user_id</code> 列を含みます：</p>
 <div class="highlight"><pre><span></span><code><span class="n">notes</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">created_at</span><span class="p">,</span><span class="w"> </span><span class="n">updated_at</span><span class="p">,</span><span class="w"> </span><span class="n">user_id</span><span class="p">)</span>
 </code></pre></div>
 
-<p><code>DBAdapter.InitDB()</code> のマイグレーションは既存のテーブルに列を追加します：</p>
+<p><code>DBAdapter.InitDB()</code> のマイグレーションは既存のテーブルに列を追加します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Add user_id column if it doesn&#39;t exist (migration for existing databases)</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">RowSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;SELECT COUNT(*) AS cnt FROM pragma_table_info(&#39;notes&#39;) WHERE name=&#39;user_id&#39;&quot;</span><span class="p">)</span>
@@ -601,7 +601,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<p><code>DEFAULT 0</code> は、既存のノート（認証が存在する前に作成）がアクセス可能なままであることを保証します。新しいノートには認証されたユーザーの ID が付与されます。</p>
+<p><code>DEFAULT 0</code> は、既存のノート（認証機能が追加される前に作成されたもの）が引き続きアクセスできることを保証します。新しいノートには認証済みユーザーの ID が付与されます。</p>
 <h3 id="notemodel">NoteModel — ユーザースコープメソッド<a class="headerlink" href="#notemodel" title="Permanent link">&para;</a></h3>
 <p>すべての <code>NoteModel</code> メソッドは <code>userID</code> パラメータが必要です。すべての SQL クエリは <code>WHERE user_id = ?</code> を含みます：</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
@@ -648,7 +648,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>ページネーション用の追加的なユーザースコープメソッド：</p>
+<p>ページネーション用の追加ユーザースコープメソッド:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CountForUser</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">RowSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="s2">&quot;SELECT COUNT(*) AS cnt FROM notes WHERE user_id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
@@ -665,7 +665,7 @@
 </code></pre></div>
 
 <h3 id="viewmodel-userid">ViewModel パターン — userID の渡し方<a class="headerlink" href="#viewmodel-userid" title="Permanent link">&para;</a></h3>
-<p>すべての Notes ViewModel は <code>CurrentUserID()</code>（auth クッキーから）を読み取り、モデルに渡します：</p>
+<p>すべての Notes ViewModel は <code>CurrentUserID()</code>（auth クッキーから）を読み取り、モデルに渡します:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
 
@@ -686,7 +686,7 @@
 <li>モデルは SQL レベルでスコーピングを実装する（<code>WHERE user_id = ?</code>）</li>
 </ol>
 <h3 id="_6">所有権の実装<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
-<p><code>GetByID</code>、<code>Update</code>、および <code>Delete</code> はすべて WHERE 句に <code>AND user_id = ?</code> を含みます。ユーザー A がユーザー B のノートに ID を推測してアクセスしようとする場合、クエリは <code>Nil</code> を返す（または 0 行に影響する）、ViewModel は 404 を返します：</p>
+<p><code>GetByID</code>、<code>Update</code>、および <code>Delete</code> はすべて WHERE 句に <code>AND user_id = ?</code> を含みます。ユーザー A がユーザー B のノートの ID を推測してアクセスしようとすると、クエリは <code>Nil</code> を返す（または 0 行に影響する）ため、ViewModel は 404 を返します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// In NotesDetailVM.OnGet():</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">userID</span><span class="p">)</span>
 <span class="k">If</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
@@ -695,9 +695,9 @@
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<p>別の「あなたはこれを所有していない」エラーはありません—ノートは現在のユーザーの視点から単に存在しません。</p>
+<p>「このノートはあなたのものではありません」という別のエラーメッセージは表示しません — 現在のユーザーの視点からは、そのノートは単に存在しないことになります。</p>
 <h3 id="_7">タグ — グローバルだが保護されている<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
-<p>タグはすべてのユーザー間で共有されます。ログインが必要ですが、ユーザーによってスコープされていません：</p>
+<p>タグはすべてのユーザー間で共有されます。ログインは必要ですが、ユーザーによるスコープはありません:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// In TagsListVM.OnGet():</span>
 <span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">    </span><span class="c1">// must be logged in</span>
@@ -707,10 +707,10 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>この設計は、すべてのユーザーが同じ タグ の語彙を共有することを意味します。1 人のユーザーが作成したタグはすべてのユーザーが利用できます。</p>
+<p>この設計により、すべてのユーザーが同じタグの語彙を共有します。1 人のユーザーが作成したタグはすべてのユーザーが利用できます。</p>
 <hr />
 <h2 id="_8">所有権のテスト<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
-<p><code>NoteOwnershipTests</code> はユーザー スコーピングが正しく機能することを検証します：</p>
+<p><code>NoteOwnershipTests</code> はユーザースコーピングが正しく機能することを検証します:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">WrongUserCannotReadTest</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="s2">&quot;Secret&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;body&quot;</span><span class="p">,</span><span class="w"> </span><span class="m">999</span><span class="p">)</span>
@@ -733,7 +733,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>これらのテストは異なる <code>userID</code> 値（999 対 888）を使用して、SQL レベルのスコーピングがユーザー間のアクセスを防ぐことを証明します。</p>
+<p>これらのテストは異なる <code>userID</code> 値（999 と 888）を使用して、SQL レベルのスコーピングがユーザー間の不正アクセスを防ぐことを証明します。</p>
 
         <!-- Prev / Next navigation -->
         

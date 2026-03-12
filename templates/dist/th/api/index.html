@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JSON API และการให้บริการไฟล์แบบ Static — MVVM Docs</title>
-  <meta name="description" content="วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการรับรองตัวตน พร้อมกับเส้นทาง SSR ของมัน และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์แบบ static ที่สร้างขึ้นมา" />
+  <meta name="description" content="วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการยืนยันตัวตน พร้อมกับเส้นทาง SSR ของมัน และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์แบบ static ที่สร้างขึ้นมา" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -344,11 +344,11 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">JSON API และการให้บริการไฟล์แบบ Static</h1>
-          <p class="page-description">วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการรับรองตัวตน พร้อมกับเส้นทาง SSR ของมัน และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์แบบ static ที่สร้างขึ้นมา</p>
+          <p class="page-description">วิธีที่ XjMVVM เปิดเผย JSON API ที่มีการยืนยันตัวตน พร้อมกับเส้นทาง SSR ของมัน และวิธีการทำงานของเซิร์ฟเวอร์ไฟล์แบบ static ที่สร้างขึ้นมา</p>
         </div>
 
         <h1 id="json-api-static">JSON API และการให้บริการไฟล์แบบ Static<a class="headerlink" href="#json-api-static" title="Permanent link">&para;</a></h1>
-<p>XjMVVM สามารถให้บริการหน้า HTML ที่สร้างจากเซิร์ฟเวอร์ <strong>และ</strong> JSON API จากแอปพลิเคชันเดียวกัน — ไม่จำเป็นต้องใช้กระบวนการแยกต่างหากหรือเฟรมเวิร์กอื่น API ใช้ Router เดียวกัน ลวดลายการใช้งาน ViewModel เดียวกัน และ Models เดียวกัน ความแตกต่างเพียงอย่างเดียวคือรูปแบบของการตอบสนองและการป้องกันการเข้าถึง</p>
+<p>XjMVVM สามารถให้บริการหน้า HTML ที่สร้างจากเซิร์ฟเวอร์ <strong>และ</strong> JSON API จากแอปพลิเคชันเดียวกัน — ไม่จำเป็นต้องใช้กระบวนการแยกต่างหากหรือเฟรมเวิร์กอื่น API ใช้ Router เดียวกัน รูปแบบ ViewModel เดียวกัน และ Models เดียวกัน ความแตกต่างเพียงอย่างเดียวคือรูปแบบของการตอบสนองและการป้องกันการเข้าถึง</p>
 <hr />
 <h2 id="jsonserializer">โมดูล JSONSerializer<a class="headerlink" href="#jsonserializer" title="Permanent link">&para;</a></h2>
 <p><strong>ไฟล์:</strong> <code>Framework/JSONSerializer.xojo_code</code></p>
@@ -400,10 +400,10 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>content-type จะสัญญาณว่าเป็น JSON ให้กับผู้ใช้งาน ViewModel ไม่จำเป็นต้องตั้งค่าหัวข้อโดยตรง — เพียงเรียก <code>WriteJSON(...)</code> ด้วยสตริงที่ถูกจัดอักษรแล้ว</p>
+<p>Content-Type header จะบอก client ว่า response เป็น JSON ViewModel ไม่จำเป็นต้องตั้งค่าหัวข้อโดยตรง — เพียงเรียก <code>WriteJSON(...)</code> ด้วยสตริงที่ถูกจัดอักษรแล้ว</p>
 <hr />
-<h2 id="api">การรับรองตัวตนของ API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
-<p>ปลายทาง API ทั้งหมดต้องใช้การรับรองตัวตน ต่างจากเส้นทาง HTML ที่เปลี่ยนเส้นทางไปยัง <code>/login</code> เส้นทาง API จะส่งกลับข้อผิดพลาด <strong>401 JSON</strong> เมื่อผู้ใช้ไม่ได้รับการรับรองตัวตน:</p>
+<h2 id="api">การยืนยันตัวตนของ API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>ปลายทาง API ทั้งหมดต้องใช้การยืนยันตัวตน ต่างจากเส้นทาง HTML ที่เปลี่ยนเส้นทางไปยัง <code>/login</code> เส้นทาง API จะส่งกลับข้อผิดพลาด <strong>401 JSON</strong> เมื่อผู้ใช้ไม่ได้รับการยืนยันตัวตน:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;Authentication required&quot;</span><span class="p">}</span>
 </code></pre></div>
 
@@ -417,7 +417,7 @@
 <p>ไคลเอนต์ API ต้องรวม cookie <code>mvvm_auth</code> ในคำขอของพวกเขา สำหรับ JavaScript ที่ใช้ในเบราว์เซอร์ (<code>fetch</code>) สิ่งนี้เกิดขึ้นโดยอัตโนมัติเมื่อใช้ <code>credentials: 'same-origin'</code> สำหรับไคลเอนต์ภายนอก cookie จะต้องได้รับผ่านปลายทางการเข้าสู่ระบบ และส่งไปพร้อมกับคำขอต่อมา</p>
 <hr />
 <h2 id="api-viewmodels">API ViewModels<a class="headerlink" href="#api-viewmodels" title="Permanent link">&para;</a></h2>
-<p>ViewModel API ทั้งหมดอยู่ในโฟลเดอร์ <code>ViewModels/API/</code> พวกเขาปฏิบัติตามลวดลายเดียวกับ SSR ViewModels — <code>OnGet()</code>/<code>OnPost()</code> — ความแตกต่างเพียงอย่างเดียวคือพวกเขาเรียก <code>WriteJSON()</code> แทน <code>Render()</code></p>
+<p>ViewModel API ทั้งหมดอยู่ในโฟลเดอร์ <code>ViewModels/API/</code> พวกเขาปฏิบัติตามรูปแบบ ViewModel เดียวกับ SSR ViewModels — <code>OnGet()</code>/<code>OnPost()</code> — ความแตกต่างเพียงอย่างเดียวคือพวกเขาเรียก <code>WriteJSON()</code> แทน <code>Render()</code></p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -625,7 +625,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 </div>
 
 <h3 id="notesapilistvm-get-apinotes">NotesAPIListVM — <code>GET /api/notes</code><a class="headerlink" href="#notesapilistvm-get-apinotes" title="Permanent link">&para;</a></h3>
-<p>ส่งกลับบันทึกย่อทั้งหมดสำหรับผู้ใช้ที่ได้รับการรับรองตัวตน:</p>
+<p>ส่งกลับบันทึกย่อทั้งหมดสำหรับผู้ใช้ที่ได้รับการยืนยันตัวตน:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
 
@@ -637,7 +637,7 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 </code></pre></div>
 
 <p>การตอบสนอง: <code>[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"...","user_id":"5"},...]</code></p>
-<p>บันทึกย่อถูกจำกัดขอบเขตให้เป็นของผู้ใช้ที่ได้รับการรับรองตัวตน — แต่ละผู้ใช้มองเห็นได้เฉพาะบันทึกย่อของตนเองเท่านั้น</p>
+<p>บันทึกย่อถูกจำกัดขอบเขตให้เป็นของผู้ใช้ที่ได้รับการยืนยันตัวตน — แต่ละผู้ใช้มองเห็นได้เฉพาะบันทึกย่อของตนเองเท่านั้น</p>
 <h3 id="notesapidetailvm-get-apinotesid">NotesAPIDetailVM — <code>GET /api/notes/:id</code><a class="headerlink" href="#notesapidetailvm-get-apinotesid" title="Permanent link">&para;</a></h3>
 <p>ส่งกลับบันทึกย่อที่มีอาร์เรย์ <code>tags</code> แบบฝังตัว ส่งกลับ 404 หากบันทึกย่อไม่มีอยู่หรือเป็นของผู้ใช้คนอื่น:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
@@ -691,9 +691,9 @@ GET  /api/tags/:id    -> TagsAPIDetailVM  -> RequireLoginJSON() -> DictToJSON(ta
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>รหัสสถานะที่ใช้โดย API: <strong>200</strong> สำหรับการอ่านที่สำเร็จ <strong>201</strong> สำหรับการสร้างที่สำเร็จ <strong>401</strong> สำหรับไม่มีการรับรองตัวตน <strong>404</strong> สำหรับไม่พบ <strong>422</strong> สำหรับล้มเหลวการตรวจสอบ</p>
+<p>รหัสสถานะที่ใช้โดย API: <strong>200</strong> สำหรับการอ่านที่สำเร็จ <strong>201</strong> สำหรับการสร้างที่สำเร็จ <strong>401</strong> สำหรับไม่มีการยืนยันตัวตน <strong>404</strong> สำหรับไม่พบ <strong>422</strong> สำหรับล้มเหลวการตรวจสอบ</p>
 <h3 id="tagsapilistvm-get-apitags">TagsAPIListVM — <code>GET /api/tags</code><a class="headerlink" href="#tagsapilistvm-get-apitags" title="Permanent link">&para;</a></h3>
-<p>แท็กเป็นส่วนกลาง (ไม่ได้จำกัดขอบเขตตามผู้ใช้) แต่ยังคงต้องใช้การรับรองตัวตน:</p>
+<p>แท็กเป็นส่วนกลาง (ไม่ได้จำกัดขอบเขตตามผู้ใช้) แต่ยังคงต้องใช้การยืนยันตัวตน:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLoginJSON</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span>
 
@@ -848,7 +848,7 @@ http://localhost:8080/dist/jp/index.html
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การรบรองตวตนของ-api">การรับรองตัวตนของ API</a>
+            <a class="toc-link" href="#การยนยนตวตนของ-api">การยืนยันตัวตนของ API</a>
           </li>
           
           <li class="toc-item toc-level-2">

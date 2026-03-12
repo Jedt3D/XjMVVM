@@ -486,13 +486,13 @@ SQLite database file</code></pre>
 <hr />
 <h2 id="_3">การตัดสินใจออกแบบ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <h3 id="dictionary">ทำไมต้องส่งคืน <code>Dictionary</code> แทนอินสแตนซ์ของโมเดล?<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h3>
-<p>เทมเพลต JinjaX ใช้สัญกรณ์จุด: <code>{{ note.title }}</code> เอนจิน JinjaX แก้ไขสิ่งนี้โดยเรียก <code>dict.Value("title")</code> บน <code>Dictionary</code> ของ Xojo อินสแตนซ์คลาสที่กำหนดเองไม่มีกลไกการสอบเทียบที่เทียบเท่า</p>
+<p>เทมเพลต JinjaX ใช้สัญกรณ์จุด: <code>{{ note.title }}</code> เอนจิน JinjaX แก้ไขสิ่งนี้โดยเรียก <code>dict.Value("title")</code> บน <code>Dictionary</code> ของ Xojo อินสแตนซ์คลาสที่กำหนดเองไม่มีกลไก introspection ที่เทียบเท่า</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// Template: {{ note.title }}</span>
 
 <span class="c1">// ✅ ทำงาน — Dictionary ตอบสนองสัญกรณ์จุด</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myDictionary</span><span class="w">        </span><span class="c1">// .Value(&quot;title&quot;) → &quot;Hello&quot;</span>
 
-<span class="c1">// ❌ ไม่ทำงาน — NoteModel ไม่มีการสอบเทียบ JinjaX</span>
+<span class="c1">// ❌ ไม่ทำงาน — NoteModel ไม่มี introspection สำหรับ JinjaX</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myNoteInstance</span>
 </code></pre></div>
 
@@ -878,7 +878,7 @@ Per-request (concurrent, independent)
 <div class="highlight"><pre><span></span><code><span class="n">model</span><span class="p">.</span><span class="n">DeleteByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="_7">เมธอดทางออกที่มีการป้องกัน<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
+<h3 id="escape-hatch-protected">เมธอด escape hatch (protected)<a class="headerlink" href="#escape-hatch-protected" title="Permanent link">&para;</a></h3>
 <h4 id="opendb-as-sqlitedatabase"><code>OpenDB() As SQLiteDatabase</code><a class="headerlink" href="#opendb-as-sqlitedatabase" title="Permanent link">&para;</a></h4>
 <p>ส่งคืนการเชื่อมต่อดิบสำหรับคลาสย่อยที่ต้องการ SQL แบบกำหนดเอง คลาสย่อยมีหน้าที่รับผิดชอบสำหรับ <code>db.Close()</code></p>
 <p>ใช้เมื่อ:
@@ -1036,7 +1036,7 @@ Per-request (concurrent, independent)
 </tbody>
 </table>
 <hr />
-<h2 id="_8">ประโยชน์และการแลกเปลี่ยน<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h2 id="_7">ประโยชน์และการแลกเปลี่ยน<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1047,7 +1047,7 @@ Per-request (concurrent, independent)
 <tbody>
 <tr>
 <td>ไม่มี boilerplate</td>
-<td>ทรัพยากรใหม่ต้องการเพียง <code>TableName()</code> + <code>Columns()</code> + ตัวห่อหุ้มบาง</td>
+<td>ทรัพยากรใหม่ต้องการเพียง <code>TableName()</code> + <code>Columns()</code> + method wrapper บางๆ</td>
 </tr>
 <tr>
 <td>ปลอดภัยจากการฉีด SQL</td>
@@ -1101,7 +1101,7 @@ Per-request (concurrent, independent)
 <p>ใช้วิธี <code>BaseModel</code> ที่สืบทอดมาเมื่อการดำเนินการเป็น <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code> หรือ <code>DELETE</code> ที่เรียบง่ายพร้อมค่าที่ผูกไว้ธรรมดา</p>
 <p>ใช้ <code>OpenDB()</code> เมื่อคุณต้องการนิพจน์ SQLite (<code>datetime('now')</code>, <code>strftime(...)</code>), คำขอที่ซับซ้อน (<code>JOIN</code>, <code>GROUP BY</code>, คำขออย่างย่อย), <code>db.LastRowID</code> หลังจากการแทรกแบบกำหนดเอง หรือหลายคำสั่งในการเชื่อมต่อเดียว</p>
 <hr />
-<h2 id="_9">การเพิ่มทรัพยากรใหม่<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
+<h2 id="_8">การเพิ่มทรัพยากรใหม่<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
 <p>การเพิ่ม <code>TagModel</code> เป็นตัวอย่างที่สมบูรณ์:</p>
 <p><strong>1. สร้าง <code>Models/TagModel.xojo_code</code>:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span>
@@ -1229,7 +1229,7 @@ Per-request (concurrent, independent)
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#เมธอดทางออกทมการปองกน">เมธอดทางออกที่มีการป้องกัน</a>
+            <a class="toc-link" href="#เมธอด-escape-hatch-protected">เมธอด escape hatch (protected)</a>
           </li>
           
           <li class="toc-item toc-level-2">

@@ -445,7 +445,7 @@
 
 <div class="admonition warning">
 <p class="admonition-title">ความปลอดภัย</p>
-<p>ตรวจสอบชื่อไฟล์เสมอก่อนการอ่านจากดิสก์ การตรวจสอบ path traversal (<code>..</code>, <code>/</code>, <code>\</code>) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำ ไม่ว่าสร้างเส้นทางไฟล์จากข้อมูลที่ป้อนโดยผู้ใช้โดยไม่มีการตรวจสอบ</p>
+<p>ตรวจสอบชื่อไฟล์เสมอก่อนอ่านจากดิสก์ การตรวจสอบ path traversal (<code>..</code>, <code>/</code>, <code>\</code>) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำ อย่าสร้าง file path จากข้อมูลที่ผู้ใช้ป้อนโดยไม่ผ่านการตรวจสอบ</p>
 </div>
 <h2 id="option-3-xojo-copy-files-build-step">Option 3 — Xojo Copy Files build step<a class="headerlink" href="#option-3-xojo-copy-files-build-step" title="Permanent link">&para;</a></h2>
 <p>สำหรับไฟล์ที่ควรรวมอยู่กับไบนารีแอปพลิเคชัน (ฟอนต์, รูปภาพเริ่มต้น) ให้ใช้ <strong>Copy Files</strong> build step ของ Xojo เพื่อรวมไฟล์เหล่านั้นในโฟลเดอร์ Resources ของแอป</p>
@@ -459,7 +459,7 @@
 <table>
 <thead>
 <tr>
-<th>ส่วนขยาย</th>
+<th>นามสกุลไฟล์</th>
 <th>MIME type</th>
 </tr>
 </thead>

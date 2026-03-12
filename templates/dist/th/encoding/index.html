@@ -426,7 +426,7 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<p><code>Chr(0xE0)</code> ส่งคืนตัวอักษร Unicode U+00E0 (<code>à</code>), ซึ่งเป็นลำดับ UTF-8 สองไบต์ <code>0xC3 0xA0</code> แต่เราต้องการไบต์เดียว <code>0xE0</code>, ซึ่งเป็นไบต์เริ่มต้นของลำดับอักขระไทยสามไบต์เช่น <code>ก</code> (<code>0xE0 0xB8 0x81</code>) ความไม่ตรงกันของสองไบต์ต่อไบต์เสียหาย ทุกอักขระหลายไบต์</p>
+<p><code>Chr(0xE0)</code> ส่งคืนตัวอักษร Unicode U+00E0 (<code>à</code>), ซึ่งเป็นลำดับ UTF-8 สองไบต์ <code>0xC3 0xA0</code> แต่เราต้องการไบต์เดียว <code>0xE0</code>, ซึ่งเป็นไบต์เริ่มต้นของลำดับอักขระไทยสามไบต์เช่น <code>ก</code> (<code>0xE0 0xB8 0x81</code>) ความไม่ตรงกันระหว่าง 2 ไบต์นี้ทำให้อักขระหลายไบต์ทุกตัวเสียหาย</p>
 <h3 id="memoryblock-defineencoding">แนวทางที่ถูกต้อง (MemoryBlock + DefineEncoding)<a class="headerlink" href="#memoryblock-defineencoding" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// ✅ ถูกต้อง — รวบรวมไบต์ดิบใน MemoryBlock, จากนั้นถอดรหัสเป็น UTF-8</span>
 <span class="k">Function</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
@@ -469,7 +469,7 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 </code></pre></div>
 
 <p>ข้อมูลเชิงลึกที่สำคัญ: รวบรวมไบต์ดิบทั้งหมดใน <code>MemoryBlock</code> ก่อน, จากนั้นเรียก <code>DefineEncoding(..., Encodings.UTF8)</code> เพียงครั้งเดียวที่ส่วนท้าย สิ่งนี้จะประกอบลำดับหลายไบต์อย่างถูกต้องก่อนที่ Xojo จะตีความการเข้ารหัสสตริง</p>
-<h2 id="0-xojo-2025">การจัดทำดัชนีสตริง — แบบ 0 ใน Xojo 2025<a class="headerlink" href="#0-xojo-2025" title="Permanent link">&para;</a></h2>
+<h2 id="0-based-xojo-2025">การนับดัชนีสตริงแบบ 0-based ใน Xojo 2025<a class="headerlink" href="#0-based-xojo-2025" title="Permanent link">&para;</a></h2>
 <p>สตริง Xojo 2025 ใช้ API สมัยใหม่ที่ <strong>0-based</strong> อย่างเต็มที่ ฟังก์ชันเดิม <code>Mid()</code> เป็นแบบ 1 และต้องไม่ใช้ร่วมกับ <code>IndexOf()</code>:</p>
 <table>
 <thead>
@@ -608,7 +608,7 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การจดทำดชนสตรง-แบบ-0-ใน-xojo-2025">การจัดทำดัชนีสตริง — แบบ 0 ใน Xojo 2025</a>
+            <a class="toc-link" href="#การนบดชนสตรงแบบ-0-based-ใน-xojo-2025">การนับดัชนีสตริงแบบ 0-based ใน Xojo 2025</a>
           </li>
           
           <li class="toc-item toc-level-2">

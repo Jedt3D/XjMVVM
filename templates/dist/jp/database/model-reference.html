@@ -481,7 +481,7 @@ SQLite database file</code></pre>
 <ul>
 <li><strong>リソースモデルにボイラープレートなし</strong> — <code>NoteModel</code>は約20行です。テーブルと列を宣言し、汎用操作を<code>BaseModel</code>に委譲し、カスタムSQLが必要な場合のみ記述します。</li>
 <li><strong>接続ロジックの変更が一箇所</strong> — SQLiteからPostgreSQLへの移行は<code>DBAdapter.Connect()</code>のみに影響します。</li>
-<li><strong>明確なエスケープハッチ</strong> — <code>BaseModel.OpenDB()</code>はサブクラスに生DB アクセスを提供し、汎用層を破壊しません。</li>
+<li><strong>明確なエスケープハッチ</strong> — <code>BaseModel.OpenDB()</code> はサブクラスに生の DB アクセスを提供し、汎用層を壊しません。</li>
 </ul>
 <hr />
 <h2 id="_2">設計決定<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -498,7 +498,7 @@ SQLite database file</code></pre>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>すべてのモデルメソッドは<code>Dictionary</code>または<code>Variant()</code>の<code>Dictionary</code>を返す必要があります。これはデータレイヤーにおける最も重要なアーキテクチャルルールです。カスタムクラスインスタンスはJinjaXテンプレートで使用できません。</p>
+<p>すべてのモデルメソッドは <code>Dictionary</code> または <code>Variant()</code> の <code>Dictionary</code> を返す必要があります。これはデータレイヤーにおける最も重要なアーキテクチャルールです。カスタムクラスインスタンスは JinjaX テンプレートで使用できません。</p>
 </div>
 <h3 id="1">なぜリクエストごとに1つの接続なのか?<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
 <p>Xojo Webは別々のスレッドで同時HTTPリクエストを処理します。スレッド間で共有される<code>SQLiteDatabase</code>はロッキングが必要であり、デッドロックのリスクがあります。</p>
@@ -770,9 +770,9 @@ SQLite database file</code></pre>
 <hr />
 <h2 id="dbadapter">DBAdapter (モジュール)<a class="headerlink" href="#dbadapter" title="Permanent link">&para;</a></h2>
 <p><strong>ファイル:</strong> <code>Framework/DBAdapter.xojo_code</code></p>
-<p>モジュール — インスタンス化は不要 — で、接続ファクトリとスキーマセットアップを所有しています。</p>
+<p>モジュールです（インスタンス化不要）。接続ファクトリとスキーマセットアップを担当します。</p>
 <h3 id="connect-as-sqlitedatabase"><code>Connect() As SQLiteDatabase</code><a class="headerlink" href="#connect-as-sqlitedatabase" title="Permanent link">&para;</a></h3>
-<p>新しい接続を開いて返します。呼び出し元が<code>db.Close()</code>を実行する責務があります。</p>
+<p>新しい接続を開いて返します。呼び出し元が <code>db.Close()</code> を実行する責任があります。</p>
 <p>データベースファイルは、実行可能ファイルの<strong>隣の</strong> <code>data/</code>フォルダに配置されます — <code>App.ExecutableFile.Parent</code>経由で解決されます。Xojoデバッガと構築された本番バイナリで同じように動作します。<code>data/</code>ディレクトリが存在しない場合は自動作成されます。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Connect</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="c1">// 実行可能ファイルの隣にdata/を解決 (デバッグと本番両方で動作)</span>
@@ -791,8 +791,8 @@ SQLite database file</code></pre>
 <p><code>App.ExecutableFile</code>は実行中のバイナリです — Xojoデバッガではこれはデバッグスタブで、本番ではコンパイルされたアプリです。どちらの場合も<code>Parent</code>を同じフォルダに解決するため、パスは環境全体で安定しています。</p>
 </div>
 <h3 id="initdb"><code>InitDB()</code><a class="headerlink" href="#initdb" title="Permanent link">&para;</a></h3>
-<p>テーブルが存在しない場合は作成します。<code>App.Opening</code>から1回呼ばれます。すべてのスタートアップで呼び出しても安全です — <code>CREATE TABLE IF NOT EXISTS</code>はべき等です。</p>
-<p>新しいテーブルを追加するには、<code>db.Close()</code>前にここに別の<code>ExecuteSQL</code>を追加します。</p>
+<p>テーブルが存在しない場合に作成します。<code>App.Opening</code> から 1 回呼ばれます。起動のたびに呼び出しても安全です — <code>CREATE TABLE IF NOT EXISTS</code> はべき等です。</p>
+<p>新しいテーブルを追加するには、<code>db.Close()</code> の前にここへ別の <code>ExecuteSQL</code> を追加します。</p>
 <h3 id="appopening">App.Opening — スタートアップパス<a class="headerlink" href="#appopening" title="Permanent link">&para;</a></h3>
 <p><code>App.Opening</code>は、リクエストが提供される前にランタイムパスをワイヤアップする単一の場所です:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Opening</span><span class="p">()</span>
@@ -809,11 +809,11 @@ SQLite database file</code></pre>
 <span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p><code>templates/</code>と<code>data/</code>の両方は実行可能ファイルと同じ場所にあります。つまり、バイナリとそれら2つのフォルダを一緒にコピーすることでアプリをデプロイできます — 絶対パスや環境変数は不要です。</p>
+<p><code>templates/</code> と <code>data/</code> の両方は実行可能ファイルと同じ場所に置かれます。つまり、バイナリとこの 2 つのフォルダをまとめてコピーするだけでアプリをデプロイできます — 絶対パスや環境変数は不要です。</p>
 <hr />
 <h2 id="basemodel">BaseModel (クラス)<a class="headerlink" href="#basemodel" title="Permanent link">&para;</a></h2>
 <p><strong>ファイル:</strong> <code>Framework/BaseModel.xojo_code</code></p>
-<p>汎用CRUDベースクラス。サブクラスは2つのメソッドをオーバーライドし、すべての操作を継承します。</p>
+<p>汎用 CRUD 基底クラス。サブクラスは 2 つのメソッドをオーバーライドするだけで、すべての操作を継承します。</p>
 <h3 id="_4">サブクラスコントラクト<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
@@ -880,14 +880,14 @@ SQLite database file</code></pre>
 
 <h3 id="_5">保護されたエスケープハッチメソッド<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <h4 id="opendb-as-sqlitedatabase"><code>OpenDB() As SQLiteDatabase</code><a class="headerlink" href="#opendb-as-sqlitedatabase" title="Permanent link">&para;</a></h4>
-<p>カスタムSQLが必要なサブクラス用の生接続を返します。サブクラスが<code>db.Close()</code>を実行する責務があります。</p>
-<p>使用時機:
-- SQLite式(<code>datetime('now')</code>, <code>strftime(...)</code>)がSQLで必要 — <code>?</code>パラメータにはできない
-- <code>JOIN</code>, <code>GROUP BY</code>, <code>HAVING</code>またはサブクエリを含む複雑なクエリ
-- <code>INSERT</code>後の<code>db.LastRowID</code>が必要
-- 複数のステートメントが1つの接続を共有する必要がある</p>
+<p>カスタム SQL が必要なサブクラス向けに生の接続を返します。サブクラスが <code>db.Close()</code> を実行する責任があります。</p>
+<p>使用する場面:
+- SQL で SQLite 式（<code>datetime('now')</code>、<code>strftime(...)</code>）が必要な場合 — <code>?</code> パラメータでは渡せない
+- <code>JOIN</code>、<code>GROUP BY</code>、<code>HAVING</code> やサブクエリを含む複雑なクエリ
+- <code>INSERT</code> 後に <code>db.LastRowID</code> が必要な場合
+- 複数のステートメントが 1 つの接続を共有する必要がある場合</p>
 <h4 id="rowtodictrs-as-rowset-as-dictionary"><code>RowToDict(rs As RowSet) As Dictionary</code><a class="headerlink" href="#rowtodictrs-as-rowset-as-dictionary" title="Permanent link">&para;</a></h4>
-<p>現在のRowSet行を<code>Columns()</code>の列名を使用して<code>Dictionary</code>にマップします。すべての値は<code>StringValue</code>として保存されます — 意図的です。JinjaXはすべてをテキストとしてレンダリングします。ViewModelsは必要に応じて<code>Val()</code>経由で整数にキャストします。</p>
+<p>現在の RowSet 行を <code>Columns()</code> の列名を使用して <code>Dictionary</code> にマップします。すべての値は <code>StringValue</code> として保存されます — これは意図的な設計です。JinjaX はすべてをテキストとしてレンダリングします。ViewModel は必要に応じて <code>Val()</code> で整数にキャストします。</p>
 <hr />
 <h2 id="notemodel">NoteModel (クラス)<a class="headerlink" href="#notemodel" title="Permanent link">&para;</a></h2>
 <p><strong>ファイル:</strong> <code>Models/NoteModel.xojo_code</code></p>
@@ -1098,8 +1098,8 @@ SQLite database file</code></pre>
 </tbody>
 </table>
 <h3 id="crud_2">継承されたCRUD対エスケープハッチ使用時<a class="headerlink" href="#crud_2" title="Permanent link">&para;</a></h3>
-<p>操作が単純な<code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, または<code>DELETE</code>でプレーンなバインド値のみ場合は<code>BaseModel</code>継承メソッドを使用します。</p>
-<p>SQLite式(<code>datetime('now')</code>, <code>strftime(...)</code>)が必要、複雑なクエリ(<code>JOIN</code>, <code>GROUP BY</code>, サブクエリ)、カスタムinsert後の<code>db.LastRowID</code>、または1つの接続で複数のステートメントを共有する必要がある場合は<code>OpenDB()</code>を使用します。</p>
+<p>操作がプレーンなバインド値のみを使うシンプルな <code>SELECT</code>、<code>INSERT</code>、<code>UPDATE</code>、または <code>DELETE</code> の場合は、<code>BaseModel</code> の継承メソッドを使用します。</p>
+<p>SQLite 式（<code>datetime('now')</code>、<code>strftime(...)</code>）が必要な場合、複雑なクエリ（<code>JOIN</code>、<code>GROUP BY</code>、サブクエリ）、カスタム INSERT 後の <code>db.LastRowID</code>、または 1 つの接続で複数のステートメントを共有する必要がある場合は <code>OpenDB()</code> を使用します。</p>
 <hr />
 <h2 id="_7">新しいリソース追加<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <p>完全な例として<code>TagModel</code>を追加:</p>
@@ -1146,8 +1146,8 @@ SQLite database file</code></pre>
 <span class="w">  </span><span class="s2">&quot;created_at TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
-<p><strong>3. 登録</strong> <code>Models/TagModel.xojo_code</code>を<code>mvvm.xojo_project</code>のModelsフォルダに登録します (Xojo IDE: ファイルをプロジェクトパネルにドラッグ)。</p>
-<p><strong>4. ViewModelsを作成</strong> <code>ViewModels/Tags/</code>に、<strong>テンプレート</strong>を<code>templates/tags/</code>に、<code>Notes</code>と同じパターンに従って作成します。</p>
+<p><strong>3. 登録:</strong> <code>Models/TagModel.xojo_code</code> を <code>mvvm.xojo_project</code> の Models フォルダに登録します（Xojo IDE: ファイルをプロジェクトパネルにドラッグ）。</p>
+<p><strong>4. ViewModel とテンプレートを作成:</strong> <code>ViewModels/Tags/</code> に ViewModel を、<code>templates/tags/</code> にテンプレートを、<code>Notes</code> と同じパターンに従って作成します。</p>
 
         <!-- Prev / Next navigation -->
         

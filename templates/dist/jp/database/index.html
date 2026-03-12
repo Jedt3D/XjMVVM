@@ -376,7 +376,7 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>戻り型 <code>Variant()</code> を <code>Dictionary</code> オブジェクトを含むのは、JinjaX が <code>{% for %}</code> ループで反復できる唯一の形式です。</p>
+<p>戻り型を <code>Dictionary</code> オブジェクトを含む <code>Variant()</code> にするのは、JinjaX が <code>{% for %}</code> ループで反復できる唯一の形式だからです。</p>
 <h2 id="_2">戻り型<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -419,7 +419,7 @@
 </code></pre></div>
 
 <h2 id="_3">リクエストごとのデータベース接続<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>プライベート <code>OpenDB()</code> メソッドはすべての呼び出しで <strong>新しい</strong> 接続を開きます。<code>App</code> に共有され、長期間保たれるデータベース接続はありません。</p>
+<p>プライベートの <code>OpenDB()</code> メソッドは呼び出しごとに<strong>新しい</strong>接続を開きます。<code>App</code> に共有された長期接続は存在しません。</p>
 <div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dbFile</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="n">DB_PATH</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
@@ -429,8 +429,8 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p><strong>なぜリクエストごと?</strong> Xojo は複数のスレッドで同時リクエストを処理します。共有 <code>SQLiteDatabase</code> インスタンスはミューテックスが必要です。リクエストごとに新しい接続を開く方が簡単で、すべてのロック複雑さを避けます — SQLite は複数のプロセスからの同時読み取り接続をネイティブに処理します。</p>
-<p><strong>なぜ接続プールではない?</strong> このフレームワークが対象とするトラフィック量 (小チーム、内部ツール)、接続を開く際のオーバーヘッドは無視できます。プールはこのスケールでの測定可能な利点なしに複雑さを追加します。</p>
+<p><strong>なぜリクエストごとか?</strong> Xojo は複数のスレッドで同時リクエストを処理します。共有 <code>SQLiteDatabase</code> インスタンスにはミューテックスが必要です。リクエストごとに新しい接続を開く方がシンプルで、ロック周りの複雑さをすべて回避できます — SQLite は複数プロセスからの同時読み取り接続をネイティブに処理します。</p>
+<p><strong>なぜ接続プールではないか?</strong> このフレームワークが対象とするトラフィック量（小チーム、内部ツール）では、接続を開くオーバーヘッドは無視できます。このスケールではプールは複雑さを加えるだけで、測定可能なメリットはありません。</p>
 <h2 id="_4">データベース初期化<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>アプリが起動するときに呼ばれる最初のメソッドは <code>NoteModel.InitDB()</code> (<code>App.Opening()</code> から) です。データベースファイルを作成し、<code>CREATE TABLE IF NOT EXISTS</code> を実行します:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Shared</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">InitDB</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
@@ -455,9 +455,9 @@
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>これは起動するたびに呼ぶのが安全です — <code>IF NOT EXISTS</code> はべき等です。</p>
+<p>起動のたびに呼び出しても安全です — <code>IF NOT EXISTS</code> はべき等です。</p>
 <h2 id="_5">パラメータ化されたクエリ<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>値には常に <code>?</code> プレースホルダーを使用します。ユーザー入力を SQL 文字列に連結しません — これは SQL インジェクションを防ぎます:</p>
+<p>値には常に <code>?</code> プレースホルダーを使用します。ユーザー入力を SQL 文字列に連結しないでください — SQL インジェクションを防ぐためです:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — パラメータ化</span>
 <span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
 <span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM notes WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span>
@@ -513,7 +513,7 @@
 </tr>
 </tbody>
 </table>
-<p>SQLite の <code>datetime()</code> 関数を使用してすべての日付を <code>TEXT</code> として保存します。文字列として取得し表示します — 必要に応じてテンプレートまたは ViewModel で形式化します。</p>
+<p>SQLite の <code>datetime()</code> 関数を使用してすべての日付を <code>TEXT</code> として保存します。文字列として取得して表示し、必要に応じてテンプレートまたは ViewModel でフォーマットします。</p>
 <h2 id="_7">本番用のデータベースパス<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <p>現在の実装は開発用にパスをハードコードしています。本番ビルドの場合、<code>SpecialFolder.ApplicationData</code> を使用:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// 開発 (ハードコード — IDE デバッグ実行に適しています)</span>

@@ -403,7 +403,7 @@
 </code></pre></div>
 
 <h2 id="framework-vs-viewmodels">Framework vs ViewModels<a class="headerlink" href="#framework-vs-viewmodels" title="Permanent link">&para;</a></h2>
-<p><code>Framework/</code> フォルダには 1 回書いてめったに触れないコードが含まれています。これは「エンジン」です — ルーティング、基本 ViewModel ライフサイクル、リクエスト/レスポンスヘルパー。新しい機能を追加するときは、<code>Framework/</code> を変更しません。</p>
+<p><code>Framework/</code> フォルダには一度書いたらほぼ変更しないコードが含まれています。これは「エンジン」です — ルーティング、基本 ViewModel ライフサイクル、リクエスト/レスポンスヘルパー。新しい機能を追加するときは、<code>Framework/</code> を変更しません。</p>
 <p><code>ViewModels/</code> はすべてのアプリケーション固有の作業が行われる場所です。すべての新しいルートは、関連するフィーチャーフォルダに新しい ViewModel ファイルを取得します。</p>
 <h2 id="viewmodels">ViewModels のフィーチャーフォルダ<a class="headerlink" href="#viewmodels" title="Permanent link">&para;</a></h2>
 <p>HTTP メソッドではなく、フィーチャーで ViewModel をグループ化します:</p>
@@ -446,7 +446,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>form.html</code> テンプレートは create と edit ルート間で共有されます。<code>note</code> コンテキスト変数の存在を検査します: 存在する場合、フォームはエディットモード; 存在しない場合、フォームは作成モード。</p>
+<p><code>form.html</code> テンプレートは create ルートと edit ルートで共有されます。<code>note</code> コンテキスト変数の存在を検査します: 存在する場合はフォームは編集モード、存在しない場合は作成モードです。</p>
 <h2 id="data"><code>data/</code> ディレクトリ<a class="headerlink" href="#data" title="Permanent link">&para;</a></h2>
 <p>現在、データベースパスは開発用にハードコードされています。本番ビルドの場合、<code>SpecialFolder.ApplicationData</code> を使用して、データベースを正しい OS 位置に配置します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// 開発 (IDE デバッグ実行用にハードコード)</span>

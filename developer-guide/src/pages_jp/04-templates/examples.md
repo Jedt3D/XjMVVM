@@ -43,7 +43,7 @@ description: ノート機能から取られた実際のテンプレート例 —
 </html>
 ```
 
-`flash` 変数は 2 つのキーを持つ `Dictionary` です: `type` (`"success"`、`"error"`、`"info"`) と `message` (文字列)。自動的に注入されます — 任意の ViewModel は `SetFlash()` を呼び出でき、メッセージは次のレンダリングされたページに表示されます。
+`flash` 変数は 2 つのキーを持つ `Dictionary` です: `type`（`"success"`、`"error"`、`"info"`）と `message`（文字列）。自動的に注入されます — 任意の ViewModel で `SetFlash()` を呼び出せば、メッセージは次にレンダリングされるページに表示されます。
 
 ## ノートリスト
 
@@ -84,7 +84,7 @@ description: ノート機能から取られた実際のテンプレート例 —
 {% endblock %}
 ```
 
-重要なポイント: `note.id`、`note.title`、`note.body`、`note.updated_at` は Dictionary キーです。delete アクションは `POST` フォームです。HTML フォームは GET と POST のみをサポートします — ブラウザフォームに HTTP DELETE はありません。
+重要なポイント: `note.id`、`note.title`、`note.body`、`note.updated_at` は Dictionary のキーです。削除アクションは `POST` フォームで行います。HTML フォームは GET と POST のみをサポートしているため、ブラウザフォームで HTTP DELETE は使えません。
 
 ## 共有 create/edit フォーム
 
@@ -120,7 +120,7 @@ description: ノート機能から取られた実際のテンプレート例 —
 {% endblock %}
 ```
 
-`NotesNewVM` は `note` キーを渡しません (または `Nil` を渡します) — フォームは create モードでレンダリングされます。`NotesEditVM` はロードされた `note` Dictionary を渡します — フォームは既存の値でプリポピュレートされます。
+`NotesNewVM` は `note` キーを渡しません（または `Nil` を渡します）— フォームは作成モードでレンダリングされます。`NotesEditVM` はロードした `note` Dictionary を渡します — フォームは既存の値で事前入力されます。
 
 ## ノート詳細
 
@@ -171,4 +171,4 @@ description: ノート機能から取られた実際のテンプレート例 —
 {% endblock %}
 ```
 
-エラーテンプレートはフラッシュメッセージについて心配する必要があります — ルーターによって直接レンダリングされます。任意の ViewModel が実行される前に。
+エラーテンプレートはフラッシュメッセージを気にする必要はありません — ルーターによって直接レンダリングされ、どの ViewModel も実行される前に処理されます。

@@ -348,7 +348,7 @@
         </div>
 
         <h1 id="many-to-many">แท็ก &amp; ความสัมพันธ์แบบ Many-to-Many<a class="headerlink" href="#many-to-many" title="Permanent link">&para;</a></h1>
-<p>การเพิ่ม Tags นำเสนออสองสิ่งไปพร้อมกัน: <strong>ทรัพยากรเต็มตัวอันที่สอง</strong> (พิสูจน์ว่ารูปแบบ CRUD ขยายไปไกลกว่า Notes) และ <strong>ความสัมพันธ์แบบ many-to-many</strong> ระหว่าง Notes และ Tags ผ่านตารางจุดเชื่อม</p>
+<p>การเพิ่ม Tags นำเสนอสองสิ่งไปพร้อมกัน: <strong>ทรัพยากรเต็มตัวอันที่สอง</strong> (พิสูจน์ว่ารูปแบบ CRUD ขยายไปไกลกว่า Notes) และ <strong>ความสัมพันธ์แบบ many-to-many</strong> ระหว่าง Notes และ Tags ผ่านตารางจุดเชื่อม</p>
 <h2 id="tag">ทรัพยากร Tag<a class="headerlink" href="#tag" title="Permanent link">&para;</a></h2>
 <p><code>TagModel</code> ปฏิบัติตามรูปแบบสามชั้นเดียวกับ <code>NoteModel</code> อย่างแม่นยำ</p>
 <div class="diagram-tabs" id="diag1">
@@ -491,7 +491,7 @@ Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
 <span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
-<p>โครงการถูกลงทะเบียนใน <code>DBAdapter.InitDB()</code>:</p>
+<p>ตาราง <code>tags</code> ถูกสร้างใน <code>DBAdapter.InitDB()</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;id          INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;name        TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
@@ -557,7 +557,7 @@ Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
 </table>
 <hr />
 <h2 id="many-to-many-note_tags">Many-to-Many: note_tags<a class="headerlink" href="#many-to-many-note_tags" title="Permanent link">&para;</a></h2>
-<p>Notes และ Tags มีความสัมพันธ์แบบ many-to-many ไปมา บันทึกหนึ่งสามารถมีแท็กจำนวนมากได้ แท็กหนึ่งสามารถปรากฏบนบันทึกจำนวนมากได้ โดยแสดงผลด้วย <strong>ตารางจุดเชื่อม</strong> — ไม่มีคอลัมน์กุญแจต่างประเทศใน notes หรือ tags table</p>
+<p>Notes และ Tags มีความสัมพันธ์แบบ many-to-many บันทึกหนึ่งสามารถมีได้หลาย tag และ tag หนึ่งสามารถปรากฏในหลายบันทึก โดยใช้ <strong>junction table</strong> (ตารางเชื่อมความสัมพันธ์) — ไม่มี foreign key column ใน notes หรือ tags โดยตรง</p>
 <div class="diagram-tabs" id="diag2">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
@@ -674,7 +674,7 @@ A tag can appear on zero or many notes.</code></pre>
   </div>
 </div>
 
-<p>โครงการ:</p>
+<p>โครงสร้างตาราง:</p>
 <div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS note_tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;note_id  INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
 <span class="w">  </span><span class="s2">&quot;tag_id   INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>

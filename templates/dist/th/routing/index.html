@@ -503,8 +503,8 @@ App.HandleURL
 </div>
 
 <hr />
-<h2 id="handleurl">ต้นไม้การตัดสินใจ HandleURL<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h2>
-<p><code>HandleURL</code> ใช้ลำดับการตรวจสอบที่ตายตัวก่อนส่งคำขอใดๆ ปกติการเส้นทาง path มาก่อน — ทุกการเปรียบเทียบขึ้นอยู่กับมัน</p>
+<h2 id="handleurl">แผนผังการตัดสินใจ HandleURL<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h2>
+<p><code>HandleURL</code> ใช้ลำดับการตรวจสอบที่ตายตัวก่อนส่งคำขอใดๆ การ normalize path มาก่อนเสมอ — ทุกการเปรียบเทียบขึ้นอยู่กับมัน</p>
 <div class="diagram-tabs" id="diag2">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
@@ -696,7 +696,7 @@ Normalize: prepend "/" if missing, strip trailing "/"
   </div>
 </div>
 
-<h3 id="requestpath">เอกลักษณ์ <code>request.Path</code><a class="headerlink" href="#requestpath" title="Permanent link">&para;</a></h3>
+<h3 id="requestpath">พฤติกรรมพิเศษของ <code>request.Path</code><a class="headerlink" href="#requestpath" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Xojo Web 2 ละเว้น <code>/</code> นำหน้าจาก <code>request.Path</code> คำขอไป <code>/notes</code> มาถึงพร้อม <code>request.Path = "notes"</code> ไม่ใช่ <code>"/notes"</code> ทุกการเปรียบเทียบเส้นทางล้มเหลวเงียบๆ โดยไม่มีการปกติ</p>
@@ -709,7 +709,7 @@ Normalize: prepend "/" if missing, strip trailing "/"
 
 <p>โดยไม่มีสิ่งนี้ <code>"notes" &lt;&gt; "/notes"</code> ประเมินเป็น <code>True</code> โดยไม่มีข้อผิดพลาด — ทุกการจับคู่เส้นทางล้มเหลว</p>
 <hr />
-<h2 id="mvvm-request">ท่อ MVVM Request<a class="headerlink" href="#mvvm-request" title="Permanent link">&para;</a></h2>
+<h2 id="mvvm-request-pipeline">MVVM Request Pipeline<a class="headerlink" href="#mvvm-request-pipeline" title="Permanent link">&para;</a></h2>
 <p>สำหรับเส้นทาง SSR ที่จับคู่ได้ ท่อ pipeline เต็มรูปแบบจาก <code>HandleURL</code> ไปยังการตอบสนอง HTML:</p>
 <div class="diagram-tabs" id="diag3">
   <div class="diagram-tab-bar">
@@ -1071,7 +1071,7 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 <td>MVVM template</td>
 <td>Xojo WebPage</td>
 <td><code>&lt;a href="/tests"&gt;</code></td>
-<td>ปลิดทริกเกอร์เต้นรำเปลี่ยนเส้นทาง</td>
+<td>กระตุ้นลำดับ redirect dance</td>
 </tr>
 <tr>
 <td>Xojo WebPage</td>
@@ -1109,7 +1109,7 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 <tbody>
 <tr>
 <td><code>App.xojo_code</code></td>
-<td><code>HandleURL</code> — ปกติเส้นทาง การปลี่ยนเส้นทาง <code>/tests</code> การผ่าน <code>/?_xojo=1</code> การส่งตัว Router</td>
+<td><code>HandleURL</code> — normalize path การเปลี่ยนเส้นทาง <code>/tests</code> การผ่าน <code>/?_xojo=1</code> การส่งตัว Router</td>
 </tr>
 <tr>
 <td><code>Framework/Router.xojo_code</code></td>
@@ -1166,15 +1166,15 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ตนไมการตดสนใจ-handleurl">ต้นไม้การตัดสินใจ HandleURL</a>
+            <a class="toc-link" href="#แผนผงการตดสนใจ-handleurl">แผนผังการตัดสินใจ HandleURL</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#เอกลกษณ-requestpath">เอกลักษณ์ `request.Path`</a>
+            <a class="toc-link" href="#พฤตกรรมพเศษของ-requestpath">พฤติกรรมพิเศษของ `request.Path`</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#ทอ-mvvm-request">ท่อ MVVM Request</a>
+            <a class="toc-link" href="#mvvm-request-pipeline">MVVM Request Pipeline</a>
           </li>
           
           <li class="toc-item toc-level-2">

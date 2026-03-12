@@ -5,7 +5,7 @@ description: วิธีการเพิ่มทรัพยากร (Tags)
 
 # แท็ก & ความสัมพันธ์แบบ Many-to-Many
 
-การเพิ่ม Tags นำเสนออสองสิ่งไปพร้อมกัน: **ทรัพยากรเต็มตัวอันที่สอง** (พิสูจน์ว่ารูปแบบ CRUD ขยายไปไกลกว่า Notes) และ **ความสัมพันธ์แบบ many-to-many** ระหว่าง Notes และ Tags ผ่านตารางจุดเชื่อม
+การเพิ่ม Tags นำเสนอสองสิ่งไปพร้อมกัน: **ทรัพยากรเต็มตัวอันที่สอง** (พิสูจน์ว่ารูปแบบ CRUD ขยายไปไกลกว่า Notes) และ **ความสัมพันธ์แบบ many-to-many** ระหว่าง Notes และ Tags ผ่านตารางจุดเชื่อม
 
 ## ทรัพยากร Tag
 
@@ -71,7 +71,7 @@ Inherits BaseModel
 End Class
 ```
 
-โครงการถูกลงทะเบียนใน `DBAdapter.InitDB()`:
+ตาราง `tags` ถูกสร้างใน `DBAdapter.InitDB()`:
 
 ```xojo
 db.ExecuteSQL("CREATE TABLE IF NOT EXISTS tags (" + _
@@ -100,7 +100,7 @@ db.ExecuteSQL("CREATE TABLE IF NOT EXISTS tags (" + _
 
 ## Many-to-Many: note_tags
 
-Notes และ Tags มีความสัมพันธ์แบบ many-to-many ไปมา บันทึกหนึ่งสามารถมีแท็กจำนวนมากได้ แท็กหนึ่งสามารถปรากฏบนบันทึกจำนวนมากได้ โดยแสดงผลด้วย **ตารางจุดเชื่อม** — ไม่มีคอลัมน์กุญแจต่างประเทศใน notes หรือ tags table
+Notes และ Tags มีความสัมพันธ์แบบ many-to-many บันทึกหนึ่งสามารถมีได้หลาย tag และ tag หนึ่งสามารถปรากฏในหลายบันทึก โดยใช้ **junction table** (ตารางเชื่อมความสัมพันธ์) — ไม่มี foreign key column ใน notes หรือ tags โดยตรง
 
 <!-- diagram -->
 <!-- nomnoml
@@ -125,7 +125,7 @@ A tag can appear on zero or many notes.
 -->
 <!-- /diagram -->
 
-โครงการ:
+โครงสร้างตาราง:
 
 ```xojo
 db.ExecuteSQL("CREATE TABLE IF NOT EXISTS note_tags (" + _

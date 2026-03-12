@@ -50,7 +50,7 @@ SQLite database file
 
 ### ทำไมต้องส่งคืน `Dictionary` แทนอินสแตนซ์ของโมเดล?
 
-เทมเพลต JinjaX ใช้สัญกรณ์จุด: `{{ note.title }}` เอนจิน JinjaX แก้ไขสิ่งนี้โดยเรียก `dict.Value("title")` บน `Dictionary` ของ Xojo อินสแตนซ์คลาสที่กำหนดเองไม่มีกลไกการสอบเทียบที่เทียบเท่า
+เทมเพลต JinjaX ใช้สัญกรณ์จุด: `{{ note.title }}` เอนจิน JinjaX แก้ไขสิ่งนี้โดยเรียก `dict.Value("title")` บน `Dictionary` ของ Xojo อินสแตนซ์คลาสที่กำหนดเองไม่มีกลไก introspection ที่เทียบเท่า
 
 ```xojo
 // Template: {{ note.title }}
@@ -58,7 +58,7 @@ SQLite database file
 // ✅ ทำงาน — Dictionary ตอบสนองสัญกรณ์จุด
 ctx.Value("note") = myDictionary        // .Value("title") → "Hello"
 
-// ❌ ไม่ทำงาน — NoteModel ไม่มีการสอบเทียบ JinjaX
+// ❌ ไม่ทำงาน — NoteModel ไม่มี introspection สำหรับ JinjaX
 ctx.Value("note") = myNoteInstance
 ```
 
@@ -256,7 +256,7 @@ model.UpdateByID(42, data)
 model.DeleteByID(42)
 ```
 
-### เมธอดทางออกที่มีการป้องกัน
+### เมธอด escape hatch (protected)
 
 #### `OpenDB() As SQLiteDatabase`
 
@@ -383,7 +383,7 @@ End Class
 
 | ประโยชน์ | เหตุผล |
 |---------|-----|
-| ไม่มี boilerplate | ทรัพยากรใหม่ต้องการเพียง `TableName()` + `Columns()` + ตัวห่อหุ้มบาง |
+| ไม่มี boilerplate | ทรัพยากรใหม่ต้องการเพียง `TableName()` + `Columns()` + method wrapper บางๆ |
 | ปลอดภัยจากการฉีด SQL | ค่าผู้ใช้ทั้งหมดจะไปผ่านพารามิเตอร์ `?` |
 | ปลอดภัยจากเธรด | การเชื่อมต่อต่อคำขอ — ไม่มีสถานะที่เปลี่ยนแปลงร่วมกัน |
 | เข้ากันได้กับ JinjaX | ผลลัพธ์ทั้งหมดเป็น `Dictionary` — เทมเพลตทำงานได้ทันที |

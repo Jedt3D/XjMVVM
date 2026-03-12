@@ -382,7 +382,7 @@
 </code></pre></div>
 
 <h2 id="_2">カスタムフィルターを登録<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>フィルターは <code>Variant</code> を取り、<code>Variant</code> を返す Xojo メソッドです。テンプレートが pipe <code>|</code> オペレータで使用する文字列名で登録します:</p>
+<p>フィルターは <code>Variant</code> を受け取り <code>Variant</code> を返す Xojo メソッドです。テンプレートがパイプ <code>|</code> 演算子で使用する文字列名で登録します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// App.xojo_code (またはモジュール) で</span>
 <span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
 <span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span>
@@ -401,7 +401,7 @@
 </code></pre></div>
 
 <h2 id="viewmodel">ViewModel から環境にアクセス<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
-<p><code>JinjaEnvironment</code> は <code>Handle()</code> が呼ばれる前にルーターから各 ViewModel に渡されます。<code>BaseViewModel</code> はそれを <code>Jinja</code> プロパティとして保存します。決して直接アクセスしません — <code>Render()</code> を呼び出すだけです:</p>
+<p><code>JinjaEnvironment</code> は <code>Handle()</code> が呼ばれる前にルーターから各 ViewModel に渡されます。<code>BaseViewModel</code> はそれを <code>Jinja</code> プロパティとして保存します。直接アクセスする必要はありません — <code>Render()</code> を呼び出すだけです:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// 任意の ViewModel で — Render() は内部的に Self.Jinja を使用</span>
 <span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
 <span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
@@ -411,7 +411,7 @@
 <h2 id="_3">スレッドセーフティ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p><code>JinjaEnvironment</code> は <code>Opening()</code> 完了後にスレッド間で共有するのは安全です。理由は:</p>
 <ul>
-<li><code>RegisterFilter</code> は <code>Opening()</code> 中にのみ呼ばれます — リクエスト中は決にしません</li>
+<li><code>RegisterFilter</code> は <code>Opening()</code> 中にのみ呼ばれます — リクエスト処理中には決して呼びません</li>
 <li><code>GetTemplate()</code> と <code>Render()</code> は環境から読み取るだけです</li>
 <li><code>CompiledTemplate</code> と <code>JinjaContext</code> はリクエストごとに新規作成されます (スタック割り当て、共有されません)</li>
 </ul>

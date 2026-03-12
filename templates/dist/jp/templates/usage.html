@@ -384,7 +384,7 @@
 
 <p>子テンプレートは、親で定義されているブロックのみをオーバーライドできます。子テンプレートの <code>{% block %}</code> タグの外のコンテンツは無視されます。</p>
 <h2 id="_3">変数<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>double curly braces で変数を出力します。HTML は自動的にエスケープされます — <code>&lt;script&gt;</code> は <code>&amp;lt;script&amp;gt;</code> になります:</p>
+<p>二重波括弧で変数を出力します。HTML は自動的にエスケープされます — <code>&lt;script&gt;</code> は <code>&amp;lt;script&amp;gt;</code> になります:</p>
 <div class="highlight"><pre><span></span><code>{{ note.title }}
 {{ note.created_at }}
 {{ page_title }}
@@ -409,7 +409,7 @@
 {% endif %}
 </code></pre></div>
 
-<p>Jinja2 のフォルシー値: <code>False</code>、<code>0</code>、<code>""</code> (空文字列)、<code>[]</code> (空配列)、<code>None</code>/<code>Nil</code>。存在しないキーはフォルシーとして扱われます。</p>
+<p>Jinja2 の偽値（falsy）: <code>False</code>、<code>0</code>、<code>""</code> （空文字列）、<code>[]</code> （空配列）、<code>None</code>/<code>Nil</code>。存在しないキーも偽値として扱われます。</p>
 <h2 id="_6">ループ<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p><code>Variant()</code> の <code>Dictionary</code> オブジェクト配列を反復:</p>
 <div class="highlight"><pre><span></span><code>{% for note in notes %}
@@ -423,7 +423,7 @@
 {% endfor %}
 </code></pre></div>
 
-<p><code>{% else %}</code> ブロックは配列が空のときレンダリングします。</p>
+<p><code>{% else %}</code> ブロックは配列が空のときにレンダリングされます。</p>
 <h3 id="_7">ループ変数<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h3>
 <p><code>{% for %}</code> ブロック内では、特別な <code>loop</code> 変数が利用可能です:</p>
 <table>
@@ -466,7 +466,7 @@
 </code></pre></div>
 
 <h2 id="_8">フィルター<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
-<p>フィルターは pipe <code>|</code> オペレータを使用して値を変換します:</p>
+<p>フィルターはパイプ <code>|</code> 演算子を使用して値を変換します:</p>
 <div class="highlight"><pre><span></span><code>{{ note.title | upper }}
 {{ note.title | lower }}
 {{ note.body  | truncate(100) }}
@@ -480,7 +480,7 @@
 </code></pre></div>
 
 <h2 id="_9">テンプレート インクルード<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h2>
-<p>部分的なテンプレートをインクルード:</p>
+<p>部分テンプレートをインクルードします:</p>
 <div class="highlight"><pre><span></span><code>{% include &quot;partials/pagination.html&quot; %}
 </code></pre></div>
 
@@ -501,7 +501,7 @@
 {%- endfor -%}
 </code></pre></div>
 
-<p>JSON または CSV をテンプレートから生成する場合に有用です。</p>
+<p>テンプレートから JSON や CSV を生成する場合に有用です。</p>
 <h2 id="viewmodel">ViewModel からコンテキストを渡す<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
 <p>コンテキスト <code>Dictionary</code> のすべてのものはテンプレート変数になります:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
@@ -519,7 +519,7 @@
 {% for note in notes %}...{% endfor %}
 </code></pre></div>
 
-<p>フラッシュメッセージは <code>BaseViewModel.Render()</code> によって自動的に注入されます — それらを手動でコンテキストに追加しません。</p>
+<p>フラッシュメッセージは <code>BaseViewModel.Render()</code> によって自動的に注入されます — 手動でコンテキストに追加する必要はありません。</p>
 
         <!-- Prev / Next navigation -->
         

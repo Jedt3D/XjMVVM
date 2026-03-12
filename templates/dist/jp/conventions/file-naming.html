@@ -353,7 +353,7 @@
 <ul>
 <li><strong>Feature</strong> は名詞 (コレクション操作は複数形、アイテム操作は単数形)</li>
 <li><strong>Action</strong> はこの ViewModel が何をするかを説明する動詞</li>
-<li><strong>VM</strong> サフィックスは即座にこれが ViewModel であることを明白にします</li>
+<li><strong>VM</strong> サフィックスは、これが ViewModel であることを一目で明確にします</li>
 </ul>
 <p>リソースの 7 つの標準的なアクションは RESTful 規約に従います:</p>
 <table>
@@ -417,7 +417,7 @@
 NoteModel.xojo_code      →  Class NoteModel
 </code></pre></div>
 
-<p>Xojo はランタイムでクラス名を使用します — ファイル名ではなく — しかし、それらを同じに保つことは混乱を防ぎます。</p>
+<p>Xojo はランタイムでクラス名を使用します（ファイル名ではありません）が、両者を一致させることで混乱を防げます。</p>
 <h2 id="_3">モデル<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>モデルファイルは <code>{Feature}Model.xojo_code</code> パターンに従います:</p>
 <div class="highlight"><pre><span></span><code>NoteModel.xojo_code     # 単数形 — 「ノートのモデル」
@@ -459,9 +459,9 @@ ProductModel.xojo_code  # 今後
 {% endif %}
 </code></pre></div>
 
-<p>ViewModel はコンテキスト辞書で <code>note</code> を渡すか省略することでモードを制御します。</p>
+<p>ViewModel はコンテキスト Dictionary で <code>note</code> を渡すか省略することでモードを制御します。</p>
 <h2 id="_6">ルート登録命名<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
-<p><code>App.Opening()</code> でルートを登録するとき、順序と一致させます: POST の前に GET、詳細の前にリスト:</p>
+<p><code>App.Opening()</code> でルートを登録するときは、順序を合わせます: GET を POST の前に、リストを詳細の前に登録します:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// App.Opening() で — ルートを論理的順序で登録</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">                 </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span>
 <span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">            </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span>

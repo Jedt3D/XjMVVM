@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.9.3-editorial] — 2026-03-13
+
+### Changed
+
+- **Thai (TH) translation — full editorial pass** across all 20 pages (60 fixes total)
+  - **Major fixes** in 5 priority files: Japanese characters leaked into TH text (`リダイレクト` removed), catastrophic mistranslation "ประเทศไทยมีสองวิธีการยาม" → "มีสองเมธอด guard", garbled "อะแซงก์ก" → "Async", garbled "ตัวฟังชายตัวสนับสนุน" → rewritten, "จะไฟ" (fire) → "fire ขึ้นมาอีกครั้ง", missing verb in security warning fixed
+  - **Terminology standardized**: "authentication" → "การยืนยันตัวตน" throughout, "กุญแจ" → "key", "ลวดลาย" → "รูปแบบ", "เบราวเซอร์" → "เบราว์เซอร์", "ท่อ" → "pipeline", "โครงการ" → "ตาราง", "ถูกไม่สนใจ" → "ถูกละเว้น", "นำเสนอ Jinja2" → "port ของ Jinja2"
+  - **Headings**: 8 English headings in `05-database` translated; 3 English headings in `02-conventions/directory-structure` translated; routing headings fixed
+  - **Tone**: Added senior→junior programmer tone guidance to `build.py` translate prompt
+- **Japanese (JP) translation — full editorial pass** across all 20 pages
+  - **Critical**: Untranslated headings `## Philosophy` → `## 設計思想`, `## Installation` → `## インストール`; meaning reversal in templates/examples fixed; "SRRモード" → "SSRモード"; `description` frontmatter wrong kanji fixed
+  - **Systematic**: "決に〜" → "決して〜" (5+ files); "フォルシー" → "偽値（falsy）"; "ディフェレンシエート" → "差分比較"; "コンテキスト辞書" → "コンテキスト Dictionary"; garbled byte-mismatch sentence fixed; full-width/half-width parentheses normalized
+
+### Added
+
+- `developer-guide/th_observation.md` — detailed Thai editorial review report (Major/Moderate/Minor per file, 20-term terminology glossary)
+- `developer-guide/jp_observation.md` — detailed Japanese editorial review report (per-file observations, unified terminology glossary)
+
+---
+
 ## [0.9.3-docs] — 2026-03-13
 
 ### Changed

@@ -402,10 +402,10 @@
     └── dist/
 </code></pre></div>
 
-<h2 id="framework-vs-viewmodels">Framework vs. ViewModels<a class="headerlink" href="#framework-vs-viewmodels" title="Permanent link">&para;</a></h2>
+<h2 id="framework-viewmodels">Framework กับ ViewModels<a class="headerlink" href="#framework-viewmodels" title="Permanent link">&para;</a></h2>
 <p>โฟลเดอร์ <code>Framework/</code> ประกอบด้วยโค้ดที่เราเขียนครั้งเดียวและแทบไม่ต้องแก้ไขอีก มันคือ &ldquo;เครื่องยนต์&rdquo; — routing, base ViewModel lifecycle, และ helper สำหรับ request/response สิ่งสำคัญคือเมื่อเพิ่มฟีเจอร์ใหม่ เราจะไม่ต้องแก้ไขไฟล์ใดๆ ใน <code>Framework/</code> เลย</p>
 <p><code>ViewModels/</code> คือตำแหน่งที่ทำงานเฉพาะของแอปพลิเคชัน ทุกเส้นทาง (route) ใหม่จะได้ไฟล์ ViewModel ใหม่อยู่ในโฟลเดอร์ฟีเจอร์ที่เกี่ยวข้อง</p>
-<h2 id="feature-folders-viewmodels">Feature folders ใน ViewModels<a class="headerlink" href="#feature-folders-viewmodels" title="Permanent link">&para;</a></h2>
+<h2 id="feature-viewmodels">โฟลเดอร์ Feature ใน ViewModels<a class="headerlink" href="#feature-viewmodels" title="Permanent link">&para;</a></h2>
 <p>จัดกลุ่ม ViewModels ตามฟีเจอร์ ไม่ใช่ตามเมธอด HTTP:</p>
 <div class="highlight"><pre><span></span><code>ViewModels/
   Notes/         ← all seven note-related ViewModels live here
@@ -414,7 +414,7 @@
 </code></pre></div>
 
 <p>วิธีนี้ช่วยให้ไฟล์ที่เกี่ยวข้องอยู่ด้วยกัน และทำให้ค้นหาทุกอย่างเกี่ยวกับฟีเจอร์ในที่เดียวได้ง่าย</p>
-<h2 id="template-mirroring">Template mirroring<a class="headerlink" href="#template-mirroring" title="Permanent link">&para;</a></h2>
+<h2 id="template-url">Template สะท้อนโครงสร้าง URL<a class="headerlink" href="#template-url" title="Permanent link">&para;</a></h2>
 <p>โครงสร้าง <code>templates/</code> สะท้อนให้เห็นลำดับชั้นของ URL:</p>
 <table>
 <thead>
@@ -489,15 +489,15 @@
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#framework-vs-viewmodels">Framework vs. ViewModels</a>
+            <a class="toc-link" href="#framework-กบ-viewmodels">Framework กับ ViewModels</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#feature-folders-ใน-viewmodels">Feature folders ใน ViewModels</a>
+            <a class="toc-link" href="#โฟลเดอร-feature-ใน-viewmodels">โฟลเดอร์ Feature ใน ViewModels</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#template-mirroring">Template mirroring</a>
+            <a class="toc-link" href="#template-สะทอนโครงสราง-url">Template สะท้อนโครงสร้าง URL</a>
           </li>
           
           <li class="toc-item toc-level-2">

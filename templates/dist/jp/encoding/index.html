@@ -349,7 +349,7 @@
 
         <h1 id="mime-utf-8">フォーム、MIME &amp; UTF-8<a class="headerlink" href="#mime-utf-8" title="Permanent link">&para;</a></h1>
 <h2 id="html">HTML フォームエンコーディング<a class="headerlink" href="#html" title="Permanent link">&para;</a></h2>
-<p>ブラウザが <code>&lt;form method="post"&gt;</code> を送信するとき、フィールド値をリクエストボディ内のバイト文字列として符号化します。エンコーディング形式はフォームの <code>enctype</code> 属性で指定されます。</p>
+<p>ブラウザが <code>&lt;form method="post"&gt;</code> を送信するとき、フィールド値をリクエストボディ内のバイト列としてエンコードします。エンコーディング形式はフォームの <code>enctype</code> 属性で指定されます。</p>
 <p>このプロジェクトはデフォルトエンコーディングを処理します: <code>application/x-www-form-urlencoded</code>。</p>
 <h3 id="_1">エンコードされたボディはどのように見えるか<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <p>このフォームを考えます:</p>
@@ -371,7 +371,7 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 - 特殊文字は <code>%XX</code> になる。<code>XX</code> は 16 進バイト値
 - マルチバイト文字 (タイ、絵文字、アクセント付き文字) は複数の <code>%XX</code> シーケンス — 1 つずつ UTF-8 バイト</p>
 <h3 id="xojo-post">Xojo で POST ボディを読む<a class="headerlink" href="#xojo-post" title="Permanent link">&para;</a></h3>
-<p>Xojo の <code>WebRequest.Body</code> は生のエンコードされた文字列を含みます。<strong>一度</strong> 読む必要があります。直後に。内部バッファは最初のアクセス後に再読み取り可能ではないかもしれないため。<code>BaseViewModel.Handle()</code> はキャッシュします:</p>
+<p>Xojo の <code>WebRequest.Body</code> は生のエンコードされた文字列を含みます。<strong>一度だけ</strong>、できるだけ早く読み取る必要があります。内部バッファは最初のアクセス後に再読み取りできない場合があるためです。<code>BaseViewModel.Handle()</code> でキャッシュします:</p>
 <div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Handle</span><span class="p">()</span>
 <span class="w">  </span><span class="c1">// POST ボディを直後にキャッシュ — Request.Body は 1 回のみ読み取り可能かもしれません</span>
 <span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="w"> </span><span class="k">Then</span>
@@ -414,10 +414,10 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 
 <div class="admonition note">
 <p class="admonition-title">0-based 文字列インデックス</p>
-<p><code>pair.IndexOf("=")</code> は 0-based 位置を返します。<code>pair.Left(eqPos)</code> はキー (<code>=</code> の前のすべて) を抽出します。<code>pair.Middle(eqPos + 1)</code> は値を抽出します (<code>=</code> の後のすべて)。<code>Middle()</code> は 0-based で <code>IndexOf</code> に正しく整合します。決に <code>Mid()</code> を使用しないでください — それは <code>IndexOf</code> と組み合わせると間違った結果を与える従来の 1-based 関数です。</p>
+<p><code>pair.IndexOf("=")</code> は 0-based の位置を返します。<code>pair.Left(eqPos)</code> はキー（<code>=</code> より前のすべて）を抽出します。<code>pair.Middle(eqPos + 1)</code> は値（<code>=</code> より後のすべて）を抽出します。<code>Middle()</code> は 0-based なので <code>IndexOf</code> と正しく整合します。<code>Mid()</code> は決して使用しないでください — <code>IndexOf</code> と組み合わせると誤った結果を返すレガシーの 1-based 関数です。</p>
 </div>
 <h2 id="decodeuricomponent-utf-8">DecodeURIComponent — UTF-8 トリック<a class="headerlink" href="#decodeuricomponent-utf-8" title="Permanent link">&para;</a></h2>
-<p>これはプロジェクト内で最も重要なエンコーディング関数です。それを間違うとタイテキスト、絵文字、非 ASCII 入力をサイレントに破損させます。</p>
+<p>これはプロジェクト内で最も重要なエンコーディング関数です。実装を誤ると、タイ語テキスト、絵文字、非 ASCII 入力をサイレントに破損させます。</p>
 <h3 id="_2">間違ったアプローチ (マルチバイト文字を破損)<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// ❌ 間違い — Chr() は整数を Unicode コードポイントにマップします、生バイトではなく</span>
 <span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="k">Then</span>
@@ -426,7 +426,7 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 <span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
-<p><code>Chr(0xE0)</code> は Unicode 文字 U+00E0 (<code>à</code>) を返し、これは 2 バイト UTF-8 シーケンス <code>0xC3 0xA0</code> です。しかし私たちが望んだのは単一バイト <code>0xE0</code>、それは 3 バイト タイ文字シーケンスのスタートバイトのようなもの <code>ก</code> (<code>0xE0 0xB8 0x81</code>) です。バイトごどのの 2 バイト対バイトの不一致はすべてのマルチバイト文字を破損させます。</p>
+<p><code>Chr(0xE0)</code> は Unicode 文字 U+00E0（<code>à</code>）を返し、これは 2 バイト UTF-8 シーケンス <code>0xC3 0xA0</code> です。しかし必要なのは単一バイト <code>0xE0</code>、つまりタイ語の 3 バイト UTF-8 シーケンスの先頭バイト（例: <code>ก</code> = <code>0xE0 0xB8 0x81</code>）です。バイトごとのこのずれが、すべてのマルチバイト文字を破損させます。</p>
 <h3 id="memoryblock-defineencoding">正しいアプローチ (MemoryBlock + DefineEncoding)<a class="headerlink" href="#memoryblock-defineencoding" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — MemoryBlock で生バイトを収集し、UTF-8 としてデコード</span>
 <span class="k">Function</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
@@ -468,9 +468,9 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 <span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
-<p>重要な洞察: すべての生バイトを <code>MemoryBlock</code> に最初に収集し、その後、最後に <code>DefineEncoding(..., Encodings.UTF8)</code> を 1 回呼び出します。これはマルチバイトシーケンスを正しく組み立てます。Xojo が文字列エンコーディングを解釈する前に。</p>
+<p>重要なポイント: まずすべての生バイトを <code>MemoryBlock</code> に収集し、最後に <code>DefineEncoding(..., Encodings.UTF8)</code> を 1 回呼び出します。Xojo が文字列エンコーディングを解釈する前に、マルチバイトシーケンスを正しく組み立てるためです。</p>
 <h2 id="xojo-2025-0-based">文字列インデックス — Xojo 2025 で 0-based<a class="headerlink" href="#xojo-2025-0-based" title="Permanent link">&para;</a></h2>
-<p>Xojo 2025 文字列は完全に <strong>0-based</strong> な最新 API を使用します。従来の <code>Mid()</code> 関数は 1-based で、<code>IndexOf()</code> と一緒に決に使用してはいけません:</p>
+<p>Xojo 2025 の文字列は完全に <strong>0-based</strong> なモダン API を使用します。レガシーの <code>Mid()</code> 関数は 1-based であり、<code>IndexOf()</code> と組み合わせて決して使用してはいけません:</p>
 <table>
 <thead>
 <tr>
@@ -537,7 +537,7 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 - <code>application/json</code> — JSON API レスポンス用
 - <code>text/css; charset=utf-8</code> — サーブされた CSS ファイル用
 - <code>application/javascript; charset=utf-8</code> — サーブされた JS ファイル用</p>
-<p>常にテキスト型に <code>; charset=utf-8</code> を含めます。それなしで、いくつかのブラウザは Latin-1 にデフォルトします。タイなど非 ASCII コンテンツを破損させます。</p>
+<p>テキスト型には常に <code>; charset=utf-8</code> を含めてください。これがないと、一部のブラウザは Latin-1 をデフォルトとして使用し、タイ語などの非 ASCII コンテンツが破損します。</p>
 <div class="highlight"><pre><span></span><code><span class="c1">// 常に Content-Type を明示的に設定</span>
 <span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
 <span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>

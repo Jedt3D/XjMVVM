@@ -7,7 +7,7 @@ description: HTML フォームデータの符号化方法、FormParser がそれ
 
 ## HTML フォームエンコーディング
 
-ブラウザが `<form method="post">` を送信するとき、フィールド値をリクエストボディ内のバイト文字列として符号化します。エンコーディング形式はフォームの `enctype` 属性で指定されます。
+ブラウザが `<form method="post">` を送信するとき、フィールド値をリクエストボディ内のバイト列としてエンコードします。エンコーディング形式はフォームの `enctype` 属性で指定されます。
 
 このプロジェクトはデフォルトエンコーディングを処理します: `application/x-www-form-urlencoded`。
 
@@ -38,7 +38,7 @@ title=Hello+World&body=Line+1%0ALine+2
 
 ### Xojo で POST ボディを読む
 
-Xojo の `WebRequest.Body` は生のエンコードされた文字列を含みます。**一度** 読む必要があります。直後に。内部バッファは最初のアクセス後に再読み取り可能ではないかもしれないため。`BaseViewModel.Handle()` はキャッシュします:
+Xojo の `WebRequest.Body` は生のエンコードされた文字列を含みます。**一度だけ**、できるだけ早く読み取る必要があります。内部バッファは最初のアクセス後に再読み取りできない場合があるためです。`BaseViewModel.Handle()` でキャッシュします:
 
 ```xojo
 Sub Handle()
@@ -86,11 +86,11 @@ End Function
 ```
 
 !!! note "0-based 文字列インデックス"
-    `pair.IndexOf("=")` は 0-based 位置を返します。`pair.Left(eqPos)` はキー (`=` の前のすべて) を抽出します。`pair.Middle(eqPos + 1)` は値を抽出します (`=` の後のすべて)。`Middle()` は 0-based で `IndexOf` に正しく整合します。決に `Mid()` を使用しないでください — それは `IndexOf` と組み合わせると間違った結果を与える従来の 1-based 関数です。
+    `pair.IndexOf("=")` は 0-based の位置を返します。`pair.Left(eqPos)` はキー（`=` より前のすべて）を抽出します。`pair.Middle(eqPos + 1)` は値（`=` より後のすべて）を抽出します。`Middle()` は 0-based なので `IndexOf` と正しく整合します。`Mid()` は決して使用しないでください — `IndexOf` と組み合わせると誤った結果を返すレガシーの 1-based 関数です。
 
 ## DecodeURIComponent — UTF-8 トリック
 
-これはプロジェクト内で最も重要なエンコーディング関数です。それを間違うとタイテキスト、絵文字、非 ASCII 入力をサイレントに破損させます。
+これはプロジェクト内で最も重要なエンコーディング関数です。実装を誤ると、タイ語テキスト、絵文字、非 ASCII 入力をサイレントに破損させます。
 
 ### 間違ったアプローチ (マルチバイト文字を破損)
 
@@ -102,7 +102,7 @@ If ch = "%" Then
 End If
 ```
 
-`Chr(0xE0)` は Unicode 文字 U+00E0 (`à`) を返し、これは 2 バイト UTF-8 シーケンス `0xC3 0xA0` です。しかし私たちが望んだのは単一バイト `0xE0`、それは 3 バイト タイ文字シーケンスのスタートバイトのようなもの `ก` (`0xE0 0xB8 0x81`) です。バイトごどのの 2 バイト対バイトの不一致はすべてのマルチバイト文字を破損させます。
+`Chr(0xE0)` は Unicode 文字 U+00E0（`à`）を返し、これは 2 バイト UTF-8 シーケンス `0xC3 0xA0` です。しかし必要なのは単一バイト `0xE0`、つまりタイ語の 3 バイト UTF-8 シーケンスの先頭バイト（例: `ก` = `0xE0 0xB8 0x81`）です。バイトごとのこのずれが、すべてのマルチバイト文字を破損させます。
 
 ### 正しいアプローチ (MemoryBlock + DefineEncoding)
 
@@ -147,11 +147,11 @@ Function DecodeURIComponent(encoded As String) As String
 End Function
 ```
 
-重要な洞察: すべての生バイトを `MemoryBlock` に最初に収集し、その後、最後に `DefineEncoding(..., Encodings.UTF8)` を 1 回呼び出します。これはマルチバイトシーケンスを正しく組み立てます。Xojo が文字列エンコーディングを解釈する前に。
+重要なポイント: まずすべての生バイトを `MemoryBlock` に収集し、最後に `DefineEncoding(..., Encodings.UTF8)` を 1 回呼び出します。Xojo が文字列エンコーディングを解釈する前に、マルチバイトシーケンスを正しく組み立てるためです。
 
 ## 文字列インデックス — Xojo 2025 で 0-based
 
-Xojo 2025 文字列は完全に **0-based** な最新 API を使用します。従来の `Mid()` 関数は 1-based で、`IndexOf()` と一緒に決に使用してはいけません:
+Xojo 2025 の文字列は完全に **0-based** なモダン API を使用します。レガシーの `Mid()` 関数は 1-based であり、`IndexOf()` と組み合わせて決して使用してはいけません:
 
 | メソッド | ベース | メモ |
 |---|---|---|
@@ -198,7 +198,7 @@ Wend
 - `text/css; charset=utf-8` — サーブされた CSS ファイル用
 - `application/javascript; charset=utf-8` — サーブされた JS ファイル用
 
-常にテキスト型に `; charset=utf-8` を含めます。それなしで、いくつかのブラウザは Latin-1 にデフォルトします。タイなど非 ASCII コンテンツを破損させます。
+テキスト型には常に `; charset=utf-8` を含めてください。これがないと、一部のブラウザは Latin-1 をデフォルトとして使用し、タイ語などの非 ASCII コンテンツが破損します。
 
 ```xojo
 // 常に Content-Type を明示的に設定

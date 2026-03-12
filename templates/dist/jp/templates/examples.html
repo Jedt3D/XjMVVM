@@ -382,7 +382,7 @@
 <span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </code></pre></div>
 
-<p><code>flash</code> 変数は 2 つのキーを持つ <code>Dictionary</code> です: <code>type</code> (<code>"success"</code>、<code>"error"</code>、<code>"info"</code>) と <code>message</code> (文字列)。自動的に注入されます — 任意の ViewModel は <code>SetFlash()</code> を呼び出でき、メッセージは次のレンダリングされたページに表示されます。</p>
+<p><code>flash</code> 変数は 2 つのキーを持つ <code>Dictionary</code> です: <code>type</code>（<code>"success"</code>、<code>"error"</code>、<code>"info"</code>）と <code>message</code>（文字列）。自動的に注入されます — 任意の ViewModel で <code>SetFlash()</code> を呼び出せば、メッセージは次にレンダリングされるページに表示されます。</p>
 <h2 id="_3">ノートリスト<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>{# templates/notes/list.html #}
 {% extends &quot;layouts/base.html&quot; %}
@@ -420,7 +420,7 @@
 {% endblock %}
 </code></pre></div>
 
-<p>重要なポイント: <code>note.id</code>、<code>note.title</code>、<code>note.body</code>、<code>note.updated_at</code> は Dictionary キーです。delete アクションは <code>POST</code> フォームです。HTML フォームは GET と POST のみをサポートします — ブラウザフォームに HTTP DELETE はありません。</p>
+<p>重要なポイント: <code>note.id</code>、<code>note.title</code>、<code>note.body</code>、<code>note.updated_at</code> は Dictionary のキーです。削除アクションは <code>POST</code> フォームで行います。HTML フォームは GET と POST のみをサポートしているため、ブラウザフォームで HTTP DELETE は使えません。</p>
 <h2 id="createedit">共有 create/edit フォーム<a class="headerlink" href="#createedit" title="Permanent link">&para;</a></h2>
 <p>1 つのテンプレートは新規ノートフォームと編集フォームの両方を提供します。<code>note</code> 変数の存在がアクティブなモードを決定します:</p>
 <div class="highlight"><pre><span></span><code>{# templates/notes/form.html #}
@@ -452,7 +452,7 @@
 {% endblock %}
 </code></pre></div>
 
-<p><code>NotesNewVM</code> は <code>note</code> キーを渡しません (または <code>Nil</code> を渡します) — フォームは create モードでレンダリングされます。<code>NotesEditVM</code> はロードされた <code>note</code> Dictionary を渡します — フォームは既存の値でプリポピュレートされます。</p>
+<p><code>NotesNewVM</code> は <code>note</code> キーを渡しません（または <code>Nil</code> を渡します）— フォームは作成モードでレンダリングされます。<code>NotesEditVM</code> はロードした <code>note</code> Dictionary を渡します — フォームは既存の値で事前入力されます。</p>
 <h2 id="_4">ノート詳細<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>{# templates/notes/detail.html #}
 {% extends &quot;layouts/base.html&quot; %}
@@ -496,7 +496,7 @@
 {% endblock %}
 </code></pre></div>
 
-<p>エラーテンプレートはフラッシュメッセージについて心配する必要があります — ルーターによって直接レンダリングされます。任意の ViewModel が実行される前に。</p>
+<p>エラーテンプレートはフラッシュメッセージを気にする必要はありません — ルーターによって直接レンダリングされ、どの ViewModel も実行される前に処理されます。</p>
 
         <!-- Prev / Next navigation -->
         

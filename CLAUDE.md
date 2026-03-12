@@ -86,7 +86,7 @@ note_tags  (note_id, tag_id)  -- junction, PRIMARY KEY (note_id, tag_id)
 users      (id, username UNIQUE, password_hash, created_at)
 ```
 
-**Developer guide:** All 20 pages updated for v0.9.3, built for EN/TH/JP (60 pages total). New "Protected Routes & User Scoping" page. Auth docs rewritten for cookie-based auth.
+**Developer guide:** All 20 pages updated for v0.9.3, built for EN/TH/JP (60 pages total). New "Protected Routes & User Scoping" page. Auth docs rewritten for cookie-based auth. Full editorial pass on TH and JP translations — all major/moderate issues resolved. Observation reports saved as `developer-guide/th_observation.md` and `developer-guide/jp_observation.md`.
 
 **Next:** Version bump to v1.0.0.
 

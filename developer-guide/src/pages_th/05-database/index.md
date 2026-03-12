@@ -5,7 +5,7 @@ description: วิธีการทำงานกับ SQLite แปลง R
 
 # SQLite & Dictionary Contract
 
-## The core pattern
+## รูปแบบหลัก
 
 ทุก Model method ยึดตามรูปแบบเดียวกัน: เปิด database connection ใหม่ รันคำสั่ง query แปลง `RowSet` แต่ละแถวเป็น `Dictionary` ปิดทุกอย่าง คืนค่า
 
@@ -39,7 +39,7 @@ End Function
 
 Return type `Variant()` ที่บรรจุ `Dictionary` objects เป็นรูปแบบเดียวที่ JinjaX สามารถวนลูปใน `{% for %}` ได้
 
-## Return types
+## ประเภทค่าที่ส่งกลับ
 
 | Operation | Return type | Nil case |
 |---|---|---|
@@ -59,7 +59,7 @@ If note = Nil Then
 End If
 ```
 
-## Per-request database connections
+## การเปิด connection ต่อ request
 
 Method `OpenDB()` private เปิด connection **ใหม่** ทุกครั้งที่เรียก ไม่มี database connection ร่วมกันแบบยาวนาน บน `App`
 
@@ -73,11 +73,11 @@ Private Function OpenDB() As SQLiteDatabase
 End Function
 ```
 
-**ทำไม per-request?** Xojo จัดการคำขอพร้อมกันบนหลายเธรด SQLiteDatabase instance ร่วมกันต้องใช้ mutex การเปิด connection ใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อค — SQLite จัดการการเชื่อมต่อแบบอ่านพร้อมกันจากหลายกระบวนการเองได้
+**ทำไมต้องเปิด connection ใหม่ต่อ request?** Xojo จัดการคำขอพร้อมกันบนหลายเธรด SQLiteDatabase instance ร่วมกันต้องใช้ mutex การเปิด connection ใหม่ต่อคำขอนั้นง่ายกว่าและหลีกเลี่ยงความซับซ้อนในการล็อค — SQLite จัดการการเชื่อมต่อแบบอ่านพร้อมกันจากหลายกระบวนการเองได้
 
-**ทำไมไม่ connection pool?** สำหรับปริมาณการใช้งานที่ framework นี้เป้าหมาย (ทีมเล็ก internal tools) overhead ของการเปิด connection นั้นน้อยมาก pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่สังเกตเห็นได้ในระดับนี้
+**ทำไมไม่ใช้ connection pool?** สำหรับปริมาณการใช้งานที่ framework นี้เป้าหมาย (ทีมเล็ก internal tools) overhead ของการเปิด connection นั้นน้อยมาก pool เพิ่มความซับซ้อนโดยไม่มีประโยชน์ที่สังเกตเห็นได้ในระดับนี้
 
-## Database initialization
+## การเริ่มต้นฐานข้อมูล
 
 Method แรกที่เรียกเมื่อแอปเริ่มต้นคือ `NoteModel.InitDB()` (จาก `App.Opening()`) มันสร้างไฟล์ database และรัน `CREATE TABLE IF NOT EXISTS`:
 
@@ -104,7 +104,7 @@ Shared Function InitDB() As SQLiteDatabase
 End Function
 ```
 
-ปลอดภัยที่จะเรียกทุกครั้งเริ่มต้น — `IF NOT EXISTS` นั้น idempotent
+เรียกได้ทุกครั้งที่แอปเริ่มทำงาน — `IF NOT EXISTS` นั้น idempotent
 
 ## Parameterized queries
 
@@ -121,7 +121,7 @@ db.ExecuteSQL("INSERT INTO notes (title) VALUES ('" + title + "')")
 
 `SelectSQL()` และ `ExecuteSQL()` ยอมรับ variadic `Variant` parameters หลังจาก SQL string
 
-## Getting the last inserted row ID
+## การดึง ID แถวล่าสุดที่เพิ่ม
 
 หลังจาก `INSERT` ดึง ID ของแถวใหม่โดยใช้ `db.LastRowID`:
 
@@ -144,7 +144,7 @@ SetFlash("Note created.", "success")
 Redirect("/notes/" + Str(newID))
 ```
 
-## Column types
+## ประเภทคอลัมน์
 
 SQLite เป็น dynamically typed Xojo's `RowSet` column accessors แปลงค่าเมื่ออ่าน:
 
@@ -157,7 +157,7 @@ SQLite เป็น dynamically typed Xojo's `RowSet` column accessors แปล
 
 เก็บวันที่ทั้งหมดเป็น `TEXT` โดยใช้ SQLite's `datetime()` function ดึงและแสดงผลเป็นสตริง — format ในเทมเพลตหรือ ViewModel ตามความต้องการ
 
-## Database path for production
+## Path ฐานข้อมูลสำหรับ production
 
 Implementation ปัจจุบัน hardcode path สำหรับ development ในสำหรับ production builds ใช้ `SpecialFolder.ApplicationData`:
 

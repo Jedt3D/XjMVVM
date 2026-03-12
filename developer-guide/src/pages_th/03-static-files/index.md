@@ -118,7 +118,7 @@ mvvm/
 ```
 
 !!! warning "ความปลอดภัย"
-    ตรวจสอบชื่อไฟล์เสมอก่อนการอ่านจากดิสก์ การตรวจสอบ path traversal (`..`, `/`, `\`) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำ ไม่ว่าสร้างเส้นทางไฟล์จากข้อมูลที่ป้อนโดยผู้ใช้โดยไม่มีการตรวจสอบ
+    ตรวจสอบชื่อไฟล์เสมอก่อนอ่านจากดิสก์ การตรวจสอบ path traversal (`..`, `/`, `\`) ในตัวอย่างข้างต้นเป็นข้อกำหนดขั้นต่ำ อย่าสร้าง file path จากข้อมูลที่ผู้ใช้ป้อนโดยไม่ผ่านการตรวจสอบ
 
 ## Option 3 — Xojo Copy Files build step
 
@@ -135,7 +135,7 @@ Var file As FolderItem = resourceDir.Child(fileName)
 
 ## MIME types reference
 
-| ส่วนขยาย | MIME type |
+| นามสกุลไฟล์ | MIME type |
 |---|---|
 | `.html` | `text/html; charset=utf-8` |
 | `.css` | `text/css; charset=utf-8` |
