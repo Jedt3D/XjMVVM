@@ -12,9 +12,12 @@ Inherits BaseViewModel
 		    Return
 		  End If
 
+		  Var noteTags() As Variant = model.GetTagsForNote(id)
+
 		  Var context As New Dictionary()
 		  context.Value("page_title") = note.Value("title").StringValue
 		  context.Value("note") = note
+		  context.Value("note_tags") = noteTags
 		  Render("notes/detail.html", context)
 		End Sub
 	#tag EndMethod

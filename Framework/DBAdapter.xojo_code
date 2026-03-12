@@ -25,6 +25,10 @@ Protected Module DBAdapter
 		  "id INTEGER PRIMARY KEY AUTOINCREMENT, " + _
 		  "name TEXT NOT NULL, " + _
 		  "created_at TEXT DEFAULT (datetime('now')))")
+		  db.ExecuteSQL("CREATE TABLE IF NOT EXISTS note_tags (" + _
+		  "note_id INTEGER NOT NULL, " + _
+		  "tag_id INTEGER NOT NULL, " + _
+		  "PRIMARY KEY (note_id, tag_id))")
 		  db.Close()
 		End Sub
 	#tag EndMethod

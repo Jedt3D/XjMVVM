@@ -14,7 +14,12 @@ Protected Module FormParser
 		    If eqPos >= 0 Then
 		      Var key As String = DecodeURIComponent(pair.Left(eqPos))
 		      Var value As String = DecodeURIComponent(pair.Middle(eqPos + 1))
-		      result.Value(key) = value
+		      // Multi-value: append with comma when key already exists
+		      If result.HasKey(key) And result.Value(key).StringValue.Length > 0 Then
+		        result.Value(key) = result.Value(key).StringValue + "," + value
+		      Else
+		        result.Value(key) = value
+		      End If
 		    ElseIf pair.Length > 0 Then
 		      result.Value(DecodeURIComponent(pair)) = ""
 		    End If

@@ -61,6 +61,7 @@ Class=BaseModelTests;Tests/BaseModelTests.xojo_code;&hFFFFFFFF620C3FFF;&hFFFFFFF
 Class=NoteModelTests;Tests/NoteModelTests.xojo_code;&hFFFFFFFF620C4FFF;&hFFFFFFFF620C1FFF;false
 Class=NotesPaginationTests;Tests/NotesPaginationTests.xojo_code;&hFFFFFFFF620C5FFF;&hFFFFFFFF620C1FFF;false
 Class=TagModelTests;Tests/TagModelTests.xojo_code;&hFFFFFFFF620C6FFF;&hFFFFFFFF620C1FFF;false
+Class=NoteTagAssociationTests;Tests/NoteTagAssociationTests.xojo_code;&hFFFFFFFF620C7FFF;&hFFFFFFFF620C1FFF;false
 Folder=JinjaXLib;JinjaXLib;&hFFFFFFFF810A1FFF;&h0000000000000000;false
 Folder=XojoUnit;XojoUnit;&h00000000791BB7FF;&h0000000000000000;false
 Module=TokenType;JinjaXLib/TokenType.xojo_code;&hFFFFFFFF810A2FFF;&hFFFFFFFF810A1FFF;false

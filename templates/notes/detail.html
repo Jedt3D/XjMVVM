@@ -8,6 +8,15 @@
 
 <div style="white-space:pre-wrap; margin:20px 0;">{{ note.body }}</div>
 
+{% if note_tags %}
+<div style="margin:10px 0;">
+  <strong>Tags:</strong>
+  {% for tag in note_tags %}
+  <a href="/tags/{{ tag.id }}" style="display:inline-block; padding:2px 8px; margin:2px; background:#e9ecef; border-radius:12px; text-decoration:none; font-size:0.85em; color:#495057;">{{ tag.name }}</a>
+  {% endfor %}
+</div>
+{% endif %}
+
 <p>
   <a href="/notes/{{ note.id }}/edit" class="btn btn-primary">Edit</a>
   <form method="post" action="/notes/{{ note.id }}/delete" style="display:inline;">
