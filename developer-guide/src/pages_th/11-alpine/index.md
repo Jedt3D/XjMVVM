@@ -1,38 +1,38 @@
 ---
 title: "Alpine.js"
-description: How and why XjMVVM uses Alpine.js for minimal client-side interactivity, and when to reach for it versus plain HTML or htmx.
+description: วิธีการและเหตุผลที่ XjMVVM ใช้ Alpine.js สำหรับการโต้ตอบแบบ client-side ขั้นต่ำ และเวลาที่ควรเลือกใช้มันแทน HTML ธรรมชาติหรือ htmx
 ---
 
 # Alpine.js
 
-XjMVVM is a server-rendered framework — HTML comes from Xojo, not a JS framework. Alpine.js fills the small gap where the server cannot manage state: reactive UI elements that must respond to browser-local state (localStorage, sessionStorage) without a full page reload.
+XjMVVM เป็น framework ที่ render จากเซิร์ฟเวอร์ — HTML มาจาก Xojo ไม่ใช่จาก JS framework Alpine.js เติมเต็มช่องว่างเล็ก ๆ ที่เซิร์ฟเวอร์ไม่สามารถจัดการสถานะได้: UI elements ที่มีการ react ต่อสถานะในเบราว์เซอร์ (localStorage, sessionStorage) โดยไม่ต้องโหลดหน้าเต็มใหม่
 
 ## Philosophy
 
 > **Server renders. Alpine reacts. htmx fetches.**
 
-The goal is the minimum JavaScript possible. The decision tree for any interactive element is:
+เป้าหมายคือให้ JavaScript น้อยที่สุดเท่าที่เป็นไปได้ ต้นไม้การตัดสินใจสำหรับ interactive elements ใด ๆ คือ:
 
-1. **Can a plain HTML form + PRG pattern handle it?** → use that, no JS
-2. **Does it react to browser-local state or needs inline DOM updates?** → Alpine
-3. **Does it need to fetch from the server and update part of the page?** → htmx (see [htmx adoption plan](#when-to-reach-for-htmx))
+1. **สามารถจัดการด้วย plain HTML form + PRG pattern ได้หรือไม่?** → ใช้อันนี้ ไม่ต้องมี JS
+2. **มันต้อง react ต่อสถานะในเบราว์เซอร์หรือต้องการ inline DOM updates หรือไม่?** → Alpine
+3. **มันต้องดึงข้อมูลจากเซิร์ฟเวอร์และอัปเดตส่วนของหน้าหรือไม่?** → htmx (ดู [htmx adoption plan](#when-to-reach-for-htmx))
 
-Alpine is never used as a replacement for server-side logic. All business rules, data, and validation that can live on the server do.
+Alpine ไม่เคยใช้เป็นทดแทนสำหรับ server-side logic ชิ้นส่วนธุรกิจ ข้อมูล และการตรวจสอบทั้งหมดที่สามารถอยู่บนเซิร์ฟเวอร์ก็อยู่บนเซิร์ฟเวอร์
 
 ---
 
 ## Installation
 
-Alpine is loaded from CDN with no build step. One line at the bottom of `layouts/base.html`, before `</body>`:
+Alpine ถูก load จาก CDN โดยไม่มี build step ตัวเดียวที่ด้านล่างของ `layouts/base.html` ก่อน `</body>`:
 
 ```html
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
 ```
 
-The `defer` attribute is required — Alpine must process the DOM after it has been parsed.
+`defer` attribute จำเป็นต้อง — Alpine ต้อง process DOM หลังจากที่มันได้รับการ parse แล้ว
 
 !!! note
-    Pin to a specific version (e.g. `@3.14.3`) rather than `@3` so builds are reproducible and an upstream CDN update cannot break the app.
+    Pin ไปเป็นเวอร์ชันที่เฉพาะเจาะจง (เช่น `@3.14.3`) มากกว่า `@3` เพื่อให้ builds มีความเสถียรและ upstream CDN update ไม่สามารถทำลายแอปได้
 
 ---
 
@@ -40,20 +40,20 @@ The `defer` attribute is required — Alpine must process the DOM after it has b
 
 | Directive | Purpose |
 |---|---|
-| `x-data="{ ... }"` | Declares a reactive component with its state |
-| `x-show="expr"` | Toggles `display:none` based on a boolean expression |
-| `x-text="expr"` | Sets element text content to the expression value |
-| `:class="expr"` | Binds the `class` attribute dynamically |
+| `x-data="{ ... }"` | ประกาศ reactive component กับ state ของมัน |
+| `x-show="expr"` | Toggles `display:none` ตาม boolean expression |
+| `x-text="expr"` | ตั้ง element text content เป็นค่า expression |
+| `:class="expr"` | Binds `class` attribute แบบ dynamic |
 | `@submit.prevent="fn"` | Intercepts form submit, prevents default, calls a function |
-| `@submit="expr"` | Runs an expression on form submit without preventing default |
-| `x-cloak` | Hides an element until Alpine initializes (prevents FOUC) |
-| `init()` | Lifecycle hook — runs once when the component initializes |
+| `@submit="expr"` | Runs an expression on form submit โดยไม่ prevent default |
+| `x-cloak` | Hides an element จนกว่า Alpine จะ initialize (prevents FOUC) |
+| `init()` | Lifecycle hook — runs once เมื่อ component initialize |
 
 ---
 
 ## Pattern 1 — Nav auth state
 
-The nav bar must show either Log In / Sign Up (logged-out) or username + Log Out (logged-in), driven by `localStorage`. The server cannot inject this because Xojo Web 2 SSR mode does not persist `WebSession` state between plain HTTP requests.
+Nav bar ต้องแสดง Log In / Sign Up (logged-out) หรือ username + Log Out (logged-in) ที่ขับเคลื่อนโดย `localStorage` เซิร์ฟเวอร์ไม่สามารถ inject สิ่งนี้ได้เพราะ Xojo Web 2 SSR mode ไม่สามารถคงอยู่ `WebSession` state ระหว่าง plain HTTP requests
 
 ```html
 <nav x-data="{ user: localStorage.getItem('_auth_user') }">
@@ -78,21 +78,21 @@ The nav bar must show either Log In / Sign Up (logged-out) or username + Log Out
 </nav>
 ```
 
-`x-cloak` on the logged-in span prevents a flash of both states before Alpine initializes. The CSS rule that makes this work must be in the stylesheet:
+`x-cloak` บน logged-in span ป้องกัน flash ของทั้งสองสถานะก่อนที่ Alpine จะ initialize CSS rule ที่ทำให้สิ่งนี้ทำงานต้องอยู่ในสไตล์ชีต:
 
 ```css
 [x-cloak] { display: none !important; }
 ```
 
-`@submit` on the logout form clears localStorage and queues the flash message before the POST is submitted. No separate event listener or script block needed.
+`@submit` บน logout form clear localStorage และ queue flash message ก่อนที่ POST จะถูก submit ไม่จำเป็นต้องมี separate event listener หรือ script block
 
 ---
 
 ## Pattern 2 — Client-side flash messages
 
-Flash messages for the POST→redirect→GET cycle cannot use Xojo's session in SSR mode — the session is gone by the time the redirect's GET arrives. The workaround: write to `sessionStorage` before the form submits, read it on the next page load.
+Flash messages สำหรับ POST→redirect→GET cycle ไม่สามารถใช้ session ของ Xojo ใน SSR mode — session หายไปเมื่อ redirect's GET มาถึง workaround: write ไปที่ `sessionStorage` ก่อน form submit, read มันบน next page load
 
-Alpine reads and displays the queued message in `init()`, then `x-show` keeps it hidden if there is nothing to show:
+Alpine reads และ displays queued message ใน `init()` จากนั้น `x-show` เก็บมันไว้ hidden หากไม่มีอะไรให้แสดง:
 
 ```html
 <div x-data="{
@@ -108,15 +108,15 @@ Alpine reads and displays the queued message in `init()`, then `x-show` keeps it
 }" x-show="msg" :class="'flash flash-' + type" x-text="msg" style="display:none"></div>
 ```
 
-The `!document.querySelector('.flash')` guard prevents a double-flash if the Xojo server-side session happens to deliver a flash directly (future-proofs for WebSocket mode).
+`!document.querySelector('.flash')` guard ป้องกัน double-flash หาก Xojo server-side session บังเอิญ deliver flash โดยตรง (future-proofs สำหรับ WebSocket mode)
 
 ---
 
 ## Pattern 3 — Form submit with async pre-processing
 
-Auth forms must hash the password client-side with the Web Crypto API before the POST is sent. This is inherently async and must intercept the submit event. Alpine's `@submit.prevent` + an async method in `x-data` handles this cleanly, with no separate `addEventListener` script block.
+Auth forms ต้อง hash password client-side ด้วย Web Crypto API ก่อนที่ POST จะถูกส่ง นี่คือ inherently async และต้อง intercept submit event Alpine's `@submit.prevent` + async method ใน `x-data` handles นี่ได้อย่างสะอาด ไม่มี separate `addEventListener` script block
 
-The SHA-256 helper is defined in a small `<script>` above the form (it must be in scope when the Alpine method runs):
+SHA-256 helper ถูกกำหนดใน small `<script>` เหนือ form (มันต้องอยู่ในขอบเขตเมื่อ Alpine method runs):
 
 ```html
 <script>
@@ -145,11 +145,11 @@ async function sha256hex(str) {
 </form>
 ```
 
-The `hashed` flag prevents re-processing if `e.target.submit()` somehow re-fires the event. `e.target.submit()` (the DOM method) bypasses the `submit` event entirely, so the flag is mainly a safety guard.
+`hashed` flag ป้องกัน re-processing หาก `e.target.submit()` บังเอิญ re-fires event `e.target.submit()` (DOM method) bypasses `submit` event ทั้งหมด ดังนั้น flag นี้เป็นหลัก safety guard
 
 ### Adding inline validation
 
-The signup form adds password validation. `pwError` state drives an inline error paragraph with no extra DOM wiring:
+Signup form เพิ่ม password validation `pwError` state drives inline error paragraph ไม่มี extra DOM wiring:
 
 ```html
 <p x-show="pwError" x-text="pwError"
@@ -157,7 +157,7 @@ The signup form adds password validation. `pwError` state drives an inline error
           padding:8px 12px; border-radius:4px; margin:0 0 12px;"></p>
 ```
 
-Inside `handleSubmit`:
+ภายใน `handleSubmit`:
 
 ```javascript
 if (pw.length < 6) { this.pwError = 'Password must be at least 6 characters.'; return; }
@@ -165,15 +165,15 @@ if (pw !== cf)     { this.pwError = 'Passwords do not match.'; return; }
 this.pwError = '';
 ```
 
-No `document.getElementById`, no manual `style.display` toggling. Alpine keeps the element in sync.
+ไม่มี `document.getElementById`, ไม่มี manual `style.display` toggling Alpine keeps element ในการซิงค์
 
 ---
 
 ## Pattern 4 — Multi-value checkboxes (no Alpine needed)
 
-Tag checkboxes on the note form previously required JS to collect checked values into a hidden field. This is unnecessary — native HTML form serialization sends all checked checkboxes with the same `name` as multiple values. Xojo's `FormParser` already handles comma-append for duplicate keys.
+Tag checkboxes บน note form ก่อนหน้านี้ต้องมี JS เพื่อ collect checked values เป็น hidden field นี่คือ unnecessary — native HTML form serialization sends checkboxes ทั้งหมดที่ checked ด้วย `name` เดียวกันเป็น multiple values Xojo's `FormParser` ตรวจสอบแล้ว comma-append สำหรับ duplicate keys
 
-The correct pattern requires **no JavaScript at all**:
+Pattern ที่ถูกต้องต้องการ **ไม่มี JavaScript เลย**:
 
 ```html
 {% for tag in all_tags %}
@@ -183,10 +183,10 @@ The correct pattern requires **no JavaScript at all**:
 {% endfor %}
 ```
 
-The form submits `tag_ids=1&tag_ids=3`, FormParser stores `"1,3"`, and the ViewModel splits on `","` as before. No hidden field, no script block.
+Form submits `tag_ids=1&tag_ids=3`, FormParser stores `"1,3"` และ ViewModel splits บน `","` เหมือนก่อนหน้า ไม่มี hidden field ไม่มี script block
 
 !!! tip
-    Before reaching for Alpine (or any JS), check whether the browser's native form serialization already does what you need. Multiple checkboxes, radio groups, and `<select multiple>` all work without any JavaScript.
+    ก่อนที่จะ reach for Alpine (หรือ JS ใด ๆ) check ว่า browser's native form serialization ทำสิ่งที่คุณต้องการแล้วหรือไม่ Multiple checkboxes, radio groups และ `<select multiple>` ทั้งหมดทำงานได้โดยไม่มี JavaScript
 
 ---
 
@@ -201,23 +201,23 @@ The form submits `tag_ids=1&tag_ids=3`, FormParser stores `"1,3"`, and the ViewM
 | **Total custom JS** | **93 lines** | **16 lines** |
 | Alpine CDN | 0 | 14 KB (minified + gzip: ~5 KB) |
 
-The irreducible 16 lines are the SHA-256 helper function (duplicated across login and signup). This cannot be moved to a shared file without a build step — a deliberate trade-off to keep zero build tooling.
+16 lines irreducible คือ SHA-256 helper function (duplicated ข้าม login และ signup) นี่ไม่สามารถย้ายไปยังไฟล์ที่แชร์โดยไม่มี build step — deliberate trade-off เพื่อรักษา zero build tooling
 
 ---
 
 ## When to reach for htmx
 
-Alpine manages **local browser state**. When an interaction needs to **fetch from the server and update part of the page**, add htmx instead of expanding Alpine.
+Alpine manages **local browser state** เมื่อ interaction ต้อง **fetch จากเซิร์ฟเวอร์และอัปเดตส่วนของหน้า** add htmx แทนการขยาย Alpine
 
-Trigger features that warrant adding htmx:
+Trigger features ที่รับประกัน adding htmx:
 
-- Inline edit (click note → form appears in place, saves without reload)
-- Delete without reload (remove row from list)
-- Live search / filter (notes or tags update as you type)
-- Pagination without reload
-- Tag toggle on list view
+- Inline edit (click note → form appears in place, saves ไม่มี reload)
+- Delete ไม่มี reload (remove row จาก list)
+- Live search / filter (notes หรือ tags update เมื่อคุณพิมพ์)
+- Pagination ไม่มี reload
+- Tag toggle บน list view
 
-htmx and Alpine compose cleanly — Alpine owns local state, htmx owns server round-trips. The two libraries do not conflict.
+htmx และ Alpine compose อย่างสะอาด — Alpine owns local state, htmx owns server round-trips libraries ทั้งสองไม่ conflict
 
 ---
 
@@ -225,6 +225,6 @@ htmx and Alpine compose cleanly — Alpine owns local state, htmx owns server ro
 
 | JS | Reason |
 |---|---|
-| `crypto.subtle.digest` (SHA-256) | Browser security API, no Alpine equivalent |
-| `localStorage` / `sessionStorage` reads and writes | Still needed; Alpine just organises them in `x-data` |
-| Server-side session persistence | Architectural — requires cookie-based auth, unrelated to Alpine |
+| `crypto.subtle.digest` (SHA-256) | Browser security API ไม่มี Alpine equivalent |
+| `localStorage` / `sessionStorage` reads และ writes | Still needed; Alpine เพียงแค่ organises มันใน `x-data` |
+| Server-side session persistence | Architectural — requires cookie-based auth ไม่เกี่ยวข้องกับ Alpine |

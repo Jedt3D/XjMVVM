@@ -32,7 +32,7 @@ Should the toolkit manage only the MVVM project's database, or be a general-purp
 
 **Q2. SQLite-only or multi-database from day one?**
 Your current MVVM app uses SQLite. Do you want PostgreSQL/MySQL support immediately, or should we start SQLite-only and add others later? This affects the migration engine complexity significantly.
-**A2** No, only SQLite3 support at this moment
+**A2** No, only SQLite3 support at this moment. Also has specific procedures for each database brands to let us handle edge cases of each database engines later.
 
 **Q3. Schema source of truth — where should it live?**
 Options:
@@ -41,7 +41,7 @@ Options:
 - **C) A schema DSL file** (like Prisma's `.prisma` or DBML) — a text file in the repo that both humans and AI can read/edit
 - **D) The database itself** — inspect the live SQLite file and generate from that
 My recommendation: **Option C** — a `.schema` or `.dbml`-like text file. It's version-controllable, AI-readable, human-editable, and can generate both Xojo code AND SQL. But your preference matters here.
-**A3** C) A Schema DSL file 
+**A3** C) A Schema DSL file.
 
 **Q4. How important is visual ER diagramming?**
 TMS Data Modeler's ER diagrams are a major feature. Do you want:
@@ -49,6 +49,7 @@ TMS Data Modeler's ER diagrams are a major feature. Do you want:
 - **B) Auto-generated diagrams** (read-only, from schema file) — like nomnoml/dbdiagram renders
 - **C) Text-based schema definition with optional diagram export** — simpler, CLI-friendly
 - **D) Skip diagrams for now** — focus on code generation and migration first
+
 **A4** A) Full visual D&D ER Editor or Viewer at least for the first phase.
 
 ### Code Generation
@@ -59,13 +60,15 @@ Currently your models follow a pattern (override `TableName()`, `Columns()`, add
 - **B) Model + ViewModel stubs** (CRUD ViewModels for each model)
 - **C) Model + ViewModel + Templates** (full resource scaffolding, like Rails `scaffold`)
 - **D) Only migration SQL** (leave Xojo code to the developer)
-**A5** B) Model + ViewModel stubs
+- **A5** B) Model + ViewModel stubs
 
 **Q6. Should generated code be editable after generation?**
 Two philosophies:
+
 - **Rails-style**: Generate once, then the developer owns the file. Re-generation overwrites.
 - **Prisma-style**: Generated code is in a separate "do not edit" layer. Custom logic goes in a different file.
 Your current models mix generated-like patterns with custom methods (e.g., `GetTagsForNote` in NoteModel). How should that work?
+
 **A6** Prisma style
 
 ### Migration & Versioning
@@ -748,9 +751,234 @@ Done! I've added:
 
 ---
 
+## 12. Follow-Up Questions (Round 2)
+
+Your answers reshape the proposal significantly. The biggest shifts:
+
+- **All-Xojo stack** (xojo-ttytoolkit CLI + JinjaX code gen) — no Python at all
+- **ER viewer/editor is Phase 1 priority** (not deferred to Phase 7)
+- **Prisma-style separation** — generated code lives in a "do not edit" layer
+
+Here are the deeper questions these answers raise:
+
+### Architecture: All-Xojo Stack
+
+**Q12. xojo-ttytoolkit is a Console App toolkit. The ER editor needs HTMLViewer (AntV X6). How should these coexist?**
+
+Two possible architectures:
+
+- **A) Two separate apps**: a Console app (`model-toolkit` CLI using xojo-ttytoolkit) for schema/migration/codegen commands, and a Desktop app (`model-viewer`) for the ER diagram + property editor. The CLI launches the Desktop app when needed (e.g., `toolkit diagram` opens the viewer).
+- **B) One Desktop app with dual personality**: a Xojo Desktop app that has an HTMLViewer for the ER diagram AND can be invoked from the command line (Xojo Desktop apps can accept `System.CommandLine` arguments, though they still show a window).
+- **C) Desktop app only**: skip the CLI, do everything through the Desktop GUI with menus/toolbar. Use xojo-ttytoolkit only for a lightweight helper (e.g., `toolkit migrate:apply` for server-side use where no GUI is available).
+
+Which approach do you prefer?
+
+**A12** A) Two separate apps:
+
+**Q13. JinjaX for code generation templates — how should templates be stored?**
+
+Your question from Phase 2: "Should the templates of .xojo_code be saved in Jinja format?"
+
+JinjaX is fully standalone (confirmed — no web dependency). Two storage approaches:
+
+- **A) FileSystemLoader** — templates stored as `.j2` files in a `templates/codegen/` folder alongside the toolkit:
+  ```
+  model-toolkit/
+  ├── templates/codegen/
+  │   ├── base_model.xojo.j2      ← JinjaX template
+  │   ├── viewmodel_list.xojo.j2
+  │   └── viewmodel_create.xojo.j2
+  ```
+  Easier to edit, AI can modify them, visible in git.
+
+- **B) DictLoader** — templates embedded as string constants in a Xojo module:
+  ```xojo
+  Module CodegenTemplates
+    Const ModelTemplate As String = "..."
+  End Module
+  ```
+  Self-contained (single binary), but harder to edit and version.
+
+- **C) Hybrid** — ship with embedded defaults (DictLoader), but allow user overrides via FileSystemLoader (check filesystem first, fall back to embedded). Like Rails generators.
+
+Which approach?
+
+**A13** C) Hybrid
+
+**Q14. Parser in Xojo — are you comfortable with building a recursive descent parser in Xojo?**
+
+The `.model` SDL needs a parser. In Python this would be trivial (lark, pyparsing). In Xojo, we'd write a hand-rolled recursive descent parser (tokenizer → AST). Your JinjaX implementation already has a full parser (JinjaLexer, JinjaParser), so the pattern is proven.
+
+But it's more code than Python. Alternatively:
+- **A) Hand-rolled Xojo parser** — full control, proven pattern from JinjaX, no dependencies
+- **B) Simpler format** — use YAML instead of a custom DSL (XjTTYLib already has `XjYAML`), which eliminates the parser entirely:
+  ```yaml
+  project: mvvm-notes
+  database: sqlite
+  
+  models:
+    Note:
+      id: Integer @primary @autoincrement
+      title: String @required
+      body: String?
+      user_id: Integer @references(User.id)
+      created_at: DateTime @default(now)
+      updated_at: DateTime @default(now) @on_update(now)
+  
+    Tag:
+      id: Integer @primary @autoincrement
+      name: String @required
+      created_at: DateTime @default(now)
+  ```
+  The `XjYAML` parser handles structure; you only need a lightweight annotation parser for `@primary`, `@references(...)`, etc.
+
+- **C) JSON schema file** — simplest to parse (Xojo has JSONItem built-in), but less human-friendly
+
+Which do you prefer? Option B (YAML + annotation parser) is the sweet spot — reuses your existing XjYAML and cuts parser work by 80%.
+
+**A14** It may be B) but what's about performance between XjYAML vs JinjaX parser? Can we do algorithms analysis and other pros and cons between 2 competitors?
+
+### Prisma-Style Code Separation
+
+**Q15. How should the "do not edit" vs "custom code" split work in practice?**
+
+Three patterns used in the industry:
+
+- **A) Separate files, inheritance chain**:
+  ```
+  Models/
+  ├── _generated/           ← "DO NOT EDIT" — regenerated freely
+  │   ├── NoteModelBase.xojo_code    (TableName, Columns, CRUD)
+  │   └── TagModelBase.xojo_code
+  └── NoteModel.xojo_code            ← YOUR CODE — inherits NoteModelBase
+      TagModel.xojo_code             (custom methods: GetTagsForNote, etc.)
+  ```
+  `NoteModel Inherits NoteModelBase`. Generated base has all boilerplate. Your custom `NoteModel` adds `GetTagsForNote`, association logic, etc.
+
+- **B) Separate files, partial-class style** (Xojo doesn't have partial classes, so you'd use a module + extension pattern):
+  ```
+  Models/
+  ├── _generated/NoteModel.Generated.xojo_code   ← DO NOT EDIT
+  └── NoteModel.xojo_code                        ← YOUR CODE (calls generated methods)
+  ```
+  Less clean in Xojo since you can't split a class across files.
+
+- **C) Single file with marker comments**:
+  ```xojo
+  // ===== GENERATED — DO NOT EDIT BELOW =====
+  Function TableName() As String
+    Return "notes"
+  End Function
+  // ===== END GENERATED =====
+  
+  // ===== CUSTOM CODE — your methods below =====
+  Function GetTagsForNote(noteID As Integer) As Variant()
+    // ...
+  End Function
+  ```
+  Simpler but fragile — risk of accidental edits in the generated zone.
+
+**Option A (inheritance) is the cleanest for Xojo.** It maps naturally to Xojo's class hierarchy: `NoteModel Inherits NoteModelBase Inherits BaseModel`. But it means changing your existing code to use a 3-level inheritance chain.
+
+Which pattern do you prefer? And are you OK with the 3-level inheritance (`NoteModel → NoteModelBase → BaseModel`)?
+
+**A15** Option A for sure
+
+### ER Diagram Scope
+
+**Q16. For Phase 1 ER viewer — read-only or editable?**
+
+Building a full drag-and-drop ER *editor* (create tables, add columns, draw FK lines) with AntV X6 + Xojo property panel is substantial work. Two approaches:
+
+- **A) Phase 1 = read-only viewer**: parse `.model` file → render ER diagram in HTMLViewer. Click a table to see its columns in a native panel. No editing in the diagram — edit the `.model` file directly or via CLI prompts.
+- **B) Phase 1 = full editor**: create/edit/delete tables visually, draw FK relationships, property panel edits columns. Changes write back to `.model` file.
+
+Option A ships in days. Option B takes weeks. Which do you want first?
+
+**A16** A) Phase 1 - read only
+
+**Q17. ER diagram — from `.model` file or from live database?**
+
+- **A) From `.model` file** — read the schema DSL, render as diagram. Source of truth is the text file.
+- **B) From live SQLite database** — reverse-engineer via `PRAGMA table_info`, render as diagram. Source of truth is the DB.
+- **C) Both** — primary from `.model`, but also support "inspect this database" mode.
+
+This connects to Q3 (you chose Schema DSL as source of truth), so A or C?
+
+**A17** C) Both
+
+### Migration & Versioning Details
+
+**Q18. Snapshot storage format?**
+
+For TMS-style snapshots, how should versions be stored?
+
+- **A) Timestamped copies of the `.model` file**:
+  ```
+  versions/
+  ├── 2026-03-12_initial.model
+  ├── 2026-03-13_add-categories.model
+  └── manifest.json        ← list of versions with descriptions
+  ```
+- **B) Git tags/commits** — just tag the git repo at meaningful points, no separate storage. Use `git diff` for comparison.
+- **C) Delta-based** — store only the diff between versions (more complex, smaller files).
+
+Option A is simplest and self-contained. Option B leverages git you already use. Which?
+
+**A18** A) timestamped copies
+
+**Q19. SQLite ALTER TABLE limitations — how to handle?**
+
+SQLite has major ALTER TABLE limitations:
+- Can ADD COLUMN (since 3.2.0)
+- Can RENAME COLUMN (since 3.25.0)
+- Can DROP COLUMN (since 3.35.0)
+- **Cannot**: change column type, add/remove constraints, modify defaults
+
+For unsupported changes, the standard workaround is the "12-step" process:
+1. Create new table with desired schema
+2. Copy data from old table
+3. Drop old table
+4. Rename new table
+
+Should the migration generator:
+- **A) Auto-generate the 12-step process** when needed (complex but hands-free)
+- **B) Warn and let the developer write the migration manually** (simpler, safer)
+- **C) Hybrid** — auto-generate 12-step for simple cases (type change, add constraint), warn for complex ones (data transformation)
+
+**A19** It should be A) only. Also has specific procedures for each database brands to let us handle edge cases of each database engines later.
+
+### Output & Documentation
+
+**Q20. "Generate report with JinjaX, view on default browser" — what reports?**
+
+You mentioned generating reports viewable in the browser. Which reports do you envision?
+
+- **A) Schema documentation** — model reference pages (like the developer-guide format)
+- **B) Migration report** — what changed, what SQL will run, risk assessment
+- **C) Validation report** — errors and warnings with clickable links
+- **D) Version comparison** — side-by-side diff of two schema versions (like TMS)
+- **E) All of the above**
+
+And should these use the developer-guide's existing page.html layout + CSS (consistent look), or a separate simpler template?
+
+**A20** E) All of the above
+
+**Q21. Should the ER diagram be embeddable in the developer-guide documentation?**
+
+You already have nomnoml for architecture diagrams in the developer-guide. Should the toolkit also:
+- **A) Export the ER diagram as a nomnoml-compatible block** (for embedding in `.md` pages)
+- **B) Export as SVG/PNG** (for manual insertion)
+- **C) Auto-generate a developer-guide page** with the ER diagram + model docs in one page
+- **D) Not needed** — ER diagram is only in the toolkit app
+
+**A21** A) should be enough
+
+---
+
 ## Next Steps
 
-1. **Answer the clarifying questions** (Section 2) — these shape everything
-2. **Agree on Phase 1 scope** — SDL syntax + SQL generator
-3. **Build Phase 1** — working parser + generator in 1-2 sessions
-4. **Iterate** — each phase builds on the last, with your feedback guiding priorities
+1. **Answer Round 2 questions** (Q12–Q21) — these finalize the technical architecture
+2. **Revise the proposal** with updated architecture (all-Xojo, xojo-ttytoolkit CLI, JinjaX codegen, AntV X6 ER viewer)
+3. **Revise the phase plan** — ER viewer moves to Phase 1, Python references removed
+4. **Build Phase 1** — start implementation

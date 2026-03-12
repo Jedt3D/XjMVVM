@@ -1,70 +1,70 @@
 ---
 title: "Alpine.js"
-description: How and why XjMVVM uses Alpine.js for minimal client-side interactivity, and when to reach for it versus plain HTML or htmx.
+description: XjMVVMがクライアント側の最小限のインタラクティビティにAlpine.jsをどのように、そしてなぜ使うのか、また平易なHTMLやhtmxと比較した場合の使い分けについて。
 ---
 
 # Alpine.js
 
-XjMVVM is a server-rendered framework — HTML comes from Xojo, not a JS framework. Alpine.js fills the small gap where the server cannot manage state: reactive UI elements that must respond to browser-local state (localStorage, sessionStorage) without a full page reload.
+XjMVVMはサーバーレンダリングフレームワークです — HTMLはJSフレームワークではなくXojoから生成されます。Alpine.jsは、サーバーが状態を管理できない小さなギャップを埋めます。つまり、ブラウザのローカル状態(localStorage、sessionStorage)に応答して、ページ全体のリロードなしに動作する必要があるリアクティブなUI要素です。
 
 ## Philosophy
 
-> **Server renders. Alpine reacts. htmx fetches.**
+> **サーバーが描画する。Alpine が反応する。htmx がフェッチする。**
 
-The goal is the minimum JavaScript possible. The decision tree for any interactive element is:
+目標は可能な限り最小限のJavaScriptを使用することです。すべてのインタラクティブ要素の判断フローは以下のとおりです:
 
-1. **Can a plain HTML form + PRG pattern handle it?** → use that, no JS
-2. **Does it react to browser-local state or needs inline DOM updates?** → Alpine
-3. **Does it need to fetch from the server and update part of the page?** → htmx (see [htmx adoption plan](#when-to-reach-for-htmx))
+1. **平易なHTMLフォーム + PRGパターンで処理できるか?** → それを使う、JSは不要
+2. **ブラウザのローカル状態に応答するか、インラインDOM更新が必要か?** → Alpine を使う
+3. **サーバーからフェッチしてページの一部を更新する必要があるか?** → htmx を使う([htmx導入計画](#when-to-reach-for-htmx)を参照)
 
-Alpine is never used as a replacement for server-side logic. All business rules, data, and validation that can live on the server do.
+Alpineは決してサーバー側ロジックの置き換えとして使用されません。サーバーで実行できるすべてのビジネスルール、データ、検証はサーバーに留まります。
 
 ---
 
 ## Installation
 
-Alpine is loaded from CDN with no build step. One line at the bottom of `layouts/base.html`, before `</body>`:
+AlpineはビルドステップなしでCDNから読み込まれます。`layouts/base.html`の`</body>`の前に1行追加します:
 
 ```html
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
 ```
 
-The `defer` attribute is required — Alpine must process the DOM after it has been parsed.
+`defer`属性は必須です — AlpineはDOMが解析された後に処理する必要があります。
 
 !!! note
-    Pin to a specific version (e.g. `@3.14.3`) rather than `@3` so builds are reproducible and an upstream CDN update cannot break the app.
+    `@3`ではなく特定のバージョン(例: `@3.14.3`)に固定してください。ビルドが再現可能になり、アップストリームのCDN更新がアプリを破壊することはありません。
 
 ---
 
-## Core directives used in XjMVVM
+## XjMVVMで使用されるコアディレクティブ
 
-| Directive | Purpose |
+| ディレクティブ | 目的 |
 |---|---|
-| `x-data="{ ... }"` | Declares a reactive component with its state |
-| `x-show="expr"` | Toggles `display:none` based on a boolean expression |
-| `x-text="expr"` | Sets element text content to the expression value |
-| `:class="expr"` | Binds the `class` attribute dynamically |
-| `@submit.prevent="fn"` | Intercepts form submit, prevents default, calls a function |
-| `@submit="expr"` | Runs an expression on form submit without preventing default |
-| `x-cloak` | Hides an element until Alpine initializes (prevents FOUC) |
-| `init()` | Lifecycle hook — runs once when the component initializes |
+| `x-data="{ ... }"` | リアクティブ状態を持つコンポーネントを宣言する |
+| `x-show="expr"` | ブール式に基づいて`display:none`を切り替える |
+| `x-text="expr"` | 要素のテキストコンテンツを式の値に設定する |
+| `:class="expr"` | `class`属性を動的にバインドする |
+| `@submit.prevent="fn"` | フォーム送信を傍受し、デフォルトを防ぎ、関数を呼び出す |
+| `@submit="expr"` | デフォルトを防がずにフォーム送信時に式を実行する |
+| `x-cloak` | Alpineが初期化されるまで要素を非表示にする(FOUCを防ぐ) |
+| `init()` | ライフサイクルフック — コンポーネント初期化時に1回実行される |
 
 ---
 
-## Pattern 1 — Nav auth state
+## パターン1 — ナビゲーション認証状態
 
-The nav bar must show either Log In / Sign Up (logged-out) or username + Log Out (logged-in), driven by `localStorage`. The server cannot inject this because Xojo Web 2 SSR mode does not persist `WebSession` state between plain HTTP requests.
+ナビゲーションバーは、`localStorage`で駆動される「ログイン/サインアップ」(ログアウト状態)または「ユーザー名 + ログアウト」(ログイン状態)を表示する必要があります。Xojo Web 2 SSRモードは平易なHTTPリクエスト間で`WebSession`状態を保持しないため、サーバーはこれを注入できません。
 
 ```html
 <nav x-data="{ user: localStorage.getItem('_auth_user') }">
 
-  <!-- Logged-out state: visible by default, hidden by Alpine if user is set -->
+  <!-- ログアウト状態: デフォルトで表示、ユーザーが設定されている場合はAlpineで非表示 -->
   <span class="nav-auth" x-show="!user">
     <a href="/login" class="btn btn-sm">Log In</a>
     <a href="/signup" class="btn btn-primary btn-sm">Sign Up</a>
   </span>
 
-  <!-- Logged-in state: hidden by x-cloak until Alpine confirms user exists -->
+  <!-- ログイン状態: x-cloakで非表示、Alpineがユーザーの存在を確認するまで隠れたまま -->
   <span class="nav-auth" x-show="user" x-cloak>
     <span x-text="user" style="font-size:0.9em; color:#555;"></span>
     <form method="post" action="/logout"
@@ -78,21 +78,21 @@ The nav bar must show either Log In / Sign Up (logged-out) or username + Log Out
 </nav>
 ```
 
-`x-cloak` on the logged-in span prevents a flash of both states before Alpine initializes. The CSS rule that makes this work must be in the stylesheet:
+ログイン状態のspanの`x-cloak`は、Alpineが初期化される前に両方の状態がフラッシュするのを防ぎます。これを機能させるために必要なCSS規則はスタイルシートに入っている必要があります:
 
 ```css
 [x-cloak] { display: none !important; }
 ```
 
-`@submit` on the logout form clears localStorage and queues the flash message before the POST is submitted. No separate event listener or script block needed.
+ログアウトフォームの`@submit`は、POSTが送信される前にlocalStorageをクリアし、フラッシュメッセージをキューイングします。別のイベントリスナーやスクリプトブロックは不要です。
 
 ---
 
-## Pattern 2 — Client-side flash messages
+## パターン2 — クライアント側フラッシュメッセージ
 
-Flash messages for the POST→redirect→GET cycle cannot use Xojo's session in SSR mode — the session is gone by the time the redirect's GET arrives. The workaround: write to `sessionStorage` before the form submits, read it on the next page load.
+POST→リダイレクト→GETサイクルのフラッシュメッセージは、SRRモードではXojoのセッションを使用できません — リダイレクトのGETが到着するまでセッションは消えています。回避策: フォーム送信前に`sessionStorage`に書き込み、次のページロード時に読み取ります。
 
-Alpine reads and displays the queued message in `init()`, then `x-show` keeps it hidden if there is nothing to show:
+Alpineは`init()`でキューイングされたメッセージを読み取って表示し、表示するものがない場合は`x-show`で非表示に保ちます:
 
 ```html
 <div x-data="{
@@ -108,15 +108,15 @@ Alpine reads and displays the queued message in `init()`, then `x-show` keeps it
 }" x-show="msg" :class="'flash flash-' + type" x-text="msg" style="display:none"></div>
 ```
 
-The `!document.querySelector('.flash')` guard prevents a double-flash if the Xojo server-side session happens to deliver a flash directly (future-proofs for WebSocket mode).
+`!document.querySelector('.flash')`ガードは、Xojoサーバー側セッションがフラッシュを直接配信する場合のダブルフラッシュを防ぎます(WebSocketモードに対応しています)。
 
 ---
 
-## Pattern 3 — Form submit with async pre-processing
+## パターン3 — 非同期前処理によるフォーム送信
 
-Auth forms must hash the password client-side with the Web Crypto API before the POST is sent. This is inherently async and must intercept the submit event. Alpine's `@submit.prevent` + an async method in `x-data` handles this cleanly, with no separate `addEventListener` script block.
+認証フォームは、POSTが送信される前にWeb Crypto APIを使用してクライアント側でパスワードをハッシュする必要があります。これは本質的に非同期であり、送信イベントを傍受する必要があります。Alpineの`@submit.prevent` + `x-data`の非同期メソッドはこれを簡潔に処理し、別の`addEventListener`スクリプトブロックは不要です。
 
-The SHA-256 helper is defined in a small `<script>` above the form (it must be in scope when the Alpine method runs):
+SHA-256ヘルパーはフォームの上にある小さな`<script>`で定義されます(Alpineメソッドが実行されるときにスコープ内にある必要があります):
 
 ```html
 <script>
@@ -145,11 +145,11 @@ async function sha256hex(str) {
 </form>
 ```
 
-The `hashed` flag prevents re-processing if `e.target.submit()` somehow re-fires the event. `e.target.submit()` (the DOM method) bypasses the `submit` event entirely, so the flag is mainly a safety guard.
+`hashed`フラグは、`e.target.submit()`がなんらかの理由でイベントを再発火させた場合の再処理を防ぎます。`e.target.submit()`(DOMメソッド)は`submit`イベントを完全にバイパスするため、フラグは主に安全ガードです。
 
-### Adding inline validation
+### インライン検証の追加
 
-The signup form adds password validation. `pwError` state drives an inline error paragraph with no extra DOM wiring:
+サインアップフォームはパスワード検証を追加します。`pwError`状態は、追加のDOM配線なしでインラインエラー段落を駆動します:
 
 ```html
 <p x-show="pwError" x-text="pwError"
@@ -157,7 +157,7 @@ The signup form adds password validation. `pwError` state drives an inline error
           padding:8px 12px; border-radius:4px; margin:0 0 12px;"></p>
 ```
 
-Inside `handleSubmit`:
+`handleSubmit`内:
 
 ```javascript
 if (pw.length < 6) { this.pwError = 'Password must be at least 6 characters.'; return; }
@@ -165,15 +165,15 @@ if (pw !== cf)     { this.pwError = 'Passwords do not match.'; return; }
 this.pwError = '';
 ```
 
-No `document.getElementById`, no manual `style.display` toggling. Alpine keeps the element in sync.
+`document.getElementById`なし、手動の`style.display`切り替えなし。Alpineが要素を同期させたままにします。
 
 ---
 
-## Pattern 4 — Multi-value checkboxes (no Alpine needed)
+## パターン4 — 複数値チェックボックス(Alpineは不要)
 
-Tag checkboxes on the note form previously required JS to collect checked values into a hidden field. This is unnecessary — native HTML form serialization sends all checked checkboxes with the same `name` as multiple values. Xojo's `FormParser` already handles comma-append for duplicate keys.
+ノートフォームのタグチェックボックスは、以前はチェック済み値を非表示フィールドに集約するためのJSが必要でした。これは不要です — ネイティブHTMLフォームのシリアライゼーションは、同じ`name`を持つすべてのチェック済みチェックボックスを複数の値として送信します。Xojoの`FormParser`は既に重複キーのコンマ追加を処理します。
 
-The correct pattern requires **no JavaScript at all**:
+正しいパターンは**JavaScriptを全く必要としません**:
 
 ```html
 {% for tag in all_tags %}
@@ -183,48 +183,48 @@ The correct pattern requires **no JavaScript at all**:
 {% endfor %}
 ```
 
-The form submits `tag_ids=1&tag_ids=3`, FormParser stores `"1,3"`, and the ViewModel splits on `","` as before. No hidden field, no script block.
+フォームは`tag_ids=1&tag_ids=3`を送信し、FormParserは`"1,3"`を格納し、ViewModelは前のように`","`で分割します。非表示フィールドなし、スクリプトブロックなし。
 
 !!! tip
-    Before reaching for Alpine (or any JS), check whether the browser's native form serialization already does what you need. Multiple checkboxes, radio groups, and `<select multiple>` all work without any JavaScript.
+    Alpineに手を出す前に(または任意のJS)、ブラウザのネイティブフォームシリアライゼーションが既に必要なことをやっているか確認してください。複数のチェックボックス、ラジオグループ、`<select multiple>`はすべてJavaScriptなしで機能します。
 
 ---
 
-## JS footprint comparison
+## JSフットプリント比較
 
-| What | Before Alpine | After Alpine |
+| 何 | Alpine前 | Alpine後 |
 |---|---|---|
-| base.html IIFE | 30 lines | 0 (replaced by `x-data` attributes) |
-| login.html `<script>` | 19 lines | 8 (sha256hex helper only) |
-| signup.html `<script>` | 35 lines | 8 (sha256hex helper only) |
-| notes/form.html `<script>` | 9 lines | 0 (removed entirely) |
-| **Total custom JS** | **93 lines** | **16 lines** |
-| Alpine CDN | 0 | 14 KB (minified + gzip: ~5 KB) |
+| base.html IIFE | 30行 | 0(`x-data`属性で置き換え) |
+| login.html `<script>` | 19行 | 8(sha256hexヘルパーのみ) |
+| signup.html `<script>` | 35行 | 8(sha256hexヘルパーのみ) |
+| notes/form.html `<script>` | 9行 | 0(完全に削除) |
+| **カスタムJS合計** | **93行** | **16行** |
+| Alpine CDN | 0 | 14 KB(縮小化 + gzip: ~5 KB) |
 
-The irreducible 16 lines are the SHA-256 helper function (duplicated across login and signup). This cannot be moved to a shared file without a build step — a deliberate trade-off to keep zero build tooling.
-
----
-
-## When to reach for htmx
-
-Alpine manages **local browser state**. When an interaction needs to **fetch from the server and update part of the page**, add htmx instead of expanding Alpine.
-
-Trigger features that warrant adding htmx:
-
-- Inline edit (click note → form appears in place, saves without reload)
-- Delete without reload (remove row from list)
-- Live search / filter (notes or tags update as you type)
-- Pagination without reload
-- Tag toggle on list view
-
-htmx and Alpine compose cleanly — Alpine owns local state, htmx owns server round-trips. The two libraries do not conflict.
+削減不可能な16行はSHA-256ヘルパー関数です(ログインとサインアップで重複)。ビルドステップなしで共有ファイルに移動することはできません — ゼロのビルドツールを維持するための意図的なトレードオフです。
 
 ---
 
-## What Alpine will never replace
+## htmxに手を出すべき場合
 
-| JS | Reason |
+Alpineは**ローカルブラウザ状態**を管理します。インタラクションがサーバーからのフェッチとページの一部を更新する必要がある場合は、Alpineを拡張するのではなくhtmxを追加してください。
+
+htmxの追加が正当化される機能をトリガーします:
+
+- インライン編集(ノートをクリック → フォームがインプレイスで表示され、リロードなしで保存)
+- リロードなしで削除(リストから行を削除)
+- ライブ検索/フィルタリング(入力時にノートまたはタグを更新)
+- ページネーション(リロードなし)
+- リストビューのタグ切り替え
+
+htmxとAlpineは清潔に構成されます — Alpineはローカル状態を所有し、htmxはサーバーのラウンドトリップを所有します。2つのライブラリは競合しません。
+
+---
+
+## Alpineが決して置き換えることができないもの
+
+| JS | 理由 |
 |---|---|
-| `crypto.subtle.digest` (SHA-256) | Browser security API, no Alpine equivalent |
-| `localStorage` / `sessionStorage` reads and writes | Still needed; Alpine just organises them in `x-data` |
-| Server-side session persistence | Architectural — requires cookie-based auth, unrelated to Alpine |
+| `crypto.subtle.digest`(SHA-256) | ブラウザセキュリティAPI、Alpine相当物なし |
+| `localStorage` / `sessionStorage`の読み書き | 引き続き必要です; Alpineは単に`x-data`内で整理するだけです |
+| サーバー側セッション永続性 | アーキテクチャ — クッキーベースの認証が必要で、Alpineとは無関係 |
