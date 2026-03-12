@@ -4,12 +4,13 @@ Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnGet()
 		  If CurrentUserID() > 0 Then
-		    Redirect("/")
+		    Redirect("/notes")
 		    Return
 		  End If
 
 		  Var context As New Dictionary()
 		  context.Value("page_title") = "Sign Up"
+		  context.Value("error_message") = ""
 		  Render("auth/signup.html", context)
 		End Sub
 	#tag EndMethod
@@ -21,43 +22,44 @@ Inherits BaseViewModel
 		  Var confirm As String = GetFormValue("password_confirm")
 
 		  If username.Length = 0 Then
-		    SetFlash("Username is required", "error")
-		    Redirect("/signup")
+		    RenderSignupWithError("Username is required")
 		    Return
 		  End If
 
 		  If username.Length < 3 Then
-		    SetFlash("Username must be at least 3 characters", "error")
-		    Redirect("/signup")
+		    RenderSignupWithError("Username must be at least 3 characters")
 		    Return
 		  End If
 
+		  // Note: with client-side SHA-256, password arrives as 64-char hex.
+		  // This check is a fallback for non-JS clients.
 		  If password.Length < 6 Then
-		    SetFlash("Password must be at least 6 characters", "error")
-		    Redirect("/signup")
+		    RenderSignupWithError("Password must be at least 6 characters")
 		    Return
 		  End If
 
 		  If password <> confirm Then
-		    SetFlash("Passwords do not match", "error")
-		    Redirect("/signup")
+		    RenderSignupWithError("Passwords do not match")
 		    Return
 		  End If
 
 		  Var model As New UserModel()
 		  Var newID As Integer = model.Create(username, password)
 		  If newID = 0 Then
-		    SetFlash("Username already taken", "error")
-		    Redirect("/signup")
+		    RenderSignupWithError("Username already taken")
 		    Return
 		  End If
 
-		  Var ws As WebSession = Self.Session
-		  If ws IsA Session Then
-		    Session(ws).LogIn(newID, username)
-		  End If
-		  SetFlash("Account created! Welcome, " + username + "!")
-		  Redirect("/notes")
+		  RedirectWithAuth("/notes", newID, username)
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub RenderSignupWithError(errorMsg As String)
+		  Var context As New Dictionary()
+		  context.Value("page_title") = "Sign Up"
+		  context.Value("error_message") = errorMsg
+		  Render("auth/signup.html", context)
 		End Sub
 	#tag EndMethod
 

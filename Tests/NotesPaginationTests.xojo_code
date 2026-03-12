@@ -3,9 +3,10 @@ Protected Class NotesPaginationTests
 Inherits TestGroup
 	#tag Event
 		Sub TearDown()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
 		  For Each id As Integer In mTestIDs
-		    model.Delete(id)
+		    model.Delete(id, kTestUserID)
 		  Next
 		  mTestIDs.RemoveAll()
 		End Sub
@@ -14,43 +15,47 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "Count() returns a non-negative integer."
 		Sub CountReturnsNonNegativeTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  Var n As Integer = model.Count()
+		  Var n As Integer = model.CountForUser(kTestUserID)
 		  Assert.IsTrue(n >= 0, "Count should be >= 0")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = "Count() increases by 1 after creating a note."
 		Sub CountIncreasesAfterCreateTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  Var before As Integer = model.Count()
-		  mTestIDs.Add(model.Create("Pag Count Test", "body"))
-		  Var after As Integer = model.Count()
+		  Var before As Integer = model.CountForUser(kTestUserID)
+		  mTestIDs.Add(model.Create("Pag Count Test", "body", kTestUserID))
+		  Var after As Integer = model.CountForUser(kTestUserID)
 		  Assert.AreEqual(before + 1, after, "Count should increase by 1 after create")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = "FindPaginated respects the limit parameter."
 		Sub FindPaginatedRespectsLimitTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  mTestIDs.Add(model.Create("Pag Limit A", ""))
-		  mTestIDs.Add(model.Create("Pag Limit B", ""))
-		  mTestIDs.Add(model.Create("Pag Limit C", ""))
+		  mTestIDs.Add(model.Create("Pag Limit A", "", kTestUserID))
+		  mTestIDs.Add(model.Create("Pag Limit B", "", kTestUserID))
+		  mTestIDs.Add(model.Create("Pag Limit C", "", kTestUserID))
 
-		  Var page() As Variant = model.FindPaginated(2, 0, "id ASC")
+		  Var page() As Variant = model.FindPaginatedForUser(kTestUserID, 2, 0, "id ASC")
 		  Assert.IsTrue(page.Count <= 2, "FindPaginated(limit=2) should return at most 2 rows")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = "FindPaginated offset returns different rows than page 1."
 		Sub FindPaginatedOffsetReturnsDifferentRowsTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  mTestIDs.Add(model.Create("Pag Offset A", ""))
-		  mTestIDs.Add(model.Create("Pag Offset B", ""))
-		  mTestIDs.Add(model.Create("Pag Offset C", ""))
+		  mTestIDs.Add(model.Create("Pag Offset A", "", kTestUserID))
+		  mTestIDs.Add(model.Create("Pag Offset B", "", kTestUserID))
+		  mTestIDs.Add(model.Create("Pag Offset C", "", kTestUserID))
 
-		  Var page1() As Variant = model.FindPaginated(1, 0, "id ASC")
-		  Var page2() As Variant = model.FindPaginated(1, 1, "id ASC")
+		  Var page1() As Variant = model.FindPaginatedForUser(kTestUserID, 1, 0, "id ASC")
+		  Var page2() As Variant = model.FindPaginatedForUser(kTestUserID, 1, 1, "id ASC")
 
 		  If page1.Count = 0 Or page2.Count = 0 Then
 		    Assert.IsTrue(False, "Both pages should return a row")
@@ -65,8 +70,9 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "FindPaginated with large offset returns empty array."
 		Sub FindPaginatedLargeOffsetEmptyTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  Var page() As Variant = model.FindPaginated(10, 99999, "id ASC")
+		  Var page() As Variant = model.FindPaginatedForUser(kTestUserID, 10, 99999, "id ASC")
 		  Assert.IsTrue(page.Count = 0, "Large offset should return empty array")
 		End Sub
 	#tag EndMethod

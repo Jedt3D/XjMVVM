@@ -32,6 +32,8 @@ Inherits WebApplication
 		    Return ServeStatic(p.Middle(6), response)
 		  End If
 		  
+	
+
 		  // All other paths: SSR router handles known routes.
 		  // Unknown paths (Xojo framework JS/CSS resources) return False
 		  // so Xojo serves its own framework files for the active WebSocket session.
@@ -43,6 +45,9 @@ Inherits WebApplication
 		Sub Opening(args() As String)
 		  #Pragma Unused args
 		  
+		  // Generate auth cookie signing secret
+		  mAuthSecret = EncodeHex(Crypto.GenerateRandomBytes(32))
+
 		  // Initialize database
 		  DBAdapter.InitDB()
 		  
@@ -284,6 +289,10 @@ Inherits WebApplication
 
 	#tag Property, Flags = &h0
 		mRouter As Router
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		mAuthSecret As String
 	#tag EndProperty
 
 

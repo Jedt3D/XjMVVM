@@ -3,10 +3,11 @@ Protected Class BaseModelTests
 Inherits TestGroup
 	#tag Event
 		Sub TearDown()
+		  Const kTestUserID As Integer = 999
 		  // Clean up any note inserted during the test
 		  If mTestID > 0 Then
 		    Var model As New NoteModel()
-		    model.Delete(mTestID)
+		    model.Delete(mTestID, kTestUserID)
 		    mTestID = 0
 		  End If
 		End Sub
@@ -15,19 +16,21 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "FindAll returns a Variant() with Count >= 0."
 		Sub FindAllReturnsArrayTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  Var results() As Variant = model.GetAll()
+		  Var results() As Variant = model.GetAll(kTestUserID)
 		  Assert.IsTrue(results.Count >= 0, "FindAll should return a non-negative count")
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = "Insert a row via Create, then FindByID returns matching Dictionary."
 		Sub InsertAndFindByIDTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  mTestID = model.Create("BaseModel Insert Test", "body text")
+		  mTestID = model.Create("BaseModel Insert Test", "body text", kTestUserID)
 		  Assert.IsTrue(mTestID > 0, "Create should return a positive ID")
 
-		  Var row As Dictionary = model.GetByID(mTestID)
+		  Var row As Dictionary = model.GetByID(mTestID, kTestUserID)
 		  Assert.IsNotNil(row)
 		  Assert.AreEqual("BaseModel Insert Test", row.Value("title").StringValue)
 		End Sub
@@ -35,15 +38,16 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "UpdateByID changes column values visible via FindByID."
 		Sub UpdateByIDChangesValuesTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  mTestID = model.Create("Before Update", "old body")
+		  mTestID = model.Create("Before Update", "old body", kTestUserID)
 
 		  Var data As New Dictionary()
 		  data.Value("title") = "After Update"
 		  data.Value("body") = "new body"
 		  model.UpdateByID(mTestID, data)
 
-		  Var row As Dictionary = model.GetByID(mTestID)
+		  Var row As Dictionary = model.GetByID(mTestID, kTestUserID)
 		  Assert.IsNotNil(row)
 		  Assert.AreEqual("After Update", row.Value("title").StringValue)
 		  Assert.AreEqual("new body", row.Value("body").StringValue)
@@ -52,13 +56,14 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "DeleteByID removes the row so FindByID returns Nil."
 		Sub DeleteByIDRemovesRowTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  mTestID = model.Create("To Be Deleted", "")
+		  mTestID = model.Create("To Be Deleted", "", kTestUserID)
 
 		  model.DeleteByID(mTestID)
 		  mTestID = 0 // already deleted, skip TearDown cleanup
 
-		  Var row As Dictionary = model.GetByID(Integer.FromString("999999999"))
+		  Var row As Dictionary = model.GetByID(Integer.FromString("999999999"), kTestUserID)
 		  // Use a guaranteed-missing row to prove Nil return
 		  Assert.IsNil(row)
 		End Sub
@@ -66,8 +71,9 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "FindByID with a non-existent ID returns Nil."
 		Sub FindByIDReturnsNilForMissingTest()
+		  Const kTestUserID As Integer = 999
 		  Var model As New NoteModel()
-		  Var row As Dictionary = model.GetByID(999999999)
+		  Var row As Dictionary = model.GetByID(999999999, kTestUserID)
 		  Assert.IsNil(row)
 		End Sub
 	#tag EndMethod

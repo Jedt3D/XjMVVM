@@ -3,6 +3,8 @@ Protected Class TagsListVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnGet()
+		  If RequireLogin() Then Return
+
 		  Var model As New TagModel()
 		  Var tags() As Variant = model.GetAll()
 

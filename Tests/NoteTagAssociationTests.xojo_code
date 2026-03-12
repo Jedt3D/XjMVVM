@@ -3,10 +3,11 @@ Protected Class NoteTagAssociationTests
 Inherits TestGroup
 	#tag Event
 		Sub TearDown()
+		  Const kTestUserID As Integer = 999
 		  Var noteModel As New NoteModel()
 		  Var tagModel As New TagModel()
 		  If mNoteID > 0 Then
-		    noteModel.Delete(mNoteID)
+		    noteModel.Delete(mNoteID, kTestUserID)
 		    mNoteID = 0
 		  End If
 		  For Each id As Integer In mTagIDs
@@ -19,10 +20,11 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "SetTagsForNote then GetTagsForNote returns the assigned tags."
 		Sub SetAndGetTagsTest()
+		  Const kTestUserID As Integer = 999
 		  Var noteModel As New NoteModel()
 		  Var tagModel As New TagModel()
 
-		  mNoteID = noteModel.Create("Tagged Note", "body")
+		  mNoteID = noteModel.Create("Tagged Note", "body", kTestUserID)
 		  Var tag1ID As Integer = tagModel.Create("AssocTag1")
 		  Var tag2ID As Integer = tagModel.Create("AssocTag2")
 		  mTagIDs.Add(tag1ID)
@@ -40,10 +42,11 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "SetTagsForNote overwrites previous tags."
 		Sub SetTagsOverwritesPreviousTest()
+		  Const kTestUserID As Integer = 999
 		  Var noteModel As New NoteModel()
 		  Var tagModel As New TagModel()
 
-		  mNoteID = noteModel.Create("Overwrite Test", "")
+		  mNoteID = noteModel.Create("Overwrite Test", "", kTestUserID)
 		  Var tag1ID As Integer = tagModel.Create("OvTag1")
 		  Var tag2ID As Integer = tagModel.Create("OvTag2")
 		  Var tag3ID As Integer = tagModel.Create("OvTag3")
@@ -69,10 +72,11 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "SetTagsForNote with empty array clears all tags."
 		Sub SetEmptyTagsClearsAllTest()
+		  Const kTestUserID As Integer = 999
 		  Var noteModel As New NoteModel()
 		  Var tagModel As New TagModel()
 
-		  mNoteID = noteModel.Create("Clear Tags Test", "")
+		  mNoteID = noteModel.Create("Clear Tags Test", "", kTestUserID)
 		  Var tag1ID As Integer = tagModel.Create("ClearTag1")
 		  mTagIDs.Add(tag1ID)
 

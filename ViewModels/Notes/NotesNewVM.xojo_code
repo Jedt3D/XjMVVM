@@ -3,6 +3,8 @@ Protected Class NotesNewVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnGet()
+		  If RequireLogin() Then Return
+
 		  Var tagModel As New TagModel()
 		  Var allTags() As Variant = tagModel.GetAll()
 		  // Mark all tags as unselected for new note form

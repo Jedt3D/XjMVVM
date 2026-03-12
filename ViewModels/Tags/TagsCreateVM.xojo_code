@@ -3,6 +3,8 @@ Protected Class TagsCreateVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnPost()
+		  If RequireLogin() Then Return
+
 		  Var name As String = GetFormValue("name").Trim()
 
 		  If name.Length = 0 Then

@@ -3,6 +3,8 @@ Protected Class TagsUpdateVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnPost()
+		  If RequireLogin() Then Return
+
 		  Var id As Integer = Val(GetParam("id"))
 		  Var name As String = GetFormValue("name").Trim()
 

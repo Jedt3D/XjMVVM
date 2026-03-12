@@ -3,9 +3,12 @@ Protected Class NotesDetailVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnGet()
+		  If RequireLogin() Then Return
+
 		  Var id As Integer = Val(GetParam("id"))
+		  Var uid As Integer = CurrentUserID()
 		  Var model As New NoteModel()
-		  Var note As Dictionary = model.GetByID(id)
+		  Var note As Dictionary = model.GetByID(id, uid)
 
 		  If note = Nil Then
 		    RenderError(404, "Note not found")

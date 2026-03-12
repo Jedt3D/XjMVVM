@@ -76,6 +76,7 @@ Class=TagModelTests;Tests/TagModelTests.xojo_code;&hFFFFFFFF620C6FFF;&hFFFFFFFF6
 Class=NoteTagAssociationTests;Tests/NoteTagAssociationTests.xojo_code;&hFFFFFFFF620C7FFF;&hFFFFFFFF620C1FFF;false
 Class=UserModelTests;Tests/UserModelTests.xojo_code;&hFFFFFFFF620C8FFF;&hFFFFFFFF620C1FFF;false
 Class=APITests;Tests/APITests.xojo_code;&hFFFFFFFF620C9FFF;&hFFFFFFFF620C1FFF;false
+Class=NoteOwnershipTests;Tests/NoteOwnershipTests.xojo_code;&hFFFFFFFF620CAFFF;&hFFFFFFFF620C1FFF;false
 Folder=JinjaXLib;JinjaXLib;&hFFFFFFFF810A1FFF;&h0000000000000000;false
 Folder=XojoUnit;XojoUnit;&h00000000791BB7FF;&h0000000000000000;false
 Module=TokenType;JinjaXLib/TokenType.xojo_code;&hFFFFFFFF810A2FFF;&hFFFFFFFF810A1FFF;false

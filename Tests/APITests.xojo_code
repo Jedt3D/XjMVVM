@@ -3,10 +3,11 @@ Protected Class APITests
 Inherits TestGroup
 	#tag Event
 		Sub TearDown()
+		  Const kTestUserID As Integer = 999
 		  Var noteModel As New NoteModel()
 		  Var tagModel As New TagModel()
 		  For Each id As Integer In mNoteIDs
-		    noteModel.Delete(id)
+		    noteModel.Delete(id, kTestUserID)
 		  Next
 		  mNoteIDs.RemoveAll()
 		  For Each id As Integer In mTagIDs
@@ -19,11 +20,12 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "Note serialized as JSON includes expected keys."
 		Sub NoteToJSONIncludesKeysTest()
+		  Const kTestUserID As Integer = 999
 		  Var noteModel As New NoteModel()
-		  Var id As Integer = noteModel.Create("API Test Note", "body text")
+		  Var id As Integer = noteModel.Create("API Test Note", "body text", kTestUserID)
 		  mNoteIDs.Add(id)
 
-		  Var note As Dictionary = noteModel.GetByID(id)
+		  Var note As Dictionary = noteModel.GetByID(id, kTestUserID)
 		  Var json As String = DictToJSON(note)
 
 		  Assert.IsTrue(json.IndexOf("""id""") >= 0, "JSON should contain id key")
@@ -48,11 +50,12 @@ Inherits TestGroup
 
 	#tag Method, Flags = &h0, Description = "Notes array serialized as JSON is a valid array."
 		Sub NotesArrayToJSONIsArrayTest()
+		  Const kTestUserID As Integer = 999
 		  Var noteModel As New NoteModel()
-		  Var id As Integer = noteModel.Create("Array JSON Test", "")
+		  Var id As Integer = noteModel.Create("Array JSON Test", "", kTestUserID)
 		  mNoteIDs.Add(id)
 
-		  Var notes() As Variant = noteModel.GetAll()
+		  Var notes() As Variant = noteModel.GetAll(kTestUserID)
 		  Var json As String = ArrayToJSON(notes)
 
 		  Assert.IsTrue(json.Left(1) = "[", "JSON array should start with [")

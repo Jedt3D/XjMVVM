@@ -3,6 +3,8 @@ Protected Class NotesUpdateVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnPost()
+		  If RequireLogin() Then Return
+
 		  Var id As Integer = Val(GetParam("id"))
 		  Var title As String = GetFormValue("title")
 		  Var body As String = GetFormValue("body")
@@ -13,8 +15,9 @@ Inherits BaseViewModel
 		    Return
 		  End If
 
+		  Var uid As Integer = CurrentUserID()
 		  Var model As New NoteModel()
-		  model.Update(id, title, body)
+		  model.Update(id, title, body, uid)
 
 		  // Parse comma-joined tag_ids from multi-value checkboxes
 		  Var tagIDsRaw As String = GetFormValue("tag_ids")

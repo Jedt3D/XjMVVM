@@ -3,18 +3,21 @@ Protected Class NotesListVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnGet()
+		  If RequireLogin() Then Return
+
 		  Const perPage As Integer = 10
+		  Var uid As Integer = CurrentUserID()
 
 		  Var page As Integer = Val(GetParam("page"))
 		  If page < 1 Then page = 1
 
 		  Var model As New NoteModel()
-		  Var total As Integer = model.Count()
+		  Var total As Integer = model.CountForUser(uid)
 		  Var totalPages As Integer = If(total = 0, 1, (total + perPage - 1) \ perPage)
 		  If page > totalPages Then page = totalPages
 
 		  Var offset As Integer = (page - 1) * perPage
-		  Var notes() As Variant = model.FindPaginated(perPage, offset, "updated_at DESC")
+		  Var notes() As Variant = model.FindPaginatedForUser(uid, perPage, offset, "updated_at DESC")
 
 		  Var pagination As New Dictionary()
 		  pagination.Value("page") = Str(page)

@@ -17,7 +17,8 @@ Inherits TestController
 		  group = New NoteTagAssociationTests(Self, "NoteTagAssociations")
 		  group = New UserModelTests(Self, "UserModel")
 		  group = New APITests(Self, "API")
-		  
+		  group = New NoteOwnershipTests(Self, "NoteOwnership")
+
 		End Sub
 	#tag EndEvent
 

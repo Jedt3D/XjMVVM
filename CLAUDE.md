@@ -28,13 +28,14 @@ Browser → HandleURL → Router → ViewModel → Model → Database
 #### Key architectural rules:
 1. **Dictionary Data Contract** (most critical rule): JinjaX dot-notation (`{{ user.name }}`) only works with `Dictionary` objects. Models must return `Dictionary` or `Variant()` of `Dictionary` — never custom class instances. ViewModels build `Dictionary` contexts for templates.
 2. **No WebPage controls**: All rendering goes through JinjaX HTML templates in `templates/`. The existing `WebPage1` is a placeholder to be deleted.
-3. **Session isolation**: Never store user-specific data in `App` — use `WebSession` (the `Session` class). `App` is shared across all users.
+3. **SSR has no Session** (CRITICAL): `Self.Session` is **always Nil** in HandleURL — there is no WebSocket session in SSR mode. Never call `SetFlash()`, `Session.LogIn()`, or any session method from ViewModels. Auth uses HMAC-signed cookies instead (see Authentication Pattern below).
 4. **Dependency direction**: View → ViewModel → Model (never reverse). ViewModels never reference HTML/template structure; Models never reference ViewModels.
 5. **Post/Redirect/Get**: All form submissions follow POST → process → Redirect(302) → GET pattern to prevent duplicate submissions.
 
 #### Singletons on App (shared, read-only after Opening):
 - `mRouter As Router` — route registration and dispatch
 - `mJinja As JinjaEnvironment` — template compilation (thread-safe after setup)
+- `mAuthSecret As String` — HMAC signing key for auth cookies (generated at startup)
 
 #### Per-request objects (created fresh, thread-safe):
 - `ViewModel` instances, `CompiledTemplate`, `JinjaContext`
@@ -50,7 +51,7 @@ ViewModels/
   Tags/          → 7 VMs (full CRUD)
   Auth/          → LoginVM, LogoutVM, SignupVM
   API/           → NotesAPIList/Detail/Create, TagsAPIList/Detail
-Tests/           → 8 XojoUnit TestGroups
+Tests/           → 9 XojoUnit TestGroups
 JinjaXLib/       → Full JinjaX source (Jinja2-compatible engine, pure Xojo)
 templates/       → layouts/, notes/, tags/, auth/, errors/
 data/            → SQLite database (auto-created at startup)
@@ -60,31 +61,32 @@ model-toolkit/   → Research docs for future Model Toolkit app
 
 ### Current State
 
-**v0.9.2** — Phase 3 complete. Full-featured SSR web app with auth, tags, API, and Alpine.js.
+**v0.9.3** — Phase 4 complete. User-scoped notes, protected routes, cookie-based auth.
 
 - `Framework/` — Router, BaseViewModel, BaseModel, DBAdapter, FormParser, QueryParser, RouteDefinition, JSONSerializer
-- `Models/` — NoteModel, TagModel, UserModel (all return Dictionary, inherit BaseModel)
-- `ViewModels/Notes/` — 7 ViewModels, full CRUD, pagination, tag associations
-- `ViewModels/Tags/` — 7 ViewModels, full CRUD
-- `ViewModels/Auth/` — LoginVM, LogoutVM, SignupVM (SHA-256 + salt password storage)
-- `ViewModels/API/` — 5 JSON API endpoints for notes and tags
-- `Tests/` — 8 XojoUnit TestGroups: DBAdapter, BaseModel, NoteModel, NotesPagination, TagModel, NoteTagAssociation, UserModel, API
+- `Models/` — NoteModel (user-scoped), TagModel (global), UserModel (all return Dictionary, inherit BaseModel)
+- `ViewModels/Notes/` — 7 ViewModels, full CRUD, pagination, tag associations, **all require login + user-scoped**
+- `ViewModels/Tags/` — 7 ViewModels, full CRUD, **all require login** (tags remain global)
+- `ViewModels/Auth/` — LoginVM, LogoutVM, SignupVM (SHA-256 + salt password storage, inline error rendering)
+- `ViewModels/API/` — 5 JSON API endpoints, **all require auth** (401 JSON if not logged in)
+- `Tests/` — 9 XojoUnit TestGroups: DBAdapter, BaseModel, NoteModel, NotesPagination, TagModel, NoteTagAssociation, UserModel, API, **NoteOwnership**
 - `templates/` — layouts/base.html, notes/*, tags/*, auth/*, errors/*
 - **Alpine.js** (via CDN) replaces custom JS — 93 → 16 lines
 - **Client-side SHA-256** — plaintext passwords never cross the network
-- **Session auth** — login/signup/logout with nav state via localStorage/sessionStorage
+- **Cookie-based auth** — HMAC-signed `mvvm_auth` cookie via HTTP `Set-Cookie` header (SSR has no WebSocket session)
+- **Protected routes** — `RequireLogin()` redirects to `/login?next=<url>`, `RequireLoginJSON()` returns 401
 - Thai, emoji, all Unicode input/storage works correctly
 - `/tests` URL loads XojoUnit test runner via redirect dance (see `Routing.md`)
 
-#### DB Schema (v0.9.2)
+#### DB Schema (v0.9.3)
 ```sql
-notes      (id, title, body, created_at, updated_at)
+notes      (id, title, body, created_at, updated_at, user_id)  -- user_id scopes notes per user
 tags       (id, name, created_at)
 note_tags  (note_id, tag_id)  -- junction, PRIMARY KEY (note_id, tag_id)
 users      (id, username UNIQUE, password_hash, created_at)
 ```
 
-**Next:** Scope notes to logged-in user, protected routes, API authentication.
+**Next:** Developer guide docs for Phase 3+4 features, version bump to v1.0.0.
 
 ### HandleURL / Routing (Critical)
 
@@ -526,6 +528,7 @@ This must remain as the **last element in `<head>`**, after the stylesheet link.
 | v0.9.0 | JSON API endpoints (Phase 3.5) |
 | v0.9.1 | Auth UX — client-side SHA-256, SSR session workarounds |
 | v0.9.2 | Alpine.js — 93 → 16 lines of custom JS |
+| v0.9.3 | User-scoped notes, protected routes, cookie-based auth (Phase 4) |
 | pygment | Xojo Pygments lexer (`xojo_lexer.py`) working |
 | dark-light | Day/Night theme toggle, cross-language state sharing |
 
@@ -543,29 +546,45 @@ This must remain as the **last element in `<head>`**, after the stylesheet link.
 | Create per-language `page.html` files | One layout for all — fix the shared template |
 | Use `Mid()` in Xojo | 1-based legacy, silently wrong; use `String.Middle()` |
 | Use `Chr(byte)` for UTF-8 decoding | Corrupts multi-byte chars; use `MemoryBlock` + `DefineEncoding` |
-| Store user data on `App` | App is shared across all sessions; use `Session` |
+| Store user data on `App` | App is shared across all sessions; use cookies (not `Session` — it's Nil in SSR) |
+| Use `SetFlash()` or `Session.LogIn()` in SSR | `Self.Session` is always Nil in HandleURL; use cookies + inline error rendering |
 | Move the inline theme script to `docs.js` | Causes FOUC on every page load |
 | Use MermaidJS or D2 for diagrams | MermaidJS bakes inline colors; D2 produces 200KB+ SVGs |
 
-### Xojo Gotchas (Phase 3)
+### Xojo Gotchas (Phase 3+4)
 
 | What | Why / Fix |
 |------|-----------|
+| `Self.Session` is Nil in HandleURL | SSR mode has no WebSocket — no Xojo session. Use cookies for auth, sessionStorage for flash. |
+| `SetFlash()` does nothing in SSR | Session is Nil. Render errors inline via template context variable instead. |
+| `Response.Header("Set-Cookie")` works in HandleURL | Proven to work — use this for auth cookies, not JS `document.cookie` |
 | `Crypto.SHA256(s)` returns MemoryBlock | Use `EncodeHex(Crypto.SHA256(s))` — there is no `.Hex` method |
 | No `Math.Ceiling()` in Xojo | Use integer arithmetic: `(total + perPage - 1) \ perPage` |
 | `Assert.AreEqual(0, someInt)` is ambiguous | Xojo can't pick overload — use `Assert.IsTrue(someInt = 0)` |
 | FormParser was single-value (last-wins) | Changed to comma-append for duplicate keys (multi-value checkboxes) |
 | Missing Dictionary key in JinjaX template | Always populate all keys templates expect, even with empty defaults |
 
-### Authentication Pattern
+### Authentication Pattern (CRITICAL — Cookie-Based, Not Session-Based)
 
-- Password storage: `SHA256(password + salt):salt` in a single TEXT column
-- Salt: random via `Crypto.GenerateRandomBytes(16)`, hex-encoded
-- Verify: split stored value on `:`, recompute hash with extracted salt
-- Client-side: Web Crypto API hashes password before form submit (plaintext never sent)
-- Session: `Session.CurrentUserID`, `Session.IsLoggedIn()`, `Session.LogIn(id, username)`, `Session.LogOut()`
-- Nav auth state: localStorage stores username (set on login/signup, cleared on logout)
-- Flash messages: sessionStorage survives POST→redirect→GET cycle in SSR mode
+**`Self.Session` is always Nil in SSR HandleURL.** There is no WebSocket session in SSR mode. All auth is cookie-based.
+
+- **Password storage:** `SHA256(clientHash + salt):salt` in a single TEXT column (client sends SHA-256 hash, server adds salt)
+- **Salt:** random via `Crypto.GenerateRandomBytes(16)`, hex-encoded
+- **Verify:** split stored value on `:`, recompute hash with extracted salt
+- **Client-side:** Web Crypto API hashes password before form submit (plaintext never sent)
+- **Auth cookie:** HMAC-signed `mvvm_auth=userID:username:SHA256(userID:username:secret)` set via HTTP `Set-Cookie` header
+- **`App.mAuthSecret`:** random 32-byte hex string generated at startup for HMAC signing
+- **`ParseAuthCookie()`:** reads `Request.Header("Cookie")`, verifies HMAC, returns user Dictionary or Nil
+- **`CurrentUserID()` / `CurrentUsername()`:** read from parsed cookie (NOT from session)
+- **`RequireLogin()`:** redirects to `/login?next=<encoded-url>` if not authenticated; returns True if redirect issued
+- **`RequireLoginJSON()`:** returns 401 JSON `{"error":"Authentication required"}` for API endpoints
+- **`RedirectWithAuth()`:** HTTP `Set-Cookie` header + JS intermediate page for localStorage/sessionStorage
+- **`RedirectWithLogout()`:** `Set-Cookie: Max-Age=0` + JS clears localStorage
+- **Nav auth state:** localStorage stores username (set by JS intermediate page on login/signup)
+- **Flash messages:** sessionStorage (set by JS intermediate page), read by Alpine.js on next page load
+- **Error display:** login/signup errors rendered inline via `error_message` template variable (NOT SetFlash — that requires session)
+- **User-scoped notes:** `NoteModel` methods all require `userID` parameter; `WHERE user_id = ?` in every query
+- **Global tags:** Tags are shared across all users — only require login, no user scoping
 
 ### JSON API Pattern
 

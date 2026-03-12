@@ -3,6 +3,8 @@ Protected Class NotesAPICreateVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnPost()
+		  If RequireLoginJSON() Then Return
+
 		  Var title As String = GetFormValue("title").Trim()
 		  Var body As String = GetFormValue("body")
 
@@ -12,9 +14,10 @@ Inherits BaseViewModel
 		    Return
 		  End If
 
+		  Var uid As Integer = CurrentUserID()
 		  Var model As New NoteModel()
-		  Var newID As Integer = model.Create(title, body)
-		  Var note As Dictionary = model.GetByID(newID)
+		  Var newID As Integer = model.Create(title, body, uid)
+		  Var note As Dictionary = model.GetByID(newID, uid)
 
 		  Response.Status = 201
 		  WriteJSON(JSONSerializer.DictToJSON(note))

@@ -3,6 +3,8 @@ Protected Class TagsDetailVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnGet()
+		  If RequireLogin() Then Return
+
 		  Var id As Integer = Val(GetParam("id"))
 		  Var model As New TagModel()
 		  Var tag As Dictionary = model.GetByID(id)

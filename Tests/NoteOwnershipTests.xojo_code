@@ -1,86 +1,49 @@
 #tag Class
-Protected Class NoteModelTests
+Protected Class NoteOwnershipTests
 Inherits TestGroup
 	#tag Event
 		Sub TearDown()
 		  Const kTestUserID As Integer = 999
-		  If mTestID > 0 Then
-		    Var model As New NoteModel()
-		    model.Delete(mTestID, kTestUserID)
-		    mTestID = 0
-		  End If
+		  Var model As New NoteModel()
+		  For Each id As Integer In mTestIDs
+		    model.Delete(id, kTestUserID)
+		  Next
+		  mTestIDs.RemoveAll()
 		End Sub
 	#tag EndEvent
 
 
-	#tag Method, Flags = &h0, Description = "Create returns a positive integer ID."
-		Sub CreateReturnsIDTest()
+	#tag Method, Flags = &h0, Description = "GetByID returns Nil when fetched by a different user."
+		Sub GetByIDReturnsNilForWrongUserTest()
 		  Const kTestUserID As Integer = 999
+		  Const kOtherUserID As Integer = 888
 		  Var model As New NoteModel()
-		  mTestID = model.Create("Test Note", "Test body", kTestUserID)
-		  Assert.IsTrue(mTestID > 0, "Create should return a positive ID")
+		  Var id As Integer = model.Create("Ownership Test", "body", kTestUserID)
+		  mTestIDs.Add(id)
+
+		  Var note As Dictionary = model.GetByID(id, kOtherUserID)
+		  Assert.IsNil(note, "GetByID should return Nil for wrong user")
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = "GetAll includes the newly created note."
-		Sub GetAllIncludesNewNoteTest()
+	#tag Method, Flags = &h0, Description = "Delete by wrong user does not remove the note."
+		Sub DeleteDoesNotAffectOtherUsersNoteTest()
 		  Const kTestUserID As Integer = 999
+		  Const kOtherUserID As Integer = 888
 		  Var model As New NoteModel()
-		  mTestID = model.Create("GetAll Test Note", "body", kTestUserID)
+		  Var id As Integer = model.Create("Protected Note", "body", kTestUserID)
+		  mTestIDs.Add(id)
 
-		  Var results() As Variant = model.GetAll(kTestUserID)
-		  Var found As Boolean = False
-		  For Each item As Variant In results
-		    Var row As Dictionary = item
-		    If row.Value("id").StringValue = CStr(mTestID) Then
-		      found = True
-		    End If
-		  Next
-		  Assert.IsTrue(found, "GetAll should include the newly created note")
-		End Sub
-	#tag EndMethod
+		  model.Delete(id, kOtherUserID)
 
-	#tag Method, Flags = &h0, Description = "GetByID returns the correct title for the created note."
-		Sub GetByIDMatchesTitleTest()
-		  Const kTestUserID As Integer = 999
-		  Var model As New NoteModel()
-		  mTestID = model.Create("Specific Title", "body text", kTestUserID)
-
-		  Var row As Dictionary = model.GetByID(mTestID, kTestUserID)
-		  Assert.IsNotNil(row)
-		  Assert.AreEqual("Specific Title", row.Value("title").StringValue)
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = "Update changes the title visible via GetByID."
-		Sub UpdateChangesTitleTest()
-		  Const kTestUserID As Integer = 999
-		  Var model As New NoteModel()
-		  mTestID = model.Create("Original Title", "body", kTestUserID)
-		  model.Update(mTestID, "Updated Title", "new body", kTestUserID)
-
-		  Var row As Dictionary = model.GetByID(mTestID, kTestUserID)
-		  Assert.IsNotNil(row)
-		  Assert.AreEqual("Updated Title", row.Value("title").StringValue)
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0, Description = "Delete removes the note so GetByID returns Nil."
-		Sub DeleteRemovesNoteTest()
-		  Const kTestUserID As Integer = 999
-		  Var model As New NoteModel()
-		  Var tempID As Integer = model.Create("To Delete", "", kTestUserID)
-		  model.Delete(tempID, kTestUserID)
-		  // Don't set mTestID — already deleted, TearDown should skip
-
-		  Var row As Dictionary = model.GetByID(tempID, kTestUserID)
-		  Assert.IsNil(row)
+		  Var note As Dictionary = model.GetByID(id, kTestUserID)
+		  Assert.IsNotNil(note, "Delete by wrong user should not remove the note")
 		End Sub
 	#tag EndMethod
 
 
 	#tag Property, Flags = &h21
-		Private mTestID As Integer
+		Private mTestIDs() As Integer
 	#tag EndProperty
 
 

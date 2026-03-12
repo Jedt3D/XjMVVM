@@ -34,6 +34,22 @@ Protected Module DBAdapter
 		  "username TEXT NOT NULL UNIQUE, " + _
 		  "password_hash TEXT NOT NULL, " + _
 		  "created_at TEXT DEFAULT (datetime('now')))")
+
+		  // Migration: add user_id column to notes if missing
+		  Var rs As RowSet = db.SelectSQL("PRAGMA table_info(notes)")
+		  Var hasUserID As Boolean = False
+		  While Not rs.AfterLastRow
+		    If rs.Column("name").StringValue = "user_id" Then
+		      hasUserID = True
+		    End If
+		    rs.MoveToNextRow()
+		  Wend
+		  rs.Close()
+		  If Not hasUserID Then
+		    db.ExecuteSQL("ALTER TABLE notes ADD COLUMN user_id INTEGER NOT NULL DEFAULT 0")
+		  End If
+		  db.ExecuteSQL("CREATE INDEX IF NOT EXISTS idx_notes_user_id ON notes (user_id)")
+
 		  db.Close()
 		End Sub
 	#tag EndMethod

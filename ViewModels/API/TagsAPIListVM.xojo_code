@@ -3,6 +3,8 @@ Protected Class TagsAPIListVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnGet()
+		  If RequireLoginJSON() Then Return
+
 		  Var model As New TagModel()
 		  Var tags() As Variant = model.GetAll()
 		  WriteJSON(JSONSerializer.ArrayToJSON(tags))

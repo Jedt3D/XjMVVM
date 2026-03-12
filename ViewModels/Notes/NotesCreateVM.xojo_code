@@ -3,6 +3,8 @@ Protected Class NotesCreateVM
 Inherits BaseViewModel
 	#tag Method, Flags = &h0
 		Sub OnPost()
+		  If RequireLogin() Then Return
+
 		  Var title As String = GetFormValue("title")
 		  Var body As String = GetFormValue("body")
 
@@ -12,8 +14,9 @@ Inherits BaseViewModel
 		    Return
 		  End If
 
+		  Var uid As Integer = CurrentUserID()
 		  Var model As New NoteModel()
-		  Var newID As Integer = model.Create(title, body)
+		  Var newID As Integer = model.Create(title, body, uid)
 
 		  // Parse comma-joined tag_ids from multi-value checkboxes
 		  Var tagIDsRaw As String = GetFormValue("tag_ids")
