@@ -34,7 +34,7 @@ Inherits TestGroup
 		  noteModel.SetTagsForNote(mNoteID, tagIDs)
 
 		  Var tags() As Variant = noteModel.GetTagsForNote(mNoteID)
-		  Assert.AreEqual(2, tags.Count, "Should have 2 tags after SetTagsForNote")
+		  Assert.IsTrue(tags.Count = 2, "Should have 2 tags after SetTagsForNote")
 		End Sub
 	#tag EndMethod
 
@@ -63,7 +63,7 @@ Inherits TestGroup
 		  noteModel.SetTagsForNote(mNoteID, newTagIDs)
 
 		  Var tags() As Variant = noteModel.GetTagsForNote(mNoteID)
-		  Assert.AreEqual(1, tags.Count, "Should have 1 tag after overwrite")
+		  Assert.IsTrue(tags.Count = 1, "Should have 1 tag after overwrite")
 		End Sub
 	#tag EndMethod
 
@@ -85,7 +85,7 @@ Inherits TestGroup
 		  noteModel.SetTagsForNote(mNoteID, emptyIDs)
 
 		  Var tags() As Variant = noteModel.GetTagsForNote(mNoteID)
-		  Assert.AreEqual(0, tags.Count, "Should have 0 tags after clearing")
+		  Assert.IsTrue(tags.Count = 0, "Should have 0 tags after clearing")
 		End Sub
 	#tag EndMethod
 

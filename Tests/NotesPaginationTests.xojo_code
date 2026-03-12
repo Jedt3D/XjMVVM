@@ -67,7 +67,7 @@ Inherits TestGroup
 		Sub FindPaginatedLargeOffsetEmptyTest()
 		  Var model As New NoteModel()
 		  Var page() As Variant = model.FindPaginated(10, 99999, "id ASC")
-		  Assert.AreEqual(0, page.Count, "Large offset should return empty array")
+		  Assert.IsTrue(page.Count = 0, "Large offset should return empty array")
 		End Sub
 	#tag EndMethod
 

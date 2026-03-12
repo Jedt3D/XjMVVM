@@ -10,7 +10,7 @@ Inherits BaseViewModel
 
 		  Var model As New NoteModel()
 		  Var total As Integer = model.Count()
-		  Var totalPages As Integer = If(total = 0, 1, Math.Ceiling(total / perPage))
+		  Var totalPages As Integer = If(total = 0, 1, (total + perPage - 1) \ perPage)
 		  If page > totalPages Then page = totalPages
 
 		  Var offset As Integer = (page - 1) * perPage
