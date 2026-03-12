@@ -1,0 +1,22 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<h1>{{ page_title }}</h1>
+
+{% if tag %}
+<form method="post" action="/tags/{{ tag.id }}">
+{% else %}
+<form method="post" action="/tags">
+{% endif %}
+  <div>
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name" value="{% if tag %}{{ tag.name }}{% endif %}" required>
+  </div>
+  <p>
+    <button type="submit" class="btn btn-primary">{% if tag %}Update{% else %}Create{% endif %}</button>
+    <a href="/tags" class="btn">Cancel</a>
+  </p>
+</form>
+{% endblock %}

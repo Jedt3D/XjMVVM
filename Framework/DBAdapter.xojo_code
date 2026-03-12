@@ -21,6 +21,10 @@ Protected Module DBAdapter
 		  "body TEXT, " + _
 		  "created_at TEXT DEFAULT (datetime('now')), " + _
 		  "updated_at TEXT DEFAULT (datetime('now')))")
+		  db.ExecuteSQL("CREATE TABLE IF NOT EXISTS tags (" + _
+		  "id INTEGER PRIMARY KEY AUTOINCREMENT, " + _
+		  "name TEXT NOT NULL, " + _
+		  "created_at TEXT DEFAULT (datetime('now')))")
 		  db.Close()
 		End Sub
 	#tag EndMethod

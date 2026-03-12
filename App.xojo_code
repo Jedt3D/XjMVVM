@@ -66,6 +66,15 @@ Inherits WebApplication
 		  mRouter.Get("/notes/:id/edit", AddressOf CreateNotesEditVM)
 		  mRouter.Post("/notes/:id", AddressOf CreateNotesUpdateVM)
 		  mRouter.Post("/notes/:id/delete", AddressOf CreateNotesDeleteVM)
+
+		  // Tags CRUD routes
+		  mRouter.Get("/tags", AddressOf CreateTagsListVM)
+		  mRouter.Get("/tags/new", AddressOf CreateTagsNewVM)
+		  mRouter.Post("/tags", AddressOf CreateTagsCreateVM)
+		  mRouter.Get("/tags/:id", AddressOf CreateTagsDetailVM)
+		  mRouter.Get("/tags/:id/edit", AddressOf CreateTagsEditVM)
+		  mRouter.Post("/tags/:id", AddressOf CreateTagsUpdateVM)
+		  mRouter.Post("/tags/:id/delete", AddressOf CreateTagsDeleteVM)
 		End Sub
 	#tag EndEvent
 
@@ -115,6 +124,48 @@ Inherits WebApplication
 	#tag Method, Flags = &h21
 		Private Function CreateNotesUpdateVM() As BaseViewModel
 		  Return New NotesUpdateVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsListVM() As BaseViewModel
+		  Return New TagsListVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsDetailVM() As BaseViewModel
+		  Return New TagsDetailVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsNewVM() As BaseViewModel
+		  Return New TagsNewVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsCreateVM() As BaseViewModel
+		  Return New TagsCreateVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsEditVM() As BaseViewModel
+		  Return New TagsEditVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsUpdateVM() As BaseViewModel
+		  Return New TagsUpdateVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsDeleteVM() As BaseViewModel
+		  Return New TagsDeleteVM()
 		End Function
 	#tag EndMethod
 

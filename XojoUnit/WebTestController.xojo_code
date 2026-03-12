@@ -13,6 +13,7 @@ Inherits TestController
 		  group = New BaseModelTests(Self, "BaseModel")
 		  group = New NoteModelTests(Self, "NoteModel")
 		  group = New NotesPaginationTests(Self, "NotesPagination")
+		  group = New TagModelTests(Self, "TagModel")
 		  
 		End Sub
 	#tag EndEvent

@@ -1,0 +1,16 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}{{ tag.name }}{% endblock %}
+
+{% block content %}
+<h1>{{ tag.name }}</h1>
+<p style="color:#666; font-size:0.9em;">Created: {{ tag.created_at }}</p>
+
+<p>
+  <a href="/tags/{{ tag.id }}/edit" class="btn">Edit</a>
+  <form method="post" action="/tags/{{ tag.id }}/delete" style="display:inline;">
+    <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this tag?')">Delete</button>
+  </form>
+  <a href="/tags" class="btn">Back to Tags</a>
+</p>
+{% endblock %}
