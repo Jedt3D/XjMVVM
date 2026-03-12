@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.9.3-tooling] — 2026-03-13
+
+### Added
+
+- **`test_api.py`** — Python API smoke-test script (no dependencies beyond stdlib)
+  - Handles SHA-256 client-side password hashing before login POST (mirrors browser Web Crypto API)
+  - Extracts `mvvm_auth` cookie from `Set-Cookie` response header automatically
+  - `--signup` flag auto-creates the test user if login fails
+  - 9 test scenarios: unauthenticated 401, list notes, create note (validation 422 + success 201), note detail with embedded tags, notes 404, list tags, tag detail, tags 404
+  - Coloured pass/fail summary table with elapsed time; exits 0/1 for CI use
+
+### Changed
+
+- **Debug port** changed `8080 → 9090` in `mvvm.xojo_project` (conflict avoidance)
+
+---
+
 ## [0.9.3-editorial] — 2026-03-13
 
 ### Changed
