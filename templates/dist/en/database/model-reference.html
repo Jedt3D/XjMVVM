@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -412,13 +457,13 @@ SQLite database file</code></pre>
 <h2 id="design-decisions">Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
 <h3 id="why-return-dictionary-instead-of-model-instances">Why return <code>Dictionary</code> instead of model instances?<a class="headerlink" href="#why-return-dictionary-instead-of-model-instances" title="Permanent link">&para;</a></h3>
 <p>JinjaX templates use dot-notation: <code>{{ note.title }}</code>. The JinjaX engine resolves this by calling <code>dict.Value("title")</code> on a Xojo <code>Dictionary</code>. Custom class instances have no equivalent introspection mechanism.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Template: {{ note.title }}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// Template: {{ note.title }}</span>
 
-<span class="c1">// ✅ Works — Dictionary satisfies dot-notation</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myDictionary</span><span class="w">        </span><span class="c1">// .Value(&quot;title&quot;) → &quot;Hello&quot;</span><span class="w"></span>
+<span class="c1">// ✅ Works — Dictionary satisfies dot-notation</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myDictionary</span><span class="w">        </span><span class="c1">// .Value(&quot;title&quot;) → &quot;Hello&quot;</span>
 
-<span class="c1">// ❌ Does NOT work — NoteModel has no JinjaX introspection</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myNoteInstance</span><span class="w"></span>
+<span class="c1">// ❌ Does NOT work — NoteModel has no JinjaX introspection</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myNoteInstance</span>
 </code></pre></div>
 
 <div class="admonition warning">
@@ -699,16 +744,16 @@ Per-request (concurrent, independent)
 <h3 id="connect-as-sqlitedatabase"><code>Connect() As SQLiteDatabase</code><a class="headerlink" href="#connect-as-sqlitedatabase" title="Permanent link">&para;</a></h3>
 <p>Opens and returns a fresh connection. The caller is responsible for <code>db.Close()</code>.</p>
 <p>The database file lives in a <code>data/</code> folder <strong>next to the executable</strong> — resolved via <code>App.ExecutableFile.Parent</code>. This works identically in the Xojo debugger and in a built production binary. The <code>data/</code> directory is created automatically if it does not exist.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Connect</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// Resolve data/ next to the executable (works in debug and production)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dataDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">CreateAsFolder</span><span class="p">()</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Connect</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
+<span class="w">  </span><span class="c1">// Resolve data/ next to the executable (works in debug and production)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dataDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">CreateAsFolder</span><span class="p">()</span>
 
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
-<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">db</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">db</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
 <div class="admonition note">
@@ -720,18 +765,18 @@ Per-request (concurrent, independent)
 <p>To add a new table, add another <code>ExecuteSQL</code> here before <code>db.Close()</code>.</p>
 <h3 id="appopening-startup-paths">App.Opening — Startup Paths<a class="headerlink" href="#appopening-startup-paths" title="Permanent link">&para;</a></h3>
 <p><code>App.Opening</code> is the single place that wires up both runtime paths before any request is served:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Opening</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// Templates — resolved relative to executable, same as DB</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tplDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaEnvironment</span><span class="p">(</span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">tplDir</span><span class="p">.</span><span class="n">NativePath</span><span class="p">))</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Opening</span><span class="p">()</span>
+<span class="w">  </span><span class="c1">// Templates — resolved relative to executable, same as DB</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tplDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaEnvironment</span><span class="p">(</span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">tplDir</span><span class="p">.</span><span class="n">NativePath</span><span class="p">))</span>
 
-<span class="w">  </span><span class="c1">// Database — create schema on first launch</span><span class="w"></span>
-<span class="w">  </span><span class="n">DBAdapter</span><span class="p">.</span><span class="n">InitDB</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Database — create schema on first launch</span>
+<span class="w">  </span><span class="n">DBAdapter</span><span class="p">.</span><span class="n">InitDB</span><span class="p">()</span>
 
-<span class="w">  </span><span class="c1">// Router — register all routes</span><span class="w"></span>
-<span class="w">  </span><span class="n">mRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Router</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="n">RegisterRoutes</span><span class="p">()</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Router — register all routes</span>
+<span class="w">  </span><span class="n">mRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Router</span><span class="p">()</span>
+<span class="w">  </span><span class="n">RegisterRoutes</span><span class="p">()</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
 <p>Both <code>templates/</code> and <code>data/</code> sit alongside the executable. This means you can deploy the app by copying the binary together with those two folders — no absolute paths, no environment variables needed.</p>
@@ -767,25 +812,25 @@ Per-request (concurrent, independent)
 <h3 id="crud-methods">CRUD Methods<a class="headerlink" href="#crud-methods" title="Permanent link">&para;</a></h3>
 <h4 id="findallorderby-as-string-as-variant"><code>FindAll(orderBy As String = "") As Variant()</code><a class="headerlink" href="#findallorderby-as-string-as-variant" title="Permanent link">&para;</a></h4>
 <p>Returns all rows ordered by <code>orderBy</code>. Each element is a <code>Dictionary</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">rows</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="c1">// rows(0) → Dictionary: {&quot;id&quot;: &quot;1&quot;, &quot;title&quot;: &quot;Hello&quot;, ...}</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">rows</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span>
+<span class="c1">// rows(0) → Dictionary: {&quot;id&quot;: &quot;1&quot;, &quot;title&quot;: &quot;Hello&quot;, ...}</span>
 </code></pre></div>
 
 <h4 id="findbyidid-as-integer-as-dictionary"><code>FindByID(id As Integer) As Dictionary</code><a class="headerlink" href="#findbyidid-as-integer-as-dictionary" title="Permanent link">&para;</a></h4>
 <p>Returns the matching row, or <code>Nil</code> if not found. Always check before using:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+<span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
 <h4 id="insertdata-as-dictionary-as-integer"><code>Insert(data As Dictionary) As Integer</code><a class="headerlink" href="#insertdata-as-dictionary-as-integer" title="Permanent link">&para;</a></h4>
 <p>Builds a parameterized <code>INSERT</code> from the dictionary keys. Returns the new <code>ROWID</code>. SQL injection safe — uses <code>SQLitePreparedStatement</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My Note&quot;</span><span class="w"></span>
-<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Content&quot;</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Insert</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My Note&quot;</span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Content&quot;</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Insert</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </code></pre></div>
 
 <div class="admonition note">
@@ -794,13 +839,13 @@ Per-request (concurrent, independent)
 </div>
 <h4 id="updatebyidid-as-integer-data-as-dictionary"><code>UpdateByID(id As Integer, data As Dictionary)</code><a class="headerlink" href="#updatebyidid-as-integer-data-as-dictionary" title="Permanent link">&para;</a></h4>
 <p>Parameterized <code>UPDATE ... WHERE id = ?</code>. Only keys present in the dictionary are updated.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w"></span>
-<span class="n">model</span><span class="p">.</span><span class="n">UpdateByID</span><span class="p">(</span><span class="m">42</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;New Title&quot;</span>
+<span class="n">model</span><span class="p">.</span><span class="n">UpdateByID</span><span class="p">(</span><span class="m">42</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span>
 </code></pre></div>
 
 <h4 id="deletebyidid-as-integer"><code>DeleteByID(id As Integer)</code><a class="headerlink" href="#deletebyidid-as-integer" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">model</span><span class="p">.</span><span class="n">DeleteByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">model</span><span class="p">.</span><span class="n">DeleteByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 </code></pre></div>
 
 <h3 id="protected-escape-hatch-methods">Protected Escape Hatch Methods<a class="headerlink" href="#protected-escape-hatch-methods" title="Permanent link">&para;</a></h3>
@@ -817,48 +862,48 @@ Per-request (concurrent, independent)
 <h2 id="notemodel-class">NoteModel (Class)<a class="headerlink" href="#notemodel-class" title="Permanent link">&para;</a></h2>
 <p><strong>File:</strong> <code>Models/NoteModel.xojo_code</code></p>
 <p>The concrete resource model. Only ~20 lines because <code>BaseModel</code> handles everything generic.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">NoteModel</span><span class="w"></span>
-<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">NoteModel</span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;notes&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;notes&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, title, body, created_at, updated_at&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, title, body, created_at, updated_at&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="c1">// Delegation — zero boilerplate</span><span class="w"></span>
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Delegation — zero boilerplate</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="w">  </span><span class="c1">// Escape hatch — SQLite expressions required for timestamps</span><span class="w"></span>
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Escape hatch — SQLite expressions required for timestamps</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">      </span><span class="s2">&quot;UPDATE notes SET title = ?, body = ?, updated_at = datetime(&#39;now&#39;) WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">      </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="s2">&quot;UPDATE notes SET title = ?, body = ?, updated_at = datetime(&#39;now&#39;) WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
 <p><code>Create</code> and <code>Update</code> use the escape hatch because <code>datetime('now')</code> is a SQLite-evaluated expression — binding the string <code>"datetime('now')"</code> as a <code>?</code> parameter would store the literal text, not a timestamp.</p>
@@ -995,46 +1040,46 @@ Per-request (concurrent, independent)
 <h2 id="adding-a-new-resource">Adding a New Resource<a class="headerlink" href="#adding-a-new-resource" title="Permanent link">&para;</a></h2>
 <p>Adding <code>TagModel</code> as a complete example:</p>
 <p><strong>1. Create <code>Models/TagModel.xojo_code</code>:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span><span class="w"></span>
-<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;tags&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;tags&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, name, created_at&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, name, created_at&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;name ASC&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;name ASC&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO tags (name) VALUES (?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO tags (name) VALUES (?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
 <p><strong>2. Add the table to <code>DBAdapter.InitDB()</code>:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;id         INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;name       TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;created_at TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;id         INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;name       TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;created_at TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <p><strong>3. Register</strong> <code>Models/TagModel.xojo_code</code> in <code>mvvm.xojo_project</code> under the Models folder (Xojo IDE: drag the file into the project panel).</p>
@@ -1053,9 +1098,9 @@ Per-request (concurrent, independent)
           </div>
           <div class="page-nav-next">
             
-            <a href="../encoding/">
+            <a href="../tags/">
               <span class="page-nav-label">Next →</span>
-              <span class="page-nav-title">Forms, MIME & UTF-8</span>
+              <span class="page-nav-title">Tags & Many-to-Many</span>
             </a>
             
           </div>

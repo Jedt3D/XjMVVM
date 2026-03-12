@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tags & Many-to-Many — MVVM Docs</title>
+  <meta name="description" content="How to add a second resource (Tags), wire up a many-to-many junction table, and query across the relationship." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/dist/en/index.html">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.9.0</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn active" href="/dist/en/index.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/dist/th/index.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/dist/jp/index.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/dist/en/index.html">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">Tags & Many-to-Many</h1>
+          <p class="page-description">How to add a second resource (Tags), wire up a many-to-many junction table, and query across the relationship.</p>
+        </div>
+
+        <h1 id="tags-many-to-many">Tags &amp; Many-to-Many<a class="headerlink" href="#tags-many-to-many" title="Permanent link">&para;</a></h1>
+<p>Adding Tags introduced two things at once: a <strong>second full resource</strong> (proving the CRUD pattern generalises beyond Notes) and a <strong>many-to-many relationship</strong> between Notes and Tags via a junction table.</p>
+<h2 id="the-tag-resource">The Tag resource<a class="headerlink" href="#the-tag-resource" title="Permanent link">&para;</a></h2>
+<p><code>TagModel</code> follows exactly the same three-layer pattern as <code>NoteModel</code>.</p>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="1329.0" height="132.0" viewBox="0 0 1329 132" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: right
+    #spacing: 48
+    #padding: 10
+    #lineWidth: 1.5
+    [DBAdapter] -&gt; [BaseModel]
+    [BaseModel] -&gt; [TagModel|TableName(): &quot;tags&quot;\nColumns(): id, name, created_at\nGetAll() / GetByID()\nCreate() / Update() / Delete()]
+    [TagModel] -&gt; [&lt;database&gt; tags]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="132.0" width="1329.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(10, 10)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M105.0 36.0 L129 36 L145 36 L145.0 36.0 " fill="none"></path>
+                    <path d="M137.0 42.4 L145.0 36.0 L137.0 29.6 L153.0 36.0 Z"></path>
+                    <path d="M261.0 36.0 L285 36 L301 36 L301.0 36.0 " fill="none"></path>
+                    <path d="M293.0 42.4 L301.0 36.0 L293.0 29.6 L309.0 36.0 Z"></path>
+                    <path d="M1167.0 36.0 L1191 36 L1207 36 L1207.0 36.0 " fill="none"></path>
+                    <path d="M1199.0 42.4 L1207.0 36.0 L1199.0 29.6 L1215.0 36.0 Z"></path>
+                    <g data-name="DBAdapter">
+                        <g fill="white" stroke="black" data-name="DBAdapter">
+                            <rect x="0.0" y="18.0" height="36.0" width="105.0" data-name="DBAdapter"></rect>
+                        </g>
+                        <g transform="translate(0, 18)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="DBAdapter" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="DBAdapter" data-compartment="0">
+                                <text x="42.5" y="14.1" stroke="none" text-anchor="middle" data-name="DBAdapter" data-compartment="0">DBAdapter</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="BaseModel">
+                        <g fill="white" stroke="black" data-name="BaseModel">
+                            <rect x="153.0" y="18.0" height="36.0" width="108.0" data-name="BaseModel"></rect>
+                        </g>
+                        <g transform="translate(153, 18)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BaseModel" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="BaseModel" data-compartment="0">
+                                <text x="44.0" y="14.1" stroke="none" text-anchor="middle" data-name="BaseModel" data-compartment="0">BaseModel</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="TagModel">
+                        <g fill="white" stroke="black" data-name="TagModel">
+                            <rect x="309.0" y="0.0" height="72.0" width="858.0" data-name="TagModel"></rect>
+                            <path d="M309.0 36.0 L1167.0 36.0" fill="none" data-name="TagModel"></path>
+                        </g>
+                        <g transform="translate(309, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TagModel" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="TagModel" data-compartment="0">
+                                <text x="419.0" y="14.1" stroke="none" text-anchor="middle" data-name="TagModel" data-compartment="0">TagModel</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(309, 36)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TagModel" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="TagModel" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="TagModel" data-compartment="1">TableName(): &quot;tags&quot;
+                                Columns(): id, name, created_at
+                                GetAll() / GetByID()
+                                Create() / Update() / Delete()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="tags">
+                        <g fill="white" stroke="black" data-name="tags">
+                            <rect x="1215.0" y="18.0" height="36.0" width="54.0" stroke="none" data-name="tags"></rect>
+                            <path d="M1215.0 18.0 L1215.0 54.0" fill="none" data-name="tags"></path>
+                            <path d="M1269.0 18.0 L1269.0 54.0" fill="none" data-name="tags"></path>
+                            <ellipse cx="1242.0" cy="18.0" rx="27.0" ry="7.5" data-name="tags"></ellipse>
+                            <path d="M1269.0 54.0 L1269.0 54.4 L1268.9 54.7 L1268.7 55.1 L1268.5 55.5 L1268.2 55.9 L1267.8 56.2 L1267.4 56.6 L1266.9 56.9 L1266.3 57.3 L1265.7 57.6 L1265.0 57.9 L1264.3 58.2 L1263.5 58.5 L1262.7 58.8 L1261.8 59.1 L1260.9 59.4 L1259.9 59.6 L1258.8 59.9 L1257.8 60.1 L1256.6 60.3 L1255.5 60.5 L1254.3 60.7 L1253.1 60.8 L1251.9 61.0 L1250.6 61.1 L1249.3 61.2 L1248.0 61.3 L1246.7 61.4 L1245.4 61.4 L1244.0 61.5 L1242.7 61.5 L1241.3 61.5 L1240.0 61.5 L1238.6 61.4 L1237.3 61.4 L1236.0 61.3 L1234.7 61.2 L1233.4 61.1 L1232.1 61.0 L1230.9 60.8 L1229.7 60.7 L1228.5 60.5 L1227.4 60.3 L1226.2 60.1 L1225.2 59.9 L1224.1 59.6 L1223.1 59.4 L1222.2 59.1 L1221.3 58.8 L1220.5 58.5 L1219.7 58.2 L1219.0 57.9 L1218.3 57.6 L1217.7 57.3 L1217.1 56.9 L1216.6 56.6 L1216.2 56.2 L1215.8 55.9 L1215.5 55.5 L1215.3 55.1 L1215.1 54.7 L1215.0 54.4 L1215.0 54.0" data-name="tags"></path>
+                        </g>
+                        <g transform="translate(1215, 23)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="tags" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="tags" data-compartment="0">
+                                <text x="17.0" y="14.1" stroke="none" text-anchor="middle" data-name="tags" data-compartment="0">tags</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>DBAdapter → BaseModel → TagModel → tags table
+TagModel declares: TableName="tags", Columns="id, name, created_at"
+Methods: GetAll(), GetByID(), Create(), Update(), Delete()</code></pre>
+  </div>
+</div>
+
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span>
+
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;tags&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, name, created_at&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;name ASC&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO tags (name) VALUES (?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;UPDATE tags SET name = ? WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
+</code></pre></div>
+
+<p>The schema is registered in <code>DBAdapter.InitDB()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;id          INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;name        TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;created_at  TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<hr />
+<h2 id="tags-routes">Tags routes<a class="headerlink" href="#tags-routes" title="Permanent link">&para;</a></h2>
+<p>Seven routes are registered in <code>App.Opening</code>, mirroring the Notes pattern:</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Path</th>
+<th>ViewModel</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET</code></td>
+<td><code>/tags</code></td>
+<td><code>TagsListVM</code></td>
+<td>List all tags</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/tags/new</code></td>
+<td><code>TagsNewVM</code></td>
+<td>New tag form</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/tags</code></td>
+<td><code>TagsCreateVM</code></td>
+<td>Create tag</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/tags/:id</code></td>
+<td><code>TagsDetailVM</code></td>
+<td>View tag</td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/tags/:id/edit</code></td>
+<td><code>TagsEditVM</code></td>
+<td>Edit form</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/tags/:id</code></td>
+<td><code>TagsUpdateVM</code></td>
+<td>Update tag</td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/tags/:id/delete</code></td>
+<td><code>TagsDeleteVM</code></td>
+<td>Delete tag</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="many-to-many-note_tags">Many-to-many: note_tags<a class="headerlink" href="#many-to-many-note_tags" title="Permanent link">&para;</a></h2>
+<p>Notes and Tags have a many-to-many relationship. A note can have many tags; a tag can appear on many notes. This is modelled with a <strong>junction table</strong> — no foreign key column on either the notes or tags table.</p>
+<div class="diagram-tabs" id="diag2">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag2','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="1168.0" height="152.0" viewBox="0 0 1168 152" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: right
+    #spacing: 44
+    #padding: 10
+    #lineWidth: 1.5
+    [&lt;database&gt; notes|id\ntitle\nbody\ncreated_at\nupdated_at] -- [note_tags|note_id (FK)\ntag_id (FK)\nPRIMARY KEY (note_id, tag_id)]
+    [note_tags] -- [&lt;database&gt; tags|id\nname\ncreated_at]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="normal" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="152.0" width="1168.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(10, 10)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <g stroke-dasharray="4 4">
+                        <path d="M340.0 46.0 L362 46 L384 46 L384.0 46.0 " fill="none"></path>
+                    </g>
+                    <g stroke-dasharray="4 4">
+                        <path d="M869.0 46.0 L891 46 L913 46 L913.0 46.0 " fill="none"></path>
+                    </g>
+                    <g data-name="notes">
+                        <g fill="white" stroke="black" data-name="notes">
+                            <rect x="0.0" y="10.0" height="72.0" width="340.0" stroke="none" data-name="notes"></rect>
+                            <path d="M0.0 10.0 L0.0 82.0" fill="none" data-name="notes"></path>
+                            <path d="M340.0 10.0 L340.0 82.0" fill="none" data-name="notes"></path>
+                            <ellipse cx="170.0" cy="10.0" rx="170.0" ry="7.5" data-name="notes"></ellipse>
+                            <path d="M340.0 82.0 L339.8 82.4 L339.2 82.7 L338.1 83.1 L336.6 83.5 L334.7 83.9 L332.4 84.2 L329.7 84.6 L326.7 84.9 L323.2 85.3 L319.3 85.6 L315.1 85.9 L310.5 86.2 L305.5 86.5 L300.2 86.8 L294.6 87.1 L288.7 87.4 L282.5 87.6 L276.0 87.9 L269.2 88.1 L262.2 88.3 L255.0 88.5 L247.6 88.7 L239.9 88.8 L232.1 89.0 L224.1 89.1 L216.0 89.2 L207.8 89.3 L199.5 89.4 L191.1 89.4 L182.7 89.5 L174.2 89.5 L165.8 89.5 L157.3 89.5 L148.9 89.4 L140.5 89.4 L132.2 89.3 L124.0 89.2 L115.9 89.1 L107.9 89.0 L100.1 88.8 L92.4 88.7 L85.0 88.5 L77.8 88.3 L70.8 88.1 L64.0 87.9 L57.5 87.6 L51.3 87.4 L45.4 87.1 L39.8 86.8 L34.5 86.5 L29.5 86.2 L24.9 85.9 L20.7 85.6 L16.8 85.3 L13.3 84.9 L10.3 84.6 L7.6 84.2 L5.3 83.9 L3.4 83.5 L1.9 83.1 L0.8 82.7 L0.2 82.4 L0.0 82.0" data-name="notes"></path>
+                            <path d="M0.0 46.0 L3.7 47.6 L14.7 49.1 L32.5 50.4 L56.2 51.6 L85.0 52.5 L117.5 53.1 L152.2 53.5 L187.8 53.5 L222.5 53.1 L255.0 52.5 L283.8 51.6 L307.5 50.4 L325.3 49.1 L336.3 47.6 L340.0 46.0" fill="none" data-name="notes"></path>
+                        </g>
+                        <g transform="translate(0, 15)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="notes" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="notes" data-compartment="0">
+                                <text x="160.0" y="14.1" stroke="none" text-anchor="middle" data-name="notes" data-compartment="0">notes</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(0, 51)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="notes" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="notes" data-compartment="1">
+                                <text x="160.0" y="14.1" stroke="none" text-anchor="middle" data-name="notes" data-compartment="1">id
+                                title
+                                body
+                                created_at
+                                updated_at</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="note_tags">
+                        <g fill="white" stroke="black" data-name="note_tags">
+                            <rect x="384.0" y="10.0" height="72.0" width="485.0" data-name="note_tags"></rect>
+                            <path d="M384.0 46.0 L869.0 46.0" fill="none" data-name="note_tags"></path>
+                        </g>
+                        <g transform="translate(384, 10)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="note_tags" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="note_tags" data-compartment="0">
+                                <text x="232.5" y="14.1" stroke="none" text-anchor="middle" data-name="note_tags" data-compartment="0">note_tags</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(384, 46)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="note_tags" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="note_tags" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="note_tags" data-compartment="1">note_id (FK)
+                                tag_id (FK)
+                                PRIMARY KEY (note_id, tag_id)</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="tags">
+                        <g fill="white" stroke="black" data-name="tags">
+                            <rect x="913.0" y="10.0" height="72.0" width="195.0" stroke="none" data-name="tags"></rect>
+                            <path d="M913.0 10.0 L913.0 82.0" fill="none" data-name="tags"></path>
+                            <path d="M1108.0 10.0 L1108.0 82.0" fill="none" data-name="tags"></path>
+                            <ellipse cx="1010.5" cy="10.0" rx="97.5" ry="7.5" data-name="tags"></ellipse>
+                            <path d="M1108.0 82.0 L1107.9 82.4 L1107.5 82.7 L1106.9 83.1 L1106.1 83.5 L1105.0 83.9 L1103.7 84.2 L1102.1 84.6 L1100.3 84.9 L1098.3 85.3 L1096.1 85.6 L1093.7 85.9 L1091.1 86.2 L1088.2 86.5 L1085.2 86.8 L1082.0 87.1 L1078.6 87.4 L1075.0 87.6 L1071.3 87.9 L1067.4 88.1 L1063.4 88.3 L1059.2 88.5 L1055.0 88.7 L1050.6 88.8 L1046.1 89.0 L1041.6 89.1 L1036.9 89.2 L1032.2 89.3 L1027.4 89.4 L1022.6 89.4 L1017.8 89.5 L1012.9 89.5 L1008.1 89.5 L1003.2 89.5 L998.4 89.4 L993.6 89.4 L988.8 89.3 L984.1 89.2 L979.4 89.1 L974.9 89.0 L970.4 88.8 L966.0 88.7 L961.7 88.5 L957.6 88.3 L953.6 88.1 L949.7 87.9 L946.0 87.6 L942.4 87.4 L939.0 87.1 L935.8 86.8 L932.8 86.5 L929.9 86.2 L927.3 85.9 L924.9 85.6 L922.7 85.3 L920.7 84.9 L918.9 84.6 L917.3 84.2 L916.0 83.9 L914.9 83.5 L914.1 83.1 L913.5 82.7 L913.1 82.4 L913.0 82.0" data-name="tags"></path>
+                            <path d="M913.0 46.0 L915.1 47.6 L921.4 49.1 L931.6 50.4 L945.3 51.6 L961.8 52.5 L980.4 53.1 L1000.3 53.5 L1020.7 53.5 L1040.6 53.1 L1059.3 52.5 L1075.7 51.6 L1089.4 50.4 L1099.6 49.1 L1105.9 47.6 L1108.0 46.0" fill="none" data-name="tags"></path>
+                        </g>
+                        <g transform="translate(913, 15)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="tags" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="tags" data-compartment="0">
+                                <text x="87.5" y="14.1" stroke="none" text-anchor="middle" data-name="tags" data-compartment="0">tags</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(913, 51)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="tags" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="tags" data-compartment="1">
+                                <text x="87.5" y="14.1" stroke="none" text-anchor="middle" data-name="tags" data-compartment="1">id
+                                name
+                                created_at</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>notes (id, title, body, ...)
+  │
+  │  note_tags (note_id, tag_id)  ← junction / bridge table
+  │
+tags (id, name, created_at)
+
+A note can have zero or many tags.
+A tag can appear on zero or many notes.</code></pre>
+  </div>
+</div>
+
+<p>The schema:</p>
+<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS note_tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;note_id  INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;tag_id   INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;PRIMARY KEY (note_id, tag_id))&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p>The composite primary key <code>(note_id, tag_id)</code> enforces uniqueness at the database level — a note cannot be associated with the same tag twice.</p>
+<hr />
+<h2 id="reading-tags-for-a-note">Reading tags for a note<a class="headerlink" href="#reading-tags-for-a-note" title="Permanent link">&para;</a></h2>
+<p><code>NoteModel.GetTagsForNote()</code> queries the junction table with a <code>JOIN</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">GetTagsForNote</span><span class="p">(</span><span class="n">noteID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">results</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">sql</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;SELECT t.id, t.name, t.created_at FROM tags t &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;JOIN note_tags nt ON nt.tag_id = t.id &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">    </span><span class="s2">&quot;WHERE nt.note_id = ? ORDER BY t.name ASC&quot;</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">RowSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">SelectSQL</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span><span class="w"> </span><span class="n">noteID</span><span class="p">)</span>
+<span class="w">  </span><span class="k">While</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">AfterLastRow</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">    </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">    </span><span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+<span class="w">    </span><span class="n">rs</span><span class="p">.</span><span class="n">MoveToNextRow</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Wend</span>
+<span class="w">  </span><span class="n">rs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">results</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>The return value is <code>Variant()</code> of <code>Dictionary</code> — fully compatible with JinjaX templates and the JSON API.</p>
+<hr />
+<h2 id="writing-tags-for-a-note">Writing tags for a note<a class="headerlink" href="#writing-tags-for-a-note" title="Permanent link">&para;</a></h2>
+<p><code>NoteModel.SetTagsForNote()</code> uses a <strong>delete-then-insert</strong> pattern to replace the full tag set atomically:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">SetTagsForNote</span><span class="p">(</span><span class="n">noteID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">tagIDs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;DELETE FROM note_tags WHERE note_id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">noteID</span><span class="p">)</span>
+<span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="k">Each</span><span class="w"> </span><span class="n">tagID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="ow">In</span><span class="w"> </span><span class="n">tagIDs</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT OR IGNORE INTO note_tags (note_id, tag_id) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">noteID</span><span class="p">,</span><span class="w"> </span><span class="n">tagID</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Next</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code>INSERT OR IGNORE</code> is intentional. The composite primary key prevents duplicates at the database level. If the same <code>tagID</code> appears in the array more than once, <code>INSERT OR IGNORE</code> silently skips the duplicate rather than raising a constraint error.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The delete-then-insert pattern treats the tag set as a whole — it does not diff the old set against the new. This is simpler and correct for most use cases. If you need to preserve metadata on individual associations (e.g., timestamps per tag assignment), a diff approach would be needed instead.</p>
+</div>
+<hr />
+<h2 id="adding-a-new-many-to-many-relationship">Adding a new many-to-many relationship<a class="headerlink" href="#adding-a-new-many-to-many-relationship" title="Permanent link">&para;</a></h2>
+<p>To add a second junction (e.g., Note ↔ Category):</p>
+<p><strong>1.</strong> Add the junction table in <code>DBAdapter.InitDB()</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS note_categories (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;note_id      INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;category_id  INTEGER NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;PRIMARY KEY (note_id, category_id))&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><strong>2.</strong> Add <code>GetCategoriesForNote()</code> and <code>SetCategoriesForNote()</code> to the relevant model using the same JOIN and delete-then-insert patterns.</p>
+<p><strong>3.</strong> In the ViewModel that renders the note detail or edit form, call both methods and merge results into the context dictionary.</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../database/model-reference.html">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">DB Layer Reference</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../auth/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Auth System</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#the-tag-resource">The Tag resource</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#tags-routes">Tags routes</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#many-to-many-note_tags">Many-to-many: note_tags</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#reading-tags-for-a-note">Reading tags for a note</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#writing-tags-for-a-note">Writing tags for a note</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#adding-a-new-many-to-many-relationship">Adding a new many-to-many relationship</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

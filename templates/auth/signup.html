@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Sign Up</h1>
 
-<form method="post" action="/signup" style="max-width:360px;">
+<form id="signup-form" method="post" action="/signup" style="max-width:360px;">
   <div>
     <label for="username">Username</label>
     <input type="text" id="username" name="username" autocomplete="username" required>
@@ -18,9 +18,50 @@
     <label for="password_confirm">Confirm Password</label>
     <input type="password" id="password_confirm" name="password_confirm" autocomplete="new-password" required>
   </div>
+  <p id="pw-error" style="display:none; color:#721c24; background:#f8d7da; padding:8px 12px; border-radius:4px; margin:0 0 12px;"></p>
   <p>
     <button type="submit" class="btn btn-primary">Create Account</button>
   </p>
   <p style="font-size:0.9em;">Already have an account? <a href="/login">Log in</a></p>
 </form>
+
+<script>
+async function sha256hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+document.getElementById('signup-form').addEventListener('submit', async function(e) {
+  if (this.dataset.hashed) return;
+  e.preventDefault();
+
+  const pwEl  = document.getElementById('password');
+  const cfEl  = document.getElementById('password_confirm');
+  const errEl = document.getElementById('pw-error');
+  const pw = pwEl.value;
+  const cf = cfEl.value;
+
+  if (pw.length < 6) {
+    errEl.textContent = 'Password must be at least 6 characters.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (pw !== cf) {
+    errEl.textContent = 'Passwords do not match.';
+    errEl.style.display = 'block';
+    return;
+  }
+  errEl.style.display = 'none';
+
+  const username = document.getElementById('username').value;
+  const hash = await sha256hex(pw);
+  pwEl.value = hash;
+  cfEl.value = hash;
+  localStorage.setItem('_auth_user', username);
+  sessionStorage.setItem('_flash_msg',  'Account created! Welcome, ' + username + '!');
+  sessionStorage.setItem('_flash_type', 'success');
+  this.dataset.hashed = '1';
+  this.submit();
+});
+</script>
 {% endblock %}

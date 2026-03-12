@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Database Layer Reference — MVVM Docs</title>
-  <meta name="description" content="The three-layer DBAdapter / BaseModel / NoteModel architecture — design rationale, connection lifecycle, full CRUD API, and how to add a new resource." />
+  <title>データベースレイヤーリファレンス — MVVM Docs</title>
+  <meta name="description" content="3層DBAdapter / BaseModel / NoteModelアーキテクチャ — 設計根拠、接続ライフサイクル、完全なCRUD API、および新しいリソースを追加する方法。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -268,13 +313,13 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">Database Layer Reference</h1>
-          <p class="page-description">The three-layer DBAdapter / BaseModel / NoteModel architecture — design rationale, connection lifecycle, full CRUD API, and how to add a new resource.</p>
+          <h1 class="page-title">データベースレイヤーリファレンス</h1>
+          <p class="page-description">3層DBAdapter / BaseModel / NoteModelアーキテクチャ — 設計根拠、接続ライフサイクル、完全なCRUD API、および新しいリソースを追加する方法。</p>
         </div>
 
-        <h1 id="database-layer-reference">Database Layer Reference<a class="headerlink" href="#database-layer-reference" title="Permanent link">&para;</a></h1>
-<h2 id="three-layer-architecture">Three-Layer Architecture<a class="headerlink" href="#three-layer-architecture" title="Permanent link">&para;</a></h2>
-<p>The database layer separates three distinct responsibilities. Each layer knows only about the one below it.</p>
+        <h1 id="_1">データベースレイヤーリファレンス<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<h2 id="3">3層アーキテクチャ<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<p>データベースレイヤーは、3つの異なる責任を分離します。各層は、それより下の層についてのみ知っています。</p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -402,31 +447,31 @@ SQLite database file</code></pre>
   </div>
 </div>
 
-<p>This separation means:</p>
+<p>この分離は以下を意味します：</p>
 <ul>
-<li><strong>No boilerplate in resource models</strong> — <code>NoteModel</code> is ~20 lines. It declares the table and columns, delegates generic operations to <code>BaseModel</code>, and only writes custom SQL when needed.</li>
-<li><strong>Single place to change connection logic</strong> — moving from SQLite to PostgreSQL touches only <code>DBAdapter.Connect()</code>.</li>
-<li><strong>Clear escape hatch</strong> — <code>BaseModel.OpenDB()</code> gives subclasses raw DB access without breaking the generic layer.</li>
+<li><strong>リソースモデルのボイラープレートなし</strong> — <code>NoteModel</code>は約20行です。テーブルと列を宣言し、一般的な操作を<code>BaseModel</code>に委譲し、カスタムSQLが必要な場合のみ記述します。</li>
+<li><strong>接続ロジックを変更する単一の場所</strong> — SQLiteからPostgreSQLへの移動は、<code>DBAdapter.Connect()</code>のみを触れます。</li>
+<li><strong>クリアなエスケープハッチ</strong> — <code>BaseModel.OpenDB()</code>はサブクラスに一般的なレイヤーを破壊することなく生のDB アクセスを与えます。</li>
 </ul>
 <hr />
-<h2 id="design-decisions">Design Decisions<a class="headerlink" href="#design-decisions" title="Permanent link">&para;</a></h2>
-<h3 id="why-return-dictionary-instead-of-model-instances">Why return <code>Dictionary</code> instead of model instances?<a class="headerlink" href="#why-return-dictionary-instead-of-model-instances" title="Permanent link">&para;</a></h3>
-<p>JinjaX templates use dot-notation: <code>{{ note.title }}</code>. The JinjaX engine resolves this by calling <code>dict.Value("title")</code> on a Xojo <code>Dictionary</code>. Custom class instances have no equivalent introspection mechanism.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Template: {{ note.title }}</span><span class="w"></span>
+<h2 id="_2">設計上の決定<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="dictionary">モデルインスタンスの代わりに<code>Dictionary</code>を返すのはなぜか？<a class="headerlink" href="#dictionary" title="Permanent link">&para;</a></h3>
+<p>JinjaXテンプレートはドット記法を使用します：<code>{{ note.title }}</code>。JinjaXエンジンは、Xojo<code>Dictionary</code>に対して<code>dict.Value("title")</code>を呼び出すことでこれを解決します。カスタムクラスインスタンスは、同等のイントロスペクションメカニズムを持ちません。</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Template: {{ note.title }}</span>
 
-<span class="c1">// ✅ Works — Dictionary satisfies dot-notation</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myDictionary</span><span class="w">        </span><span class="c1">// .Value(&quot;title&quot;) → &quot;Hello&quot;</span><span class="w"></span>
+<span class="c1">// ✅ Works — Dictionary satisfies dot-notation</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myDictionary</span><span class="w">        </span><span class="c1">// .Value(&quot;title&quot;) → &quot;Hello&quot;</span>
 
-<span class="c1">// ❌ Does NOT work — NoteModel has no JinjaX introspection</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myNoteInstance</span><span class="w"></span>
+<span class="c1">// ❌ Does NOT work — NoteModel has no JinjaX introspection</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;note&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">myNoteInstance</span>
 </code></pre></div>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>All model methods must return <code>Dictionary</code> or <code>Variant()</code> of <code>Dictionary</code>. This is the most critical architectural rule in the data layer. Custom class instances cannot be used in JinjaX templates.</p>
+<p>すべてのモデルメソッドは<code>Dictionary</code>または<code>Variant()</code>の<code>Dictionary</code>を返す必要があります。これはデータレイヤーで最も重要なアーキテクチャルールです。カスタムクラスインスタンスはJinjaXテンプレートで使用することはできません。</p>
 </div>
-<h3 id="why-one-connection-per-request">Why one connection per request?<a class="headerlink" href="#why-one-connection-per-request" title="Permanent link">&para;</a></h3>
-<p>Xojo Web handles concurrent HTTP requests on separate threads. A shared <code>SQLiteDatabase</code> across threads requires locking and risks deadlock.</p>
+<h3 id="11">1つのリクエストあたり1つの接続はなぜか？<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<p>Xojo Webは、並行HTTPリクエストを別々のスレッドで処理します。スレッド全体で共有される<code>SQLiteDatabase</code>にはロッキングが必要で、デッドロックのリスクがあります。</p>
 <div class="diagram-tabs" id="diag2">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
@@ -507,9 +552,9 @@ SQLite database file</code></pre>
   </div>
 </div>
 
-<p>Opening a fresh connection per call is safe. SQLite&rsquo;s overhead for opening a local file connection is negligible at typical internal-tool traffic volumes.</p>
+<p>各呼び出しごとに新しい接続を開くことは安全です。SQLiteのローカルファイル接続を開くことのオーバーヘッドは、通常的な内部ツールのトラフィック量では無視できます。</p>
 <hr />
-<h2 id="connection-lifecycle">Connection Lifecycle<a class="headerlink" href="#connection-lifecycle" title="Permanent link">&para;</a></h2>
+<h2 id="_3">接続ライフサイクル<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <div class="diagram-tabs" id="diag3">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag3','nomnoml',this)">Diagram</button>
@@ -690,56 +735,56 @@ Per-request (concurrent, independent)
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Every code path that calls <code>Connect()</code> must call <code>db.Close()</code> before returning — including error paths. All <code>BaseModel</code> methods close the connection on every return branch.</p>
+<p><code>Connect()</code>を呼び出すすべてのコードパスは、エラーパスを含む、戻る前に<code>db.Close()</code>を呼び出す必要があります。すべての<code>BaseModel</code>メソッドはすべての戻りブランチで接続を閉じます。</p>
 </div>
 <hr />
-<h2 id="dbadapter-module">DBAdapter (Module)<a class="headerlink" href="#dbadapter-module" title="Permanent link">&para;</a></h2>
+<h2 id="dbadapter-module">DBAdapter （Module）<a class="headerlink" href="#dbadapter-module" title="Permanent link">&para;</a></h2>
 <p><strong>File:</strong> <code>Framework/DBAdapter.xojo_code</code></p>
-<p>A module — no instantiation needed — that owns the connection factory and schema setup.</p>
+<p>モジュール — インスタンス化は必要ありません — 接続ファクトリとスキーマセットアップを所有しています。</p>
 <h3 id="connect-as-sqlitedatabase"><code>Connect() As SQLiteDatabase</code><a class="headerlink" href="#connect-as-sqlitedatabase" title="Permanent link">&para;</a></h3>
-<p>Opens and returns a fresh connection. The caller is responsible for <code>db.Close()</code>.</p>
-<p>The database file lives in a <code>data/</code> folder <strong>next to the executable</strong> — resolved via <code>App.ExecutableFile.Parent</code>. This works identically in the Xojo debugger and in a built production binary. The <code>data/</code> directory is created automatically if it does not exist.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Connect</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// Resolve data/ next to the executable (works in debug and production)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dataDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">CreateAsFolder</span><span class="p">()</span><span class="w"></span>
+<p>新しい接続を開いて返します。呼び出し側は<code>db.Close()</code>の責任があります。</p>
+<p>データベースファイルは、実行可能ファイルの<strong>隣の</strong> <code>data/</code>フォルダに存在します — <code>App.ExecutableFile.Parent</code>を経由で解決されます。これはXojoデバッガーと構築された本番バイナリの両方で同じように機能します。<code>data/</code>ディレクトリが存在しない場合は自動的に作成されます。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Connect</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
+<span class="w">  </span><span class="c1">// Resolve data/ next to the executable (works in debug and production)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">dataDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">CreateAsFolder</span><span class="p">()</span>
 
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"></span>
-<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">db</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">SQLiteDatabase</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">DatabaseFile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;notes.sqlite&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Connect</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">db</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>App.ExecutableFile</code> is the running binary — in the Xojo debugger this is the debug stub, in production it is the compiled app. Both cases resolve <code>Parent</code> to the same folder, so the path is stable across environments.</p>
+<p><code>App.ExecutableFile</code>は実行中のバイナリです — Xojoデバッガーではこれはデバッグスタブで、本番ではコンパイルされたアプリケーションです。両方のケースで<code>Parent</code>を同じフォルダに解決するため、パスは環境全体で安定しています。</p>
 </div>
 <h3 id="initdb"><code>InitDB()</code><a class="headerlink" href="#initdb" title="Permanent link">&para;</a></h3>
-<p>Creates all tables if they do not exist. Called once from <code>App.Opening</code>. Safe to call on every startup — <code>CREATE TABLE IF NOT EXISTS</code> is idempotent.</p>
-<p>To add a new table, add another <code>ExecuteSQL</code> here before <code>db.Close()</code>.</p>
-<h3 id="appopening-startup-paths">App.Opening — Startup Paths<a class="headerlink" href="#appopening-startup-paths" title="Permanent link">&para;</a></h3>
-<p><code>App.Opening</code> is the single place that wires up both runtime paths before any request is served:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Opening</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// Templates — resolved relative to executable, same as DB</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tplDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaEnvironment</span><span class="p">(</span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">tplDir</span><span class="p">.</span><span class="n">NativePath</span><span class="p">))</span><span class="w"></span>
+<p>存在しない場合はすべてのテーブルを作成します。<code>App.Opening</code>から一度呼び出されます。すべての起動で呼び出すのは安全です — <code>CREATE TABLE IF NOT EXISTS</code>は冪等です。</p>
+<p>新しいテーブルを追加するには、<code>db.Close()</code>の前にここに別の<code>ExecuteSQL</code>を追加してください。</p>
+<h3 id="appopening">App.Opening — スタートアップパス<a class="headerlink" href="#appopening" title="Permanent link">&para;</a></h3>
+<p><code>App.Opening</code>は、任意のリクエストが提供される前に両方のランタイムパスをワイヤーアップする単一の場所です：</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Opening</span><span class="p">()</span>
+<span class="w">  </span><span class="c1">// Templates — resolved relative to executable, same as DB</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tplDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaEnvironment</span><span class="p">(</span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">tplDir</span><span class="p">.</span><span class="n">NativePath</span><span class="p">))</span>
 
-<span class="w">  </span><span class="c1">// Database — create schema on first launch</span><span class="w"></span>
-<span class="w">  </span><span class="n">DBAdapter</span><span class="p">.</span><span class="n">InitDB</span><span class="p">()</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Database — create schema on first launch</span>
+<span class="w">  </span><span class="n">DBAdapter</span><span class="p">.</span><span class="n">InitDB</span><span class="p">()</span>
 
-<span class="w">  </span><span class="c1">// Router — register all routes</span><span class="w"></span>
-<span class="w">  </span><span class="n">mRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Router</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="n">RegisterRoutes</span><span class="p">()</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Router — register all routes</span>
+<span class="w">  </span><span class="n">mRouter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Router</span><span class="p">()</span>
+<span class="w">  </span><span class="n">RegisterRoutes</span><span class="p">()</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p>Both <code>templates/</code> and <code>data/</code> sit alongside the executable. This means you can deploy the app by copying the binary together with those two folders — no absolute paths, no environment variables needed.</p>
+<p><code>templates/</code>と<code>data/</code>の両方は実行可能ファイルの隣に位置します。これは、バイナリをこれら2つのフォルダと一緒にコピーすることでアプリをデプロイできることを意味します — 絶対パスも環境変数も必要ありません。</p>
 <hr />
-<h2 id="basemodel-class">BaseModel (Class)<a class="headerlink" href="#basemodel-class" title="Permanent link">&para;</a></h2>
+<h2 id="basemodel-class">BaseModel （Class）<a class="headerlink" href="#basemodel-class" title="Permanent link">&para;</a></h2>
 <p><strong>File:</strong> <code>Framework/BaseModel.xojo_code</code></p>
-<p>The generic CRUD base class. Subclasses override two methods and inherit all operations.</p>
-<h3 id="subclass-contract">Subclass Contract<a class="headerlink" href="#subclass-contract" title="Permanent link">&para;</a></h3>
+<p>一般的なCRUD基本クラス。サブクラスは2つのメソッドをオーバーライドし、すべての操作を継承します。</p>
+<h3 id="_4">サブクラス契約<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -754,116 +799,116 @@ Per-request (concurrent, independent)
 <td><code>TableName() As String</code></td>
 <td>Yes</td>
 <td><code>"notes"</code></td>
-<td>SQL table name</td>
+<td>SQLテーブル名</td>
 </tr>
 <tr>
 <td><code>Columns() As String</code></td>
 <td>Yes</td>
 <td><code>"id, title, body, ..."</code></td>
-<td>Comma-separated column list for <code>SELECT</code></td>
+<td><code>SELECT</code>のカンマ区切り列リスト</td>
 </tr>
 </tbody>
 </table>
-<h3 id="crud-methods">CRUD Methods<a class="headerlink" href="#crud-methods" title="Permanent link">&para;</a></h3>
+<h3 id="crud">CRUDメソッド<a class="headerlink" href="#crud" title="Permanent link">&para;</a></h3>
 <h4 id="findallorderby-as-string-as-variant"><code>FindAll(orderBy As String = "") As Variant()</code><a class="headerlink" href="#findallorderby-as-string-as-variant" title="Permanent link">&para;</a></h4>
-<p>Returns all rows ordered by <code>orderBy</code>. Each element is a <code>Dictionary</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">rows</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="c1">// rows(0) → Dictionary: {&quot;id&quot;: &quot;1&quot;, &quot;title&quot;: &quot;Hello&quot;, ...}</span><span class="w"></span>
+<p><code>orderBy</code>でソートされたすべての行を返します。各要素は<code>Dictionary</code>です。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">rows</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span>
+<span class="c1">// rows(0) → Dictionary: {&quot;id&quot;: &quot;1&quot;, &quot;title&quot;: &quot;Hello&quot;, ...}</span>
 </code></pre></div>
 
 <h4 id="findbyidid-as-integer-as-dictionary"><code>FindByID(id As Integer) As Dictionary</code><a class="headerlink" href="#findbyidid-as-integer-as-dictionary" title="Permanent link">&para;</a></h4>
-<p>Returns the matching row, or <code>Nil</code> if not found. Always check before using:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<p>マッチする行を返すか、見つからない場合は<code>Nil</code>を返します。使用する前に常にチェックしてください：</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">FindByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+<span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">RenderError</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
 <h4 id="insertdata-as-dictionary-as-integer"><code>Insert(data As Dictionary) As Integer</code><a class="headerlink" href="#insertdata-as-dictionary-as-integer" title="Permanent link">&para;</a></h4>
-<p>Builds a parameterized <code>INSERT</code> from the dictionary keys. Returns the new <code>ROWID</code>. SQL injection safe — uses <code>SQLitePreparedStatement</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My Note&quot;</span><span class="w"></span>
-<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Content&quot;</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Insert</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<p>ディクショナリキーから<code>INSERT</code>をパラメータ化します。新しい<code>ROWID</code>を返します。SQL注入セーフです — <code>SQLitePreparedStatement</code>を使用します。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;My Note&quot;</span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Content&quot;</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Insert</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </code></pre></div>
 
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>Insert</code> cannot express SQLite-side expressions like <code>datetime('now')</code> — those must go through the escape hatch. See NoteModel below.</p>
+<p><code>Insert</code>は<code>datetime('now')</code>のようなSQLite側の式を表現することはできません — これらはエスケープハッチを通じて行く必要があります。下記のNoteModelを参照してください。</p>
 </div>
 <h4 id="updatebyidid-as-integer-data-as-dictionary"><code>UpdateByID(id As Integer, data As Dictionary)</code><a class="headerlink" href="#updatebyidid-as-integer-data-as-dictionary" title="Permanent link">&para;</a></h4>
-<p>Parameterized <code>UPDATE ... WHERE id = ?</code>. Only keys present in the dictionary are updated.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;New Title&quot;</span><span class="w"></span>
-<span class="n">model</span><span class="p">.</span><span class="n">UpdateByID</span><span class="p">(</span><span class="m">42</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"></span>
+<p>パラメータ化<code>UPDATE ... WHERE id = ?</code>。ディクショナリに存在するキーのみが更新されます。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="n">data</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;New Title&quot;</span>
+<span class="n">model</span><span class="p">.</span><span class="n">UpdateByID</span><span class="p">(</span><span class="m">42</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">)</span>
 </code></pre></div>
 
 <h4 id="deletebyidid-as-integer"><code>DeleteByID(id As Integer)</code><a class="headerlink" href="#deletebyidid-as-integer" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="n">model</span><span class="p">.</span><span class="n">DeleteByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">model</span><span class="p">.</span><span class="n">DeleteByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 </code></pre></div>
 
-<h3 id="protected-escape-hatch-methods">Protected Escape Hatch Methods<a class="headerlink" href="#protected-escape-hatch-methods" title="Permanent link">&para;</a></h3>
+<h3 id="_5">保護されたエスケープハッチメソッド<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
 <h4 id="opendb-as-sqlitedatabase"><code>OpenDB() As SQLiteDatabase</code><a class="headerlink" href="#opendb-as-sqlitedatabase" title="Permanent link">&para;</a></h4>
-<p>Returns a raw connection for subclasses that need custom SQL. The subclass is responsible for <code>db.Close()</code>.</p>
-<p>Use when:
-- SQLite expressions (<code>datetime('now')</code>, <code>strftime(...)</code>) are needed in SQL — they cannot be <code>?</code> parameters
-- Complex queries with <code>JOIN</code>, <code>GROUP BY</code>, <code>HAVING</code>, or subqueries
-- <code>db.LastRowID</code> is needed after an <code>INSERT</code>
-- Multiple statements must share one connection</p>
+<p>サブクラスがカスタムSQLを必要とするために生の接続を返します。サブクラスは<code>db.Close()</code>の責任があります。</p>
+<p>以下の場合に使用してください：
+- SQLite式（<code>datetime('now')</code>、<code>strftime(...)</code>）がSQLで必要です — <code>?</code>パラメータにはできません
+- 複雑なクエリ（<code>JOIN</code>、<code>GROUP BY</code>、<code>HAVING</code>、またはサブクエリ）
+- <code>INSERT</code>後に<code>db.LastRowID</code>が必要です
+- 複数のステートメントが1つの接続を共有する必要があります</p>
 <h4 id="rowtodictrs-as-rowset-as-dictionary"><code>RowToDict(rs As RowSet) As Dictionary</code><a class="headerlink" href="#rowtodictrs-as-rowset-as-dictionary" title="Permanent link">&para;</a></h4>
-<p>Maps the current RowSet row to a <code>Dictionary</code> using the column names from <code>Columns()</code>. All values are stored as <code>StringValue</code> — intentional. JinjaX renders everything as strings; ViewModels cast to integers via <code>Val()</code> when needed.</p>
+<p>現在のRowSetの行を、<code>Columns()</code>の列名を使用して<code>Dictionary</code>にマップします。すべての値は<code>StringValue</code>として格納されます — 意図的です。JinjaXはすべてを文字列としてレンダリングします。ViewModelは必要に応じて<code>Val()</code>を使用して整数にキャストします。</p>
 <hr />
-<h2 id="notemodel-class">NoteModel (Class)<a class="headerlink" href="#notemodel-class" title="Permanent link">&para;</a></h2>
+<h2 id="notemodel-class">NoteModel （Class）<a class="headerlink" href="#notemodel-class" title="Permanent link">&para;</a></h2>
 <p><strong>File:</strong> <code>Models/NoteModel.xojo_code</code></p>
-<p>The concrete resource model. Only ~20 lines because <code>BaseModel</code> handles everything generic.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">NoteModel</span><span class="w"></span>
-<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span><span class="w"></span>
+<p>具体的なリソースモデル。<code>BaseModel</code>がすべての一般的なことを処理するため、約20行のみです。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">NoteModel</span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;notes&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;notes&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, title, body, created_at, updated_at&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, title, body, created_at, updated_at&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="c1">// Delegation — zero boilerplate</span><span class="w"></span>
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Delegation — zero boilerplate</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;updated_at DESC&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="w">  </span><span class="c1">// Escape hatch — SQLite expressions required for timestamps</span><span class="w"></span>
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// Escape hatch — SQLite expressions required for timestamps</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO notes (title, body) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">      </span><span class="s2">&quot;UPDATE notes SET title = ?, body = ?, updated_at = datetime(&#39;now&#39;) WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">      </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Update</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="s2">&quot;UPDATE notes SET title = ?, body = ?, updated_at = datetime(&#39;now&#39;) WHERE id = ?&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">_</span>
+<span class="w">      </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="p">)</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
-<p><code>Create</code> and <code>Update</code> use the escape hatch because <code>datetime('now')</code> is a SQLite-evaluated expression — binding the string <code>"datetime('now')"</code> as a <code>?</code> parameter would store the literal text, not a timestamp.</p>
+<p><code>Create</code>と<code>Update</code>はエスケープハッチを使用します。なぜなら<code>datetime('now')</code>はSQLite評価式だからです — 文字列<code>"datetime('now')"</code>を<code>?</code>パラメータとしてバインドすることはタイムスタンプではなくリテラルテキストを格納します。</p>
 <hr />
-<h2 id="crud-task-mapping">CRUD Task Mapping<a class="headerlink" href="#crud-task-mapping" title="Permanent link">&para;</a></h2>
+<h2 id="crud_1">CRUD タスクマッピング<a class="headerlink" href="#crud_1" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -876,49 +921,49 @@ Per-request (concurrent, independent)
 </thead>
 <tbody>
 <tr>
-<td>View list</td>
+<td>リストを表示</td>
 <td><code>GET /notes</code></td>
 <td><code>NotesListVM</code></td>
 <td><code>NoteModel.GetAll()</code></td>
 <td><code>SELECT … ORDER BY updated_at DESC</code></td>
 </tr>
 <tr>
-<td>View one</td>
+<td>1つを表示</td>
 <td><code>GET /notes/:id</code></td>
 <td><code>NotesDetailVM</code></td>
 <td><code>NoteModel.GetByID(id)</code></td>
 <td><code>SELECT … WHERE id = ?</code></td>
 </tr>
 <tr>
-<td>New form</td>
+<td>新しいフォーム</td>
 <td><code>GET /notes/new</code></td>
 <td><code>NotesNewVM</code></td>
 <td>—</td>
 <td>—</td>
 </tr>
 <tr>
-<td>Create</td>
+<td>作成</td>
 <td><code>POST /notes</code></td>
 <td><code>NotesCreateVM</code></td>
 <td><code>NoteModel.Create(title, body)</code></td>
 <td><code>INSERT INTO notes (title, body) VALUES (?, ?)</code></td>
 </tr>
 <tr>
-<td>Edit form</td>
+<td>フォームを編集</td>
 <td><code>GET /notes/:id/edit</code></td>
 <td><code>NotesEditVM</code></td>
 <td><code>NoteModel.GetByID(id)</code></td>
 <td><code>SELECT … WHERE id = ?</code></td>
 </tr>
 <tr>
-<td>Update</td>
+<td>更新</td>
 <td><code>POST /notes/:id</code></td>
 <td><code>NotesUpdateVM</code></td>
 <td><code>NoteModel.Update(id, title, body)</code></td>
 <td><code>UPDATE notes SET … WHERE id = ?</code></td>
 </tr>
 <tr>
-<td>Delete</td>
+<td>削除</td>
 <td><code>POST /notes/:id/delete</code></td>
 <td><code>NotesDeleteVM</code></td>
 <td><code>NoteModel.Delete(id)</code></td>
@@ -927,7 +972,7 @@ Per-request (concurrent, independent)
 </tbody>
 </table>
 <hr />
-<h2 id="benefits-and-trade-offs">Benefits and Trade-offs<a class="headerlink" href="#benefits-and-trade-offs" title="Permanent link">&para;</a></h2>
+<h2 id="_6">利益とトレードオフ<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -937,28 +982,28 @@ Per-request (concurrent, independent)
 </thead>
 <tbody>
 <tr>
-<td>No boilerplate</td>
-<td>New resource needs only <code>TableName()</code> + <code>Columns()</code> + thin wrappers</td>
+<td>ボイラープレートなし</td>
+<td>新しいリソースには<code>TableName()</code> + <code>Columns()</code> + シンラッパーのみが必要です</td>
 </tr>
 <tr>
-<td>SQL injection safe</td>
-<td>All user values go through <code>?</code> parameter binding</td>
+<td>SQL注入セーフ</td>
+<td>すべてのユーザー値は<code>?</code>パラメータバインディングを通過します</td>
 </tr>
 <tr>
-<td>Thread-safe</td>
-<td>Per-request connections — no shared mutable state</td>
+<td>スレッドセーフ</td>
+<td>リクエストあたりの接続 — 共有可変状態なし</td>
 </tr>
 <tr>
-<td>JinjaX compatible</td>
-<td>All results are <code>Dictionary</code> — templates work immediately</td>
+<td>JinjaX互換</td>
+<td>すべての結果は<code>Dictionary</code>です — テンプレートはすぐに機能します</td>
 </tr>
 <tr>
-<td>Testable</td>
-<td>XojoUnit tests hit a real SQLite DB; negligible overhead</td>
+<td>テスト可能</td>
+<td>XojoUnitテストは本当のSQLite DBをヒットします。無視できるオーバーヘッド</td>
 </tr>
 <tr>
-<td>Clear escape hatch</td>
-<td><code>OpenDB()</code> is documented and intentional, not a workaround</td>
+<td>クリアなエスケープハッチ</td>
+<td><code>OpenDB()</code>は文書化されており意図的で、回避策ではなく</td>
 </tr>
 </tbody>
 </table>
@@ -971,74 +1016,74 @@ Per-request (concurrent, independent)
 </thead>
 <tbody>
 <tr>
-<td>No ORM features</td>
-<td>No associations, lazy loading, or change tracking</td>
+<td>ORM機能なし</td>
+<td>関連付け、遅延ロード、または変更追跡なし</td>
 </tr>
 <tr>
-<td>String-only values</td>
-<td><code>RowToDict</code> stores everything as <code>StringValue</code>; ViewModels must cast via <code>Val()</code></td>
+<td>文字列のみの値</td>
+<td><code>RowToDict</code>はすべてを<code>StringValue</code>として格納します。ViewModelは必要に応じて<code>Val()</code>を使用してキャストする必要があります</td>
 </tr>
 <tr>
-<td>No migration system</td>
-<td>Schema changes require manual <code>ALTER TABLE</code> or recreating the DB in dev</td>
+<td>移行システムなし</td>
+<td>スキーマの変更には手動<code>ALTER TABLE</code>またはdevで DBを再作成する必要があります</td>
 </tr>
 <tr>
-<td><code>datetime</code> limitation</td>
-<td><code>BaseModel.Insert</code> cannot use <code>DEFAULT (datetime('now'))</code> — use escape hatch</td>
+<td><code>datetime</code>制限</td>
+<td><code>BaseModel.Insert</code>は<code>DEFAULT (datetime('now'))</code>を使用できません — エスケープハッチを使用してください</td>
 </tr>
 </tbody>
 </table>
-<h3 id="when-to-use-inherited-crud-vs-the-escape-hatch">When to use inherited CRUD vs the escape hatch<a class="headerlink" href="#when-to-use-inherited-crud-vs-the-escape-hatch" title="Permanent link">&para;</a></h3>
-<p>Use <code>BaseModel</code> inherited methods when the operation is a simple <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, or <code>DELETE</code> with plain bound values.</p>
-<p>Use <code>OpenDB()</code> when you need SQLite expressions (<code>datetime('now')</code>, <code>strftime(...)</code>), complex queries (<code>JOIN</code>, <code>GROUP BY</code>, subqueries), <code>db.LastRowID</code> after a custom insert, or multiple statements in one connection.</p>
+<h3 id="crud_2">継承されたCRUDとエスケープハッチをいつ使用するか<a class="headerlink" href="#crud_2" title="Permanent link">&para;</a></h3>
+<p>プレーン値がバインドされた単純<code>SELECT</code>、<code>INSERT</code>、<code>UPDATE</code>、または<code>DELETE</code>の場合は、<code>BaseModel</code>継承メソッドを使用してください。</p>
+<p>SQLite式（<code>datetime('now')</code>、<code>strftime(...)</code>）、複雑なクエリ（<code>JOIN</code>、<code>GROUP BY</code>、サブクエリ）、カスタム挿入後の<code>db.LastRowID</code>、または1つの接続内の複数のステートメントが必要な場合は<code>OpenDB()</code>を使用してください。</p>
 <hr />
-<h2 id="adding-a-new-resource">Adding a New Resource<a class="headerlink" href="#adding-a-new-resource" title="Permanent link">&para;</a></h2>
-<p>Adding <code>TagModel</code> as a complete example:</p>
-<p><strong>1. Create <code>Models/TagModel.xojo_code</code>:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span><span class="w"></span>
-<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span><span class="w"></span>
+<h2 id="_7">新しいリソースを追加<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p><code>TagModel</code>を完全な例として追加：</p>
+<p><strong>1. <code>Models/TagModel.xojo_code</code>を作成：</strong></p>
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">TagModel</span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">BaseModel</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;tags&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">TableName</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;tags&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, name, created_at&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Protected</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">Columns</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;id, name, created_at&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;name ASC&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetAll</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindAll</span><span class="p">(</span><span class="s2">&quot;name ASC&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">FindByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO tags (name) VALUES (?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span><span class="w"></span>
-<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO tags (name) VALUES (?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">Delete</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">    </span><span class="n">DeleteByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
-<p><strong>2. Add the table to <code>DBAdapter.InitDB()</code>:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;id         INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;name       TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span><span class="w"></span>
-<span class="w">  </span><span class="s2">&quot;created_at TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span><span class="w"></span>
+<p><strong>2. <code>DBAdapter.InitDB()</code>にテーブルを追加：</strong></p>
+<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS tags (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;id         INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;name       TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;created_at TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <p><strong>3. Register</strong> <code>Models/TagModel.xojo_code</code> in <code>mvvm.xojo_project</code> under the Models folder (Xojo IDE: drag the file into the project panel).</p>
-<p><strong>4. Create ViewModels</strong> in <code>ViewModels/Tags/</code> and <strong>templates</strong> in <code>templates/tags/</code> following the same pattern as <code>Notes</code>.</p>
+<p><strong>4. ViewModels</strong> in <code>ViewModels/Tags/</code> と <strong>templates</strong> in <code>templates/tags/</code> を<code>Notes</code>と同じパターンに従って作成してください。</p>
 
         <!-- Prev / Next navigation -->
         
@@ -1053,9 +1098,9 @@ Per-request (concurrent, independent)
           </div>
           <div class="page-nav-next">
             
-            <a href="../encoding/">
+            <a href="../tags/">
               <span class="page-nav-label">Next →</span>
-              <span class="page-nav-title">Forms, MIME & UTF-8</span>
+              <span class="page-nav-title">Tags & Many-to-Many</span>
             </a>
             
           </div>
@@ -1072,27 +1117,27 @@ Per-request (concurrent, independent)
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#three-layer-architecture">Three-Layer Architecture</a>
+            <a class="toc-link" href="#3層アーキテクチャ">3層アーキテクチャ</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#design-decisions">Design Decisions</a>
+            <a class="toc-link" href="#設計上の決定">設計上の決定</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#why-return-dictionary-instead-of-model-instances">Why return `Dictionary` instead of model instances?</a>
+            <a class="toc-link" href="#モデルインスタンスの代わりにdictionaryを返すのはなぜか">モデルインスタンスの代わりに`Dictionary`を返すのはなぜか？</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#why-one-connection-per-request">Why one connection per request?</a>
+            <a class="toc-link" href="#1つのリクエストあたり1つの接続はなぜか">1つのリクエストあたり1つの接続はなぜか？</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#connection-lifecycle">Connection Lifecycle</a>
+            <a class="toc-link" href="#接続ライフサイクル">接続ライフサイクル</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#dbadapter-module">DBAdapter (Module)</a>
+            <a class="toc-link" href="#dbadapter-module">DBAdapter （Module）</a>
           </li>
           
           <li class="toc-item toc-level-3">
@@ -1104,43 +1149,43 @@ Per-request (concurrent, independent)
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#appopening-startup-paths">App.Opening — Startup Paths</a>
+            <a class="toc-link" href="#appopening-スタートアップパス">App.Opening — スタートアップパス</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#basemodel-class">BaseModel (Class)</a>
+            <a class="toc-link" href="#basemodel-class">BaseModel （Class）</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#subclass-contract">Subclass Contract</a>
+            <a class="toc-link" href="#サブクラス契約">サブクラス契約</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#crud-methods">CRUD Methods</a>
+            <a class="toc-link" href="#crudメソッド">CRUDメソッド</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#protected-escape-hatch-methods">Protected Escape Hatch Methods</a>
+            <a class="toc-link" href="#保護されたエスケープハッチメソッド">保護されたエスケープハッチメソッド</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#notemodel-class">NoteModel (Class)</a>
+            <a class="toc-link" href="#notemodel-class">NoteModel （Class）</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#crud-task-mapping">CRUD Task Mapping</a>
+            <a class="toc-link" href="#crud-タスクマッピング">CRUD タスクマッピング</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#benefits-and-trade-offs">Benefits and Trade-offs</a>
+            <a class="toc-link" href="#利益とトレードオフ">利益とトレードオフ</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#when-to-use-inherited-crud-vs-the-escape-hatch">When to use inherited CRUD vs the escape hatch</a>
+            <a class="toc-link" href="#継承されたcrudとエスケープハッチをいつ使用するか">継承されたCRUDとエスケープハッチをいつ使用するか</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#adding-a-new-resource">Adding a New Resource</a>
+            <a class="toc-link" href="#新しいリソースを追加">新しいリソースを追加</a>
           </li>
           
         </ul>

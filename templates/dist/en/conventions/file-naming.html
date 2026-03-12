@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -387,15 +432,15 @@ ProductModel.xojo_code  # future
 <p>The ViewModel controls mode by passing or omitting <code>note</code> in the context dictionary.</p>
 <h2 id="route-registration-naming">Route registration naming<a class="headerlink" href="#route-registration-naming" title="Permanent link">&para;</a></h2>
 <p>When registering routes in <code>App.Opening()</code>, match the order: GET before POST, list before detail:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// In App.Opening() — register routes in logical order</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">                 </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">            </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">,</span><span class="w">        </span><span class="k">New</span><span class="w"> </span><span class="n">NotesNewVMFactory</span><span class="p">())</span><span class="w">    </span><span class="c1">// ← must come before :id</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">NotesCreateVMFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/:id&quot;</span><span class="p">,</span><span class="w">        </span><span class="k">New</span><span class="w"> </span><span class="n">NotesDetailVMFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/:id/edit&quot;</span><span class="p">,</span><span class="w">   </span><span class="k">New</span><span class="w"> </span><span class="n">NotesEditVMFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/notes/:id&quot;</span><span class="p">,</span><span class="w">       </span><span class="k">New</span><span class="w"> </span><span class="n">NotesUpdateVMFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/notes/:id/delete&quot;</span><span class="p">,</span><span class="k">New</span><span class="w"> </span><span class="n">NotesDeleteVMFactory</span><span class="p">())</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// In App.Opening() — register routes in logical order</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">                 </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">            </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">,</span><span class="w">        </span><span class="k">New</span><span class="w"> </span><span class="n">NotesNewVMFactory</span><span class="p">())</span><span class="w">    </span><span class="c1">// ← must come before :id</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">NotesCreateVMFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/:id&quot;</span><span class="p">,</span><span class="w">        </span><span class="k">New</span><span class="w"> </span><span class="n">NotesDetailVMFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes/:id/edit&quot;</span><span class="p">,</span><span class="w">   </span><span class="k">New</span><span class="w"> </span><span class="n">NotesEditVMFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/notes/:id&quot;</span><span class="p">,</span><span class="w">       </span><span class="k">New</span><span class="w"> </span><span class="n">NotesUpdateVMFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/notes/:id/delete&quot;</span><span class="p">,</span><span class="k">New</span><span class="w"> </span><span class="n">NotesDeleteVMFactory</span><span class="p">())</span>
 </code></pre></div>
 
 <div class="admonition warning">

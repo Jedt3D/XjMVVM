@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -288,70 +333,70 @@
 <p>สำหรับ CSS JS และรูปภาพของคุณเอง ลงทะเบียนเส้นทาง <code>/static/:file</code> ที่อ่านไฟล์จากดิสก์และเขียนไปยังการตอบสนอง</p>
 <h3 id="1-viewmodel">1. สร้าง ViewModel<a class="headerlink" href="#1-viewmodel" title="Permanent link">&para;</a></h3>
 <p>สร้าง <code>ViewModels/StaticFileVM.xojo_code</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Class</span><span class="w"> </span><span class="n">StaticFileVM</span><span class="w"></span>
-<span class="w">  </span><span class="k">Inherits</span><span class="w"> </span><span class="n">BaseViewModel</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Class</span><span class="w"> </span><span class="n">StaticFileVM</span>
+<span class="w">  </span><span class="k">Inherits</span><span class="w"> </span><span class="n">BaseViewModel</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c1">// ความปลอดภัย: ปฏิเสธความพยายามการข้ามเส้นทาง</span><span class="w"></span>
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;\&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Bad Request&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="k">Return</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ความปลอดภัย: ปฏิเสธความพยายามการข้ามเส้นทาง</span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;\&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Bad Request&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Return</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 
-<span class="w">    </span><span class="c1">// สร้างเส้นทางไปยังโฟลเดอร์ static/ (ปรับตามเค้าโครงโครงการของคุณ)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">staticDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/static&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">staticDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// สร้างเส้นทางไปยังโฟลเดอร์ static/ (ปรับตามเค้าโครงโครงการของคุณ)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">staticDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/static&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">staticDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Not Found&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="k">Return</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Not Found&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Return</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 
-<span class="w">    </span><span class="c1">// ตั้งค่าประเภท MIME ตามนามสกุล</span><span class="w"></span>
-<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ตั้งค่าประเภท MIME ตามนามสกุล</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c1">// แคชทรัพยากรคงที่เป็นเวลา 1 ชั่วโมงในโปรดักชัน</span><span class="w"></span>
-<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cache-Control&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;public, max-age=3600&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// แคชทรัพยากรคงที่เป็นเวลา 1 ชั่วโมงในโปรดักชัน</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cache-Control&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;public, max-age=3600&quot;</span>
 
-<span class="w">    </span><span class="c1">// อ่านและเขียนไบต์ไฟล์</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">BinaryStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BinaryStream</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Length</span><span class="p">))</span><span class="w"></span>
-<span class="w">    </span><span class="n">bs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// อ่านและเขียนไบต์ไฟล์</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">BinaryStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BinaryStream</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Length</span><span class="p">))</span>
+<span class="w">    </span><span class="n">bs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="w">  </span><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">NthField</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">CountFields</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)).</span><span class="n">Lowercase</span><span class="w"></span>
-<span class="w">    </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">ext</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;css&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;text/css; charset=utf-8&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;js&quot;</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/javascript; charset=utf-8&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;png&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;jpeg&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/jpeg&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;gif&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/gif&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;svg&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/svg+xml&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;ico&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/x-icon&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff2&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff&quot;</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;pdf&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/pdf&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Else</span><span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/octet-stream&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">NthField</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">CountFields</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)).</span><span class="n">Lowercase</span>
+<span class="w">    </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">ext</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;css&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;text/css; charset=utf-8&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;js&quot;</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/javascript; charset=utf-8&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;png&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;jpeg&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/jpeg&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;gif&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/gif&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;svg&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/svg+xml&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;ico&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/x-icon&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff2&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff&quot;</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;pdf&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/pdf&quot;</span>
+<span class="w">    </span><span class="k">Else</span><span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/octet-stream&quot;</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
 <h3 id="2">2. ลงทะเบียนเส้นทาง<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
 <p>ใน <code>App.Opening()</code> ลงทะเบียนเส้นทางคงที่ <strong>หลังจาก</strong> เส้นทางอื่นทั้งหมดเพื่อหลีกเลี่ยงการจับคู่เส้นทางแอปพลิเคชันโดยไม่ตั้งใจ:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ลงทะเบียนเส้นทางแอปพลิเคชันก่อน</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span><span class="w"></span>
-<span class="c1">// ... เส้นทางอื่นทั้งหมด ...</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ลงทะเบียนเส้นทางแอปพลิเคชันก่อน</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span>
+<span class="c1">// ... เส้นทางอื่นทั้งหมด ...</span>
 
-<span class="c1">// ไฟล์คงที่สุดท้าย</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/static/:file&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">StaticFileVMFactory</span><span class="p">())</span><span class="w"></span>
+<span class="c1">// ไฟล์คงที่สุดท้าย</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/static/:file&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">StaticFileVMFactory</span><span class="p">())</span>
 </code></pre></div>
 
 <h3 id="3-static">3. สร้างโฟลเดอร์ static/<a class="headerlink" href="#3-static" title="Permanent link">&para;</a></h3>
@@ -375,8 +420,8 @@
 <h2 id="3-xojo-copy-files-build-step">ตัวเลือกที่ 3 — Xojo Copy Files build step<a class="headerlink" href="#3-xojo-copy-files-build-step" title="Permanent link">&para;</a></h2>
 <p>สำหรับไฟล์ที่ควรมีชุดรวมกับไบนารีแอปพลิเคชัน (ฟอนต์ รูปภาพเริ่มต้น) ให้ใช้ขั้น <strong>Copy Files</strong> ของ Xojo เพื่อรวมไฟล์เหล่านั้นไว้ในโฟลเดอร์ Resources ของแอป</p>
 <p>จากนั้นเข้าถึงพวกมันในเวลาทำงานผ่าน:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">resourceDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;Resources&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resourceDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">resourceDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;Resources&quot;</span><span class="p">)</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resourceDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 </code></pre></div>
 
 <p>วิธีการนี้เหมาะสำหรับไฟล์ที่ส่งมาพร้อมกับแอปและไม่เปลี่ยนแปลงในเวลาทำงาน สำหรับทรัพยากรนักพัฒนาที่คุณแก้ไขบ่อย ๆ ระหว่างการพัฒนา ตัวเลือกที่ 2 จะสะดวกมากกว่า</p>

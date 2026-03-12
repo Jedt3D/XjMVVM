@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -275,34 +320,34 @@
         <h1 id="methods-properties">Methods &amp; Properties<a class="headerlink" href="#methods-properties" title="Permanent link">&para;</a></h1>
 <h2 id="viewmodel-methods">ViewModel methods<a class="headerlink" href="#viewmodel-methods" title="Permanent link">&para;</a></h2>
 <p>Every ViewModel inherits from <code>BaseViewModel</code> and overrides one or both of:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w">   </span><span class="c1">// Handles GET requests</span><span class="w"></span>
-<span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span><span class="w">  </span><span class="c1">// Handles POST requests</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w">   </span><span class="c1">// Handles GET requests</span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span><span class="w">  </span><span class="c1">// Handles POST requests</span>
 </code></pre></div>
 
 <p>These are deliberately named like event handlers — they <em>respond</em> to an HTTP method, they don&rsquo;t initiate anything. If you only override <code>OnGet()</code>, any <code>POST</code> to that route gets a 405 response from the base class automatically.</p>
 <p>Private helper methods within a ViewModel use descriptive verb-first names:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Good — reads like English, describes what it does</span><span class="w"></span>
-<span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">FindNoteOrRedirect</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="k">Private</span><span class="w"> </span><span class="k">Sub</span><span class="w"> </span><span class="n">ValidateTitle</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Good — reads like English, describes what it does</span>
+<span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">FindNoteOrRedirect</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="k">Private</span><span class="w"> </span><span class="k">Sub</span><span class="w"> </span><span class="n">ValidateTitle</span><span class="p">(</span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
 
-<span class="c1">// ❌ Avoid — vague, reads like a getter</span><span class="w"></span>
-<span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">GetData</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="k">Private</span><span class="w"> </span><span class="k">Sub</span><span class="w"> </span><span class="n">Process</span><span class="p">()</span><span class="w"></span>
+<span class="c1">// ❌ Avoid — vague, reads like a getter</span>
+<span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">GetData</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="k">Private</span><span class="w"> </span><span class="k">Sub</span><span class="w"> </span><span class="n">Process</span><span class="p">()</span>
 </code></pre></div>
 
 <h2 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">&para;</a></h2>
 <p>Xojo convention: private (module-level) properties use an <code>m</code> prefix and <code>camelCase</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="n">mFormData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w">   </span><span class="c1">// cached parsed POST body</span><span class="w"></span>
-<span class="k">Private</span><span class="w"> </span><span class="n">mRawBody</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w">       </span><span class="c1">// raw POST body bytes</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="n">mFormData</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w">   </span><span class="c1">// cached parsed POST body</span>
+<span class="k">Private</span><span class="w"> </span><span class="n">mRawBody</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w">       </span><span class="c1">// raw POST body bytes</span>
 </code></pre></div>
 
 <p>Public properties (those inherited from or set by <code>BaseViewModel</code>) have no prefix:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// These are set by the Router before Handle() is called</span><span class="w"></span>
-<span class="n">Request</span><span class="w">    </span><span class="k">As</span><span class="w"> </span><span class="n">WebRequest</span><span class="w"></span>
-<span class="n">Response</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="n">WebResponse</span><span class="w"></span>
-<span class="n">Session</span><span class="w">    </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"></span>
-<span class="n">Jinja</span><span class="w">      </span><span class="k">As</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="w"></span>
-<span class="n">PathParams</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// These are set by the Router before Handle() is called</span>
+<span class="n">Request</span><span class="w">    </span><span class="k">As</span><span class="w"> </span><span class="n">WebRequest</span>
+<span class="n">Response</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="n">WebResponse</span>
+<span class="n">Session</span><span class="w">    </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span>
+<span class="n">Jinja</span><span class="w">      </span><span class="k">As</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span>
+<span class="n">PathParams</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
 </code></pre></div>
 
 <h2 id="model-methods">Model methods<a class="headerlink" href="#model-methods" title="Permanent link">&para;</a></h2>
@@ -344,28 +389,28 @@
 </tbody>
 </table>
 <p>Model methods are <code>Shared</code> — you never need to instantiate a Model class:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Call on the class directly</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">notes</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
-<span class="n">NoteModel</span><span class="p">.</span><span class="n">Delete</span><span class="p">(</span><span class="m">42</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Call on the class directly</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">notes</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">()</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+<span class="n">NoteModel</span><span class="p">.</span><span class="n">Delete</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 
-<span class="c1">// ❌ Don&#39;t instantiate Models</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span><span class="w"></span>
-<span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w"></span>
+<span class="c1">// ❌ Don&#39;t instantiate Models</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
 </code></pre></div>
 
 <h2 id="dictionary-keys">Dictionary keys<a class="headerlink" href="#dictionary-keys" title="Permanent link">&para;</a></h2>
 <p>Keys in <code>Dictionary</code> objects — both in context dictionaries for templates and in Model return values — use <code>snake_case</code> strings. This matches the column names in SQLite and the variable names used in Jinja2 templates:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Model → Dictionary</span><span class="w"></span>
-<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">IntegerValue</span><span class="w"></span>
-<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
-<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// Model → Dictionary</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">IntegerValue</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;created_at&quot;</span><span class="p">).</span><span class="n">StringValue</span>
 
-<span class="c1">// ViewModel → context Dictionary for template</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w">    </span><span class="c1">// Variant() of Dictionary</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;page_title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;All Notes&quot;</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w">                   </span><span class="c1">// injected by Render() automatically</span><span class="w"></span>
+<span class="c1">// ViewModel → context Dictionary for template</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w">    </span><span class="c1">// Variant() of Dictionary</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;page_title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;All Notes&quot;</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;flash&quot;</span><span class="p">)</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="p">...</span><span class="w">                   </span><span class="c1">// injected by Render() automatically</span>
 </code></pre></div>
 
 <p>In templates, the same <code>snake_case</code> key names are accessed with dot-notation:</p>
@@ -377,33 +422,33 @@
 <h2 id="baseviewmodel-helper-methods">BaseViewModel helper methods<a class="headerlink" href="#baseviewmodel-helper-methods" title="Permanent link">&para;</a></h2>
 <p>These methods are always available inside any ViewModel:</p>
 <p><code>GetFormValue(key)</code> — reads a field from a URL-encoded POST body. Lazily parses the body on first call and caches the result.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">body</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">body</span><span class="w">  </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <p><code>GetParam(key)</code> — reads a URL path parameter or query string parameter. Path params take priority over query string params.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// For route /notes/:id with URL /notes/42</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">ToInteger</span><span class="p">()</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// For route /notes/:id with URL /notes/42</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">).</span><span class="n">ToInteger</span><span class="p">()</span>
 
-<span class="c1">// For URL /notes?sort=asc</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// For URL /notes?sort=asc</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 <p><code>Render(templateName, context)</code> — compiles and renders a template, auto-injects flash messages, and writes the HTML response.</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w"></span>
-<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
+<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
 </code></pre></div>
 
 <p><code>Redirect(url, statusCode)</code> — sends an HTTP redirect. Default status is 302. Always call <code>Return</code> immediately after to stop execution.</p>
-<div class="highlight"><pre><span></span><code><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="k">Return</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">)</span>
+<span class="k">Return</span>
 </code></pre></div>
 
 <p><code>SetFlash(message, type)</code> — stores a flash message in the session. The next call to <code>Render()</code> on any ViewModel will inject it into the template context automatically. Type is <code>"success"</code>, <code>"error"</code>, or <code>"info"</code>.</p>
-<div class="highlight"><pre><span></span><code><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Note created.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="k">Return</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Note created.&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;success&quot;</span><span class="p">)</span>
+<span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">)</span>
+<span class="k">Return</span>
 </code></pre></div>
 
         <!-- Prev / Next navigation -->

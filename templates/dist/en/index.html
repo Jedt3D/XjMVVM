@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -240,6 +240,51 @@
               <a class="nav-link"
                  href="./database/model-reference.html">
                 DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./api/">
+                JSON API & Static Serving
               </a>
             </li>
             
@@ -473,13 +518,25 @@ Browser renders the page</code></pre>
 <td>Three-layer architecture (DBAdapter / BaseModel / NoteModel), full CRUD API, trade-offs</td>
 </tr>
 <tr>
+<td><a href="tags/index.html">Tags &amp; Many-to-Many</a></td>
+<td>Second resource, junction table, GetTagsForNote, SetTagsForNote</td>
+</tr>
+<tr>
+<td><a href="auth/index.html">Auth System</a></td>
+<td>UserModel, SHA-256 + salt password hashing, Session, RequireLogin guard</td>
+</tr>
+<tr>
+<td><a href="api/index.html">JSON API &amp; Static Serving</a></td>
+<td>JSONSerializer, API ViewModels, 201/422 status codes, ServeStatic path-traversal guard</td>
+</tr>
+<tr>
 <td><a href="encoding/index.html">Encoding</a></td>
 <td>Form parsing, MIME types, UTF-8 and percent-encoding</td>
 </tr>
 </tbody>
 </table>
 <h2 id="current-version">Current version<a class="headerlink" href="#current-version" title="Permanent link">&para;</a></h2>
-<p><strong>v0.4.2</strong> — Production path fix: DB (<code>data/notes.sqlite</code>) and templates are now located relative to the executable via <code>App.ExecutableFile.Parent</code>, so the app works correctly both in debug and as a built application. v0.4.1 added the XojoUnit test runner at <code>/tests</code> and the BaseModel/DBAdapter three-layer architecture. Phase 3 (authentication, multiple models) is next.</p>
+<p><strong>v0.9.0</strong> — JSON API layer, authentication (SHA-256 + salt, session login/logout), Tags resource with many-to-many note_tags, and a built-in static file server for the developer docs at <code>/dist/*</code>. Production path fix (v0.4.2) ensures DB and templates resolve relative to the executable in all environments.</p>
 
         <!-- Prev / Next navigation -->
         

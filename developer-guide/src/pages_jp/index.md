@@ -1,17 +1,17 @@
 ---
-title: 概要
-description: Xojo Web 2 で構築されたサーバーサイドレンダリング (SSR) MVVM Web フレームワーク (XjMVVM)。JinjaX テンプレートエンジンで動作します。
+title: はじめに
+description: Xojo Web 2上に構築されたサーバーサイドレンダリング（SSR）Xojo MVVMフレームワーク（XjMVVM）。JinjaXテンプレートエンジンを使用しています。
 ---
 
-# 概要
+# はじめに
 
-これは **XjMVVM** (Xojo MVVM Web Framework) — Xojo Web 2 で構築されたサーバーサイドレンダリング (SSR) Web アプリケーションフレームワークです。Xojo の組み込み WebPage および WebControl GUI システムを使用する代わりに、すべての HTTP リクエストは `HandleURL` で傍受されて ViewModel にルーティングされ、**JinjaX テンプレートエンジン**を使用して HTML レスポンスがレンダリングされます。
+これは **XjMVVM** （Xojo MVVM Web Framework） — Xojo Web 2上に構築されたサーバーサイドレンダリング（SSR）Webアプリケーションフレームワークです。Xojoの組み込みWebPageおよびWebControl GUIシステムを使用する代わりに、すべてのHTTPリクエストは `HandleURL` で傍受され、ViewModel にルーティングされ、**JinjaX テンプレートエンジン**を使用してHTML応答をレンダリングします。
 
-アーキテクチャは意図的に **Flask** または **Django** に似ています — Python で SSR Web アプリケーションを構築した人なら誰でも使い慣れています。Flask を使用したことがない場合は、こう考えてください: ブラウザがページをリクエストすると、サーバーはコードを実行して HTML 文字列をビルドし、それを返します。JavaScript フレームワークはなく、レンダリング用の WebSocket もありません。シンプルなリクエスト/レスポンスです。
+このアーキテクチャは意図的に **Flask** または **Django** に似ています — PythonでSSRウェブアプリを構築したことのある人ならば、誰もが馴染みがあります。Flaskを使用したことがない場合は、このように考えてください。ブラウザがページをリクエストし、サーバーがコードを実行し、HTML文字列を作成して戻します。JavaScriptフレームワークもなく、レンダリング用のWebSocketもなく、クリーンなリクエスト/レスポンスだけです。
 
 ## リクエストのライフサイクル
 
-すべてのリクエスト (URL に関係なく) は同じパイプラインを通ります。
+すべてのリクエスト（URLに関係なく）は、同じパイプラインを通過します：
 
 <!-- diagram -->
 <!-- nomnoml
@@ -58,27 +58,32 @@ Browser renders the page
 -->
 <!-- /diagram -->
 
-このパイプラインの何も `WebPage`、`WebButton`、`WebTextField`、または他の Xojo Web コントロールを使用しません。プロジェクトファイルのデフォルト WebPage は Xojo のプロジェクト構造に必要なプレースホルダーです — 実際には提供されることはありません。
+このパイプラインでは、`WebPage`、`WebButton`、`WebTextField`、またはその他のXojoウェブコントロールは使用されていません。プロジェクトファイルの`Default` WebPageは、Xojoのプロジェクト構造のために必要なプレースホルダーですが、実際には提供されることはありません。
 
 ## アプリの実行
 
-1. **Xojo 2025r3.1** で `mvvm.xojo_project` を開きます。
-2. **Run** (⌘R) をクリックします。アプリは `http://localhost:8080` で起動します。
-3. SQLite データベース `data/notes.sqlite` は初回起動時に自動的に作成されます。
+1. **Xojo 2025r3.1** で`mvvm.xojo_project`を開きます。
+2. **Run** （⌘R）をクリックします。アプリは`http://localhost:8080`で起動します。
+3. SQLiteデータベース`data/notes.sqlite`は初回起動時に自動的に作成されます。
 
-CLI ビルドシステムはありません。すべてのテストとビルドは Xojo IDE 内で発生します。
+CLIビルドシステムはありません。すべてのテストとビルドはXojo IDE内で行われます。
 
 ## このガイドの内容
 
-| セクション | 学習内容 |
+| セクション | 学べること |
 |---|---|
-| [なぜ MVVM?](concepts/index.html) | このデザイン背後にある建築的な決定とトレードオフ |
+| [MVVMが必要な理由？](concepts/index.html) | このデザインの背後にある建築上の決定とトレードオフ |
+| [ルーティング](routing/index.html) | HandleURL決定ツリー、`/tests`リダイレクトダンス、SSRとXojo WebPageの間のクロス |
 | [規約](conventions/index.html) | ディレクトリ構造、ファイル命名、メソッドとプロパティの命名 |
-| [静的ファイル](static-files/index.html) | CSS、JS、画像をサーブする方法 |
-| [テンプレート](templates/index.html) | JinjaX セットアップ、Jinja2 構文、実例、完全なタグリファレンス |
-| [データベース](database/index.html) | SQLite パターン、Dictionary コントラクト、スレッドセーフティ |
-| [エンコーディング](encoding/index.html) | フォーム解析、MIME タイプ、UTF-8 とパーセントエンコーディング |
+| [静的ファイル](static-files/index.html) | CSS、JS、画像の提供方法 |
+| [テンプレート](templates/index.html) | JinjaXセットアップ、Jinja2構文、実例、完全なタグリファレンス |
+| [データベース](database/index.html) | SQLiteパターン、Dictionaryコントラクト、スレッド安全性 |
+| [DBレイヤーリファレンス](database/model-reference.html) | 3層アーキテクチャ（DBAdapter / BaseModel / NoteModel）、完全なCRUD API、トレードオフ |
+| [タグと多対多](tags/index.html) | 2番目のリソース、結合テーブル、GetTagsForNote、SetTagsForNote |
+| [認証システム](auth/index.html) | UserModel、SHA-256 + ソルトパスワードハッシング、Session、RequireLoginガード |
+| [JSON API と静的提供](api/index.html) | JSONSerializer、API ViewModel、201/422ステータスコード、ServeStaticパストラバーサルガード |
+| [エンコーディング](encoding/index.html) | フォーム解析、MIMEタイプ、UTF-8およびパーセントエンコーディング |
 
 ## 現在のバージョン
 
-**v0.3.0** — Unicode (タイ語、絵文字) でフルな CRUD が動作、フォーム検証、フラッシュメッセージ、404/500 エラーページ、POST/Redirect/GET パターン。フェーズ 3 (認証、複数のモデル) は次です。
+**v0.9.0** — JSON APIレイヤー、認証（SHA-256 + ソルト、セッションログイン/ログアウト）、多対多note_tagsを持つTagsリソース、および`/dist/*`の開発者ドキュメント用の組み込み静的ファイルサーバー。本番パス修正（v0.4.2）により、DB とテンプレートは、すべての環境で実行可能ファイルに相対的に解決されることが保証されます。

@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -288,37 +333,37 @@
 <p>JinjaX をアップグレードしたり修正したりする場合を除き、<code>JinjaXLib/</code> を変更しないでください。</p>
 <h2 id="appopening">App.Opening() でのセットアップ<a class="headerlink" href="#appopening" title="Permanent link">&para;</a></h2>
 <p><code>JinjaEnvironment</code> はアプリケーション起動時に 1 回初期化され、共有シングルトンとして <code>App</code> に保存されます。<code>Opening()</code> 完了後は読み取り専用で、これによりスレッドセーフになります:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// App.Opening() で</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// App.Opening() で</span>
 
-<span class="c1">// 1. 環境を作成</span><span class="w"></span>
-<span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="p">()</span><span class="w"></span>
+<span class="c1">// 1. 環境を作成</span>
+<span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="p">()</span>
 
-<span class="c1">// 2. テンプレートフォルダをポイント</span><span class="w"></span>
-<span class="c1">//    IDE デバッグ出力位置からどこでも機能するように絶対パスを使用</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">projectDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">templatesDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">Loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">templatesDir</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// 2. テンプレートフォルダをポイント</span>
+<span class="c1">//    IDE デバッグ出力位置からどこでも機能するように絶対パスを使用</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">projectDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">templatesDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">templatesDir</span><span class="p">)</span>
 
-<span class="c1">// 3. 自動エスケープを有効にする (XSS に対して保護 — 常にオン)</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">Autoescape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span><span class="w"></span>
+<span class="c1">// 3. 自動エスケープを有効にする (XSS に対して保護 — 常にオン)</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Autoescape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span>
 
-<span class="c1">// 4. カスタムフィルターを登録</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// 4. カスタムフィルターを登録</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="_2">カスタムフィルターを登録<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>フィルターは <code>Variant</code> を取り、<code>Variant</code> を返す Xojo メソッドです。テンプレートが pipe <code>|</code> オペレータで使用する文字列名で登録します:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// App.xojo_code (またはモジュール) で</span><span class="w"></span>
-<span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span><span class="w"></span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">77</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// App.xojo_code (またはモジュール) で</span>
+<span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">77</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;...&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="c1">// Opening() で登録:</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// Opening() で登録:</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span>
 </code></pre></div>
 
 <p>テンプレートで:</p>
@@ -327,10 +372,10 @@
 
 <h2 id="viewmodel">ViewModel から環境にアクセス<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
 <p><code>JinjaEnvironment</code> は <code>Handle()</code> が呼ばれる前にルーターから各 ViewModel に渡されます。<code>BaseViewModel</code> はそれを <code>Jinja</code> プロパティとして保存します。決して直接アクセスしません — <code>Render()</code> を呼び出すだけです:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 任意の ViewModel で — Render() は内部的に Self.Jinja を使用</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w"></span>
-<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// 任意の ViewModel で — Render() は内部的に Self.Jinja を使用</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
+<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="_3">スレッドセーフティ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>

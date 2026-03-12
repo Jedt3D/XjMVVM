@@ -75,7 +75,8 @@ Protected Class BaseViewModel
 
 	#tag Method, Flags = &h0, Description = 000EEFBFBD0A00000A000E000A0E000000000E000E000C000E000D0C000A000A0D00000E0000000000000E0E00000E00
 		Sub Render(templateName As String, context As Dictionary)
-		  // Auto-inject flash message if available
+		  // Auto-inject flash message (always set to prevent UndefinedVariableException)
+		  context.Value("flash") = ""
 		  Var ws As WebSession = Self.Session
 		  If ws IsA Session Then
 		    Var sess As Session = Session(ws)
@@ -85,16 +86,19 @@ Protected Class BaseViewModel
 		    End If
 		  End If
 		  
-		  // Auto-inject current user info for nav display
+		  // Auto-inject current user info for nav display (always add to prevent UndefinedVariableException)
+		  Var userCtx As New Dictionary()
+		  userCtx.Value("id") = "0"
+		  userCtx.Value("username") = ""
+		  userCtx.Value("logged_in") = "0"
 		  Var ws2 As WebSession = Self.Session
 		  If ws2 IsA Session Then
 		    Var sess2 As Session = Session(ws2)
-		    Var userCtx As New Dictionary()
 		    userCtx.Value("id") = Str(sess2.CurrentUserID)
 		    userCtx.Value("username") = sess2.CurrentUsername
 		    userCtx.Value("logged_in") = If(sess2.IsLoggedIn(), "1", "0")
-		    context.Value("current_user") = userCtx
 		  End If
+		  context.Value("current_user") = userCtx
 
 		  Var tmpl As JinjaX.CompiledTemplate = Jinja.GetTemplate(templateName)
 		  Var html As String = tmpl.Render(context)

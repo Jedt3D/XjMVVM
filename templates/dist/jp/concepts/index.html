@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -424,16 +469,16 @@
 <p>これはシステム全体の最も重要な規則です。</p>
 <p>JinjaX はドット記法 (<code>{{ note.title }}</code>) をオブジェクトの <code>EvaluateGetAttr</code> を呼び出すことで解決します。Xojo では、<code>EvaluateGetAttr</code> は <code>Dictionary</code> に対してのみ実装されており、名前でキーを検索します。カスタム Xojo クラスインスタンスは <code>EvaluateGetAttr</code> をサポートしないため、ドットアクセスはサイレントに空として レンダリングされます。</p>
 <p><strong>規則:</strong> テンプレートに渡されるすべてのデータは <code>Dictionary</code> または <code>Variant()</code> の <code>Dictionary</code> オブジェクトの配列である必要があります。モデルは常にこれら 2 つのタイプのいずれかを返します — カスタムクラスインスタンスを返しません。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — Dictionary キーはテンプレートのドット記法で動作</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
-<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
-<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
-<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w">   </span><span class="c1">// Variant() Dictionary の配列</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — Dictionary キーはテンプレートのドット記法で動作</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w">   </span><span class="c1">// Variant() Dictionary の配列</span>
 
-<span class="c1">// ❌ 間違い — カスタムクラスインスタンス、ドットアクセスはテンプレートで失敗</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteClass</span><span class="p">()</span><span class="w"></span>
-<span class="n">note</span><span class="p">.</span><span class="n">Title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
-<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">note</span><span class="p">)</span><span class="w">  </span><span class="c1">// {{ note.title }} は空の文字列としてレンダリング</span><span class="w"></span>
+<span class="c1">// ❌ 間違い — カスタムクラスインスタンス、ドットアクセスはテンプレートで失敗</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteClass</span><span class="p">()</span>
+<span class="n">note</span><span class="p">.</span><span class="n">Title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">note</span><span class="p">)</span><span class="w">  </span><span class="c1">// {{ note.title }} は空の文字列としてレンダリング</span>
 </code></pre></div>
 
 <p>テンプレートでは、配列は <code>Dictionary</code> オブジェクトを含む <code>Variant()</code> である必要があります:</p>
@@ -454,12 +499,12 @@
 </ol>
 <p>これにより、ブラウザがリロードでフォームを再送信することを防ぎます (&ldquo;このページをリロードしますか?&rdquo; ダイアログ)。また、ユーザーが見るすべてのページが GET リクエストで作成されたことを意味します — ブラウザ履歴、ブックマーク、戻るボタンはすべて正しく機能します。</p>
 <p>検証が失敗した場合、ViewModel はリダイレクト <strong>しません</strong> — 同じ GET テンプレートを使用してエラーフラッシュメッセージでフォームを再レンダリングします:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 検証失敗 — リエンダー、リダイレクトなし</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Trim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">  </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Title is required&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// 検証失敗 — リエンダー、リダイレクトなし</span>
+<span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Trim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Title is required&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
 <h2 id="_1">セッション分離<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>

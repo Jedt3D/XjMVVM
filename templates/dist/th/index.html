@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>บทนำ — MVVM Docs</title>
-  <meta name="description" content="เฟรมเวิร์ก Xojo MVVM Web (XjMVVM) ที่ใช้การเรนเดอร์ฝั่งเซิร์ฟเวอร์ สร้างบน Xojo Web 2 โดยใช้เอนจิน JinjaX" />
+  <meta name="description" content="เฟรมเวิร์ก Xojo MVVM Web ที่렌เดอร์ฝั่งเซิร์ฟเวอร์ (XjMVVM) สร้างบน Xojo Web 2 ขับเคลื่อนด้วยเทมเพลต JinjaX" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="./api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -269,14 +314,14 @@
       <article class="prose">
         <div class="page-header">
           <h1 class="page-title">บทนำ</h1>
-          <p class="page-description">เฟรมเวิร์ก Xojo MVVM Web (XjMVVM) ที่ใช้การเรนเดอร์ฝั่งเซิร์ฟเวอร์ สร้างบน Xojo Web 2 โดยใช้เอนจิน JinjaX</p>
+          <p class="page-description">เฟรมเวิร์ก Xojo MVVM Web ที่렌เดอร์ฝั่งเซิร์ฟเวอร์ (XjMVVM) สร้างบน Xojo Web 2 ขับเคลื่อนด้วยเทมเพลต JinjaX</p>
         </div>
 
         <h1 id="_1">บทนำ<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>นี่คือ <strong>XjMVVM</strong> (Xojo MVVM Web Framework) — เฟรมเวิร์กเว็บแอปพลิเคชันที่ใช้การเรนเดอร์ฝั่งเซิร์ฟเวอร์ (SSR) สร้างบน Xojo Web 2 แทนที่จะใช้ระบบ WebPage และ WebControl GUI ของ Xojo ทำนองเดียวกัน คำขอ HTTP ทุกรายการจะถูกดักจับใน <code>HandleURL</code> และถูกส่งไปยัง ViewModel ซึ่งเรนเดอร์การตอบสนอง HTML โดยใช้เอนจิน <strong>JinjaX template</strong></p>
-<p>สถาปัตยกรรมจงใจออกแบบให้คล้ายกับ <strong>Flask</strong> หรือ <strong>Django</strong> — คุ้นเคยสำหรับใครก็ตามที่สร้างแอป SSR ในภาษา Python หากคุณไม่เคยใช้ Flask ให้นึกถึงมันในลักษณะนี้: เบราว์เซอร์ขอหน้า เซิร์ฟเวอร์เรียกใช้โค้ด สร้างสตริง HTML และส่งกลับไป ไม่มีเฟรมเวิร์ก JavaScript ไม่มี WebSockets สำหรับการเรนเดอร์ เพียงคำขอ/การตอบสนองที่สะอาด</p>
+<p>นี่คือ <strong>XjMVVM</strong> (Xojo MVVM Web Framework) — เฟรมเวิร์กเว็บแอปพลิเคชันที่렌เดอร์ฝั่งเซิร์ฟเวอร์ (SSR) สร้างบน Xojo Web 2 แทนที่จะใช้ระบบ GUI WebPage และ WebControl ที่สร้างไว้ของ Xojo ทุก HTTP request จะถูกสกัดกั้นใน <code>HandleURL</code> และถูกส่งไปยัง ViewModel ซึ่งจะรenderHTML response โดยใช้เอนจิน <strong>JinjaX template</strong></p>
+<p>สถาปัตยกรรมมีลักษณะคล้ายกับ <strong>Flask</strong> หรือ <strong>Django</strong> โดยเจตนา — คุ้นเคยกับใครที่ได้สร้าง SSR web apps ใน Python มาแล้ว หากคุณไม่เคยใช้ Flask ลองคิดดูแบบนี้: เบราว์เซอร์ขอหน้าเว็บ เซิร์ฟเวอร์เรียกใช้โค้ดบางส่วน สร้างสตริง HTML และส่งกลับ ไม่มี JavaScript framework ไม่มี WebSockets สำหรับการแสดงผล แค่ request/response ที่สะอาดเรียบร้อย</p>
 <h2 id="_2">วงจรชีวิตของคำขอ<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>คำขอทุกรายการ — โดยไม่คำนึงถึง URL — ไหลผ่านไปป์ไลน์เดียวกัน:</p>
+<p>ทุก request — ไม่ว่า URL จะเป็นอะไร — ไหลผ่านท่อเดียวกัน:</p>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
@@ -427,15 +472,15 @@ Browser renders the page</code></pre>
   </div>
 </div>
 
-<p>ไม่มีอะไรในไปป์ไลน์นี้ใช้ <code>WebPage</code>, <code>WebButton</code>, <code>WebTextField</code> หรือ WebControl ของ Xojo อื่น ๆ <code>Default</code> WebPage ในไฟล์โครงการเป็นเพียงตัวยึดตำแหน่งที่จำเป็นสำหรับโครงสร้างโครงการของ Xojo — ไม่เคยถูกเสิร์ฟจริง ๆ</p>
-<h2 id="_3">การเรียกใช้แอป<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>ไม่มีอะไรในท่อนี้ใช้ <code>WebPage</code> <code>WebButton</code> <code>WebTextField</code> หรือ Xojo web control อื่น ๆ WebPage <code>Default</code> ในไฟล์โครงการเป็นตัวยึดตำแหน่งที่จำเป็นสำหรับโครงสร้างโครงการของ Xojo — มันไม่เคยถูกให้บริการจริง ๆ</p>
+<h2 id="_3">การรันแอปพลิเคชัน<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ol>
 <li>เปิด <code>mvvm.xojo_project</code> ใน <strong>Xojo 2025r3.1</strong></li>
-<li>คลิก <strong>Run</strong> (⌘R) แอปจะเริ่มต้นที่ <code>http://localhost:8080</code></li>
-<li>ฐานข้อมูล SQLite <code>data/notes.sqlite</code> ถูกสร้างโดยอัตโนมัติในการเปิดตัวครั้งแรก</li>
+<li>คลิก <strong>Run</strong> (⌘R) แอปจะเริ่มที่ <code>http://localhost:8080</code></li>
+<li>ฐานข้อมูล SQLite <code>data/notes.sqlite</code> จะถูกสร้างโดยอัตโนมัติเมื่อเปิดใช้ครั้งแรก</li>
 </ol>
-<p>ไม่มีระบบการสร้างจาก CLI การทดสอบและการสร้างทั้งหมดเกิดขึ้นภายใน Xojo IDE</p>
-<h2 id="_4">สิ่งที่รวมอยู่ในคู่มือนี้<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>ไม่มีระบบ CLI build ทั้งหมดการทดสอบและการสร้างเกิดขึ้นภายใน Xojo IDE</p>
+<h2 id="_4">สิ่งที่อยู่ในคำแนะนำนี้<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -445,33 +490,53 @@ Browser renders the page</code></pre>
 </thead>
 <tbody>
 <tr>
-<td><a href="concepts/index.html">ทำไมถึง MVVM?</a></td>
-<td>การตัดสินใจทางสถาปัตยกรรมและข้อแลกเปลี่ยนเบื้องหลังการออกแบบนี้</td>
+<td><a href="concepts/index.html">ทำไม MVVM?</a></td>
+<td>การตัดสินใจสถาปัตยกรรมและการแลกเปลี่ยนเสีย ๆ หลัง ๆ ของการออกแบบนี้</td>
 </tr>
 <tr>
-<td><a href="conventions/index.html">อนุสัญญา</a></td>
-<td>โครงสร้างไดเรกทอรี การตั้งชื่อไฟล์ การตั้งชื่อเมธอดและคุณสมบัติ</td>
+<td><a href="routing/index.html">Routing</a></td>
+<td>HandleURL ต้นไม้การตัดสินใจ การเปลี่ยนเส้นทาง <code>/tests</code> การข้ามระหว่าง SSR และ Xojo WebPage</td>
+</tr>
+<tr>
+<td><a href="conventions/index.html">การใช้งาน</a></td>
+<td>โครงสร้างไดเรกทอรี่ การตั้งชื่อไฟล์ การตั้งชื่อวิธีการและคุณสมบัติ</td>
 </tr>
 <tr>
 <td><a href="static-files/index.html">ไฟล์คงที่</a></td>
-<td>วิธีการเสิร์ฟ CSS, JS และรูปภาพ</td>
+<td>วิธีการให้บริการ CSS JS และรูปภาพ</td>
 </tr>
 <tr>
 <td><a href="templates/index.html">เทมเพลต</a></td>
-<td>การตั้งค่า JinjaX ไวยากรณ์ Jinja2 ตัวอย่างจริง อ้างอิงแท็กแบบเต็ม</td>
+<td>การตั้งค่า JinjaX ไวยากรณ์ Jinja2 ตัวอย่างจริง ข้อมูลอ้างอิงแท็กทั้งหมด</td>
 </tr>
 <tr>
 <td><a href="database/index.html">ฐานข้อมูล</a></td>
-<td>รูปแบบ SQLite สัญญา Dictionary ความปลอดภัยเธรด</td>
+<td>รูปแบบ SQLite สัญญา Dictionary ความปลอดภัยของเธรด</td>
+</tr>
+<tr>
+<td><a href="database/model-reference.html">อ้างอิง DB Layer</a></td>
+<td>สถาปัตยกรรมสามชั้น (DBAdapter / BaseModel / NoteModel) CRUD API ที่สมบูรณ์ การแลกเปลี่ยน</td>
+</tr>
+<tr>
+<td><a href="tags/index.html">แท็ก &amp; ความสัมพันธ์แบบหลายต่อหลาย</a></td>
+<td>ทรัพยากรที่สอง ตารางเชื่อมต่อ GetTagsForNote SetTagsForNote</td>
+</tr>
+<tr>
+<td><a href="auth/index.html">ระบบการรับรองความถูกต้อง</a></td>
+<td>UserModel การแฮช SHA-256 + salt รหัสผ่าน Session RequireLogin guard</td>
+</tr>
+<tr>
+<td><a href="api/index.html">JSON API &amp; การให้บริการคงที่</a></td>
+<td>JSONSerializer API ViewModels สถานะ 201/422 ServeStatic path-traversal guard</td>
 </tr>
 <tr>
 <td><a href="encoding/index.html">การเข้ารหัส</a></td>
-<td>การแยกวิเคราะห์แบบฟอร์ม ประเภท MIME UTF-8 และเปอร์เซ็นต์การเข้ารหัส</td>
+<td>การแยกวิเคราะห์แบบฟอร์ม ประเภท MIME UTF-8 และการเข้ารหัสเปอร์เซ็นต์</td>
 </tr>
 </tbody>
 </table>
-<h2 id="_5">เวอร์ชั่นปัจจุบัน<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p><strong>v0.3.0</strong> — CRUD ที่สมบูรณ์พร้อม Unicode (ไทย emoji) การตรวจสอบแบบฟอร์ม ข้อความแฟลช หน้าข้อผิดพลาด 404/500 และรูปแบบ POST/Redirect/GET เฟส 3 (การรับรองความถูกต้อง โมเดลหลายตัว) จะเป็นไปตามนั้น</p>
+<h2 id="_5">เวอร์ชันปัจจุบัน<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p><strong>v0.9.0</strong> — JSON API layer การรับรองความถูกต้อง (SHA-256 + salt session login/logout) ทรัพยากรแท็กพร้อมจำนวนมากถึงจำนวนมากหลายตาราง note_tags และเซิร์ฟเวอร์ไฟล์คงที่ที่สร้างขึ้นสำหรับเอกสารนักพัฒนาที่ <code>/dist/*</code> การแก้ไขเส้นทางการผลิต (v0.4.2) ช่วยให้แน่ใจว่า DB และเทมเพลตแก้ไขสัมพันธ์กับไฟล์เรียกใช้ได้ในสภาพแวดล้อมทั้งหมด</p>
 
         <!-- Prev / Next navigation -->
         
@@ -504,15 +569,15 @@ Browser renders the page</code></pre>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#การเรยกใชแอป">การเรียกใช้แอป</a>
+            <a class="toc-link" href="#การรนแอปพลเคชน">การรันแอปพลิเคชัน</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#สงทรวมอยในคมอน">สิ่งที่รวมอยู่ในคู่มือนี้</a>
+            <a class="toc-link" href="#สงทอยในคำแนะนำน">สิ่งที่อยู่ในคำแนะนำนี้</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#เวอรชนปจจบน">เวอร์ชั่นปัจจุบัน</a>
+            <a class="toc-link" href="#เวอรชนปจจบน">เวอร์ชันปัจจุบัน</a>
           </li>
           
         </ul>

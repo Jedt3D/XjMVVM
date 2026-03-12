@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -288,37 +333,37 @@
 <p>Do not modify <code>JinjaXLib/</code> unless you&rsquo;re intentionally upgrading or patching JinjaX.</p>
 <h2 id="setup-in-appopening">Setup in App.Opening()<a class="headerlink" href="#setup-in-appopening" title="Permanent link">&para;</a></h2>
 <p>The <code>JinjaEnvironment</code> is initialized once when the application starts and stored on <code>App</code> as a shared singleton. It is read-only after <code>Opening()</code> completes, which makes it thread-safe:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// In App.Opening()</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// In App.Opening()</span>
 
-<span class="c1">// 1. Create the environment</span><span class="w"></span>
-<span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="p">()</span><span class="w"></span>
+<span class="c1">// 1. Create the environment</span>
+<span class="n">mJinja</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">JinjaEnvironment</span><span class="p">()</span>
 
-<span class="c1">// 2. Point it at your templates folder</span><span class="w"></span>
-<span class="c1">//    Use an absolute path so it works from any IDE debug output location</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">projectDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">templatesDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">Loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">templatesDir</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// 2. Point it at your templates folder</span>
+<span class="c1">//    Use an absolute path so it works from any IDE debug output location</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">projectDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">templatesDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">projectDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">)</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Loader</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">JinjaX</span><span class="p">.</span><span class="n">FileSystemLoader</span><span class="p">(</span><span class="n">templatesDir</span><span class="p">)</span>
 
-<span class="c1">// 3. Enable autoescape (protects against XSS — always on)</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">Autoescape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span><span class="w"></span>
+<span class="c1">// 3. Enable autoescape (protects against XSS — always on)</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">Autoescape</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">True</span>
 
-<span class="c1">// 4. Register custom filters</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// 4. Register custom filters</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="registering-a-custom-filter">Registering a custom filter<a class="headerlink" href="#registering-a-custom-filter" title="Permanent link">&para;</a></h2>
 <p>A filter is a Xojo method that takes a <code>Variant</code> and returns a <code>Variant</code>. Register it with a string name that templates use with the pipe <code>|</code> operator:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// In App.xojo_code (or a Filters module)</span><span class="w"></span>
-<span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span><span class="w"></span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">77</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;...&quot;</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// In App.xojo_code (or a Filters module)</span>
+<span class="k">Function</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="p">.</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">80</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">77</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;...&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="c1">// Register in Opening():</span><span class="w"></span>
-<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span><span class="w"></span>
+<span class="c1">// Register in Opening():</span>
+<span class="n">mJinja</span><span class="p">.</span><span class="n">RegisterFilter</span><span class="p">(</span><span class="s2">&quot;truncate80&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">TruncateFilter</span><span class="p">)</span>
 </code></pre></div>
 
 <p>In a template:</p>
@@ -327,10 +372,10 @@
 
 <h2 id="accessing-the-environment-from-a-viewmodel">Accessing the environment from a ViewModel<a class="headerlink" href="#accessing-the-environment-from-a-viewmodel" title="Permanent link">&para;</a></h2>
 <p>The <code>JinjaEnvironment</code> is passed from the Router to each ViewModel before <code>Handle()</code> is called. <code>BaseViewModel</code> stores it as the <code>Jinja</code> property. You never access it directly — just call <code>Render()</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// In any ViewModel — Render() uses Self.Jinja internally</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
-<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span><span class="w"></span>
-<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// In any ViewModel — Render() uses Self.Jinja internally</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">ctx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
+<span class="n">Render</span><span class="p">(</span><span class="s2">&quot;notes/list.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ctx</span><span class="p">)</span>
 </code></pre></div>
 
 <h2 id="thread-safety">Thread safety<a class="headerlink" href="#thread-safety" title="Permanent link">&para;</a></h2>

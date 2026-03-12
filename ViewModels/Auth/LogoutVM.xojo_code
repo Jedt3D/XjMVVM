@@ -8,7 +8,7 @@ Inherits BaseViewModel
 		    Session(ws).LogOut()
 		  End If
 		  SetFlash("You have been logged out")
-		  Redirect("/")
+		  Redirect("/notes")
 		End Sub
 	#tag EndMethod
 

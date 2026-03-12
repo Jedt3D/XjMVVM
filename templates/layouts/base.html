@@ -29,26 +29,56 @@
     <a href="/notes">Notes</a>
     <a href="/tags">Tags</a>
     <a href="/tests" target="_blank">Tests</a>
-    {% if current_user and current_user.logged_in == "1" %}
-    <span style="margin-left:auto; display:flex; align-items:center; gap:8px;">
-      <span style="font-size:0.9em; color:#555;">{{ current_user.username }}</span>
-      <form method="post" action="/logout" style="display:inline;">
-        <button type="submit" class="btn btn-sm">Log Out</button>
-      </form>
-    </span>
-    {% else %}
-    <span style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+    <span id="nav-out" style="margin-left:auto; display:flex; gap:8px; align-items:center;">
       <a href="/login" class="btn btn-sm">Log In</a>
       <a href="/signup" class="btn btn-primary btn-sm">Sign Up</a>
     </span>
-    {% endif %}
+    <span id="nav-in" style="margin-left:auto; display:none; align-items:center; gap:8px;">
+      <span id="nav-username" style="font-size:0.9em; color:#555;"></span>
+      <form id="logout-form" method="post" action="/logout" style="display:inline;">
+        <button type="submit" class="btn btn-sm">Log Out</button>
+      </form>
+    </span>
     <a href="/dist/en/index.html" target="_blank" class="btn btn-primary btn-sm" style="margin-left:8px;">XjMVVM Docs</a>
   </nav>
   {% if flash %}
   <div class="flash flash-{{ flash.type }}">{{ flash.message }}</div>
   {% endif %}
+  <div id="_client-flash" style="display:none"></div>
   <main>
     {% block content %}{% endblock %}
   </main>
+  <script>
+    (function () {
+      // Client-side flash (fallback when Xojo session doesn't persist across SSR requests)
+      var msg  = sessionStorage.getItem('_flash_msg');
+      var type = sessionStorage.getItem('_flash_type') || 'success';
+      sessionStorage.removeItem('_flash_msg');
+      sessionStorage.removeItem('_flash_type');
+      if (msg && !document.querySelector('.flash')) {
+        var el = document.getElementById('_client-flash');
+        el.className = 'flash flash-' + type;
+        el.textContent = msg;
+        el.style.display = '';
+      }
+
+      // Auth nav: show logged-in or logged-out state based on localStorage
+      var user   = localStorage.getItem('_auth_user');
+      var navOut = document.getElementById('nav-out');
+      var navIn  = document.getElementById('nav-in');
+      if (user) {
+        document.getElementById('nav-username').textContent = user;
+        navOut.style.display = 'none';
+        navIn.style.display  = 'flex';
+      }
+
+      // Logout: clear auth state and set flash before POST
+      document.getElementById('logout-form').addEventListener('submit', function () {
+        localStorage.removeItem('_auth_user');
+        sessionStorage.setItem('_flash_msg',  'You have been logged out.');
+        sessionStorage.setItem('_flash_type', 'success');
+      });
+    })();
+  </script>
 </body>
 </html>

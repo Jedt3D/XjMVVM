@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSON API & Static Serving — MVVM Docs</title>
+  <meta name="description" content="วิธีการ XjMVVM เปิดเผย JSON API พร้อมกับเส้นทาง SSR และวิธีการเซิร์ฟเวอร์ไฟล์สแตติกในตัวทำงาน" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/dist/en/index.html">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.9.0</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/dist/en/index.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn active" href="/dist/th/index.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn" href="/dist/jp/index.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/dist/en/index.html">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">JSON API & Static Serving</h1>
+          <p class="page-description">วิธีการ XjMVVM เปิดเผย JSON API พร้อมกับเส้นทาง SSR และวิธีการเซิร์ฟเวอร์ไฟล์สแตติกในตัวทำงาน</p>
+        </div>
+
+        <h1 id="json-api-static-serving">JSON API &amp; Static Serving<a class="headerlink" href="#json-api-static-serving" title="Permanent link">&para;</a></h1>
+<p>XjMVVM สามารถให้บริการทั้ง <strong>หน้า HTML ที่แสดงบนเซิร์ฟเวอร์</strong> <strong>และ</strong> JSON API จากแอปพลิเคชันเดียวกัน — ไม่มีกระบวนการแยกต่างหากหรือเฟรมเวิร์ก API ใช้ Router เดียวกัน รูปแบบ ViewModels เดียวกัน และ Models เดียวกัน ความแตกต่างเพียงอย่างเดียวคือรูปแบบการตอบสนอง</p>
+<hr />
+<h2 id="jsonserializer">โมดูล JSONSerializer<a class="headerlink" href="#jsonserializer" title="Permanent link">&para;</a></h2>
+<p><strong>ไฟล์:</strong> <code>Framework/JSONSerializer.xojo_code</code></p>
+<p>โมดูลง่าย ๆ ที่แปลง <code>Dictionary</code> และ <code>Variant()</code> ของ <code>Dictionary</code> เป็นสตริง JSON ไม่ขึ้นอยู่กับไลบรารีภายนอก — เพียงแค่การจัดการสตริง</p>
+<div class="highlight"><pre><span></span><code><span class="k">Module</span><span class="w"> </span><span class="n">JSONSerializer</span>
+
+<span class="w">  </span><span class="c1">// Escape a value for use inside a JSON string literal</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">EscapeString</span><span class="p">(</span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="s2">&quot;\&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;\\&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="n">Chr</span><span class="p">(</span><span class="m">34</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;\&quot;&quot;&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// double-quote</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="n">Chr</span><span class="p">(</span><span class="m">10</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;\n&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// newline</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="n">Chr</span><span class="p">(</span><span class="m">13</span><span class="p">),</span><span class="w"> </span><span class="s2">&quot;\r&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// carriage return</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="n">Chr</span><span class="p">(</span><span class="m">9</span><span class="p">),</span><span class="w">  </span><span class="s2">&quot;\t&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// tab</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">s</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="c1">// Serialize a Dictionary of string values to a JSON object</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">DictToJSON</span><span class="p">(</span><span class="n">d</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">parts</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">For</span><span class="w"> </span><span class="k">Each</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="ow">In</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">Keys</span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EscapeString</span><span class="p">(</span><span class="n">key</span><span class="p">.</span><span class="n">StringValue</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">EscapeString</span><span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">key</span><span class="p">).</span><span class="n">StringValue</span><span class="p">)</span>
+<span class="w">      </span><span class="n">parts</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&quot;&quot;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&quot;&quot;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;&quot;&quot;&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Next</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;{&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="kt">String</span><span class="p">.</span><span class="n">FromArray</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;}&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="c1">// Serialize a Variant() of Dictionary to a JSON array</span>
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">ArrayToJSON</span><span class="p">(</span><span class="n">items</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">parts</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">For</span><span class="w"> </span><span class="k">Each</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="ow">In</span><span class="w"> </span><span class="n">items</span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">item</span>
+<span class="w">      </span><span class="n">parts</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">DictToJSON</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+<span class="w">    </span><span class="k">Next</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;[&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="kt">String</span><span class="p">.</span><span class="n">FromArray</span><span class="p">(</span><span class="n">parts</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;]&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="k">End</span><span class="w"> </span><span class="k">Module</span>
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>ค่าทั้งหมดถูกทำให้เป็นอนุกรมเป็นสตริง JSON — ไม่มีประเภทตัวเลขหรือบูลีน นี่สอดคล้องกับวิธี <code>RowToDict</code> ทำงาน: ค่าฐานข้อมูลทั้งหมดถูกเก็บเป็น <code>StringValue</code> ผู้บริโภค API ควรแยกตัวเลขจากสตริงตามต้องการ</p>
+</div>
+<h3 id="writejson-baseviewmodel"><code>WriteJSON</code> ใน BaseViewModel<a class="headerlink" href="#writejson-baseviewmodel" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">jsonString</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;application/json; charset=utf-8&quot;</span>
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">jsonString</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p>ประเภทเนื้อหาสัญญาณ JSON ให้ลูกค้า ไม่มี ViewModel ต้องตั้งค่า headers โดยตรง — เพียงแค่เรียก <code>WriteJSON(...)</code> ด้วยสตริง serialized</p>
+<hr />
+<h2 id="api-viewmodels">API ViewModels<a class="headerlink" href="#api-viewmodels" title="Permanent link">&para;</a></h2>
+<p>ทั้งหมด API ViewModels อาศัยอยู่ใต้ <code>ViewModels/API/</code> ตามรูปแบบ <code>OnGet()</code>/<code>OnPost()</code> เดียวกับ ViewModels SSR — ความแตกต่างเพียงอย่างเดียวคือว่าพวกเขาเรียก <code>WriteJSON()</code> แทน <code>Render()</code></p>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="779.0" height="596.0" viewBox="0 0 779 596" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: right
+    #spacing: 44
+    #padding: 10
+    #lineWidth: 1.5
+    [GET /api/notes] -&gt; [NotesAPIListVM|model.GetAll()\nArrayToJSON()]
+    [GET /api/notes/:id] -&gt; [NotesAPIDetailVM|model.GetByID(id)\nGetTagsForNote(id)\nembed tags in JSON]
+    [POST /api/notes] -&gt; [NotesAPICreateVM|validate\nmodel.Create()\n201 Created]
+    [GET /api/tags] -&gt; [TagsAPIListVM|model.GetAll()\nArrayToJSON()]
+    [GET /api/tags/:id] -&gt; [TagsAPIDetailVM|model.GetByID(id)\nDictToJSON()]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="normal" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="596.0" width="779.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(10, 10)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M149.0 36.0 L183 36 L321.1666666666667 36 L321.2 36.0 " fill="none"></path>
+                    <path d="M313.8 41.9 L321.2 36.0 L313.8 30.1 L328.5 36.0 Z"></path>
+                    <path d="M161.0 152.0 L183 152 L197.66666666666666 152 L197.7 152.0 " fill="none"></path>
+                    <path d="M190.3 157.9 L197.7 152.0 L190.3 146.1 L205.0 152.0 Z"></path>
+                    <path d="M154.5 268.0 L183 268 L289.6666666666667 268 L289.7 268.0 " fill="none"></path>
+                    <path d="M282.3 273.9 L289.7 268.0 L282.3 262.1 L297.0 268.0 Z"></path>
+                    <path d="M144.0 384.0 L183 384 L321.1666666666667 384 L321.2 384.0 " fill="none"></path>
+                    <path d="M313.8 389.9 L321.2 384.0 L313.8 378.1 L328.5 384.0 Z"></path>
+                    <path d="M156.0 500.0 L183 500 L311.1666666666667 500 L311.2 500.0 " fill="none"></path>
+                    <path d="M303.8 505.9 L311.2 500.0 L303.8 494.1 L318.5 500.0 Z"></path>
+                    <g data-name="GET /api/notes">
+                        <g fill="white" stroke="black" data-name="GET /api/notes">
+                            <rect x="12.0" y="18.0" height="36.0" width="137.0" data-name="GET /api/notes"></rect>
+                        </g>
+                        <g transform="translate(12, 18)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET /api/notes" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="GET /api/notes" data-compartment="0">
+                                <text x="58.5" y="14.1" stroke="none" text-anchor="middle" data-name="GET /api/notes" data-compartment="0">GET /api/notes</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="NotesAPIListVM">
+                        <g fill="white" stroke="black" data-name="NotesAPIListVM">
+                            <rect x="328.5" y="0.0" height="72.0" width="267.0" data-name="NotesAPIListVM"></rect>
+                            <path d="M328.5 36.0 L595.5 36.0" fill="none" data-name="NotesAPIListVM"></path>
+                        </g>
+                        <g transform="translate(328.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPIListVM" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="NotesAPIListVM" data-compartment="0">
+                                <text x="123.5" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPIListVM" data-compartment="0">NotesAPIListVM</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(328.5, 36)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPIListVM" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="NotesAPIListVM" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPIListVM" data-compartment="1">model.GetAll()
+                                ArrayToJSON()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="GET /api/notes/:id">
+                        <g fill="white" stroke="black" data-name="GET /api/notes/:id">
+                            <rect x="0.0" y="134.0" height="36.0" width="161.0" data-name="GET /api/notes/:id"></rect>
+                        </g>
+                        <g transform="translate(0, 134)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET /api/notes/:id" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="GET /api/notes/:id" data-compartment="0">
+                                <text x="70.5" y="14.1" stroke="none" text-anchor="middle" data-name="GET /api/notes/:id" data-compartment="0">GET /api/notes/:id</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="NotesAPIDetailVM">
+                        <g fill="white" stroke="black" data-name="NotesAPIDetailVM">
+                            <rect x="205.0" y="116.0" height="72.0" width="514.0" data-name="NotesAPIDetailVM"></rect>
+                            <path d="M205.0 152.0 L719.0 152.0" fill="none" data-name="NotesAPIDetailVM"></path>
+                        </g>
+                        <g transform="translate(205, 116)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPIDetailVM" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="NotesAPIDetailVM" data-compartment="0">
+                                <text x="247.0" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPIDetailVM" data-compartment="0">NotesAPIDetailVM</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(205, 152)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPIDetailVM" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="NotesAPIDetailVM" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPIDetailVM" data-compartment="1">model.GetByID(id)
+                                GetTagsForNote(id)
+                                embed tags in JSON</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="POST /api/notes">
+                        <g fill="white" stroke="black" data-name="POST /api/notes">
+                            <rect x="6.5" y="250.0" height="36.0" width="148.0" data-name="POST /api/notes"></rect>
+                        </g>
+                        <g transform="translate(6.5, 250)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="POST /api/notes" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="POST /api/notes" data-compartment="0">
+                                <text x="64.0" y="14.1" stroke="none" text-anchor="middle" data-name="POST /api/notes" data-compartment="0">POST /api/notes</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="NotesAPICreateVM">
+                        <g fill="white" stroke="black" data-name="NotesAPICreateVM">
+                            <rect x="297.0" y="232.0" height="72.0" width="330.0" data-name="NotesAPICreateVM"></rect>
+                            <path d="M297.0 268.0 L627.0 268.0" fill="none" data-name="NotesAPICreateVM"></path>
+                        </g>
+                        <g transform="translate(297, 232)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="NotesAPICreateVM" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="NotesAPICreateVM" data-compartment="0">
+                                <text x="155.0" y="14.1" stroke="none" text-anchor="middle" data-name="NotesAPICreateVM" data-compartment="0">NotesAPICreateVM</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(297, 268)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="NotesAPICreateVM" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="NotesAPICreateVM" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="NotesAPICreateVM" data-compartment="1">validate
+                                model.Create()
+                                201 Created</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="GET /api/tags">
+                        <g fill="white" stroke="black" data-name="GET /api/tags">
+                            <rect x="17.0" y="366.0" height="36.0" width="127.0" data-name="GET /api/tags"></rect>
+                        </g>
+                        <g transform="translate(17, 366)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET /api/tags" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="GET /api/tags" data-compartment="0">
+                                <text x="53.5" y="14.1" stroke="none" text-anchor="middle" data-name="GET /api/tags" data-compartment="0">GET /api/tags</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="TagsAPIListVM">
+                        <g fill="white" stroke="black" data-name="TagsAPIListVM">
+                            <rect x="328.5" y="348.0" height="72.0" width="267.0" data-name="TagsAPIListVM"></rect>
+                            <path d="M328.5 384.0 L595.5 384.0" fill="none" data-name="TagsAPIListVM"></path>
+                        </g>
+                        <g transform="translate(328.5, 348)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TagsAPIListVM" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="TagsAPIListVM" data-compartment="0">
+                                <text x="123.5" y="14.1" stroke="none" text-anchor="middle" data-name="TagsAPIListVM" data-compartment="0">TagsAPIListVM</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(328.5, 384)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TagsAPIListVM" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="TagsAPIListVM" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="TagsAPIListVM" data-compartment="1">model.GetAll()
+                                ArrayToJSON()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="GET /api/tags/:id">
+                        <g fill="white" stroke="black" data-name="GET /api/tags/:id">
+                            <rect x="5.0" y="482.0" height="36.0" width="151.0" data-name="GET /api/tags/:id"></rect>
+                        </g>
+                        <g transform="translate(5, 482)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET /api/tags/:id" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="GET /api/tags/:id" data-compartment="0">
+                                <text x="65.5" y="14.1" stroke="none" text-anchor="middle" data-name="GET /api/tags/:id" data-compartment="0">GET /api/tags/:id</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="TagsAPIDetailVM">
+                        <g fill="white" stroke="black" data-name="TagsAPIDetailVM">
+                            <rect x="318.5" y="464.0" height="72.0" width="287.0" data-name="TagsAPIDetailVM"></rect>
+                            <path d="M318.5 500.0 L605.5 500.0" fill="none" data-name="TagsAPIDetailVM"></path>
+                        </g>
+                        <g transform="translate(318.5, 464)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="TagsAPIDetailVM" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="TagsAPIDetailVM" data-compartment="0">
+                                <text x="133.5" y="14.1" stroke="none" text-anchor="middle" data-name="TagsAPIDetailVM" data-compartment="0">TagsAPIDetailVM</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(318.5, 500)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="TagsAPIDetailVM" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="TagsAPIDetailVM" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="TagsAPIDetailVM" data-compartment="1">model.GetByID(id)
+                                DictToJSON()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>GET  /api/notes       → NotesAPIListVM   → ArrayToJSON(notes)
+GET  /api/notes/:id   → NotesAPIDetailVM → note + embedded tags array
+POST /api/notes       → NotesAPICreateVM → 201 Created + new note JSON
+GET  /api/tags        → TagsAPIListVM    → ArrayToJSON(tags)
+GET  /api/tags/:id    → TagsAPIDetailVM  → DictToJSON(tag)</code></pre>
+  </div>
+</div>
+
+<h3 id="notesapilistvm-get-apinotes">NotesAPIListVM — <code>GET /api/notes</code><a class="headerlink" href="#notesapilistvm-get-apinotes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">notes</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
+<span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">ArrayToJSON</span><span class="p">(</span><span class="n">notes</span><span class="p">))</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p>ปฏิกิริยา: <code>[{"id":"1","title":"Hello","body":"...","created_at":"...","updated_at":"..."},...]</code></p>
+<h3 id="notesapidetailvm-get-apinotesid">NotesAPIDetailVM — <code>GET /api/notes/:id</code><a class="headerlink" href="#notesapidetailvm-get-apinotesid" title="Permanent link">&para;</a></h3>
+<p>ส่งคืนโน้ตด้วย <code>tags</code> array ที่ฝัง:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Val</span><span class="p">(</span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span>
+<span class="w">    </span><span class="n">WriteJSON</span><span class="p">(</span><span class="s2">&quot;{&quot;&quot;error&quot;&quot;:&quot;&quot;Note not found&quot;&quot;}&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Return</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+
+<span class="w">  </span><span class="c1">// Embed tags array inside the note JSON object</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tags</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetTagsForNote</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">noteJSON</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">DictToJSON</span><span class="p">(</span><span class="n">note</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tagsJSON</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">ArrayToJSON</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span>
+<span class="w">  </span><span class="n">noteJSON</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">noteJSON</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">noteJSON</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;,&quot;&quot;tags&quot;&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">tagsJSON</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;}&quot;</span>
+<span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">noteJSON</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p>อาร์เรย์แท็กถูกฉีดโดยการจัดการสตริง — ลบปิดการ <code>}</code> และผนวก <code>,"tags":[...]}</code> ก่อนปิดอีกครั้ง นี่เจตนา: <code>JSONSerializer.DictToJSON</code> จัดการเฉพาะดิกชันนารีสตริงแบบสม่ำเสมอเท่านั้น การฝัง array ที่ซ้อนกันต้องใช้องค์ประกอบด้วยตนเอง</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>วิธีนี้ใช้งานได้อย่างน่าเชื่อถือเพราะ <code>DictToJSON</code> ทำให้ JSON object ที่ถูกต้องเสมอจบด้วย <code>}</code> หากตัวจำหน่ายเปลี่ยน จุดฉีดนี้ต้องตรวจสอบ</p>
+</div>
+<h3 id="notesapicreatevm-post-apinotes">NotesAPICreateVM — <code>POST /api/notes</code><a class="headerlink" href="#notesapicreatevm-post-apinotes" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnPost</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">title</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">Trim</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetFormValue</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">422</span><span class="w">      </span><span class="c1">// Unprocessable Entity — validation error</span>
+<span class="w">    </span><span class="n">WriteJSON</span><span class="p">(</span><span class="s2">&quot;{&quot;&quot;error&quot;&quot;:&quot;&quot;Title is required&quot;&quot;}&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Return</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteModel</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">Create</span><span class="p">(</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">body</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">newID</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">201</span><span class="w">        </span><span class="c1">// Created</span>
+<span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">DictToJSON</span><span class="p">(</span><span class="n">note</span><span class="p">))</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<p>รหัสสถานะที่ใช้โดย API: <strong>200</strong> สำหรับการอ่านที่สำเร็จ <strong>201</strong> สำหรับการสร้างที่สำเร็จ <strong>404</strong> สำหรับไม่พบ <strong>422</strong> สำหรับความล้มเหลวในการตรวจสอบ</p>
+<h3 id="tagsapilistvm-get-apitags">TagsAPIListVM — <code>GET /api/tags</code><a class="headerlink" href="#tagsapilistvm-get-apitags" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">TagModel</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tags</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Variant</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetAll</span><span class="p">()</span>
+<span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">ArrayToJSON</span><span class="p">(</span><span class="n">tags</span><span class="p">))</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<h3 id="tagsapidetailvm-get-apitagsid">TagsAPIDetailVM — <code>GET /api/tags/:id</code><a class="headerlink" href="#tagsapidetailvm-get-apitagsid" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Val</span><span class="p">(</span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">))</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">model</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">TagModel</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">tag</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">model</span><span class="p">.</span><span class="n">GetByID</span><span class="p">(</span><span class="n">id</span><span class="p">)</span>
+
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">tag</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span>
+<span class="w">    </span><span class="n">WriteJSON</span><span class="p">(</span><span class="s2">&quot;{&quot;&quot;error&quot;&quot;:&quot;&quot;Tag not found&quot;&quot;}&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Return</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+
+<span class="w">  </span><span class="n">WriteJSON</span><span class="p">(</span><span class="n">JSONSerializer</span><span class="p">.</span><span class="n">DictToJSON</span><span class="p">(</span><span class="n">tag</span><span class="p">))</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<hr />
+<h2 id="api">เส้นทาง API<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>ลงทะเบียนใน <code>App.Opening</code> พร้อมกับเส้นทาง SSR:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// JSON API routes</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/api/notes&quot;</span><span class="p">,</span><span class="w">       </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateNotesAPIListVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/api/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateNotesAPICreateVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/api/notes/:id&quot;</span><span class="p">,</span><span class="w">   </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateNotesAPIDetailVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/api/tags&quot;</span><span class="p">,</span><span class="w">        </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateTagsAPIListVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/api/tags/:id&quot;</span><span class="p">,</span><span class="w">    </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateTagsAPIDetailVM</span><span class="p">)</span>
+</code></pre></div>
+
+<p>คำนำหน้า <code>/api/</code> แยก API routes จาก SSR routes ตามอนุสัญญา — Router ปฏิบัติต่อพวกเขาเหมือนกัน</p>
+<hr />
+<h2 id="_1">เซิร์ฟเวอร์ไฟล์สแตติก<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><strong>ไฟล์:</strong> <code>App.xojo_code</code> (วิธี <code>ServeStatic</code> + การส่ง <code>HandleURL</code>)</p>
+<p>เซิร์ฟเวอร์ไฟล์สแตติกทำให้ไซต์เอกสารพัฒนาเข้าถึงได้โดยตรงจากแอปที่ทำงานอยู่ที่ <code>/dist/*</code> ไฟล์ให้บริการจาก <code>templates/dist/</code> — โฟลเดอร์เดียวกับที่สคริปต์ <code>build.py</code> ส่งออก</p>
+<h3 id="handleurl">การส่ง HandleURL<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1">// Redirect bare /dist to /dist/</span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/dist&quot;</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">302</span>
+<span class="w">  </span><span class="n">response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Location&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/dist/&quot;</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="c1">// Serve anything under /dist/</span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">6</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/dist/&quot;</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">ServeStatic</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="m">6</span><span class="p">),</span><span class="w"> </span><span class="n">response</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
+</code></pre></div>
+
+<p><code>p.Middle(6)</code> ลบ คำนำหน้า <code>/dist/</code> (6 อักขระ 0-based) และส่งส่วนที่เหลือไปยัง <code>ServeStatic</code></p>
+<h3 id="servestatic-path-traversal">ServeStatic — การป้องกัน path traversal<a class="headerlink" href="#servestatic-path-traversal" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">ServeStatic</span><span class="p">(</span><span class="n">relativePath</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebResponse</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
+<span class="w">  </span><span class="c1">// Start from the known safe root</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;templates&quot;</span><span class="p">).</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;dist&quot;</span><span class="p">)</span>
+
+<span class="w">  </span><span class="c1">// Walk each path segment individually — never concatenate raw user input</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">parts</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">relativePath</span><span class="p">.</span><span class="n">Split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="k">Each</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="ow">In</span><span class="w"> </span><span class="n">parts</span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;.&quot;</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">part</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;..&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Continue</span><span class="w">  </span><span class="c1">// skip dangerous segments</span>
+<span class="w">    </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span>
+<span class="w">      </span><span class="n">response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/plain&quot;</span>
+<span class="w">      </span><span class="n">response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">Next</span>
+
+<span class="w">  </span><span class="c1">// Directory → try index.html automatically</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">IsFolder</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="n">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="ow">Is</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span>
+<span class="w">      </span><span class="n">response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Not found&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="c1">// ... content-type + file read ...</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><strong>ไม่เคย</strong> สร้างเส้นทางไฟล์โดยการต่อสตริง URL ดิบ คำขอสำหรับ <code>/dist/../data/notes.sqlite</code> จะให้บริการไฟล์ฐานข้อมูลหากเส้นทางสร้างขึ้นโดยตรง การเดินผ่านแต่ละส่วนผ่าน <code>Child()</code> และปฏิเสธ <code>..</code> และ <code>.</code> ป้องกันการโจมตีการเดินทาง path ทั้งหมด</p>
+</div>
+<h3 id="content-type">การแมป Content-Type<a class="headerlink" href="#content-type" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">Lowercase</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;application/octet-stream&quot;</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.html&quot;</span><span class="p">)</span><span class="w">  </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.css&quot;</span><span class="p">)</span><span class="w">   </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/css&quot;</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.js&quot;</span><span class="p">)</span><span class="w">    </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;application/javascript&quot;</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.svg&quot;</span><span class="p">)</span><span class="w">   </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;image/svg+xml&quot;</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">)</span><span class="w">   </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.ico&quot;</span><span class="p">)</span><span class="w">   </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;image/x-icon&quot;</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ext</span><span class="p">.</span><span class="n">EndsWith</span><span class="p">(</span><span class="s2">&quot;.woff2&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">ct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span>
+</code></pre></div>
+
+<p>ส่วนขยายที่ไม่รู้จักตกอยู่ <code>application/octet-stream</code> เพิ่มรายการใหม่ที่นี่หากให้บริการประเภทไฟล์เพิ่มเติม</p>
+<h3 id="_2">การเข้าถึงเอกสาร<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>พร้อมแอปที่ทำงานบนพอร์ต 8080 เอกสารพัฒนาจะพร้อมใช้ที่:</p>
+<div class="highlight"><pre><span></span><code>http://localhost:8080/dist/en/index.html
+http://localhost:8080/dist/th/index.html
+http://localhost:8080/dist/jp/index.html
+</code></pre></div>
+
+<p>เส้นทาง <code>/dist/</code> ถูกจัดการก่อนเส้นทาง SSR ดังนั้นเซิร์ฟเวอร์สแตติกจึงมีลำดับความสำคัญเสมอสำหรับคำนำหน้านั้น</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../auth/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Auth System</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../encoding/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">Forms, MIME & UTF-8</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#โมดล-jsonserializer">โมดูล JSONSerializer</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#writejson-ใน-baseviewmodel">`WriteJSON` ใน BaseViewModel</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#api-viewmodels">API ViewModels</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#notesapilistvm-get-apinotes">NotesAPIListVM — `GET /api/notes`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#notesapidetailvm-get-apinotesid">NotesAPIDetailVM — `GET /api/notes/:id`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#notesapicreatevm-post-apinotes">NotesAPICreateVM — `POST /api/notes`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#tagsapilistvm-get-apitags">TagsAPIListVM — `GET /api/tags`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#tagsapidetailvm-get-apitagsid">TagsAPIDetailVM — `GET /api/tags/:id`</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#เสนทาง-api">เส้นทาง API</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#เซรฟเวอรไฟลสแตตก">เซิร์ฟเวอร์ไฟล์สแตติก</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#การสง-handleurl">การส่ง HandleURL</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#servestatic-การปองกน-path-traversal">ServeStatic — การป้องกัน path traversal</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#การแมป-content-type">การแมป Content-Type</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#การเขาถงเอกสาร">การเข้าถึงเอกสาร</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

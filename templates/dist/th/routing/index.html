@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Routing Architecture — MVVM Docs</title>
-  <meta name="description" content="How HTTP requests flow through HandleURL, when Xojo takes over, and how to safely cross between the SSR world and Xojo WebPage controls." />
+  <title>สถาปัตยกรรมการกำหนดเส้นทาง — MVVM Docs</title>
+  <meta name="description" content="วิธีการไหลของคำขอ HTTP ผ่าน HandleURL เมื่อใดที่ Xojo ครอบครองการควบคุม และวิธีการข้ามไปมาระหว่างระบบ SSR และการควบคุม WebPage ของ Xojo" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -268,37 +313,37 @@
     <main class="content" id="content">
       <article class="prose">
         <div class="page-header">
-          <h1 class="page-title">Routing Architecture</h1>
-          <p class="page-description">How HTTP requests flow through HandleURL, when Xojo takes over, and how to safely cross between the SSR world and Xojo WebPage controls.</p>
+          <h1 class="page-title">สถาปัตยกรรมการกำหนดเส้นทาง</h1>
+          <p class="page-description">วิธีการไหลของคำขอ HTTP ผ่าน HandleURL เมื่อใดที่ Xojo ครอบครองการควบคุม และวิธีการข้ามไปมาระหว่างระบบ SSR และการควบคุม WebPage ของ Xojo</p>
         </div>
 
-        <h1 id="routing-architecture">Routing Architecture<a class="headerlink" href="#routing-architecture" title="Permanent link">&para;</a></h1>
-<h2 id="two-worlds-inside-one-app">Two Worlds Inside One App<a class="headerlink" href="#two-worlds-inside-one-app" title="Permanent link">&para;</a></h2>
-<p>A Xojo Web 2 application hosts two fundamentally different request-handling systems simultaneously. Every HTTP request enters through <code>HandleURL</code>, and its return value decides which world handles it.</p>
+        <h1 id="_1">สถาปัตยกรรมการกำหนดเส้นทาง<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<h2 id="_2">สองโลกภายในแอปพลิเคชันเดียว<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>แอปพลิเคชัน Xojo Web 2 โฮสต์ระบบจัดการคำขอ HTTP ที่แตกต่างกันโดยพื้นฐานสองระบบพร้อมกัน ทุกคำขอ HTTP เข้ามาผ่าน <code>HandleURL</code> และค่าที่ส่งคืนจะตัดสินใจว่าโลกใดจะจัดการกับมัน</p>
 <table>
 <thead>
 <tr>
-<th>World</th>
-<th>Entry point</th>
-<th>Response</th>
+<th>โลก</th>
+<th>จุดเข้า</th>
+<th>การตอบสนอง</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>MVVM (SSR)</strong></td>
 <td><code>HandleURL</code> → Router → ViewModel → JinjaX</td>
-<td>Plain HTTP, stateless HTML</td>
+<td>HTTP ธรรมดา HTML ไร้สถานะ</td>
 </tr>
 <tr>
 <td><strong>Xojo WebPage</strong></td>
 <td>Bootstrap HTML → WebSocket → Session → controls</td>
-<td>Stateful, event-driven UI</td>
+<td>การควบคุม UI ที่มีสถานะและเหตุการณ์</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><code>Return True</code> — this app handled it; Xojo does nothing further</li>
-<li><code>Return False</code> — Xojo handles it (serves bootstrap HTML, JS framework files, or WebSocket messages)</li>
+<li><code>Return True</code> — แอปพลิเคชันนี้จัดการแล้ว Xojo ไม่ทำอะไรเพิ่มเติม</li>
+<li><code>Return False</code> — Xojo จัดการ (ให้บริการ bootstrap HTML ไฟล์กรอบงาน JS หรือข้อความ WebSocket)</li>
 </ul>
 <div class="diagram-tabs" id="diag1">
   <div class="diagram-tab-bar">
@@ -428,8 +473,8 @@ App.HandleURL
 </div>
 
 <hr />
-<h2 id="handleurl-decision-tree">HandleURL Decision Tree<a class="headerlink" href="#handleurl-decision-tree" title="Permanent link">&para;</a></h2>
-<p><code>HandleURL</code> applies a fixed order of checks before dispatching any request. Path normalization comes first — every comparison depends on it.</p>
+<h2 id="handleurl">แผนภาพการตัดสินใจ HandleURL<a class="headerlink" href="#handleurl" title="Permanent link">&para;</a></h2>
+<p><code>HandleURL</code> ใช้ลำดับการตรวจสอบที่คงที่ก่อนส่งคำขอใด ๆ การปกติของเส้นทางมาก่อน — ทุกการเปรียบเทียบขึ้นอยู่กับมัน</p>
 <div class="diagram-tabs" id="diag2">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag2','nomnoml',this)">Diagram</button>
@@ -621,21 +666,21 @@ Normalize: prepend "/" if missing, strip trailing "/"
   </div>
 </div>
 
-<h3 id="the-requestpath-quirk">The <code>request.Path</code> Quirk<a class="headerlink" href="#the-requestpath-quirk" title="Permanent link">&para;</a></h3>
+<h3 id="requestpath">ความแปลกประหลาดของ <code>request.Path</code><a class="headerlink" href="#requestpath" title="Permanent link">&para;</a></h3>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Xojo Web 2 omits the leading <code>/</code> from <code>request.Path</code>. A request to <code>/notes</code> arrives with <code>request.Path = "notes"</code>, not <code>"/notes"</code>. Every path comparison silently fails without normalization.</p>
+<p>Xojo Web 2 ละเว้น <code>/</code> นำหน้าจาก <code>request.Path</code> คำขอไปที่ <code>/notes</code> มาถึงพร้อม <code>request.Path = "notes"</code> ไม่ใช่ <code>"/notes"</code> ทุกการเปรียบเทียบเส้นทางล้มเหลวเงียบ ๆ หากไม่มีการปกติ</p>
 </div>
-<p>Always normalize before any path check:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="n">Path</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Right</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"></span>
+<p>ปกติเสมอก่อนการตรวจสอบเส้นทาง:</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="n">Path</span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Right</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
 </code></pre></div>
 
-<p>Without this, <code>"notes" &lt;&gt; "/notes"</code> evaluates <code>True</code> with no error — every route match fails silently.</p>
+<p>หากไม่มีนี้ <code>"notes" &lt;&gt; "/notes"</code> ประเมินผล <code>True</code> โดยไม่มีข้อผิดพลาด — ทุกการจับคู่เส้นทางล้มเหลวอย่างเงียบ ๆ</p>
 <hr />
-<h2 id="the-mvvm-request-pipeline">The MVVM Request Pipeline<a class="headerlink" href="#the-mvvm-request-pipeline" title="Permanent link">&para;</a></h2>
-<p>For any matched SSR route, the full pipeline from <code>HandleURL</code> to HTML response:</p>
+<h2 id="mvvm">ท่อประมวลผลคำขอ MVVM<a class="headerlink" href="#mvvm" title="Permanent link">&para;</a></h2>
+<p>สำหรับเส้นทาง SSR ที่จับคู่ได้ ท่อประมวลผลทั้งหมดจาก <code>HandleURL</code> ไปยังการตอบสนอง HTML:</p>
 <div class="diagram-tabs" id="diag3">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag3','nomnoml',this)">Diagram</button>
@@ -770,23 +815,23 @@ Normalize: prepend "/" if missing, strip trailing "/"
   <div class="diagram-panel diagram-ascii" style="display:none">
     <pre class="ascii-diagram"><code>HandleURL  →  normalize path, match route
 Router     →  factory.Invoke()  →  new ViewModel
-ViewModel  →  OnGet() / OnPost()
+ ViewModel  →  OnGet() / OnPost()
 Model      →  returns Dictionary / Variant() of Dictionary
-ViewModel  →  builds context Dictionary
+ ViewModel  →  builds context Dictionary
 JinjaX     →  CompiledTemplate.Render(context)  →  HTML string
 response.Write(html)  →  Return True  →  Browser</code></pre>
   </div>
 </div>
 
-<p>Because SSR routes return <code>True</code>, Xojo never establishes a WebSocket session for them. This means Xojo WebPage controls (<code>WebLabel</code>, <code>WebListBox</code>, etc.) cannot be used from a ViewModel, and there is no real-time push from server to browser without adding Server-Sent Events or JS polling separately.</p>
+<p>เนื่องจากเส้นทาง SSR ส่งคืน <code>True</code> Xojo ไม่เคยสร้าง WebSocket session สำหรับพวกเขา ซึ่งหมายความว่าการควบคุม WebPage ของ Xojo (<code>WebLabel</code> <code>WebListBox</code> ฯลฯ) ไม่สามารถใช้จาก ViewModel ได้ และไม่มีการกดจากเซิร์ฟเวอร์ไปยังเบราว์เซอร์แบบเรียลไทม์หากไม่เพิ่ม Server-Sent Events หรือการโพล JS แยกต่างหาก</p>
 <hr />
-<h2 id="the-tests-redirect-dance">The <code>/tests</code> Redirect Dance<a class="headerlink" href="#the-tests-redirect-dance" title="Permanent link">&para;</a></h2>
-<p>The test runner (<code>XojoUnitTestPage</code>) is a Xojo WebPage — it needs a live WebSocket session. Getting there from an MVVM link requires a three-step dance.</p>
-<h3 id="why-you-cant-just-return-false-at-tests">Why you can&rsquo;t just <code>Return False</code> at <code>/tests</code><a class="headerlink" href="#why-you-cant-just-return-false-at-tests" title="Permanent link">&para;</a></h3>
-<p>Xojo only serves its bootstrap HTML at the <strong>root path</strong> <code>/</code>. For any other path, returning <code>False</code> produces a bare browser 404 — not the MVVM 404 template, just a browser error page.</p>
-<h3 id="why-defaultwindowxojounittestpage-crashes">Why <code>DefaultWindow=XojoUnitTestPage</code> crashes<a class="headerlink" href="#why-defaultwindowxojounittestpage-crashes" title="Permanent link">&para;</a></h3>
-<p>Setting <code>DefaultWindow=XojoUnitTestPage</code> in the project makes Xojo instantiate it as the first WebPage when a session connects. But <code>XojoUnitTestPage.Opening</code> runs toolbar setup and test registration — code that requires the page and session to be fully wired. At bootstrap time they are not. Result: runtime crash.</p>
-<h3 id="what-actually-works">What actually works<a class="headerlink" href="#what-actually-works" title="Permanent link">&para;</a></h3>
+<h2 id="tests">ขั้นตอนการเปลี่ยนเส้นทาง <code>/tests</code><a class="headerlink" href="#tests" title="Permanent link">&para;</a></h2>
+<p>Test runner (<code>XojoUnitTestPage</code>) คือ Xojo WebPage — ต้องการ WebSocket session ที่ใช้งานได้ การเข้าถึงที่นั่นจากลิงก์ MVVM ต้องใช้ขั้นตอนสามขั้น</p>
+<h3 id="return-false-tests">เหตุที่ไม่สามารถแค่ <code>Return False</code> ที่ <code>/tests</code><a class="headerlink" href="#return-false-tests" title="Permanent link">&para;</a></h3>
+<p>Xojo ให้บริการ bootstrap HTML ของตัวเองที่ <strong>เส้นทางราก</strong> <code>/</code> เท่านั้น สำหรับเส้นทางใด ๆ อื่น ๆ การส่งคืน <code>False</code> จะสร้าง 404 ของเบราว์เซอร์ที่เปล่า — ไม่ใช่เทมเพลต 404 ของ MVVM เพียงแค่หน้าข้อผิดพลาดของเบราว์เซอร์</p>
+<h3 id="defaultwindowxojounittestpage">เหตุที่ <code>DefaultWindow=XojoUnitTestPage</code> ขัดข้อง<a class="headerlink" href="#defaultwindowxojounittestpage" title="Permanent link">&para;</a></h3>
+<p>การตั้งค่า <code>DefaultWindow=XojoUnitTestPage</code> ในโครงการทำให้ Xojo สร้างมันเป็น WebPage แรกเมื่อ session เชื่อมต่อ แต่ <code>XojoUnitTestPage.Opening</code> เรียกใช้การตั้งค่า toolbar และการลงทะเบียน test — โค้ดที่ต้องการให้หน้าและ session มีการเชื่อมต่ออย่างเต็มที่ ในเวลา bootstrap พวกเขาไม่ได้ ผลลัพธ์: การขัดข้องที่รันไทม์</p>
+<h3 id="_3">สิ่งที่ใช้งานจริง ๆ<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <div class="diagram-tabs" id="diag4">
   <div class="diagram-tab-bar">
     <button class="diagram-tab active" onclick="switchDiagram('diag4','nomnoml',this)">Diagram</button>
@@ -948,41 +993,41 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
   </div>
 </div>
 
-<p>The <code>Default</code> page is a trivially empty <code>WebPage</code>. Its <code>Shown</code> event fires after the session is fully established — the safe earliest point to show <code>XojoUnitTestPage</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Default.xojo_code — Shown event</span><span class="w"></span>
-<span class="k">Sub</span><span class="w"> </span><span class="n">Shown</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">testPage</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">XojoUnitTestPage</span><span class="w"></span>
-<span class="w">  </span><span class="n">testPage</span><span class="p">.</span><span class="n">Show</span><span class="p">()</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<p>หน้า <code>Default</code> คือ <code>WebPage</code> ที่ว่างเปล่าอย่างชาญฉลาด เหตุการณ์ <code>Shown</code> ของมันเกิดขึ้นหลังจาก session ได้รับการตั้งค่าอย่างเต็มที่ — จุดที่ปลอดภัยที่สุดในการแสดง <code>XojoUnitTestPage</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// Default.xojo_code — Shown event</span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">Shown</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">testPage</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">XojoUnitTestPage</span>
+<span class="w">  </span><span class="n">testPage</span><span class="p">.</span><span class="n">Show</span><span class="p">()</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
-<p><code>XojoUnitTestPage</code> has <code>ImplicitInstance=False</code>, so <code>New XojoUnitTestPage</code> is required — <code>XojoUnitTestPage.Show()</code> directly would be a compile error.</p>
-<h3 id="why-_xojo1-and-not-just">Why <code>/?_xojo=1</code> and not just <code>/</code>?<a class="headerlink" href="#why-_xojo1-and-not-just" title="Permanent link">&para;</a></h3>
-<p><code>/</code> is a registered MVVM route. The Router would match it and return <code>True</code>, serving the MVVM home page — never reaching <code>Return False</code>. The <code>_xojo=1</code> query parameter is the sentinel that tells <code>HandleURL</code> to skip the Router. Normal browsers visiting <code>/</code> never send <code>_xojo=1</code>, so the home page is unaffected.</p>
+<p><code>XojoUnitTestPage</code> มี <code>ImplicitInstance=False</code> ดังนั้น <code>New XojoUnitTestPage</code> จำเป็น — <code>XojoUnitTestPage.Show()</code> โดยตรงจะเป็นข้อผิดพลาดในการรวบรวม</p>
+<h3 id="_xojo1">เหตุใด <code>/?_xojo=1</code> ไม่ใช่เพียง <code>/</code>?<a class="headerlink" href="#_xojo1" title="Permanent link">&para;</a></h3>
+<p><code>/</code> คือเส้นทาง MVVM ที่ลงทะเบียน Router จะจับคู่มันและส่งคืน <code>True</code> ให้หน้า MVVM — ไม่เคยเข้าถึง <code>Return False</code> พารามิเตอร์ query <code>_xojo=1</code> คือเซนทิเนลที่บอก <code>HandleURL</code> ให้ข้าม Router เบราว์เซอร์ปกติที่ไปยัง <code>/</code> ไม่เคยส่ง <code>_xojo=1</code> ดังนั้นหน้าแรกจึงไม่ได้รับผลกระทบ</p>
 <hr />
-<h2 id="linking-back-xojo-webpage-mvvm">Linking Back: Xojo WebPage → MVVM<a class="headerlink" href="#linking-back-xojo-webpage-mvvm" title="Permanent link">&para;</a></h2>
-<p>To navigate from a Xojo WebPage back to an MVVM route, use <code>Session.GoToURL()</code>. This sends a browser-level navigation instruction, breaking out of the WebSocket session entirely.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// XojoUnitTestPage — WebToolbar Pressed event</span><span class="w"></span>
-<span class="k">Sub</span><span class="w"> </span><span class="n">Pressed</span><span class="p">(</span><span class="n">item</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebToolbarButton</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">Caption</span><span class="w"></span>
-<span class="w">  </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;XjMVVM&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="n">Session</span><span class="p">.</span><span class="n">GoToURL</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// browser navigates to MVVM home</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<h2 id="xojo-webpage-mvvm">การลิงก์ย้อนกลับ: Xojo WebPage → MVVM<a class="headerlink" href="#xojo-webpage-mvvm" title="Permanent link">&para;</a></h2>
+<p>เพื่อนำทางจาก Xojo WebPage กลับไปยังเส้นทาง MVVM ให้ใช้ <code>Session.GoToURL()</code> สิ่งนี้ส่งคำแนะนำการนำทางระดับเบราว์เซอร์ออกจาก WebSocket session ทั้งหมด</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// XojoUnitTestPage — WebToolbar Pressed event</span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">Pressed</span><span class="p">(</span><span class="n">item</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebToolbarButton</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">Caption</span>
+<span class="w">  </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;XjMVVM&quot;</span>
+<span class="w">    </span><span class="n">Session</span><span class="p">.</span><span class="n">GoToURL</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// browser navigates to MVVM home</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Inside a <code>WebToolbar.Pressed</code> event, <code>Me</code> refers to the <code>WebToolbar</code> itself, not the page. <code>Me.Session</code> does not exist on <code>WebToolbar</code>. Use the thread-local global <code>Session</code> directly.</p>
+<p>ภายในเหตุการณ์ <code>WebToolbar.Pressed</code> <code>Me</code> หมายถึง <code>WebToolbar</code> เอง ไม่ใช่หน้า <code>Me.Session</code> ไม่มีอยู่ใน <code>WebToolbar</code> ใช้ global <code>Session</code> ที่ใช้เธรดทั่วไป โดยตรง</p>
 </div>
-<h3 id="navigation-api">Navigation API<a class="headerlink" href="#navigation-api" title="Permanent link">&para;</a></h3>
+<h3 id="api">API การนำทาง<a class="headerlink" href="#api" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>From</th>
-<th>To</th>
-<th>Method</th>
-<th>Notes</th>
+<th>จาก</th>
+<th>ไป</th>
+<th>วิธี</th>
+<th>หมายเหตุ</th>
 </tr>
 </thead>
 <tbody>
@@ -990,67 +1035,67 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 <td>MVVM template</td>
 <td>MVVM route</td>
 <td><code>&lt;a href="/notes"&gt;</code></td>
-<td>Standard HTML anchor</td>
+<td>Anchor HTML มาตรฐาน</td>
 </tr>
 <tr>
 <td>MVVM template</td>
 <td>Xojo WebPage</td>
 <td><code>&lt;a href="/tests"&gt;</code></td>
-<td>Triggers redirect dance</td>
+<td>ขั้นตอนการเปลี่ยนเส้นทางทำให้เกิด</td>
 </tr>
 <tr>
 <td>Xojo WebPage</td>
 <td>MVVM route</td>
 <td><code>Session.GoToURL("/")</code></td>
-<td>Browser-level navigation, drops WebSocket</td>
+<td>นำทางระดับเบราว์เซอร์ หยุด WebSocket</td>
 </tr>
 <tr>
 <td>Xojo WebPage</td>
 <td>Xojo WebPage</td>
 <td><code>page.Show()</code></td>
-<td>WebSocket-internal, no URL change</td>
+<td>ภายใน WebSocket ไม่เปลี่ยน URL</td>
 </tr>
 </tbody>
 </table>
 <hr />
-<h2 id="router-returns-boolean">Router Returns Boolean<a class="headerlink" href="#router-returns-boolean" title="Permanent link">&para;</a></h2>
-<p><code>Router.Route()</code> is a <code>Function As Boolean</code>, not a <code>Sub</code>. When no MVVM route matches (e.g., <code>/framework/Xojo.js</code>, <code>/websocket</code>), it returns <code>False</code>. <code>HandleURL</code> propagates that <code>False</code> to Xojo&rsquo;s own handler, which serves the file.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// HandleURL — simplified</span><span class="w"></span>
-<span class="k">Return</span><span class="w"> </span><span class="n">mRouter</span><span class="p">.</span><span class="n">Route</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">session</span><span class="p">,</span><span class="w"> </span><span class="n">mJinja</span><span class="p">)</span><span class="w"></span>
-<span class="c1">// If no route matched → Router returns False → HandleURL returns False</span><span class="w"></span>
-<span class="c1">// → Xojo serves Xojo.js, WebSocket frames, etc.</span><span class="w"></span>
+<h2 id="router">Router ส่งคืนบูลีน<a class="headerlink" href="#router" title="Permanent link">&para;</a></h2>
+<p><code>Router.Route()</code> คือ <code>Function As Boolean</code> ไม่ใช่ <code>Sub</code> เมื่อไม่มีเส้นทาง MVVM ที่ตรงกัน (เช่น <code>/framework/Xojo.js</code> <code>/websocket</code>) มันส่งคืน <code>False</code> <code>HandleURL</code> ขยายผล <code>False</code> นั้นไปยังตัวจัดการของ Xojo เซลฟ์ซึ่งให้บริการไฟล์</p>
+<div class="highlight"><pre><span></span><code><span class="c1">// HandleURL — simplified</span>
+<span class="k">Return</span><span class="w"> </span><span class="n">mRouter</span><span class="p">.</span><span class="n">Route</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">session</span><span class="p">,</span><span class="w"> </span><span class="n">mJinja</span><span class="p">)</span>
+<span class="c1">// If no route matched → Router returns False → HandleURL returns False</span>
+<span class="c1">// → Xojo serves Xojo.js, WebSocket frames, etc.</span>
 </code></pre></div>
 
-<p>If <code>Route()</code> always returned <code>True</code>, Xojo&rsquo;s own JS and CSS files would be blocked, the WebSocket session would never establish, and the <code>/tests</code> flow would break entirely.</p>
+<p>หากส่วนประกอบ <code>Route()</code> ส่งคืน <code>True</code> เสมอ ไฟล์ JS และ CSS ของ Xojo จะถูกปิดกั้น WebSocket session จะไม่เคยสร้างขึ้น และโฟลว์ <code>/tests</code> จะขาดทั้งหมด</p>
 <hr />
-<h2 id="files-reference">Files Reference<a class="headerlink" href="#files-reference" title="Permanent link">&para;</a></h2>
+<h2 id="_4">อ้างอิงไฟล์<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>File</th>
-<th>Role</th>
+<th>ไฟล์</th>
+<th>บทบาท</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>App.xojo_code</code></td>
-<td><code>HandleURL</code> — path normalization, <code>/tests</code> redirect, <code>/?_xojo=1</code> passthrough, Router dispatch</td>
+<td><code>HandleURL</code> — การปกติของเส้นทาง <code>/tests</code> redirect <code>/?_xojo=1</code> passthrough Router dispatch</td>
 </tr>
 <tr>
 <td><code>Framework/Router.xojo_code</code></td>
-<td>Route registration (<code>Get</code>, <code>Post</code>, <code>Any</code>), path matching (<code>ParsePath</code>), dispatch, error pages</td>
+<td>ลงทะเบียนเส้นทาง (<code>Get</code> <code>Post</code> <code>Any</code>) การจับคู่เส้นทาง (<code>ParsePath</code>) dispatch หน้าข้อผิดพลาด</td>
 </tr>
 <tr>
 <td><code>Default.xojo_code</code></td>
-<td>Trampoline <code>WebPage</code> — <code>Shown</code> event instantiates <code>XojoUnitTestPage</code> after session is ready</td>
+<td>Trampoline <code>WebPage</code> — เหตุการณ์ <code>Shown</code> สร้างอินสแตนซ์ <code>XojoUnitTestPage</code> หลังจาก session พร้อม</td>
 </tr>
 <tr>
 <td><code>mvvm.xojo_project</code></td>
-<td><code>DefaultWindow=Default</code> — must be <code>Default</code>, not <code>XojoUnitTestPage</code></td>
+<td><code>DefaultWindow=Default</code> — ต้องเป็น <code>Default</code> ไม่ใช่ <code>XojoUnitTestPage</code></td>
 </tr>
 <tr>
 <td><code>XojoUnit/XojoUnitTestPage.xojo_code</code></td>
-<td>Test runner; XjMVVM toolbar button calls <code>Session.GoToURL("/")</code></td>
+<td>Test runner ปุ่ม XjMVVM toolbar เรียก <code>Session.GoToURL("/")</code></td>
 </tr>
 </tbody>
 </table>
@@ -1087,55 +1132,55 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
         <ul class="toc-list">
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#two-worlds-inside-one-app">Two Worlds Inside One App</a>
+            <a class="toc-link" href="#สองโลกภายในแอปพลเคชนเดยว">สองโลกภายในแอปพลิเคชันเดียว</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#handleurl-decision-tree">HandleURL Decision Tree</a>
+            <a class="toc-link" href="#แผนภาพการตดสนใจ-handleurl">แผนภาพการตัดสินใจ HandleURL</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#the-requestpath-quirk">The `request.Path` Quirk</a>
+            <a class="toc-link" href="#ความแปลกประหลาดของ-requestpath">ความแปลกประหลาดของ `request.Path`</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#the-mvvm-request-pipeline">The MVVM Request Pipeline</a>
+            <a class="toc-link" href="#ทอประมวลผลคำขอ-mvvm">ท่อประมวลผลคำขอ MVVM</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#the-tests-redirect-dance">The `/tests` Redirect Dance</a>
+            <a class="toc-link" href="#ขนตอนการเปลยนเสนทาง-tests">ขั้นตอนการเปลี่ยนเส้นทาง `/tests`</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#why-you-cant-just-return-false-at-tests">Why you can't just `Return False` at `/tests`</a>
+            <a class="toc-link" href="#เหตทไมสามารถแค-return-false-ท-tests">เหตุที่ไม่สามารถแค่ `Return False` ที่ `/tests`</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#why-defaultwindowxojounittestpage-crashes">Why `DefaultWindow=XojoUnitTestPage` crashes</a>
+            <a class="toc-link" href="#เหตท-defaultwindowxojounittestpage-ขดของ">เหตุที่ `DefaultWindow=XojoUnitTestPage` ขัดข้อง</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#what-actually-works">What actually works</a>
+            <a class="toc-link" href="#สงทใชงานจรง-ๆ">สิ่งที่ใช้งานจริง ๆ</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#why-_xojo1-and-not-just">Why `/?_xojo=1` and not just `/`?</a>
+            <a class="toc-link" href="#เหตใด-_xojo1-ไมใชเพยง">เหตุใด `/?_xojo=1` ไม่ใช่เพียง `/`?</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#linking-back-xojo-webpage-mvvm">Linking Back: Xojo WebPage → MVVM</a>
+            <a class="toc-link" href="#การลงกยอนกลบ-xojo-webpage-mvvm">การลิงก์ย้อนกลับ: Xojo WebPage → MVVM</a>
           </li>
           
           <li class="toc-item toc-level-3">
-            <a class="toc-link" href="#navigation-api">Navigation API</a>
+            <a class="toc-link" href="#api-การนำทาง">API การนำทาง</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#router-returns-boolean">Router Returns Boolean</a>
+            <a class="toc-link" href="#router-สงคนบลน">Router ส่งคืนบูลีน</a>
           </li>
           
           <li class="toc-item toc-level-2">
-            <a class="toc-link" href="#files-reference">Files Reference</a>
+            <a class="toc-link" href="#อางองไฟล">อ้างอิงไฟล์</a>
           </li>
           
         </ul>

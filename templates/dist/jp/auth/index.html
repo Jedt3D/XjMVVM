@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="jp" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>認証システム — MVVM Docs</title>
+  <meta name="description" content="XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、リクエストごとの認証ガードをどのように処理するか。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <!-- Inline theme init — must run before first paint to prevent FOUC -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || t === 'light') {
+        document.documentElement.setAttribute('data-theme', t);
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- ── Top bar ───────────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="topbar-logo" href="/dist/en/index.html">
+        <span class="logo-mark">X</span>
+        <span class="logo-text">MVVM Docs</span>
+        <span class="logo-version">v0.9.0</span>
+      </a>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher">
+        
+        <a class="lang-btn" href="/dist/en/index.html"
+           title="English">EN</a>
+        
+        <a class="lang-btn" href="/dist/th/index.html"
+           title="ภาษาไทย">TH</a>
+        
+        <a class="lang-btn active" href="/dist/jp/index.html"
+           title="日本語">JP</a>
+        
+      </div>
+
+      <nav class="topbar-links">
+        <a href="/dist/en/index.html">Docs</a>
+        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <!-- Theme toggle (moon = go dark, sun = go light) -->
+      <button class="theme-toggle" aria-label="Toggle theme" onclick="toggleTheme()">
+        <!-- Moon — shown on Day theme -->
+        <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun — shown on Night theme -->
+        <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+
+      <button class="sidebar-toggle" aria-label="Toggle sidebar" onclick="toggleSidebar()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────────── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Getting Started</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../index.html">
+                Introduction
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Architecture</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../concepts/">
+                Why MVVM?
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Routing</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../routing/">
+                Routing Architecture
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Conventions</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/">
+                Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/directory-structure.html">
+                Directory Structure
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/file-naming.html">
+                File Naming
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../conventions/naming-methods-properties.html">
+                Methods & Properties
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Static Files</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../static-files/">
+                Serving Static Assets
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Templates</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/">
+                JinjaX Overview
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/usage.html">
+                Usage Guide
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/examples.html">
+                Examples
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../templates/reference.html">
+                Tag & Filter Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Database</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/">
+                SQLite & Dictionary Contract
+              </a>
+            </li>
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../database/model-reference.html">
+                DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link active"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Encoding</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../encoding/">
+                Forms, MIME & UTF-8
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────────── -->
+    <main class="content" id="content">
+      <article class="prose">
+        <div class="page-header">
+          <h1 class="page-title">認証システム</h1>
+          <p class="page-description">XjMVVMがユーザー登録、ログイン、ログアウト、パスワードハッシング、リクエストごとの認証ガードをどのように処理するか。</p>
+        </div>
+
+        <h1 id="_1">認証システム<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>XjMVVMの認証は3つのレイヤーに構築されています：<strong><code>UserModel</code></strong>は認証情報を格納して検証し、<strong><code>Session</code></strong>クラスはログインしているユーザーを追跡し、<strong><code>BaseViewModel</code></strong>はルートを保護し、現在のユーザーをテンプレートに公開するヘルパーを提供します。</p>
+<h2 id="_2">概要<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<div class="diagram-tabs" id="diag1">
+  <div class="diagram-tab-bar">
+    <button class="diagram-tab active" onclick="switchDiagram('diag1','nomnoml',this)">Diagram</button>
+    <button class="diagram-tab" onclick="switchDiagram('diag1','ascii',this)">ASCII</button>
+  </div>
+  <div class="diagram-panel diagram-nomnoml">
+    <svg version="1.1" baseProfile="full" width="1274.0" height="348.0" viewBox="0 0 1274 348" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:ev="http://www.w3.org/2001/xml-events">
+    <desc >#fill: white
+    #stroke: black
+    #direction: down
+    #spacing: 36
+    #padding: 10
+    #lineWidth: 1.5
+    [POST /login or /signup] -&gt; [LoginVM / SignupVM]
+    [LoginVM / SignupVM] verify -&gt; [UserModel|FindByUsername()\nVerifyPassword()\nCreate()]
+    [UserModel] result -&gt; [LoginVM / SignupVM]
+    [LoginVM / SignupVM] LogIn(id, username) -&gt; [Session|CurrentUserID\nCurrentUsername\nIsLoggedIn()]
+    [Session] -&gt; [Redirect to /]
+    [GET any protected route] -&gt; [BaseViewModel.RequireLogin()]
+    [BaseViewModel.RequireLogin()] not logged in -&gt; [Redirect /login]
+    [BaseViewModel.RequireLogin()] logged in -&gt; [OnGet() / OnPost()]</desc>
+    <g stroke-width="1.0" text-align="left" font="12pt Helvetica, Arial, sans-serif" font-size="12pt" font-family="Helvetica" font-weight="bold" font-style="normal">
+        <g font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round" stroke="black">
+            <g stroke="transparent" fill="transparent">
+                <rect x="0.0" y="0.0" height="348.0" width="1274.0" stroke="none"></rect>
+            </g>
+            <g transform="translate(10, 10)" fill="black">
+                <g transform="translate(20, 20)" fill="black" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal">
+                    <path d="M400.0 36.0 L400 54 L400 66 L400.0 66.0 " fill="none"></path>
+                    <path d="M395.2 60.0 L400.0 66.0 L404.8 60.0 L400.0 72.0 Z"></path>
+                    <text x="318.0" y="127.1" stroke="none">verify</text>
+                    <path d="M308.0 105.1 L181 126 L185.10263340389898 138.3079002116969 L185.1 138.3 " fill="none"></path>
+                    <path d="M178.7 134.1 L185.1 138.3 L187.8 131.1 L187.0 144.0 Z"></path>
+                    <text x="279.0" y="134.0" stroke="none">result</text>
+                    <path d="M333.0 144.0 L400 126 L400 114 L400.0 114.0 " fill="none"></path>
+                    <path d="M404.8 120.0 L400.0 114.0 L395.2 120.0 L400.0 108.0 Z"></path>
+                    <text x="322.0" y="126.0" stroke="none">LogIn(id, username)</text>
+                    <path d="M492.0 104.0 L637 126 L637 138 L637.0 138.0 " fill="none"></path>
+                    <path d="M632.2 132.0 L637.0 138.0 L641.8 132.0 L637.0 144.0 Z"></path>
+                    <path d="M637.0 216.0 L637 234 L637 246 L637.0 246.0 " fill="none"></path>
+                    <path d="M632.2 240.0 L637.0 246.0 L641.8 240.0 L637.0 252.0 Z"></path>
+                    <path d="M1036.5 36.0 L1036.5 54 L1036.5 66 L1036.5 66.0 " fill="none"></path>
+                    <path d="M1031.7 60.0 L1036.5 66.0 L1041.3 60.0 L1036.5 72.0 Z"></path>
+                    <text x="999.8" y="130.0" stroke="none">not logged in</text>
+                    <path d="M989.8 108.0 L943 126 L943 156 L943.0 156.0 " fill="none"></path>
+                    <path d="M938.2 150.0 L943.0 156.0 L947.8 150.0 L943.0 162.0 Z"></path>
+                    <text x="1000.3" y="130.0" stroke="none">logged in</text>
+                    <path d="M1083.3 108.0 L1130 126 L1130 156 L1130.0 156.0 " fill="none"></path>
+                    <path d="M1125.2 150.0 L1130.0 156.0 L1134.8 150.0 L1130.0 162.0 Z"></path>
+                    <g data-name="POST /login or /signup">
+                        <g fill="white" stroke="black" data-name="POST /login or /signup">
+                            <rect x="301.5" y="0.0" height="36.0" width="197.0" data-name="POST /login or /signup"></rect>
+                        </g>
+                        <g transform="translate(301.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="POST /login or /signup" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="POST /login or /signup" data-compartment="0">
+                                <text x="88.5" y="14.1" stroke="none" text-anchor="middle" data-name="POST /login or /signup" data-compartment="0">POST /login or /signup</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="LoginVM / SignupVM">
+                        <g fill="white" stroke="black" data-name="LoginVM / SignupVM">
+                            <rect x="308.0" y="72.0" height="36.0" width="184.0" data-name="LoginVM / SignupVM"></rect>
+                        </g>
+                        <g transform="translate(308, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="LoginVM / SignupVM" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="LoginVM / SignupVM" data-compartment="0">
+                                <text x="82.0" y="14.1" stroke="none" text-anchor="middle" data-name="LoginVM / SignupVM" data-compartment="0">LoginVM / SignupVM</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="UserModel">
+                        <g fill="white" stroke="black" data-name="UserModel">
+                            <rect x="0.0" y="144.0" height="72.0" width="398.0" data-name="UserModel"></rect>
+                            <path d="M0.0 180.0 L398.0 180.0" fill="none" data-name="UserModel"></path>
+                        </g>
+                        <g transform="translate(0, 144)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="UserModel" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="UserModel" data-compartment="0">
+                                <text x="189.0" y="14.1" stroke="none" text-anchor="middle" data-name="UserModel" data-compartment="0">UserModel</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(0, 180)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="UserModel" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="UserModel" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="UserModel" data-compartment="1">FindByUsername()
+                                VerifyPassword()
+                                Create()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Session">
+                        <g fill="white" stroke="black" data-name="Session">
+                            <rect x="434.0" y="144.0" height="72.0" width="406.0" data-name="Session"></rect>
+                            <path d="M434.0 180.0 L840.0 180.0" fill="none" data-name="Session"></path>
+                        </g>
+                        <g transform="translate(434, 144)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Session" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Session" data-compartment="0">
+                                <text x="193.0" y="14.1" stroke="none" text-anchor="middle" data-name="Session" data-compartment="0">Session</text>
+
+                            </g>
+                        </g>
+                        <g transform="translate(434, 180)" font-family="Helvetica" font-size="12pt" font-weight="normal" font-style="normal" data-name="Session" data-compartment="1">
+                            <g transform="translate(10, 10)" fill="black" text-align="left" data-name="Session" data-compartment="1">
+                                <text x="0.0" y="14.1" stroke="none" data-name="Session" data-compartment="1">CurrentUserID
+                                CurrentUsername
+                                IsLoggedIn()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Redirect to /">
+                        <g fill="white" stroke="black" data-name="Redirect to /">
+                            <rect x="579.0" y="252.0" height="36.0" width="116.0" data-name="Redirect to /"></rect>
+                        </g>
+                        <g transform="translate(579, 252)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect to /" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect to /" data-compartment="0">
+                                <text x="48.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect to /" data-compartment="0">Redirect to /</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="GET any protected route">
+                        <g fill="white" stroke="black" data-name="GET any protected route">
+                            <rect x="929.5" y="0.0" height="36.0" width="214.0" data-name="GET any protected route"></rect>
+                        </g>
+                        <g transform="translate(929.5, 0)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="GET any protected route" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="GET any protected route" data-compartment="0">
+                                <text x="97.0" y="14.1" stroke="none" text-anchor="middle" data-name="GET any protected route" data-compartment="0">GET any protected route</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="BaseViewModel.RequireLogin()">
+                        <g fill="white" stroke="black" data-name="BaseViewModel.RequireLogin()">
+                            <rect x="902.5" y="72.0" height="36.0" width="268.0" data-name="BaseViewModel.RequireLogin()"></rect>
+                        </g>
+                        <g transform="translate(902.5, 72)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="BaseViewModel.RequireLogin()" data-compartment="0">
+                                <text x="124.0" y="14.1" stroke="none" text-anchor="middle" data-name="BaseViewModel.RequireLogin()" data-compartment="0">BaseViewModel.RequireLogin()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="Redirect /login">
+                        <g fill="white" stroke="black" data-name="Redirect /login">
+                            <rect x="876.0" y="162.0" height="36.0" width="134.0" data-name="Redirect /login"></rect>
+                        </g>
+                        <g transform="translate(876, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="Redirect /login" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="Redirect /login" data-compartment="0">
+                                <text x="57.0" y="14.1" stroke="none" text-anchor="middle" data-name="Redirect /login" data-compartment="0">Redirect /login</text>
+
+                            </g>
+                        </g>
+                    </g>
+                    <g data-name="OnGet() / OnPost()">
+                        <g fill="white" stroke="black" data-name="OnGet() / OnPost()">
+                            <rect x="1046.0" y="162.0" height="36.0" width="168.0" data-name="OnGet() / OnPost()"></rect>
+                        </g>
+                        <g transform="translate(1046, 162)" font-family="Helvetica" font-size="12pt" font-weight="bold" font-style="normal" data-name="OnGet() / OnPost()" data-compartment="0">
+                            <g transform="translate(10, 10)" fill="black" text-align="center" data-name="OnGet() / OnPost()" data-compartment="0">
+                                <text x="74.0" y="14.1" stroke="none" text-anchor="middle" data-name="OnGet() / OnPost()" data-compartment="0">OnGet() / OnPost()</text>
+
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+  </div>
+  <div class="diagram-panel diagram-ascii" style="display:none">
+    <pre class="ascii-diagram"><code>POST /login or /signup
+  └── LoginVM / SignupVM
+        ├── UserModel.VerifyPassword() or .Create()
+        └── Session.LogIn(id, username) → Redirect /
+
+GET protected route
+  └── BaseViewModel.RequireLogin()
+        ├── not logged in → Redirect /login
+        └── logged in → OnGet() / OnPost()</code></pre>
+  </div>
+</div>
+
+<hr />
+<h2 id="usermodel">UserModel<a class="headerlink" href="#usermodel" title="Permanent link">&para;</a></h2>
+<p><strong>File:</strong> <code>Models/UserModel.xojo_code</code></p>
+<p><code>UserModel</code>は<code>BaseModel</code>を継承します。そのテーブルは<code>users(id, username, password_hash, created_at)</code>です。<code>password_hash</code>列は<code>hash:salt</code>形式の単一文字列を格納します。</p>
+<h3 id="_3">パスワードハッシング<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>Xojoはその標準ライブラリにbcryptバインディングを持ちません。フレームワークは<strong>SHA-256とランダムソルト</strong>を使用します — ソルトが無作為で、ユーザーあたり格納されている場合、よく理解される安全な代替案。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">GenerateSalt</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="c1">// Time + random number — unique per call</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="n">Ticks</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">Rnd</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">HashPassword</span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">salt</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">EncodeHex</span><span class="p">(</span><span class="n">Crypto</span><span class="p">.</span><span class="n">SHA256</span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">salt</span><span class="p">))</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>ハッシュとソルトは<code>:</code>セパレータで1つの列に結合されます：</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">stored</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">salt</span><span class="w">  </span><span class="c1">// e.g. &quot;a3f9...b2:e7c1...44&quot;</span>
+</code></pre></div>
+
+<p>これはスキーマをシンプルに保ちます — 別の<code>salt</code>列はありません — そして<code>VerifyPassword</code>を自己完結させます。</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SHA-256 + ユーザーごとのランダムソルトを使用することは、ほとんどの内部またはリスクの低いアプリケーションに適切です。高セキュリティまたは公開向けアプリの場合、プラットフォームで利用可能な場合はbcryptまたはArgon2バインディングを使用する必要があります。</p>
+</div>
+<h3 id="_4">ユーザーの作成<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Create</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">  </span><span class="c1">// Reject duplicate usernames before hashing</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">FindByUsername</span><span class="p">(</span><span class="n">username</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="m">0</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">salt</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GenerateSalt</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HashPassword</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">salt</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">stored</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;:&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">salt</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">SQLiteDatabase</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenDB</span><span class="p">()</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;INSERT INTO users (username, password_hash) VALUES (?, ?)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">stored</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">newID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="n">LastRowID</span>
+<span class="w">  </span><span class="n">db</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">newID</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>成功時に新しい<code>id</code>を返すか、ユーザー名が既に取られている場合は<code>0</code>を返します。一意性チェックはデータベース<code>UNIQUE</code>制約のみに依存するのではなく、アプリケーションレイヤー（<code>FindByUsername</code>）で実行されます — これはデータベース例外をキャッチすることなく、クリーンな信号（<code>0</code>戻り値）を与えます。</p>
+<h3 id="_5">パスワード検証<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">VerifyPassword</span><span class="p">(</span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">FindByUsername</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">Nil</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">stored</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;password_hash&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">colonPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stored</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">colonPos</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stored</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">colonPos</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">salt</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stored</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">colonPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">HashPassword</span><span class="p">(</span><span class="n">password</span><span class="p">,</span><span class="w"> </span><span class="n">salt</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hash</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code>stored.Middle(colonPos + 1)</code>は0ベースです（<code>String.Middle</code>は<code>IndexOf</code>と同じです）。ここで<code>Mid()</code>を使用しないでください — 1ベースのレガシー関数はオフバイワンを生成し、ソルト抽出を破損させます。</p>
+</div>
+<hr />
+<h2 id="session">Session<a class="headerlink" href="#session" title="Permanent link">&para;</a></h2>
+<p><strong>File:</strong> <code>Session.xojo_code</code> （extends <code>WebSession</code>）</p>
+<p><code>Session</code>は認証されたユーザーのIDを<strong>セッションプロパティ</strong>として格納します — 一時変数ではなく。WebSessionプロパティは自動的にユーザーごとにスコープされ、WebSocket接続のライフタイム全体にわたって永続化されます。</p>
+<div class="highlight"><pre><span></span><code><span class="k">Protected</span><span class="w"> </span><span class="k">Class</span><span class="w"> </span><span class="n">Session</span>
+<span class="k">Inherits</span><span class="w"> </span><span class="n">WebSession</span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">LogIn</span><span class="p">(</span><span class="n">userID</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+<span class="w">    </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userID</span>
+<span class="w">    </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">username</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">LogOut</span><span class="p">()</span>
+<span class="w">    </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+<span class="w">    </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+
+<span class="w">  </span><span class="k">Function</span><span class="w"> </span><span class="n">IsLoggedIn</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
+<span class="w">    </span><span class="k">Return</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="w">  </span><span class="c1">// ...flash message methods unchanged from v0.2.0...</span>
+
+<span class="w">  </span><span class="n">CurrentUserID</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w">   </span><span class="c1">// 0 = not logged in</span>
+<span class="w">  </span><span class="n">CurrentUsername</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
+</code></pre></div>
+
+<p><code>CurrentUserID = 0</code>は「ログインしていない」のセンチネルです — ゼロはSQLite <code>AUTOINCREMENT</code>主キー値では有効ではありません。</p>
+<hr />
+<h2 id="baseviewmodel">BaseViewModel認証ヘルパー<a class="headerlink" href="#baseviewmodel" title="Permanent link">&para;</a></h2>
+<p>3つのメソッドが<code>BaseViewModel</code>に追加され、任意のViewModelから直接<code>Session</code>をキャストすることなく認証にアクセスできます：</p>
+<h3 id="requirelogin-as-boolean"><code>RequireLogin() As Boolean</code><a class="headerlink" href="#requirelogin-as-boolean" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Boolean</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">sess</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">sess</span><span class="p">.</span><span class="n">IsLoggedIn</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Please log in to continue&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;info&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Return</span><span class="w"> </span><span class="kc">True</span><span class="w">  </span><span class="c1">// ← caller must check this and return</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="kc">False</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>保護されたViewModelでの使用パターン：</p>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">RequireLogin</span><span class="p">()</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w">  </span><span class="c1">// guard — stops execution if redirect issued</span>
+<span class="w">  </span><span class="c1">// ... rest of handler</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
+</code></pre></div>
+
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code>RequireLogin()</code>はリダイレクトを発行しますが、<strong>実行を停止することはできません</strong> — これは呼び出し側に信号を返すため<code>True</code>を返します。常に<code>If RequireLogin() Then Return</code>と対にしてください。<code>Return</code>を忘れると、ハンドラーはリダイレクトが既に送信された後に実行を続け、おそらくダブルライトエラーが発生します。</p>
+</div>
+<h3 id="currentuseridcurrentusername"><code>CurrentUserID()</code>と<code>CurrentUsername()</code><a class="headerlink" href="#currentuseridcurrentusername" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">CurrentUserID</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">).</span><span class="n">CurrentUserID</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="m">0</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+
+<span class="k">Function</span><span class="w"> </span><span class="n">CurrentUsername</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebSession</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">Self</span><span class="p">.</span><span class="n">Session</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">ws</span><span class="w"> </span><span class="ow">IsA</span><span class="w"> </span><span class="n">Session</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">Session</span><span class="p">(</span><span class="n">ws</span><span class="p">).</span><span class="n">CurrentUsername</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
+</code></pre></div>
+
+<p>これらは呼び出し側が手動で<code>WebSession</code>を<code>Session</code>にキャストする必要なく、セッション状態への安全なアクセスを提供します。</p>
+<h3 id="current_user">自動注入<code>current_user</code>コンテキスト<a class="headerlink" href="#current_user" title="Permanent link">&para;</a></h3>
+<p><code>BaseViewModel.Render()</code>はすべてのテンプレートコンテキストに<code>current_user</code>ディクショナリを自動的に注入します：</p>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">userCtx</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="n">Str</span><span class="p">(</span><span class="n">sess</span><span class="p">.</span><span class="n">CurrentUserID</span><span class="p">)</span>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">sess</span><span class="p">.</span><span class="n">CurrentUsername</span>
+<span class="n">userCtx</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;logged_in&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">If</span><span class="p">(</span><span class="n">sess</span><span class="p">.</span><span class="n">IsLoggedIn</span><span class="p">(),</span><span class="w"> </span><span class="s2">&quot;1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+<span class="n">context</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;current_user&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">userCtx</span>
+</code></pre></div>
+
+<p>したがって、すべてのテンプレートは、ViewModelが明示的にそれを渡すことなく、ログイン状態を分岐させることができます：</p>
+<div class="highlight"><pre><span></span><code>{% if current_user.logged_in == &quot;1&quot; %}
+  <span class="p">&lt;</span><span class="nt">span</span><span class="p">&gt;</span>{{ current_user.username }}<span class="p">&lt;/</span><span class="nt">span</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/logout&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span><span class="p">&gt;</span>Log out<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+{% else %}
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;/login&quot;</span><span class="p">&gt;</span>Log in<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+{% endif %}
+</code></pre></div>
+
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code>logged_in</code>は文字列<code>"1"</code>または<code>"0"</code>です — ブール値ではなく — なぜなら、JinjaXテンプレート内の<code>Dictionary</code>値はすべて文字列だからです。<code>== True</code>ではなく<code>== "1"</code>と比較してください。</p>
+</div>
+<hr />
+<h2 id="viewmodel">認証ViewModel<a class="headerlink" href="#viewmodel" title="Permanent link">&para;</a></h2>
+<h3 id="loginvm">LoginVM<a class="headerlink" href="#loginvm" title="Permanent link">&para;</a></h3>
+<p><code>GET /login</code> — ログインフォームをレンダリングします。既にログインしている場合は、<code>/</code>にリダイレクトします。</p>
+<p><code>POST /login</code> — ユーザー名+パスワードが空でないことを検証し、<code>UserModel.VerifyPassword()</code>を呼び出します。成功時に、<code>Session.LogIn()</code>を呼び出し、フラッシュメッセージと共にホームにリダイレクトします。失敗時に、エラーフラッシュで<code>/login</code>に戻ります。</p>
+<h3 id="signupvm">SignupVM<a class="headerlink" href="#signupvm" title="Permanent link">&para;</a></h3>
+<p><code>GET /signup</code> — サインアップフォームをレンダリングします。既にログインしている場合は、<code>/</code>にリダイレクトします。</p>
+<p><code>POST /signup</code> — 検証：ユーザー名が必須、3文字以上。パスワード6文字以上。パスワードが一致します。<code>UserModel.Create()</code>を呼び出します。<code>0</code>を返す場合（ユーザー名が取られている）、エラーと共に戻ります。成功時に、すぐに<code>Session.LogIn()</code>を呼び出し、ユーザーはアカウント作成直後にサインインします。</p>
+<h3 id="logoutvm">LogoutVM<a class="headerlink" href="#logoutvm" title="Permanent link">&para;</a></h3>
+<p><code>POST /logout</code>のみ — GETはサポートされません。<code>Session.LogOut()</code>を呼び出し、ホームにリダイレクトします。ログアウトにPOSTを使用することは、プリフェッチまたはリンクプリロードを通じた偶発的なログアウトを防ぎます。</p>
+<hr />
+<h2 id="_6">認証ルート<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w">   </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLoginVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span><span class="w">  </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLoginVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/logout&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateLogoutVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span><span class="w">  </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateSignupVM</span><span class="p">)</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Post</span><span class="p">(</span><span class="s2">&quot;/signup&quot;</span><span class="p">,</span><span class="w"> </span><span class="ow">AddressOf</span><span class="w"> </span><span class="n">CreateSignupVM</span><span class="p">)</span>
+</code></pre></div>
+
+<p>ログインとサインアップの両方にとって<code>GET</code>と<code>POST</code>は同じViewModelファクトリーを共有します — ViewModelそのものが<code>Request.Method</code>に基づいて<code>OnGet()</code>または<code>OnPost()</code>にディスパッチします。</p>
+<hr />
+<h2 id="_7">スキーマ<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<p><code>users</code>テーブルは<code>DBAdapter.InitDB()</code>に作成されます：</p>
+<div class="highlight"><pre><span></span><code><span class="n">db</span><span class="p">.</span><span class="n">ExecuteSQL</span><span class="p">(</span><span class="s2">&quot;CREATE TABLE IF NOT EXISTS users (&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;id            INTEGER PRIMARY KEY AUTOINCREMENT, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;username      TEXT NOT NULL UNIQUE, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;password_hash TEXT NOT NULL, &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">_</span>
+<span class="w">  </span><span class="s2">&quot;created_at    TEXT DEFAULT (datetime(&#39;now&#39;)))&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+<p><code>username</code>の<code>UNIQUE</code>制約はデータベースレベルのセーフティネットです。<code>UserModel.Create()</code>のアプリケーションレベルチェックは、ViewModelsが「ユーザー名は既に取られています」フラッシュを表示するために使用するクリーンな信号（<code>0</code>戻り値）を提供します。</p>
+
+        <!-- Prev / Next navigation -->
+        
+        <nav class="page-nav">
+          <div class="page-nav-prev">
+            
+            <a href="../tags/">
+              <span class="page-nav-label">← Previous</span>
+              <span class="page-nav-title">Tags & Many-to-Many</span>
+            </a>
+            
+          </div>
+          <div class="page-nav-next">
+            
+            <a href="../api/">
+              <span class="page-nav-label">Next →</span>
+              <span class="page-nav-title">JSON API & Static Serving</span>
+            </a>
+            
+          </div>
+        </nav>
+        
+      </article>
+    </main>
+
+    <!-- ── Right TOC ──────────────────────────────────────────────── -->
+    
+    <aside class="toc-sidebar">
+      <div class="toc-inner">
+        <div class="toc-title">On this page</div>
+        <ul class="toc-list">
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#概要">概要</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#usermodel">UserModel</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#パスワードハッシング">パスワードハッシング</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#ユーザーの作成">ユーザーの作成</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#パスワード検証">パスワード検証</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#session">Session</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#baseviewmodel認証ヘルパー">BaseViewModel認証ヘルパー</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#requirelogin-as-boolean">`RequireLogin() As Boolean`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#currentuseridとcurrentusername">`CurrentUserID()`と`CurrentUsername()`</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#自動注入current_userコンテキスト">自動注入`current_user`コンテキスト</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#認証viewmodel">認証ViewModel</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#loginvm">LoginVM</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#signupvm">SignupVM</a>
+          </li>
+          
+          <li class="toc-item toc-level-3">
+            <a class="toc-link" href="#logoutvm">LogoutVM</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#認証ルート">認証ルート</a>
+          </li>
+          
+          <li class="toc-item toc-level-2">
+            <a class="toc-link" href="#スキーマ">スキーマ</a>
+          </li>
+          
+        </ul>
+      </div>
+    </aside>
+    
+
+  </div><!-- /.layout -->
+
+  <script src="../../assets/docs.js"></script>
+</body>
+</html>

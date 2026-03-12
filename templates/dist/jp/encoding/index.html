@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -297,44 +342,44 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 - マルチバイト文字 (タイ、絵文字、アクセント付き文字) は複数の <code>%XX</code> シーケンス — 1 つずつ UTF-8 バイト</p>
 <h3 id="xojo-post">Xojo で POST ボディを読む<a class="headerlink" href="#xojo-post" title="Permanent link">&para;</a></h3>
 <p>Xojo の <code>WebRequest.Body</code> は生のエンコードされた文字列を含みます。<strong>一度</strong> 読む必要があります。直後に。内部バッファは最初のアクセス後に再読み取り可能ではないかもしれないため。<code>BaseViewModel.Handle()</code> はキャッシュします:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Handle</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// POST ボディを直後にキャッシュ — Request.Body は 1 回のみ読み取り可能かもしれません</span><span class="w"></span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">    </span><span class="n">mRawBody</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Body</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// ...</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Sub</span><span class="w"> </span><span class="n">Handle</span><span class="p">()</span>
+<span class="w">  </span><span class="c1">// POST ボディを直後にキャッシュ — Request.Body は 1 回のみ読み取り可能かもしれません</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;POST&quot;</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">    </span><span class="n">mRawBody</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Request</span><span class="p">.</span><span class="n">Body</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="c1">// ...</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
 <h2 id="formparser">FormParser — それがどのように機能するか<a class="headerlink" href="#formparser" title="Permanent link">&para;</a></h2>
 <p><code>FormParser.Parse(body)</code> は生のエンコードされた文字列をキー → 値ペアの <code>Dictionary</code> に変換します。</p>
 <p>完全な実装、注釈付き:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Parse</span><span class="p">(</span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Function</span><span class="w"> </span><span class="n">Parse</span><span class="p">(</span><span class="n">body</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">Dictionary</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span>
 
-<span class="w">  </span><span class="c1">// &amp; で分割して個々の key=value ペアを取得</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">pairs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// &amp; で分割して個々の key=value ペアを取得</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">pairs</span><span class="p">()</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">Split</span><span class="p">(</span><span class="s2">&quot;&amp;&quot;</span><span class="p">)</span>
 
-<span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="n">pairs</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pairs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">For</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="n">To</span><span class="w"> </span><span class="n">pairs</span><span class="p">.</span><span class="n">Count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pairs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c1">// = セパレータを検索 (0-based インデックス)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// = セパレータを検索 (0-based インデックス)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">      </span><span class="c1">// キーと値をデコード</span><span class="w"></span>
-<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">))</span><span class="w"></span>
-<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">))</span><span class="w"></span>
-<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"></span>
-<span class="w">    </span><span class="k">ElseIf</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">      </span><span class="c1">// = を持たないキー (例: チェックボックスがチェックされていて値がない)</span><span class="w"></span>
-<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
-<span class="w">  </span><span class="k">Next</span><span class="w"></span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="c1">// キーと値をデコード</span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">))</span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">))</span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">key</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span>
+<span class="w">    </span><span class="k">ElseIf</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="c1">// = を持たないキー (例: チェックボックスがチェックされていて値がない)</span>
+<span class="w">      </span><span class="n">result</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">pair</span><span class="p">))</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">Next</span>
 
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">result</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
 <div class="admonition note">
@@ -344,53 +389,53 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 <h2 id="decodeuricomponent-utf-8">DecodeURIComponent — UTF-8 トリック<a class="headerlink" href="#decodeuricomponent-utf-8" title="Permanent link">&para;</a></h2>
 <p>これはプロジェクト内で最も重要なエンコーディング関数です。それを間違うとタイテキスト、絵文字、非 ASCII 入力をサイレントに破損させます。</p>
 <h3 id="_2">間違ったアプローチ (マルチバイト文字を破損)<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// ❌ 間違い — Chr() は整数を Unicode コードポイントにマップします、生バイトではなく</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byte</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Chr</span><span class="p">(</span><span class="n">byte</span><span class="p">)</span><span class="w">   </span><span class="c1">// Chr(0xE0) = &quot;à&quot;、0xE0 バイトではない</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ❌ 間違い — Chr() は整数を Unicode コードポイントにマップします、生バイトではなく</span>
+<span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byte</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span>
+<span class="w">  </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Chr</span><span class="p">(</span><span class="n">byte</span><span class="p">)</span><span class="w">   </span><span class="c1">// Chr(0xE0) = &quot;à&quot;、0xE0 バイトではない</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
 <p><code>Chr(0xE0)</code> は Unicode 文字 U+00E0 (<code>à</code>) を返し、これは 2 バイト UTF-8 シーケンス <code>0xC3 0xA0</code> です。しかし私たちが望んだのは単一バイト <code>0xE0</code>、それは 3 バイト タイ文字シーケンスのスタートバイトのようなもの <code>ก</code> (<code>0xE0 0xB8 0x81</code>) です。バイトごどのの 2 バイト対バイトの不一致はすべてのマルチバイト文字を破損させます。</p>
 <h3 id="memoryblock-defineencoding">正しいアプローチ (MemoryBlock + DefineEncoding)<a class="headerlink" href="#memoryblock-defineencoding" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — MemoryBlock で生バイトを収集し、UTF-8 としてデコード</span><span class="w"></span>
-<span class="k">Function</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">  </span><span class="c1">// + → スペース (最初に発生する必要があります)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">encoded</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ 正解 — MemoryBlock で生バイトを収集し、UTF-8 としてデコード</span>
+<span class="k">Function</span><span class="w"> </span><span class="n">DecodeURIComponent</span><span class="p">(</span><span class="n">encoded</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">  </span><span class="c1">// + → スペース (最初に発生する必要があります)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">encoded</span><span class="p">.</span><span class="n">ReplaceAll</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">If</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
 
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">mb</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">MemoryBlock</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">mb</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">MemoryBlock</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
 
-<span class="w">  </span><span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">      </span><span class="c1">// パーセントエンコードバイト — 2 つの 16 進数字を抽出</span><span class="w"></span>
-<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">hex</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="k">Try</span><span class="w"></span>
-<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w">   </span><span class="c1">// 生バイトを保存</span><span class="w"></span>
-<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
-<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">3</span><span class="w">   </span><span class="c1">// %XX を過ぎてスキップ</span><span class="w"></span>
-<span class="w">      </span><span class="k">Catch</span><span class="w"></span>
-<span class="w">        </span><span class="c1">// 無効な 16 進 — % をリテラル文字として扱う</span><span class="w"></span>
-<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
-<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
-<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
-<span class="w">      </span><span class="k">End</span><span class="w"> </span><span class="k">Try</span><span class="w"></span>
-<span class="w">    </span><span class="k">Else</span><span class="w"></span>
-<span class="w">      </span><span class="c1">// リテラル文字 — そのバイト値を保存</span><span class="w"></span>
-<span class="w">      </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
-<span class="w">      </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
-<span class="w">  </span><span class="k">Wend</span><span class="w"></span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;%&quot;</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="c1">// パーセントエンコードバイト — 2 つの 16 進数字を抽出</span>
+<span class="w">      </span><span class="k">Var</span><span class="w"> </span><span class="n">hex</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Try</span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Integer</span><span class="p">.</span><span class="n">FromHex</span><span class="p">(</span><span class="n">hex</span><span class="p">)</span><span class="w">   </span><span class="c1">// 生バイトを保存</span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">3</span><span class="w">   </span><span class="c1">// %XX を過ぎてスキップ</span>
+<span class="w">      </span><span class="k">Catch</span>
+<span class="w">        </span><span class="c1">// 無効な 16 進 — % をリテラル文字として扱う</span>
+<span class="w">        </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+<span class="w">        </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
+<span class="w">        </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
+<span class="w">      </span><span class="k">End</span><span class="w"> </span><span class="k">Try</span>
+<span class="w">    </span><span class="k">Else</span>
+<span class="w">      </span><span class="c1">// リテラル文字 — そのバイト値を保存</span>
+<span class="w">      </span><span class="n">mb</span><span class="p">.</span><span class="n">Byte</span><span class="p">(</span><span class="n">byteCount</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Asc</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+<span class="w">      </span><span class="n">byteCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">byteCount</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
+<span class="w">      </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
+<span class="w">  </span><span class="k">Wend</span>
 
-<span class="w">  </span><span class="c1">// 収集バイトを UTF-8 文字列として解釈</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mb</span><span class="p">.</span><span class="n">StringValue</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">byteCount</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">DefineEncoding</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">Encodings</span><span class="p">.</span><span class="n">UTF8</span><span class="p">)</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="c1">// 収集バイトを UTF-8 文字列として解釈</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mb</span><span class="p">.</span><span class="n">StringValue</span><span class="p">(</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">byteCount</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span><span class="w"> </span><span class="n">DefineEncoding</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span><span class="w"> </span><span class="n">Encodings</span><span class="p">.</span><span class="n">UTF8</span><span class="p">)</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 </code></pre></div>
 
 <p>重要な洞察: すべての生バイトを <code>MemoryBlock</code> に最初に収集し、その後、最後に <code>DefineEncoding(..., Encodings.UTF8)</code> を 1 回呼び出します。これはマルチバイトシーケンスを正しく組み立てます。Xojo が文字列エンコーディングを解釈する前に。</p>
@@ -432,23 +477,23 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 </tr>
 </tbody>
 </table>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;title=Hello&quot;</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// 5 を返す (0-based)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">pair</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;title=Hello&quot;</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">IndexOf</span><span class="p">(</span><span class="s2">&quot;=&quot;</span><span class="p">)</span><span class="w">  </span><span class="c1">// 5 を返す (0-based)</span>
 
-<span class="c1">// ✅ 正解 — Middle() は 0-based</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">)</span><span class="w">          </span><span class="c1">// &quot;title&quot;</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">    </span><span class="c1">// &quot;Hello&quot;</span><span class="w"></span>
+<span class="c1">// ✅ 正解 — Middle() は 0-based</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">key</span><span class="w">   </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">eqPos</span><span class="p">)</span><span class="w">          </span><span class="c1">// &quot;title&quot;</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pair</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">    </span><span class="c1">// &quot;Hello&quot;</span>
 
-<span class="c1">// ❌ 間違い — Mid() は 1-based、1 つずれている</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mid</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">      </span><span class="c1">// &quot;=Hello&quot; (間違い!)</span><span class="w"></span>
+<span class="c1">// ❌ 間違い — Mid() は 1-based、1 つずれている</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Mid</span><span class="p">(</span><span class="n">pair</span><span class="p">,</span><span class="w"> </span><span class="n">eqPos</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">      </span><span class="c1">// &quot;=Hello&quot; (間違い!)</span>
 </code></pre></div>
 
 <p>カウンターループも 0-based <code>Middle</code> を使用:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="w"></span>
-<span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">   </span><span class="c1">// 0-based</span><span class="w"></span>
-<span class="w">  </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span><span class="w"></span>
-<span class="k">Wend</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>
+<span class="k">While</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Length</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">ch</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">Middle</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w">   </span><span class="c1">// 0-based</span>
+<span class="w">  </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="m">1</span>
+<span class="k">Wend</span>
 </code></pre></div>
 
 <h2 id="mime-content-type">MIME タイプと Content-Type<a class="headerlink" href="#mime-content-type" title="Permanent link">&para;</a></h2>
@@ -463,17 +508,17 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
 - <code>text/css; charset=utf-8</code> — サーブされた CSS ファイル用
 - <code>application/javascript; charset=utf-8</code> — サーブされた JS ファイル用</p>
 <p>常にテキスト型に <code>; charset=utf-8</code> を含めます。それなしで、いくつかのブラウザは Latin-1 にデフォルトします。タイなど非 ASCII コンテンツを破損させます。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// 常に Content-Type を明示的に設定</span><span class="w"></span>
-<span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span><span class="w"></span>
-<span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// 常に Content-Type を明示的に設定</span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;text/html; charset=utf-8&quot;</span>
+<span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
 </code></pre></div>
 
 <p><code>BaseViewModel.Render()</code> はこれを自動的に設定します。生のレスポンス (エラーハンドラー、静的ファイル、JSON エンドポイント) を書き込むときのみ手動で設定する必要があります。</p>
 <h2 id="_3">クエリ文字列解析<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>URL クエリ文字列 (GET URL の <code>?key=val&amp;key2=val2</code> 部分) はフォームボディと同じパーセントエンコーディング形式を使用します。<code>QueryParser.Parse()</code> は <code>FormParser.Parse()</code> と同じように処理します。</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ViewModel で</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">// ?sort=asc を読む</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// ?page=2 を読む</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ViewModel で</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">sort</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;sort&quot;</span><span class="p">)</span><span class="w">    </span><span class="c1">// ?sort=asc を読む</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;page&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// ?page=2 を読む</span>
 </code></pre></div>
 
 <p><code>GetParam()</code> はパスパラメータを最初にチェック、クエリ文字列にフォールバック — そのため <code>/notes/42?sort=asc</code> ルート <code>/notes/:id</code> で <code>GetParam("id") = "42"</code> と <code>GetParam("sort") = "asc"</code> を与えます。</p>
@@ -483,9 +528,9 @@ Line 2<span class="p">&lt;/</span><span class="nt">textarea</span><span class="p
         <nav class="page-nav">
           <div class="page-nav-prev">
             
-            <a href="../database/model-reference.html">
+            <a href="../api/">
               <span class="page-nav-label">← Previous</span>
-              <span class="page-nav-title">DB Layer Reference</span>
+              <span class="page-nav-title">JSON API & Static Serving</span>
             </a>
             
           </div>

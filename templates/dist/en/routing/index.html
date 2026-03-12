@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -240,6 +240,51 @@
               <a class="nav-link"
                  href="../database/model-reference.html">
                 DB Layer Reference
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
               </a>
             </li>
             
@@ -627,9 +672,9 @@ Normalize: prepend "/" if missing, strip trailing "/"
 <p>Xojo Web 2 omits the leading <code>/</code> from <code>request.Path</code>. A request to <code>/notes</code> arrives with <code>request.Path = "notes"</code>, not <code>"/notes"</code>. Every path comparison silently fails without normalization.</p>
 </div>
 <p>Always normalize before any path check:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="n">Path</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Right</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="n">Path</span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">p</span>
+<span class="k">If</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="ow">And</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Right</span><span class="p">(</span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;/&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="n">Left</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
 </code></pre></div>
 
 <p>Without this, <code>"notes" &lt;&gt; "/notes"</code> evaluates <code>True</code> with no error — every route match fails silently.</p>
@@ -949,11 +994,11 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 </div>
 
 <p>The <code>Default</code> page is a trivially empty <code>WebPage</code>. Its <code>Shown</code> event fires after the session is fully established — the safe earliest point to show <code>XojoUnitTestPage</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Default.xojo_code — Shown event</span><span class="w"></span>
-<span class="k">Sub</span><span class="w"> </span><span class="n">Shown</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">testPage</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">XojoUnitTestPage</span><span class="w"></span>
-<span class="w">  </span><span class="n">testPage</span><span class="p">.</span><span class="n">Show</span><span class="p">()</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// Default.xojo_code — Shown event</span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">Shown</span><span class="p">()</span>
+<span class="w">  </span><span class="k">Var</span><span class="w"> </span><span class="n">testPage</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">XojoUnitTestPage</span>
+<span class="w">  </span><span class="n">testPage</span><span class="p">.</span><span class="n">Show</span><span class="p">()</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
 <p><code>XojoUnitTestPage</code> has <code>ImplicitInstance=False</code>, so <code>New XojoUnitTestPage</code> is required — <code>XojoUnitTestPage.Show()</code> directly would be a compile error.</p>
@@ -962,13 +1007,13 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 <hr />
 <h2 id="linking-back-xojo-webpage-mvvm">Linking Back: Xojo WebPage → MVVM<a class="headerlink" href="#linking-back-xojo-webpage-mvvm" title="Permanent link">&para;</a></h2>
 <p>To navigate from a Xojo WebPage back to an MVVM route, use <code>Session.GoToURL()</code>. This sends a browser-level navigation instruction, breaking out of the WebSocket session entirely.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// XojoUnitTestPage — WebToolbar Pressed event</span><span class="w"></span>
-<span class="k">Sub</span><span class="w"> </span><span class="n">Pressed</span><span class="p">(</span><span class="n">item</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebToolbarButton</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">Caption</span><span class="w"></span>
-<span class="w">  </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;XjMVVM&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="n">Session</span><span class="p">.</span><span class="n">GoToURL</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// browser navigates to MVVM home</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// XojoUnitTestPage — WebToolbar Pressed event</span>
+<span class="k">Sub</span><span class="w"> </span><span class="n">Pressed</span><span class="p">(</span><span class="n">item</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">WebToolbarButton</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">item</span><span class="p">.</span><span class="n">Caption</span>
+<span class="w">  </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;XjMVVM&quot;</span>
+<span class="w">    </span><span class="n">Session</span><span class="p">.</span><span class="n">GoToURL</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w">   </span><span class="c1">// browser navigates to MVVM home</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span>
+<span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 </code></pre></div>
 
 <div class="admonition warning">
@@ -1015,10 +1060,10 @@ Browser: XojoUnit test runner UI (via WebSocket)</code></pre>
 <hr />
 <h2 id="router-returns-boolean">Router Returns Boolean<a class="headerlink" href="#router-returns-boolean" title="Permanent link">&para;</a></h2>
 <p><code>Router.Route()</code> is a <code>Function As Boolean</code>, not a <code>Sub</code>. When no MVVM route matches (e.g., <code>/framework/Xojo.js</code>, <code>/websocket</code>), it returns <code>False</code>. <code>HandleURL</code> propagates that <code>False</code> to Xojo&rsquo;s own handler, which serves the file.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// HandleURL — simplified</span><span class="w"></span>
-<span class="k">Return</span><span class="w"> </span><span class="n">mRouter</span><span class="p">.</span><span class="n">Route</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">session</span><span class="p">,</span><span class="w"> </span><span class="n">mJinja</span><span class="p">)</span><span class="w"></span>
-<span class="c1">// If no route matched → Router returns False → HandleURL returns False</span><span class="w"></span>
-<span class="c1">// → Xojo serves Xojo.js, WebSocket frames, etc.</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// HandleURL — simplified</span>
+<span class="k">Return</span><span class="w"> </span><span class="n">mRouter</span><span class="p">.</span><span class="n">Route</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">session</span><span class="p">,</span><span class="w"> </span><span class="n">mJinja</span><span class="p">)</span>
+<span class="c1">// If no route matched → Router returns False → HandleURL returns False</span>
+<span class="c1">// → Xojo serves Xojo.js, WebSocket frames, etc.</span>
 </code></pre></div>
 
 <p>If <code>Route()</code> always returned <code>True</code>, Xojo&rsquo;s own JS and CSS files would be blocked, the WebSocket session would never establish, and the <code>/tests</code> flow would break entirely.</p>

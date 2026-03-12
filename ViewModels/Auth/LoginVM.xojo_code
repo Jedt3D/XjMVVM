@@ -34,7 +34,7 @@ Inherits BaseViewModel
 		      Session(ws).LogIn(Val(row.Value("id").StringValue), username)
 		    End If
 		    SetFlash("Welcome back, " + username + "!")
-		    Redirect("/")
+		    Redirect("/notes")
 		  Else
 		    SetFlash("Invalid username or password", "error")
 		    Redirect("/login")

@@ -79,8 +79,11 @@ There is no CLI build system. All testing and building happens inside the Xojo I
 | [Templates](templates/index.html) | JinjaX setup, Jinja2 syntax, real examples, full tag reference |
 | [Database](database/index.html) | SQLite patterns, the Dictionary contract, thread safety |
 | [DB Layer Reference](database/model-reference.html) | Three-layer architecture (DBAdapter / BaseModel / NoteModel), full CRUD API, trade-offs |
+| [Tags & Many-to-Many](tags/index.html) | Second resource, junction table, GetTagsForNote, SetTagsForNote |
+| [Auth System](auth/index.html) | UserModel, SHA-256 + salt password hashing, Session, RequireLogin guard |
+| [JSON API & Static Serving](api/index.html) | JSONSerializer, API ViewModels, 201/422 status codes, ServeStatic path-traversal guard |
 | [Encoding](encoding/index.html) | Form parsing, MIME types, UTF-8 and percent-encoding |
 
 ## Current version
 
-**v0.4.2** — Production path fix: DB (`data/notes.sqlite`) and templates are now located relative to the executable via `App.ExecutableFile.Parent`, so the app works correctly both in debug and as a built application. v0.4.1 added the XojoUnit test runner at `/tests` and the BaseModel/DBAdapter three-layer architecture. Phase 3 (authentication, multiple models) is next.
+**v0.9.0** — JSON API layer, authentication (SHA-256 + salt, session login/logout), Tags resource with many-to-many note_tags, and a built-in static file server for the developer docs at `/dist/*`. Production path fix (v0.4.2) ensures DB and templates resolve relative to the executable in all environments.

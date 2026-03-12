@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -288,70 +333,70 @@
 <p>独自の CSS、JS、画像の場合、ディスクからファイルを読み取り、レスポンスに書き込む <code>/static/:file</code> ルートを登録します。</p>
 <h3 id="1-viewmodel">1. ViewModel を作成<a class="headerlink" href="#1-viewmodel" title="Permanent link">&para;</a></h3>
 <p><code>ViewModels/StaticFileVM.xojo_code</code> を作成:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Class</span><span class="w"> </span><span class="n">StaticFileVM</span><span class="w"></span>
-<span class="w">  </span><span class="k">Inherits</span><span class="w"> </span><span class="n">BaseViewModel</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Class</span><span class="w"> </span><span class="n">StaticFileVM</span>
+<span class="w">  </span><span class="k">Inherits</span><span class="w"> </span><span class="n">BaseViewModel</span>
 
-<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">  </span><span class="k">Sub</span><span class="w"> </span><span class="n">OnGet</span><span class="p">()</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GetParam</span><span class="p">(</span><span class="s2">&quot;file&quot;</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c1">// セキュリティ: パストラバーサル試行を拒否</span><span class="w"></span>
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;\&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Bad Request&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="k">Return</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// セキュリティ: パストラバーサル試行を拒否</span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;..&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="w"> </span><span class="ow">Or</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">Contains</span><span class="p">(</span><span class="s2">&quot;\&quot;</span><span class="p">)</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Bad Request&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Return</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 
-<span class="w">    </span><span class="c1">// static/ フォルダへのパスをビルド (プロジェクトレイアウトに合わせて調整)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">staticDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/static&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">staticDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// static/ フォルダへのパスをビルド (プロジェクトレイアウトに合わせて調整)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">staticDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">(</span><span class="s2">&quot;/path/to/mvvm/static&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">FolderItem</span><span class="p">.</span><span class="n">PathModes</span><span class="p">.</span><span class="n">Native</span><span class="p">)</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">staticDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
-<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span><span class="w"></span>
-<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Not Found&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">      </span><span class="k">Return</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<span class="w">    </span><span class="k">If</span><span class="w"> </span><span class="ow">Not</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">Exists</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">404</span>
+<span class="w">      </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;Not Found&quot;</span><span class="p">)</span>
+<span class="w">      </span><span class="k">Return</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">If</span>
 
-<span class="w">    </span><span class="c1">// 拡張に基づいて MIME タイプを設定</span><span class="w"></span>
-<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 拡張に基づいて MIME タイプを設定</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Content-Type&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 
-<span class="w">    </span><span class="c1">// 本番でキャッシュ静的アセット 1 時間</span><span class="w"></span>
-<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cache-Control&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;public, max-age=3600&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// 本番でキャッシュ静的アセット 1 時間</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Header</span><span class="p">(</span><span class="s2">&quot;Cache-Control&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;public, max-age=3600&quot;</span>
 
-<span class="w">    </span><span class="c1">// ファイルバイトを読み取り、書き込み</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">BinaryStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BinaryStream</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)</span><span class="w"></span>
-<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Length</span><span class="p">))</span><span class="w"></span>
-<span class="w">    </span><span class="n">bs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// ファイルバイトを読み取り、書き込み</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">bs</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">BinaryStream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BinaryStream</span><span class="p">.</span><span class="n">Open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="kc">False</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Response</span><span class="p">.</span><span class="n">Write</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Read</span><span class="p">(</span><span class="n">bs</span><span class="p">.</span><span class="n">Length</span><span class="p">))</span>
+<span class="w">    </span><span class="n">bs</span><span class="p">.</span><span class="n">Close</span><span class="p">()</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Sub</span>
 
-<span class="w">  </span><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"></span>
-<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">NthField</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">CountFields</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)).</span><span class="n">Lowercase</span><span class="w"></span>
-<span class="w">    </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">ext</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;css&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;text/css; charset=utf-8&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;js&quot;</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/javascript; charset=utf-8&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;png&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;jpeg&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/jpeg&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;gif&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/gif&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;svg&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/svg+xml&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;ico&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/x-icon&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff2&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff&quot;</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;pdf&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/pdf&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">Else</span><span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/octet-stream&quot;</span><span class="w"></span>
-<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span><span class="w"></span>
-<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span><span class="w"></span>
+<span class="w">  </span><span class="k">Private</span><span class="w"> </span><span class="k">Function</span><span class="w"> </span><span class="n">MimeType</span><span class="p">(</span><span class="n">fileName</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span>
+<span class="w">    </span><span class="k">Var</span><span class="w"> </span><span class="n">ext</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">NthField</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">fileName</span><span class="p">.</span><span class="n">CountFields</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)).</span><span class="n">Lowercase</span>
+<span class="w">    </span><span class="k">Select</span><span class="w"> </span><span class="k">Case</span><span class="w"> </span><span class="n">ext</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;css&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;text/css; charset=utf-8&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;js&quot;</span><span class="w">    </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/javascript; charset=utf-8&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;png&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/png&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;jpeg&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/jpeg&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;gif&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/gif&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;svg&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/svg+xml&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;ico&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;image/x-icon&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff2&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff2&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;woff&quot;</span><span class="w">  </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;font/woff&quot;</span>
+<span class="w">    </span><span class="k">Case</span><span class="w"> </span><span class="s2">&quot;pdf&quot;</span><span class="w">   </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/pdf&quot;</span>
+<span class="w">    </span><span class="k">Else</span><span class="w">          </span><span class="p">:</span><span class="w"> </span><span class="k">Return</span><span class="w"> </span><span class="s2">&quot;application/octet-stream&quot;</span>
+<span class="w">    </span><span class="k">End</span><span class="w"> </span><span class="k">Select</span>
+<span class="w">  </span><span class="k">End</span><span class="w"> </span><span class="k">Function</span>
 
-<span class="k">End</span><span class="w"> </span><span class="k">Class</span><span class="w"></span>
+<span class="k">End</span><span class="w"> </span><span class="k">Class</span>
 </code></pre></div>
 
 <h3 id="2">2. ルートを登録<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
 <p><code>App.Opening()</code> で、すべての他のルート <strong>後に</strong> 静的ルートを登録して、アプリケーションパスと誤ってマッチするのを避けます:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// アプリケーションルートを最初に登録</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span><span class="w"></span>
-<span class="c1">// ... その他のルート ...</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// アプリケーションルートを最初に登録</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span><span class="w">           </span><span class="k">New</span><span class="w"> </span><span class="n">HomeViewModelFactory</span><span class="p">())</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/notes&quot;</span><span class="p">,</span><span class="w">      </span><span class="k">New</span><span class="w"> </span><span class="n">NotesListVMFactory</span><span class="p">())</span>
+<span class="c1">// ... その他のルート ...</span>
 
-<span class="c1">// 静的ファイルを最後に</span><span class="w"></span>
-<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/static/:file&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">StaticFileVMFactory</span><span class="p">())</span><span class="w"></span>
+<span class="c1">// 静的ファイルを最後に</span>
+<span class="n">mRouter</span><span class="p">.</span><span class="n">Get</span><span class="p">(</span><span class="s2">&quot;/static/:file&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">StaticFileVMFactory</span><span class="p">())</span>
 </code></pre></div>
 
 <h3 id="3-static">3. static/ フォルダを作成<a class="headerlink" href="#3-static" title="Permanent link">&para;</a></h3>
@@ -375,8 +420,8 @@
 <h2 id="3-xojo-copy-files">オプション 3 — Xojo Copy Files ビルドステップ<a class="headerlink" href="#3-xojo-copy-files" title="Permanent link">&para;</a></h2>
 <p>アプリケーションバイナリでバンドルする必要があるファイル (フォント、デフォルト画像) の場合、Xojo の <strong>Copy Files</strong> ビルドステップを使用してそれらをアプリケーションの Resources フォルダに含めます。</p>
 <p>その後、実行時に以下を使用してアクセスします:</p>
-<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">resourceDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;Resources&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resourceDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="k">Var</span><span class="w"> </span><span class="n">resourceDir</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">App</span><span class="p">.</span><span class="n">ExecutableFile</span><span class="p">.</span><span class="n">Parent</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="s2">&quot;Resources&quot;</span><span class="p">)</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="n">FolderItem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">resourceDir</span><span class="p">.</span><span class="n">Child</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span>
 </code></pre></div>
 
 <p>このアプローチは、アプリケーションで出荷され、実行時に決して変わらないファイルに最適です。開発中に頻繁に編集する開発者アセットの場合、オプション 2 がより便利です。</p>

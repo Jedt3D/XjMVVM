@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.4.2</span>
+        <span class="logo-version">v0.9.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -247,6 +247,51 @@
         </div>
         
         <div class="nav-section">
+          <div class="nav-section-title">Tags & Relationships</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../tags/">
+                Tags & Many-to-Many
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Authentication</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../auth/">
+                Auth System
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">JSON API</div>
+          <ul class="nav-list">
+            
+            
+            <li>
+              <a class="nav-link"
+                 href="../api/">
+                JSON API & Static Serving
+              </a>
+            </li>
+            
+          </ul>
+        </div>
+        
+        <div class="nav-section">
           <div class="nav-section-title">Encoding</div>
           <ul class="nav-list">
             
@@ -424,16 +469,16 @@
 <p>This is the single most important rule in the entire system.</p>
 <p>JinjaX resolves dot-notation (<code>{{ note.title }}</code>) by calling <code>EvaluateGetAttr</code> on the object. In Xojo, <code>EvaluateGetAttr</code> is only implemented for <code>Dictionary</code> — it looks up the key by name. Custom Xojo class instances do not support <code>EvaluateGetAttr</code>, so dot-access silently renders as empty.</p>
 <p><strong>The rule:</strong> every piece of data passed to a template must be a <code>Dictionary</code> or a <code>Variant()</code> array of <code>Dictionary</code> objects. Models always return one of these two types — never a custom class instance.</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Correct — Dictionary keys work with dot-notation in templates</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span><span class="w"></span>
-<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
-<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
-<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w">   </span><span class="c1">// Variant() array of Dictionary</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// ✅ Correct — Dictionary keys work with dot-notation in templates</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">Dictionary</span><span class="p">()</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">row</span><span class="p">.</span><span class="n">Value</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="w">   </span><span class="c1">// Variant() array of Dictionary</span>
 
-<span class="c1">// ❌ Wrong — custom class instance, dot-access silently fails in templates</span><span class="w"></span>
-<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteClass</span><span class="p">()</span><span class="w"></span>
-<span class="n">note</span><span class="p">.</span><span class="n">Title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span><span class="w"></span>
-<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">note</span><span class="p">)</span><span class="w">  </span><span class="c1">// {{ note.title }} renders as empty string</span><span class="w"></span>
+<span class="c1">// ❌ Wrong — custom class instance, dot-access silently fails in templates</span>
+<span class="k">Var</span><span class="w"> </span><span class="n">note</span><span class="w"> </span><span class="k">As</span><span class="w"> </span><span class="k">New</span><span class="w"> </span><span class="n">NoteClass</span><span class="p">()</span>
+<span class="n">note</span><span class="p">.</span><span class="n">Title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="n">Column</span><span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">).</span><span class="n">StringValue</span>
+<span class="n">results</span><span class="p">.</span><span class="n">Add</span><span class="p">(</span><span class="n">note</span><span class="p">)</span><span class="w">  </span><span class="c1">// {{ note.title }} renders as empty string</span>
 </code></pre></div>
 
 <p>In templates, arrays must be <code>Variant()</code> containing <code>Dictionary</code> objects:</p>
@@ -454,12 +499,12 @@
 </ol>
 <p>This prevents the browser from re-submitting the form on refresh (the &ldquo;Reload this page?&rdquo; dialog). It also means every page the user sees was produced by a GET request — browser history, bookmarking, and the back button all work correctly.</p>
 <p>If validation fails, the ViewModel does <strong>not</strong> redirect — it re-renders the form with an error flash message using the same GET template:</p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Validation failure — re-render, no redirect</span><span class="w"></span>
-<span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Trim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">Then</span><span class="w"></span>
-<span class="w">  </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Title is required&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">)</span><span class="w"></span>
-<span class="w">  </span><span class="k">Return</span><span class="w"></span>
-<span class="k">End</span><span class="w"> </span><span class="k">If</span><span class="w"></span>
+<div class="highlight"><pre><span></span><code><span class="c1">// Validation failure — re-render, no redirect</span>
+<span class="k">If</span><span class="w"> </span><span class="n">title</span><span class="p">.</span><span class="n">Trim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">Then</span>
+<span class="w">  </span><span class="n">SetFlash</span><span class="p">(</span><span class="s2">&quot;Title is required&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;error&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="n">Redirect</span><span class="p">(</span><span class="s2">&quot;/notes/new&quot;</span><span class="p">)</span>
+<span class="w">  </span><span class="k">Return</span>
+<span class="k">End</span><span class="w"> </span><span class="k">If</span>
 </code></pre></div>
 
 <h2 id="session-isolation">Session isolation<a class="headerlink" href="#session-isolation" title="Permanent link">&para;</a></h2>

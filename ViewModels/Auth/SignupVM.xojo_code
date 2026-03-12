@@ -57,7 +57,7 @@ Inherits BaseViewModel
 		    Session(ws).LogIn(newID, username)
 		  End If
 		  SetFlash("Account created! Welcome, " + username + "!")
-		  Redirect("/")
+		  Redirect("/notes")
 		End Sub
 	#tag EndMethod
 
