@@ -22,6 +22,16 @@ Inherits WebApplication
 		    Return True
 		  End If
 		  
+		  // /dist/: serve static files from templates/dist/
+		  If p = "/dist" Then
+		    response.Status = 302
+		    response.Header("Location") = "/dist/"
+		    Return True
+		  End If
+		  If p.Left(6) = "/dist/" Then
+		    Return ServeStatic(p.Middle(6), response)
+		  End If
+
 		  // All other paths: SSR router handles known routes.
 		  // Unknown paths (Xojo framework JS/CSS resources) return False
 		  // so Xojo serves its own framework files for the active WebSocket session.
@@ -59,6 +69,52 @@ Inherits WebApplication
 		End Sub
 	#tag EndEvent
 
+
+	#tag Method, Flags = &h21
+		Private Function ServeStatic(relativePath As String, response As WebResponse) As Boolean
+		  // Resolve file safely by walking Child() per segment (prevents path traversal)
+		  Var f As FolderItem = App.ExecutableFile.Parent.Child("templates").Child("dist")
+		  Var parts() As String = relativePath.Split("/")
+		  For Each part As String In parts
+		    If part = "" Or part = "." Or part = ".." Then Continue
+		    f = f.Child(part)
+		    If f Is Nil Or Not f.Exists Then
+		      response.Status = 404
+		      response.Header("Content-Type") = "text/plain"
+		      response.Write("Not found")
+		      Return True
+		    End If
+		  Next
+		  // Directory → try index.html
+		  If f.IsFolder Then
+		    f = f.Child("index.html")
+		    If f Is Nil Or Not f.Exists Then
+		      response.Status = 404
+		      response.Header("Content-Type") = "text/plain"
+		      response.Write("Not found")
+		      Return True
+		    End If
+		  End If
+		  // Content-Type by extension
+		  Var ext As String = f.Name.Lowercase
+		  Var ct As String = "application/octet-stream"
+		  If ext.EndsWith(".html") Then ct = "text/html; charset=utf-8"
+		  If ext.EndsWith(".css")  Then ct = "text/css"
+		  If ext.EndsWith(".js")   Then ct = "application/javascript"
+		  If ext.EndsWith(".svg")  Then ct = "image/svg+xml"
+		  If ext.EndsWith(".png")  Then ct = "image/png"
+		  If ext.EndsWith(".ico")  Then ct = "image/x-icon"
+		  If ext.EndsWith(".woff2") Then ct = "font/woff2"
+		  // Read and serve
+		  Var bs As BinaryStream = BinaryStream.Open(f)
+		  Var content As String = bs.Read(bs.Length)
+		  bs.Close()
+		  response.Status = 200
+		  response.Header("Content-Type") = ct
+		  response.Write(content)
+		  Return True
+		End Function
+	#tag EndMethod
 
 	#tag Method, Flags = &h21
 		Private Function CreateHomeVM() As BaseViewModel
