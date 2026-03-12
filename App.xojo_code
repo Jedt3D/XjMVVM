@@ -82,6 +82,13 @@ Inherits WebApplication
 		  mRouter.Post("/logout", AddressOf CreateLogoutVM)
 		  mRouter.Get("/signup", AddressOf CreateSignupVM)
 		  mRouter.Post("/signup", AddressOf CreateSignupVM)
+
+		  // JSON API routes
+		  mRouter.Get("/api/notes", AddressOf CreateNotesAPIListVM)
+		  mRouter.Post("/api/notes", AddressOf CreateNotesAPICreateVM)
+		  mRouter.Get("/api/notes/:id", AddressOf CreateNotesAPIDetailVM)
+		  mRouter.Get("/api/tags", AddressOf CreateTagsAPIListVM)
+		  mRouter.Get("/api/tags/:id", AddressOf CreateTagsAPIDetailVM)
 		End Sub
 	#tag EndEvent
 
@@ -191,6 +198,36 @@ Inherits WebApplication
 	#tag Method, Flags = &h21
 		Private Function CreateSignupVM() As BaseViewModel
 		  Return New SignupVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateNotesAPIListVM() As BaseViewModel
+		  Return New NotesAPIListVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateNotesAPIDetailVM() As BaseViewModel
+		  Return New NotesAPIDetailVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateNotesAPICreateVM() As BaseViewModel
+		  Return New NotesAPICreateVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsAPIListVM() As BaseViewModel
+		  Return New TagsAPIListVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateTagsAPIDetailVM() As BaseViewModel
+		  Return New TagsAPIDetailVM()
 		End Function
 	#tag EndMethod
 
