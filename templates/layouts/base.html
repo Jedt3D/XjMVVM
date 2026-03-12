@@ -29,7 +29,20 @@
     <a href="/notes">Notes</a>
     <a href="/tags">Tags</a>
     <a href="/tests" target="_blank">Tests</a>
-    <a href="/dist/en/index.html" target="_blank" class="btn btn-primary btn-sm nav-right">XjMVVM Docs</a>
+    {% if current_user and current_user.logged_in == "1" %}
+    <span style="margin-left:auto; display:flex; align-items:center; gap:8px;">
+      <span style="font-size:0.9em; color:#555;">{{ current_user.username }}</span>
+      <form method="post" action="/logout" style="display:inline;">
+        <button type="submit" class="btn btn-sm">Log Out</button>
+      </form>
+    </span>
+    {% else %}
+    <span style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+      <a href="/login" class="btn btn-sm">Log In</a>
+      <a href="/signup" class="btn btn-primary btn-sm">Sign Up</a>
+    </span>
+    {% endif %}
+    <a href="/dist/en/index.html" target="_blank" class="btn btn-primary btn-sm" style="margin-left:8px;">XjMVVM Docs</a>
   </nav>
   {% if flash %}
   <div class="flash flash-{{ flash.type }}">{{ flash.message }}</div>

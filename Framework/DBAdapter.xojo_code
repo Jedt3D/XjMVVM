@@ -29,6 +29,11 @@ Protected Module DBAdapter
 		  "note_id INTEGER NOT NULL, " + _
 		  "tag_id INTEGER NOT NULL, " + _
 		  "PRIMARY KEY (note_id, tag_id))")
+		  db.ExecuteSQL("CREATE TABLE IF NOT EXISTS users (" + _
+		  "id INTEGER PRIMARY KEY AUTOINCREMENT, " + _
+		  "username TEXT NOT NULL UNIQUE, " + _
+		  "password_hash TEXT NOT NULL, " + _
+		  "created_at TEXT DEFAULT (datetime('now')))")
 		  db.Close()
 		End Sub
 	#tag EndMethod

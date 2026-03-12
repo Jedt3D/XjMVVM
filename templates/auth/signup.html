@@ -1,0 +1,26 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<h1>Sign Up</h1>
+
+<form method="post" action="/signup" style="max-width:360px;">
+  <div>
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" autocomplete="username" required>
+  </div>
+  <div>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="new-password" required>
+  </div>
+  <div>
+    <label for="password_confirm">Confirm Password</label>
+    <input type="password" id="password_confirm" name="password_confirm" autocomplete="new-password" required>
+  </div>
+  <p>
+    <button type="submit" class="btn btn-primary">Create Account</button>
+  </p>
+  <p style="font-size:0.9em;">Already have an account? <a href="/login">Log in</a></p>
+</form>
+{% endblock %}

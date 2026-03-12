@@ -15,6 +15,7 @@ Inherits TestController
 		  group = New NotesPaginationTests(Self, "NotesPagination")
 		  group = New TagModelTests(Self, "TagModel")
 		  group = New NoteTagAssociationTests(Self, "NoteTagAssociations")
+		  group = New UserModelTests(Self, "UserModel")
 		  
 		End Sub
 	#tag EndEvent

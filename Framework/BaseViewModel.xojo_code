@@ -85,6 +85,17 @@ Protected Class BaseViewModel
 		    End If
 		  End If
 		  
+		  // Auto-inject current user info for nav display
+		  Var ws2 As WebSession = Self.Session
+		  If ws2 IsA Session Then
+		    Var sess2 As Session = Session(ws2)
+		    Var userCtx As New Dictionary()
+		    userCtx.Value("id") = Str(sess2.CurrentUserID)
+		    userCtx.Value("username") = sess2.CurrentUsername
+		    userCtx.Value("logged_in") = If(sess2.IsLoggedIn(), "1", "0")
+		    context.Value("current_user") = userCtx
+		  End If
+
 		  Var tmpl As JinjaX.CompiledTemplate = Jinja.GetTemplate(templateName)
 		  Var html As String = tmpl.Render(context)
 		  Response.Header("Content-Type") = "text/html; charset=utf-8"
@@ -117,6 +128,41 @@ Protected Class BaseViewModel
 		    sess.SetFlash(message, type)
 		  End If
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = "Redirects to /login if not logged in. Returns True if redirect was issued."
+		Function RequireLogin() As Boolean
+		  Var ws As WebSession = Self.Session
+		  If ws IsA Session Then
+		    Var sess As Session = Session(ws)
+		    If Not sess.IsLoggedIn() Then
+		      SetFlash("Please log in to continue", "info")
+		      Redirect("/login")
+		      Return True
+		    End If
+		  End If
+		  Return False
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = "Returns the current user ID from the session, or 0 if not logged in."
+		Function CurrentUserID() As Integer
+		  Var ws As WebSession = Self.Session
+		  If ws IsA Session Then
+		    Return Session(ws).CurrentUserID
+		  End If
+		  Return 0
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = "Returns the current username from the session, or empty string."
+		Function CurrentUsername() As String
+		  Var ws As WebSession = Self.Session
+		  If ws IsA Session Then
+		    Return Session(ws).CurrentUsername
+		  End If
+		  Return ""
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 00000E000A00000000000000000E000E00000E

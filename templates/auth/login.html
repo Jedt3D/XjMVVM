@@ -1,0 +1,22 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Log In{% endblock %}
+
+{% block content %}
+<h1>Log In</h1>
+
+<form method="post" action="/login" style="max-width:360px;">
+  <div>
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" autocomplete="username" required>
+  </div>
+  <div>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required>
+  </div>
+  <p>
+    <button type="submit" class="btn btn-primary">Log In</button>
+  </p>
+  <p style="font-size:0.9em;">Don't have an account? <a href="/signup">Sign up</a></p>
+</form>
+{% endblock %}

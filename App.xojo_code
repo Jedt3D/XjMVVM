@@ -75,6 +75,13 @@ Inherits WebApplication
 		  mRouter.Get("/tags/:id/edit", AddressOf CreateTagsEditVM)
 		  mRouter.Post("/tags/:id", AddressOf CreateTagsUpdateVM)
 		  mRouter.Post("/tags/:id/delete", AddressOf CreateTagsDeleteVM)
+
+		  // Auth routes
+		  mRouter.Get("/login", AddressOf CreateLoginVM)
+		  mRouter.Post("/login", AddressOf CreateLoginVM)
+		  mRouter.Post("/logout", AddressOf CreateLogoutVM)
+		  mRouter.Get("/signup", AddressOf CreateSignupVM)
+		  mRouter.Post("/signup", AddressOf CreateSignupVM)
 		End Sub
 	#tag EndEvent
 
@@ -166,6 +173,24 @@ Inherits WebApplication
 	#tag Method, Flags = &h21
 		Private Function CreateTagsDeleteVM() As BaseViewModel
 		  Return New TagsDeleteVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateLoginVM() As BaseViewModel
+		  Return New LoginVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateLogoutVM() As BaseViewModel
+		  Return New LogoutVM()
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Function CreateSignupVM() As BaseViewModel
+		  Return New SignupVM()
 		End Function
 	#tag EndMethod
 

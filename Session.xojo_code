@@ -10,6 +10,26 @@ Inherits WebSession
   SendEventsInBatches=False
   LazyLoadDependencies=False
 #tag EndSession
+	#tag Method, Flags = &h0, Description = "Stores the authenticated user in the session."
+		Sub LogIn(userID As Integer, username As String)
+		  CurrentUserID = userID
+		  CurrentUsername = username
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = "Clears the authenticated user from the session."
+		Sub LogOut()
+		  CurrentUserID = 0
+		  CurrentUsername = ""
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = "Returns True if a user is logged in."
+		Function IsLoggedIn() As Boolean
+		  Return CurrentUserID > 0
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = "Sets a flash message to display on the next page load."
 		Sub SetFlash(message As String, type As String = "success")
 		  FlashMessage = message
@@ -33,6 +53,14 @@ Inherits WebSession
 		End Function
 	#tag EndMethod
 
+
+	#tag Property, Flags = &h0
+		CurrentUserID As Integer
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		CurrentUsername As String
+	#tag EndProperty
 
 	#tag Property, Flags = &h0
 		FlashMessage As String
