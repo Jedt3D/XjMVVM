@@ -30,8 +30,8 @@ Protected Class Router
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0, Description = "Matches the request to a route and dispatches to the ViewModel."
-		Sub Route(request As WebRequest, response As WebResponse, jinja As JinjaX.JinjaEnvironment, session As WebSession)
+	#tag Method, Flags = &h0, Description = "Matches the request to a route and dispatches to the ViewModel. Returns True if matched, False if no route matched."
+		Function Route(request As WebRequest, response As WebResponse, jinja As JinjaX.JinjaEnvironment, session As WebSession) As Boolean
 		  Var path As String = request.Path
 
 		  // Normalize: ensure leading slash, strip trailing slash (except root)
@@ -64,13 +64,13 @@ Protected Class Router
 		      Catch err As RuntimeException
 		        Serve500(response, jinja, err.Message)
 		      End Try
-		      Return
+		      Return True
 		    End If
 		  Next
 
-		  // No route matched
-		  Serve404(response, jinja)
-		End Sub
+		  // No route matched — return False so HandleURL can delegate to Xojo
+		  Return False
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = "Matches a pattern against an actual path. Returns a Dictionary of params or Nil if no match."

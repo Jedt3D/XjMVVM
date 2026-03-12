@@ -38,5 +38,11 @@ End
 #tag EndWebPage
 
 #tag WindowCode
+	#tag Event
+		Sub Shown()
+		  Var testPage As New XojoUnitTestPage
+		  testPage.Show()
+		End Sub
+	#tag EndEvent
 #tag EndWindowCode
 

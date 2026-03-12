@@ -3,8 +3,29 @@ Protected Class App
 Inherits WebApplication
 	#tag Event
 		Function HandleURL(request As WebRequest, response As WebResponse) As Boolean
-		  mRouter.Route(request, response, mJinja, Session)
-		  Return True
+		  // Normalize path (request.Path may lack leading slash in Xojo Web 2)
+		  Var p As String = request.Path
+		  If p.Left(1) <> "/" Then p = "/" + p
+		  If p.Length > 1 And p.Right(1) = "/" Then p = p.Left(p.Length - 1)
+
+		  // Xojo bootstrap entry point: Return False so Xojo serves bootstrap HTML + WebSocket
+		  If p = "/" And request.QueryString = "_xojo=1" Then
+		    Return False
+		  End If
+
+		  // /tests: redirect to Xojo bootstrap at root so Default page loads, then trampoline to XojoUnitTestPage
+		  If p = "/tests" Then
+		    response.Status = 302
+		    response.Header("Location") = "/?_xojo=1"
+		    response.Header("Content-Type") = "text/html; charset=utf-8"
+		    response.Write("<html><head><meta http-equiv=""refresh"" content=""0;url=/?_xojo=1""></head><body>Redirecting...</body></html>")
+		    Return True
+		  End If
+
+		  // All other paths: SSR router handles known routes.
+		  // Unknown paths (Xojo framework JS/CSS resources) return False
+		  // so Xojo serves its own framework files for the active WebSocket session.
+		  Return mRouter.Route(request, response, mJinja, Session)
 		End Function
 	#tag EndEvent
 
@@ -13,7 +34,7 @@ Inherits WebApplication
 		  #Pragma Unused args
 		  
 		  // Initialize database
-		  mDB = NoteModel.InitDB()
+		  DBAdapter.InitDB()
 		  
 		  // Configure JinjaX template environment
 		  mJinja = New JinjaX.JinjaEnvironment()
@@ -89,10 +110,6 @@ Inherits WebApplication
 
 
 	#tag Property, Flags = &h0
-		mDB As SQLiteDatabase
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
 		mJinja As JinjaX.JinjaEnvironment
 	#tag EndProperty
 
@@ -101,5 +118,7 @@ Inherits WebApplication
 	#tag EndProperty
 
 
+	#tag ViewBehavior
+	#tag EndViewBehavior
 End Class
 #tag EndClass

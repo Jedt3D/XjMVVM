@@ -43,6 +43,8 @@ Browser → HandleURL → Router → ViewModel → Model → Database
 Framework/
   Router.xojo_code          # Route registration & dispatch; path param parsing
   BaseViewModel.xojo_code   # Base class: Handle(), Render(), Redirect(), GetFormValue(), SetFlash()
+  BaseModel.xojo_code       # Repository base class: FindAll, FindByID, Insert, UpdateByID, DeleteByID
+  DBAdapter.xojo_code       # SQLite connection factory: Connect(), InitDB()
   FormParser.xojo_code      # URL-decode application/x-www-form-urlencoded POST bodies
   QueryParser.xojo_code     # URL-decode query strings
   RouteDefinition.xojo_code # Route data class
@@ -60,6 +62,11 @@ ViewModels/
     NotesEditVM.xojo_code   # GET  /notes/:id/edit
     NotesUpdateVM.xojo_code # POST /notes/:id
     NotesDeleteVM.xojo_code # POST /notes/:id/delete
+
+Tests/
+  DBAdapterTests.xojo_code  # XojoUnit TestGroup: DBAdapter.Connect()
+  BaseModelTests.xojo_code  # XojoUnit TestGroup: generic CRUD via NoteModel
+  NoteModelTests.xojo_code  # XojoUnit TestGroup: NoteModel full CRUD
 
 JinjaXLib/                  # Full JinjaX source (Jinja2-compatible template engine in Xojo)
 
@@ -103,12 +110,13 @@ data/
 | GET | `/notes/:id/edit` | NotesEditVM | Edit form |
 | POST | `/notes/:id` | NotesUpdateVM | Update note → redirect to detail |
 | POST | `/notes/:id/delete` | NotesDeleteVM | Delete note → redirect to list |
+| GET | `/tests` | XojoUnitTestPage | XojoUnit test runner (redirect dance → Xojo WebPage) |
 
 ---
 
 ## Current Status
 
-**v0.3.0** — All CRUD operations confirmed working, including Unicode input and form validation.
+**v0.4.1** — `/tests` routing fixed; XojoUnit test runner fully operational.
 
 | Feature | Status |
 |---|---|
@@ -119,8 +127,20 @@ data/
 | POST/Redirect/GET pattern | ✓ Working |
 | Flash messages (success / error) | ✓ Working |
 | 404 / 500 error pages | ✓ Working |
+| BaseModel / DBAdapter layer | ✓ Working |
+| XojoUnit test suite at `/tests` | ✓ Working |
+| Navigate MVVM → XojoUnit (`/tests` link) | ✓ Working |
+| Navigate XojoUnit → MVVM (XjMVVM button) | ✓ Working |
 
 **Next:** Phase 3 — additional models, authentication, more resource types.
+
+## Architecture Docs
+
+| Document | Contents |
+|---|---|
+| `Routing.md` | HandleURL decision tree, two-world architecture, `/tests` redirect dance, navigation API |
+| `DatabaseModel.md` | DBAdapter, BaseModel, NoteModel — design decisions, lifecycle, CRUD patterns, trade-offs |
+| `DatabaseGettingStarted.md` | Step-by-step: adding a new database-backed resource |
 
 ---
 

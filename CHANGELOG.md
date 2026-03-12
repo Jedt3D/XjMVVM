@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.4.1] — 2026-03-12
+
+### Added
+- **`Routing.md`** — comprehensive architecture document covering: SSR vs Xojo WebSocket world, `HandleURL` decision tree, the `request.Path` leading-slash quirk, the `/tests` redirect dance, and how to navigate between the two worlds.
+- **XjMVVM toolbar button** on `XojoUnitTestPage` — calls `Session.GoToURL("/")` to navigate back to the MVVM home page from the XojoUnit test runner.
+
+### Fixed
+- **`/tests` URL now correctly loads `XojoUnitTestPage`** via a redirect dance: `/tests` → 302 → `/?_xojo=1` → Xojo serves bootstrap HTML → `Default.Shown` trampolines to `XojoUnitTestPage`. Previous attempts all silently failed due to the `request.Path` normalization bug below.
+- **`request.Path` normalization** — Xojo Web 2 omits the leading `/` from `request.Path` (`"tests"` not `"/tests"`). All path checks in `HandleURL` now normalize first (`If p.Left(1) <> "/" Then p = "/" + p`). This was the root cause of every failed `/tests` route attempt.
+- **`Router.Route()` converted from `Sub` to `Function As Boolean`** — returns `True` if a route matched, `False` if not. `HandleURL` propagates `False` to Xojo so Xojo can serve its own JS/CSS framework files during the bootstrap sequence. Without this, `/framework/Xojo.js` was blocked and the WebSocket session could never establish.
+- **`mvvm.xojo_project` `DefaultWindow`** changed from `XojoUnitTestPage` to `Default` — `XojoUnitTestPage` crashed when set as `DefaultWindow` because `Opening` runs toolbar setup before the WebSocket session is fully established.
+- **`Default.xojo_code` `Shown` event** added as trampoline — after the session is established, navigates to `XojoUnitTestPage` via `(New XojoUnitTestPage).Show()`.
+
+---
+
+## [0.4.0] — 2026-03-12
+
+### Added
+- **`DBAdapter` module** (`Framework/DBAdapter.xojo_code`) — SQLite connection factory with `Connect()` (per-request, thread-safe) and `InitDB()` (schema bootstrap). Schema ownership moved out of `NoteModel` into this shared module.
+- **`BaseModel` class** (`Framework/BaseModel.xojo_code`) — repository base class with generic CRUD: `FindAll(orderBy)`, `FindByID(id)`, `Insert(data)`, `UpdateByID(id, data)`, `DeleteByID(id)`. Subclasses override `TableName()` and `Columns()` only. `OpenDB()` and `RowToDict()` protected for escape-hatch custom SQL.
+- **`Tests/` folder** with three XojoUnit TestGroup classes:
+  - `DBAdapterTests` — `ConnectReturnsValidConnectionTest`
+  - `BaseModelTests` — `FindAllReturnsArrayTest`, `InsertAndFindByIDTest`, `UpdateByIDChangesValuesTest`, `DeleteByIDRemovesRowTest`, `FindByIDReturnsNilForMissingTest`
+  - `NoteModelTests` — `CreateReturnsIDTest`, `GetAllIncludesNewNoteTest`, `GetByIDMatchesTitleTest`, `UpdateChangesTitleTest`, `DeleteRemovesNoteTest`
+- **`/tests` route** — `App.HandleURL` intercepts `/tests` and shows `XojoUnitTestPage` in-session. Link added to nav (`target="_blank"`).
+- **`DatabaseModel.md`** — detailed reference for DBAdapter, BaseModel, NoteModel with code walkthrough.
+- **`DatabaseGettingStarted.md`** — step-by-step tutorial for adding a new database-backed resource.
+
+### Changed
+- **`NoteModel`** now inherits `BaseModel`. `GetAll()` → `FindAll()`, `GetByID()` → `FindByID()`, `Delete()` → `DeleteByID()`. `Create()` and `Update()` keep custom SQL via `OpenDB()` escape hatch (for `datetime('now')` expressions that can't be bound as parameters). `InitDB()` removed — moved to `DBAdapter.InitDB()`.
+- **`App.Opening`** calls `DBAdapter.InitDB()` instead of `NoteModel.InitDB()`. `mDB` property removed (connections created per-request via `DBAdapter.Connect()`).
+- **`WebTestController.InitializeTestGroups()`** registers `DBAdapterTests`, `BaseModelTests`, `NoteModelTests`.
+
+---
+
 ## [0.3.0] — 2026-03-12
 
 ### Changed
