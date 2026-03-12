@@ -1,5 +1,104 @@
 # Changelog
 
+## [0.9.2] — 2026-03-12
+
+### Changed
+- **Alpine.js replaces all custom JavaScript** — Alpine.js 3.14.3 added via CDN (`defer`, no build step). Total custom JS reduced from 93 lines to 16.
+  - `base.html`: IIFE replaced with `x-data` on nav (auth state) and flash div; logout handler moved to `@submit` attribute
+  - `login.html`: `addEventListener` replaced with `x-data` + `@submit.prevent`
+  - `signup.html`: password validation driven by `x-show`/`x-text`; added `minlength="6"` HTML attribute
+  - `notes/form.html`: JS tag-checkbox collector removed entirely; checkboxes use native `name="tag_ids"` multi-value (FormParser already handles it)
+- **Developer guide**: Alpine.js page added under new "Frontend" section (EN/TH/JP)
+
+---
+
+## [0.9.1] — 2026-03-12
+
+### Added
+- **Client-side SHA-256 hashing** — Web Crypto API hashes password in login/signup forms before submit; plaintext password never crosses the network
+- **Password strength validation** — signup form requires ≥6 characters, confirms match, shown inline before submit
+- **SSR session workaround** — flash messages stored in `sessionStorage` survive the POST→redirect→GET cycle without a WebSocket session
+- **Nav auth state** — `localStorage` stores username on login/signup, cleared on logout; `base.html` shows appropriate nav links
+- **Developer guide pages** — auth (09), tags (08), API (10) pages added; all 54 EN/TH/JP pages rebuilt
+
+### Changed
+- Auth redirects changed from `/` to `/notes` (root `/` serves Xojo bootstrap in SSR mode)
+- `BaseViewModel.Render()` always injects `flash` and `current_user` with safe defaults so templates never throw `UndefinedVariableException`
+
+---
+
+## [0.9.0] — 2026-03-12
+
+### Added
+- **JSONSerializer module** — `EscapeString`, `DictToJSON`, `ArrayToJSON` for building JSON responses
+- **JSON API endpoints**:
+  - `GET /api/notes` — notes list as JSON array
+  - `POST /api/notes` — create note, returns 201 + JSON (form-encoded body)
+  - `GET /api/notes/:id` — note with embedded tags array
+  - `GET /api/tags` — tags list as JSON array
+  - `GET /api/tags/:id` — single tag as JSON
+- **APITests** — 3 tests covering DictToJSON key inclusion and array format
+
+---
+
+## [0.8.0] — 2026-03-12
+
+### Added
+- **Authentication system** (Phase 3.4):
+  - `UserModel` — Create, FindByUsername, VerifyPassword (SHA-256 + random salt via `EncodeHex`)
+  - `Session` — `CurrentUserID`, `CurrentUsername`, `LogIn()`, `LogOut()`, `IsLoggedIn()`
+  - `BaseViewModel` — `RequireLogin()` guard, `CurrentUserID()`, `CurrentUsername()` helpers
+  - `LoginVM` — `GET /login` (form), `POST /login` (verify + session)
+  - `LogoutVM` — `POST /logout` (clear session)
+  - `SignupVM` — `GET /signup` (form), `POST /signup` (validate + create + auto-login)
+  - Templates: `auth/login.html`, `auth/signup.html`
+  - Nav: shows username + logout when logged in, login/signup links when not
+- **DB**: `CREATE TABLE users (id, username UNIQUE, password_hash, created_at)`
+- **UserModelTests** — 5 tests (Create, FindByUsername, FindUnknown, VerifyCorrect, VerifyWrong)
+
+---
+
+## [0.7.0] — 2026-03-12
+
+### Added
+- **Notes ↔ Tags associations** (Phase 3.3):
+  - `note_tags` junction table (`note_id`, `tag_id`, `PRIMARY KEY`)
+  - `NoteModel.GetTagsForNote()` and `SetTagsForNote()`
+  - Notes detail shows tag badges with links; form shows tag checkboxes
+  - JS collector gathers checked values into hidden `tag_ids` field
+- **FormParser multi-value support** — duplicate keys append with comma (for multi-value checkboxes)
+- **NoteTagAssociationTests** — 3 tests (SetAndGet, Overwrite, Clear)
+
+---
+
+## [0.6.0] — 2026-03-12
+
+### Added
+- **Tags resource — full CRUD** (Phase 3.2):
+  - `TagModel` — extends BaseModel
+  - 7 Tags ViewModels: List, Detail, New, Create, Edit, Update, Delete
+  - Templates: `tags/list.html`, `tags/form.html`, `tags/detail.html`
+  - Tags link added to nav in `base.html`
+- **DB**: `CREATE TABLE tags (id, name, created_at)`
+- **TagModelTests** — 5 tests (Create, GetAll, GetByID, Update, Delete)
+
+---
+
+## [0.5.0] — 2026-03-12
+
+### Added
+- **Pagination** (Phase 3.1):
+  - `BaseModel.Count()` and `FindPaginated(limit, offset, orderBy)`
+  - `NotesListVM` reads `?page=N`, computes offset, passes pagination context
+  - `list.html` prev/next controls with page X of Y indicator
+- **NotesPaginationTests** — 5 tests covering Count and FindPaginated
+
+### Fixed
+- `Math.Ceiling()` does not exist in Xojo — replaced with integer arithmetic: `(total + perPage - 1) \ perPage`
+- `Assert.AreEqual(0, someInt)` is ambiguous in Xojo — replaced with `Assert.IsTrue(someInt = 0)`
+
+---
+
 ## [0.4.2] — 2026-03-12
 
 ### Fixed

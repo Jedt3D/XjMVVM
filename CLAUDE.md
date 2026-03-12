@@ -42,28 +42,49 @@ Browser → HandleURL → Router → ViewModel → Model → Database
 ### Project Structure
 
 ```
-Framework/      → Router, BaseViewModel, FormParser, QueryParser, RouteDefinition
-ViewModels/     → One ViewModel per route (inherits BaseViewModel)
-Models/         → Data access classes returning Dictionary objects
-templates/      → JinjaX HTML files (layouts/, errors/, feature folders)
-JinjaXLib/      → Full JinjaX source (Jinja2-compatible engine, pure Xojo)
-data/           → SQLite database (auto-created at startup)
-developer-guide/→ Static site documentation (see Part 2)
+Framework/       → Router, BaseViewModel, BaseModel, DBAdapter, FormParser,
+                   QueryParser, RouteDefinition, JSONSerializer
+Models/          → NoteModel, TagModel, UserModel (all inherit BaseModel)
+ViewModels/
+  Notes/         → 7 VMs (List, Detail, New, Create, Edit, Update, Delete)
+  Tags/          → 7 VMs (full CRUD)
+  Auth/          → LoginVM, LogoutVM, SignupVM
+  API/           → NotesAPIList/Detail/Create, TagsAPIList/Detail
+Tests/           → 8 XojoUnit TestGroups
+JinjaXLib/       → Full JinjaX source (Jinja2-compatible engine, pure Xojo)
+templates/       → layouts/, notes/, tags/, auth/, errors/
+data/            → SQLite database (auto-created at startup)
+developer-guide/ → Static site documentation (see Part 2)
+model-toolkit/   → Research docs for future Model Toolkit app
 ```
 
 ### Current State
 
-**v0.4.2** — Production path fix: DB and template paths now relative to executable.
+**v0.9.2** — Phase 3 complete. Full-featured SSR web app with auth, tags, API, and Alpine.js.
 
-- `Framework/` — Router (returns Boolean), BaseViewModel, BaseModel, DBAdapter, FormParser, QueryParser, RouteDefinition
-- `Models/NoteModel.xojo_code` — SQLite CRUD via BaseModel, Dictionary output
-- `ViewModels/Notes/` — 7 ViewModels, full CRUD, validation, flash messages
-- `Tests/` — XojoUnit TestGroups: DBAdapterTests, BaseModelTests, NoteModelTests
-- `templates/` — layouts/base.html, notes/*, errors/404.html, errors/500.html
+- `Framework/` — Router, BaseViewModel, BaseModel, DBAdapter, FormParser, QueryParser, RouteDefinition, JSONSerializer
+- `Models/` — NoteModel, TagModel, UserModel (all return Dictionary, inherit BaseModel)
+- `ViewModels/Notes/` — 7 ViewModels, full CRUD, pagination, tag associations
+- `ViewModels/Tags/` — 7 ViewModels, full CRUD
+- `ViewModels/Auth/` — LoginVM, LogoutVM, SignupVM (SHA-256 + salt password storage)
+- `ViewModels/API/` — 5 JSON API endpoints for notes and tags
+- `Tests/` — 8 XojoUnit TestGroups: DBAdapter, BaseModel, NoteModel, NotesPagination, TagModel, NoteTagAssociation, UserModel, API
+- `templates/` — layouts/base.html, notes/*, tags/*, auth/*, errors/*
+- **Alpine.js** (via CDN) replaces custom JS — 93 → 16 lines
+- **Client-side SHA-256** — plaintext passwords never cross the network
+- **Session auth** — login/signup/logout with nav state via localStorage/sessionStorage
 - Thai, emoji, all Unicode input/storage works correctly
 - `/tests` URL loads XojoUnit test runner via redirect dance (see `Routing.md`)
 
-**Next:** Phase 3 — additional models, authentication, more resource types.
+#### DB Schema (v0.9.2)
+```sql
+notes      (id, title, body, created_at, updated_at)
+tags       (id, name, created_at)
+note_tags  (note_id, tag_id)  -- junction, PRIMARY KEY (note_id, tag_id)
+users      (id, username UNIQUE, password_hash, created_at)
+```
+
+**Next:** Scope notes to logged-in user, protected routes, API authentication.
 
 ### HandleURL / Routing (Critical)
 
@@ -494,8 +515,17 @@ This must remain as the **last element in `<head>`**, after the stylesheet link.
 | Version | What was completed |
 |---------|-------------------|
 | v0.1.0 | Basic routing, HandleURL, Router |
-| v0.2.0 | JinjaX templates, BaseViewModel |
+| v0.2.0 | Notes CRUD, JinjaX templates, BaseViewModel |
 | v0.3.0 | Full CRUD, FormParser, Unicode/UTF-8, flash messages |
+| v0.4.0 | BaseModel/DBAdapter, XojoUnit test runner at `/tests` |
+| v0.4.2 | Production path fix (relative to executable) |
+| v0.5.0 | Pagination (Phase 3.1) |
+| v0.6.0 | Tags CRUD (Phase 3.2) |
+| v0.7.0 | Notes↔Tags associations (Phase 3.3) |
+| v0.8.0 | Authentication — login, signup, session (Phase 3.4) |
+| v0.9.0 | JSON API endpoints (Phase 3.5) |
+| v0.9.1 | Auth UX — client-side SHA-256, SSR session workarounds |
+| v0.9.2 | Alpine.js — 93 → 16 lines of custom JS |
 | pygment | Xojo Pygments lexer (`xojo_lexer.py`) working |
 | dark-light | Day/Night theme toggle, cross-language state sharing |
 
@@ -516,6 +546,41 @@ This must remain as the **last element in `<head>`**, after the stylesheet link.
 | Store user data on `App` | App is shared across all sessions; use `Session` |
 | Move the inline theme script to `docs.js` | Causes FOUC on every page load |
 | Use MermaidJS or D2 for diagrams | MermaidJS bakes inline colors; D2 produces 200KB+ SVGs |
+
+### Xojo Gotchas (Phase 3)
+
+| What | Why / Fix |
+|------|-----------|
+| `Crypto.SHA256(s)` returns MemoryBlock | Use `EncodeHex(Crypto.SHA256(s))` — there is no `.Hex` method |
+| No `Math.Ceiling()` in Xojo | Use integer arithmetic: `(total + perPage - 1) \ perPage` |
+| `Assert.AreEqual(0, someInt)` is ambiguous | Xojo can't pick overload — use `Assert.IsTrue(someInt = 0)` |
+| FormParser was single-value (last-wins) | Changed to comma-append for duplicate keys (multi-value checkboxes) |
+| Missing Dictionary key in JinjaX template | Always populate all keys templates expect, even with empty defaults |
+
+### Authentication Pattern
+
+- Password storage: `SHA256(password + salt):salt` in a single TEXT column
+- Salt: random via `Crypto.GenerateRandomBytes(16)`, hex-encoded
+- Verify: split stored value on `:`, recompute hash with extracted salt
+- Client-side: Web Crypto API hashes password before form submit (plaintext never sent)
+- Session: `Session.CurrentUserID`, `Session.IsLoggedIn()`, `Session.LogIn(id, username)`, `Session.LogOut()`
+- Nav auth state: localStorage stores username (set on login/signup, cleared on logout)
+- Flash messages: sessionStorage survives POST→redirect→GET cycle in SSR mode
+
+### JSON API Pattern
+
+- `JSONSerializer` module: `EscapeString`, `DictToJSON`, `ArrayToJSON`
+- API ViewModels call `WriteJSON()` instead of `Render()` — no templates needed
+- POST endpoints accept `application/x-www-form-urlencoded` (reuses FormParser)
+- Embed sub-arrays by string manipulation: strip closing `}`, append `,"key":arrayJSON}`
+
+### Alpine.js Integration
+
+- Loaded via CDN (`defer`, no build step)
+- Replaces all custom JS: auth state, flash messages, form validation, tag checkboxes
+- Pattern: `x-data` on elements, `@submit.prevent` for forms, `x-show`/`x-text` for reactive UI
+- Tag checkboxes use native `name="tag_ids"` multi-value (FormParser handles comma-append)
+- Do NOT add htmx until a specific trigger-based feature requires it (see memory)
 
 ### Environment Requirements
 
