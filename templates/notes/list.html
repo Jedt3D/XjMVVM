@@ -33,4 +33,22 @@
 {% else %}
 <p>No notes yet. Create your first one!</p>
 {% endif %}
+
+<div style="margin-top:16px; display:flex; gap:8px; align-items:center;">
+  {% if pagination.has_prev == "1" %}
+  <a href="/notes?page={{ pagination.prev_page }}" class="btn btn-sm">&laquo; Prev</a>
+  {% else %}
+  <span class="btn btn-sm" style="opacity:0.4;">&laquo; Prev</span>
+  {% endif %}
+
+  <span style="font-size:0.9em; color:#666;">
+    Page {{ pagination.page }} of {{ pagination.total_pages }} &nbsp;({{ pagination.total }} notes)
+  </span>
+
+  {% if pagination.has_next == "1" %}
+  <a href="/notes?page={{ pagination.next_page }}" class="btn btn-sm">Next &raquo;</a>
+  {% else %}
+  <span class="btn btn-sm" style="opacity:0.4;">Next &raquo;</span>
+  {% endif %}
+</div>
 {% endblock %}

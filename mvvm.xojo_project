@@ -50,6 +50,7 @@ Folder=Tests;Tests;&hFFFFFFFF620C1FFF;&h0000000000000000;false
 Class=DBAdapterTests;Tests/DBAdapterTests.xojo_code;&hFFFFFFFF620C2FFF;&hFFFFFFFF620C1FFF;false
 Class=BaseModelTests;Tests/BaseModelTests.xojo_code;&hFFFFFFFF620C3FFF;&hFFFFFFFF620C1FFF;false
 Class=NoteModelTests;Tests/NoteModelTests.xojo_code;&hFFFFFFFF620C4FFF;&hFFFFFFFF620C1FFF;false
+Class=NotesPaginationTests;Tests/NotesPaginationTests.xojo_code;&hFFFFFFFF620C5FFF;&hFFFFFFFF620C1FFF;false
 Folder=JinjaXLib;JinjaXLib;&hFFFFFFFF810A1FFF;&h0000000000000000;false
 Folder=XojoUnit;XojoUnit;&h00000000791BB7FF;&h0000000000000000;false
 Module=TokenType;JinjaXLib/TokenType.xojo_code;&hFFFFFFFF810A2FFF;&hFFFFFFFF810A1FFF;false

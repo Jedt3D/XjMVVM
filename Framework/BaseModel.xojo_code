@@ -30,6 +30,36 @@ Protected Class BaseModel
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0, Description = "Returns the total number of rows in the table."
+		Function Count() As Integer
+		  Var db As SQLiteDatabase = OpenDB()
+		  Var rs As RowSet = db.SelectSQL("SELECT COUNT(*) AS n FROM " + TableName())
+		  Var n As Integer = 0
+		  If Not rs.AfterLastRow Then n = rs.Column("n").IntegerValue
+		  rs.Close()
+		  db.Close()
+		  Return n
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = "Returns a page of rows as Variant() of Dictionary. limit and offset map to SQL LIMIT/OFFSET."
+		Function FindPaginated(limit As Integer, offset As Integer, orderBy As String = "") As Variant()
+		  Var results() As Variant
+		  Var db As SQLiteDatabase = OpenDB()
+		  Var sql As String = "SELECT " + Columns() + " FROM " + TableName()
+		  If orderBy.Length > 0 Then sql = sql + " ORDER BY " + orderBy
+		  sql = sql + " LIMIT ? OFFSET ?"
+		  Var rs As RowSet = db.SelectSQL(sql, limit, offset)
+		  While Not rs.AfterLastRow
+		    results.Add(RowToDict(rs))
+		    rs.MoveToNextRow()
+		  Wend
+		  rs.Close()
+		  db.Close()
+		  Return results
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h0, Description = "Returns all rows as Variant() of Dictionary. orderBy is an optional SQL ORDER BY clause value."
 		Function FindAll(orderBy As String = "") As Variant()
 		  Var results() As Variant

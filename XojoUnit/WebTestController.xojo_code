@@ -12,6 +12,7 @@ Inherits TestController
 		  group = New DBAdapterTests(Self, "DBAdapter")
 		  group = New BaseModelTests(Self, "BaseModel")
 		  group = New NoteModelTests(Self, "NoteModel")
+		  group = New NotesPaginationTests(Self, "NotesPagination")
 		  
 		End Sub
 	#tag EndEvent
