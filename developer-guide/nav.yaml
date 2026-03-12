@@ -84,6 +84,12 @@ sections:
         slug: "api/index"
         src: "pages/10-api/index.md"
 
+  - title: "Frontend"
+    pages:
+      - title: "Alpine.js"
+        slug: "alpine/index"
+        src: "pages/11-alpine/index.md"
+
   - title: "Encoding"
     pages:
       - title: "Forms, MIME & UTF-8"

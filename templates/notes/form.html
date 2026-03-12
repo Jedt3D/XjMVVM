@@ -21,25 +21,15 @@
   {% if all_tags %}
   <div>
     <label>Tags</label>
-    <input type="hidden" name="tag_ids" id="tag_ids_hidden" value="">
     <div style="margin:5px 0 15px 0; display:flex; flex-wrap:wrap; gap:8px;">
       {% for tag in all_tags %}
       <label style="display:flex; align-items:center; gap:4px; cursor:pointer; font-weight:normal;">
-        <input type="checkbox" class="tag-checkbox" value="{{ tag.id }}"{% if tag.selected == "1" %} checked{% endif %}>
+        <input type="checkbox" name="tag_ids" value="{{ tag.id }}"{% if tag.selected == "1" %} checked{% endif %}>
         {{ tag.name }}
       </label>
       {% endfor %}
     </div>
   </div>
-  <script>
-    (function() {
-      var form = document.querySelector('form');
-      form.addEventListener('submit', function() {
-        var checked = Array.from(document.querySelectorAll('.tag-checkbox:checked')).map(function(cb) { return cb.value; });
-        document.getElementById('tag_ids_hidden').value = checked.join(',');
-      });
-    })();
-  </script>
   {% endif %}
   <p>
     <button type="submit" class="btn btn-primary">{% if note %}Update{% else %}Create{% endif %}</button>

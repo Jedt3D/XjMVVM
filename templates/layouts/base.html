@@ -9,7 +9,7 @@
     nav { margin-bottom: 20px; padding: 10px 0; border-bottom: 1px solid #ddd; display: flex; align-items: center; }
     nav a { margin-right: 15px; text-decoration: none; color: #0066cc; }
     nav a:hover { text-decoration: underline; }
-    nav .nav-right { margin-left: auto; margin-right: 0; }
+    .nav-auth { display: flex; align-items: center; gap: 8px; margin-left: auto; }
     .flash { padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; }
     .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
@@ -21,64 +21,49 @@
     input[type="text"], textarea { width: 100%; padding: 8px; margin: 5px 0 15px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
     textarea { height: 150px; }
     label { font-weight: bold; }
+    [x-cloak] { display: none !important; }
   </style>
 </head>
 <body>
-  <nav>
+  <nav x-data="{ user: localStorage.getItem('_auth_user') }">
     <a href="/">Home</a>
     <a href="/notes">Notes</a>
     <a href="/tags">Tags</a>
     <a href="/tests" target="_blank">Tests</a>
-    <span id="nav-out" style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+    <span class="nav-auth" x-show="!user">
       <a href="/login" class="btn btn-sm">Log In</a>
       <a href="/signup" class="btn btn-primary btn-sm">Sign Up</a>
     </span>
-    <span id="nav-in" style="margin-left:auto; display:none; align-items:center; gap:8px;">
-      <span id="nav-username" style="font-size:0.9em; color:#555;"></span>
-      <form id="logout-form" method="post" action="/logout" style="display:inline;">
+    <span class="nav-auth" x-show="user" x-cloak>
+      <span x-text="user" style="font-size:0.9em; color:#555;"></span>
+      <form method="post" action="/logout" style="display:inline;"
+            @submit="localStorage.removeItem('_auth_user'); sessionStorage.setItem('_flash_msg', 'You have been logged out.'); sessionStorage.setItem('_flash_type', 'success');">
         <button type="submit" class="btn btn-sm">Log Out</button>
       </form>
     </span>
     <a href="/dist/en/index.html" target="_blank" class="btn btn-primary btn-sm" style="margin-left:8px;">XjMVVM Docs</a>
   </nav>
+
   {% if flash %}
   <div class="flash flash-{{ flash.type }}">{{ flash.message }}</div>
   {% endif %}
-  <div id="_client-flash" style="display:none"></div>
+
+  <div x-data="{
+    msg: '',
+    type: 'success',
+    init() {
+      var m = sessionStorage.getItem('_flash_msg');
+      var t = sessionStorage.getItem('_flash_type') || 'success';
+      sessionStorage.removeItem('_flash_msg');
+      sessionStorage.removeItem('_flash_type');
+      if (m && !document.querySelector('.flash')) { this.msg = m; this.type = t; }
+    }
+  }" x-show="msg" :class="'flash flash-' + type" x-text="msg" style="display:none"></div>
+
   <main>
     {% block content %}{% endblock %}
   </main>
-  <script>
-    (function () {
-      // Client-side flash (fallback when Xojo session doesn't persist across SSR requests)
-      var msg  = sessionStorage.getItem('_flash_msg');
-      var type = sessionStorage.getItem('_flash_type') || 'success';
-      sessionStorage.removeItem('_flash_msg');
-      sessionStorage.removeItem('_flash_type');
-      if (msg && !document.querySelector('.flash')) {
-        var el = document.getElementById('_client-flash');
-        el.className = 'flash flash-' + type;
-        el.textContent = msg;
-        el.style.display = '';
-      }
 
-      // Auth nav: show logged-in or logged-out state based on localStorage
-      var user   = localStorage.getItem('_auth_user');
-      var navOut = document.getElementById('nav-out');
-      var navIn  = document.getElementById('nav-in');
-      if (user) {
-        document.getElementById('nav-username').textContent = user;
-        navOut.style.display = 'none';
-        navIn.style.display  = 'flex';
-      }
-
-      // Logout: clear auth state and set flash before POST
-      document.getElementById('logout-form').addEventListener('submit', function () {
-        localStorage.removeItem('_auth_user');
-        sessionStorage.setItem('_flash_msg',  'You have been logged out.');
-        sessionStorage.setItem('_flash_type', 'success');
-      });
-    })();
-  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
 </body>
 </html>

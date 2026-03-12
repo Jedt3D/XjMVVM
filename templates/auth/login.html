@@ -5,7 +5,29 @@
 {% block content %}
 <h1>Log In</h1>
 
-<form id="login-form" method="post" action="/login" style="max-width:360px;">
+<script>
+async function sha256hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+</script>
+
+<form method="post" action="/login" style="max-width:360px;"
+      x-data="{
+        hashed: false,
+        async handleSubmit(e) {
+          if (this.hashed) return;
+          const username = document.getElementById('username').value;
+          const pwEl = document.getElementById('password');
+          pwEl.value = await sha256hex(pwEl.value);
+          localStorage.setItem('_auth_user', username);
+          sessionStorage.setItem('_flash_msg', 'Welcome back, ' + username + '!');
+          sessionStorage.setItem('_flash_type', 'success');
+          this.hashed = true;
+          e.target.submit();
+        }
+      }"
+      @submit.prevent="handleSubmit($event)">
   <div>
     <label for="username">Username</label>
     <input type="text" id="username" name="username" autocomplete="username" required>
@@ -19,25 +41,4 @@
   </p>
   <p style="font-size:0.9em;">Don't have an account? <a href="/signup">Sign up</a></p>
 </form>
-
-<script>
-async function sha256hex(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-document.getElementById('login-form').addEventListener('submit', async function(e) {
-  if (this.dataset.hashed) return;
-  e.preventDefault();
-  const username = document.getElementById('username').value;
-  const pwEl = document.getElementById('password');
-  const hash = await sha256hex(pwEl.value);
-  pwEl.value = hash;
-  localStorage.setItem('_auth_user', username);
-  sessionStorage.setItem('_flash_msg',  'Welcome back, ' + username + '!');
-  sessionStorage.setItem('_flash_type', 'success');
-  this.dataset.hashed = '1';
-  this.submit();
-});
-</script>
 {% endblock %}
