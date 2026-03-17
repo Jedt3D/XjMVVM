@@ -88,4 +88,4 @@ There is no CLI build system. All testing and building happens inside the Xojo I
 
 ## Current version
 
-**v0.9.3** — User-scoped notes (each user sees only their own), cookie-based authentication (HMAC-signed `mvvm_auth` cookie replaces broken WebSession auth), protected routes (all 19 routes require login), Alpine.js for client-side interactivity, JSON API with auth, and a built-in static file server for the developer docs at `/dist/*`.
+**v1.0.0** — User-scoped notes (each user sees only their own), cookie-based authentication (HMAC-signed `mvvm_auth` cookie replaces broken WebSession auth), protected routes (all 19 routes require login), Alpine.js for client-side interactivity, JSON API with auth, and a built-in static file server for the developer docs at `/dist/*`.

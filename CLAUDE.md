@@ -15,6 +15,13 @@ This is a **Xojo Web 2 application** implementing a server-side rendered (SSR) M
 **Debug port:** 8080
 **Bundle ID:** `com.worajedt.mvvm`
 
+## Dependencies
+
+<u>This project needs **JinjaXLib** from https://github.com/Jedt3D/JinjaX</u> 
+
+- `JinjaXLib/` and `Shared Resources/` from the project are need.
+- In this project, I created macOS aliases to two folder outside. You need to replace them before you compile the project.
+
 ### Architecture
 
 The architecture follows a strict layered pattern:
@@ -61,7 +68,7 @@ model-toolkit/   → Research docs for future Model Toolkit app
 
 ### Current State
 
-**v0.9.3** — Phase 4 complete. User-scoped notes, protected routes, cookie-based auth.
+**v1.0.0** — Phase 4 complete. User-scoped notes, protected routes, cookie-based auth.
 
 - `Framework/` — Router, BaseViewModel, BaseModel, DBAdapter, FormParser, QueryParser, RouteDefinition, JSONSerializer
 - `Models/` — NoteModel (user-scoped), TagModel (global), UserModel (all return Dictionary, inherit BaseModel)
@@ -78,7 +85,7 @@ model-toolkit/   → Research docs for future Model Toolkit app
 - Thai, emoji, all Unicode input/storage works correctly
 - `/tests` URL loads XojoUnit test runner via redirect dance (see `Routing.md`)
 
-#### DB Schema (v0.9.3)
+#### DB Schema (v1.0.0)
 ```sql
 notes      (id, title, body, created_at, updated_at, user_id)  -- user_id scopes notes per user
 tags       (id, name, created_at)
@@ -86,9 +93,7 @@ note_tags  (note_id, tag_id)  -- junction, PRIMARY KEY (note_id, tag_id)
 users      (id, username UNIQUE, password_hash, created_at)
 ```
 
-**Developer guide:** All 20 pages updated for v0.9.3, built for EN/TH/JP (60 pages total). New "Protected Routes & User Scoping" page. Auth docs rewritten for cookie-based auth. Full editorial pass on TH and JP translations — all major/moderate issues resolved. Observation reports saved as `developer-guide/th_observation.md` and `developer-guide/jp_observation.md`.
-
-**Next:** Version bump to v1.0.0.
+**Developer guide:** All 20 pages updated for v1.0.0, built for EN/TH/JP (60 pages total). New "Protected Routes & User Scoping" page. Auth docs rewritten for cookie-based auth. Full editorial pass on TH and JP translations — all major/moderate issues resolved. Observation reports saved as `developer-guide/th_observation.md` and `developer-guide/jp_observation.md`.
 
 ### HandleURL / Routing (Critical)
 
@@ -530,7 +535,7 @@ This must remain as the **last element in `<head>`**, after the stylesheet link.
 | v0.9.0 | JSON API endpoints (Phase 3.5) |
 | v0.9.1 | Auth UX — client-side SHA-256, SSR session workarounds |
 | v0.9.2 | Alpine.js — 93 → 16 lines of custom JS |
-| v0.9.3 | User-scoped notes, protected routes, cookie-based auth (Phase 4) |
+| v1.0.0 | User-scoped notes, protected routes, cookie-based auth (Phase 4) |
 | pygment | Xojo Pygments lexer (`xojo_lexer.py`) working |
 | dark-light | Day/Night theme toggle, cross-language state sharing |
 | docs-0.9.3 | Developer guide updated for Phase 3+4 (cookie auth, protected routes, user scoping) |
@@ -621,3 +626,44 @@ export ANTHROPIC_API_KEY=sk-...
 ### File Encoding
 
 All source files are UTF-8. Xojo `.xojo_code` files are also UTF-8. The build reads and writes with `encoding="utf-8"` explicitly. Never add BOM markers.
+
+## Using xoji for token-efficient indexing
+
+### Before starting any task:
+```bash
+# From project root, run freshness check
+xoji check || xoji index
+```
+
+### Index files in .xojo_index/:
+- **codetree.json** — Maps file paths to {entity, methods, properties, events, line numbers}
+- **manifest.json** — All files with their types and entity names
+- **dependencies.json** — Class inheritance and interface relationships
+- **meta.json** — Project hash and file modification times (for freshness)
+
+### How to use them:
+
+1. **Find a method/property**: Query codetree.json
+   ```bash
+   cat .xojo_index/codetree.json | grep -A 20 "MainWindow.xojo_window"
+   ```
+   Returns: "Button1.Pressed": 78 → method at line 78
+
+2. **Read only what's needed**:
+   ```bash
+   sed -n '70,90p' AppSrc/MainWindow.xojo_window
+   ```
+   Skip scanning the entire 3000-line file
+
+3. **Understand relationships**: Query dependencies.json
+   ```bash
+   cat .xojo_index/dependencies.json | grep -A 5 "OrderForm"
+   ```
+   See what OrderForm inherits from and which classes depend on it
+
+### Why this saves tokens:
+- Instead of reading entire 3KB–50KB files, read only 20–50 lines
+- Instead of blindly scanning all classes, query the dependency graph
+- Instead of re-parsing file structure, use pre-computed line numbers
+- **Result**: 5–8× fewer tokens per task
+

@@ -5,7 +5,7 @@ description: How to protect routes behind authentication and scope data per user
 
 # Protected Routes & User Scoping
 
-XjMVVM v0.9.3 introduced two related features: **protected routes** that require authentication, and **user-scoped data** that isolates records per user. Together they ensure that users must log in to access the app and can only see their own notes.
+XjMVVM v1.0.0 introduced two related features: **protected routes** that require authentication, and **user-scoped data** that isolates records per user. Together they ensure that users must log in to access the app and can only see their own notes.
 
 ## Protected Routes
 

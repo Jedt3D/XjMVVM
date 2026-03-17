@@ -1,35 +1,284 @@
-# Xojo build output
+################################################################################
+# Xojo IDE
+################################################################################
+
+# Build output
 Builds/
-Builds - mvvm/
+Builds\ -\ mvvm/
+*.debug/
 mvvm.debug/
 
-# Xojo IDE user files
+# IDE user state (local, not committed)
 *.xojo_user
 *.xojo_uistate
+*.xojo_backup
 
-# macOS
-.DS_Store
-
-# Development artifacts
+# Xojo-specific artifacts
+.xojo_index/
+*.xojo_resources
 errors.txt
+
+# macOS aliases to external projects (local filesystem references)
+JinjaX
+Shared Resources
+
+################################################################################
+# macOS
+################################################################################
+
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+.Spotlight-V100
+.Trashes
+
+################################################################################
+# Development Environment
+################################################################################
+
+# Environment variables (contains secrets)
+.env
+.env.local
+.env.*.local
+
+# IDE temporary files
+.vscode/
+.idea/
+*.sublime-workspace
+
+# Development scripts
 analyze.sh
 *.skill
-.env
 ziqBWdba
 
-# Database (exclude data dir from version control; keep structure via .gitkeep)
+################################################################################
+# Database
+################################################################################
+
+# SQLite (except schema migration scripts)
 data/*.sqlite
+data/*.sqlite-*
+data/*.db
 
-# Python
+# Keep data directory structure with .gitkeep
+!data/.gitkeep
+
+################################################################################
+# Python (Static Site Generator)
+################################################################################
+
+# Virtual environment
 .venv/
+venv/
+ENV/
+env/
+
+# Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
 
-# Node
-node_modules/
+# pytest / coverage
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+*.cover
 
-# Claude Code
-.claude/
+# pip
+*.egg-info/
+dist/
+build/
 
-# Build outputs
+# Developer guide build output
 developer-guide/dist/
+developer-guide/.DS_Store
+
+# Python temporary files
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+
+################################################################################
+# Node.js (nomnoml diagram rendering)
+################################################################################
+
+node_modules/
+npm-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+
+# Node version managers
+.nvmrc
+.node-version
+
+################################################################################
+# Claude Code / AI Assistant
+################################################################################
+
+.claude/
+.claude/projects/
+.claude/memories/
+
+# Don't commit AI assistant state files
+claude_*.log
+
+################################################################################
+# Common IDE / Editor Files
+################################################################################
+
+# VSCode
+.vscode/settings.json
+.vscode/extensions.json
+
+# JetBrains (IntelliJ, AppCode, etc.)
+.idea/
+*.iml
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+.vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+.\#*
+\#*\#
+
+################################################################################
+# OS-Specific Files
+################################################################################
+
+# Windows
+Thumbs.db
+*.lnk
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.cache/
+
+################################################################################
+# Build & Deployment Artifacts
+################################################################################
+
+# Compiled binaries (keep source, ignore builds)
+*.app/
+*.exe
+*.so
+*.dylib
+
+# Temporary build files
+*.o
+*.a
+*.lib
+
+# Package managers
+*.lock
+.yarn.lock
+poetry.lock
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+################################################################################
+# Logs & Debug Files
+################################################################################
+
+*.log
+*.logs/
+debug.log
+trace.log
+
+# Local development logs
+dev.log
+test.log
+
+# Crash dumps
+core
+*.stackdump
+
+################################################################################
+# Sensitive & Secret Files
+################################################################################
+
+# Never commit secrets
+.env
+.env.local
+*.pem
+*.key
+*.keystore
+secrets/
+credentials/
+
+# API keys (if checked in accidentally)
+api_keys.txt
+tokens.txt
+
+################################################################################
+# Temporary Files
+################################################################################
+
+# Backup files
+*.backup
+*.bak
+*.tmp
+*.temp
+
+# OS temp
+tmp/
+temp/
+
+# Sass/CSS cache
+.sass-cache/
+*.css.map
+
+################################################################################
+# Project-Specific (MVVM)
+################################################################################
+
+# Xojo resources file (large, usually regenerated)
+mvvm.xojo_resources
+
+# Test reports (if generated)
+test_reports/
+coverage/
+
+# Dist folder for built documentation
+dist/
+
+# Any .xojo_project copies or versions
+*_backup.xojo_project
+*_old.xojo_project
+
+################################################################################
+# Debugging & Analysis
+################################################################################
+
+# Performance profiles
+*.prof
+*.pstats
+
+# Memory dumps
+*.heapdump
+*.hprof
+
+# Test coverage
+.coverage
+htmlcov/
+.nyc_output/

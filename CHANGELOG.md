@@ -1,5 +1,37 @@
 # Changelog
 
+All notable changes to the MVVM project are documented here. Versions follow [Semantic Versioning](https://semver.org).
+
+## [1.0.0] — 2026-03-17
+
+### Summary
+
+**Production-ready release.** All core features completed through Phase 4. User-scoped notes, protected routes, cookie-based authentication, JSON API, full test coverage, and comprehensive 60-page developer guide (English + Thai + Japanese).
+
+### Added
+
+- **README.md complete rewrite** — quick start guide, feature matrix, architecture diagrams, all routes documented, production deployment guide, troubleshooting section
+- **MIT License** added — open source with clear terms
+
+### Changed
+
+- **Version bump** → v1.0.0 (from v0.9.3)
+- **Documentation** — README now a comprehensive onboarding document; legacy architecture docs (Routing.md, DatabaseModel.md) noted as archived in favor of developer guide
+
+### Status
+
+| Subsystem | Version | Status |
+|-----------|---------|--------|
+| **Xojo Framework** | v1.0.0 | ✓ Complete |
+| **JinjaX Engine** | Full source | ✓ Included |
+| **Database** | v1.0.0 schema | ✓ 4 tables, user-scoped notes |
+| **Authentication** | Cookie-based SSR | ✓ HMAC-signed, SHA-256 passwords |
+| **API** | 5 endpoints | ✓ Full CRUD JSON |
+| **Tests** | 9 test groups | ✓ 40+ assertions |
+| **Documentation** | 60 pages | ✓ EN/TH/JP |
+
+---
+
 ## [0.9.3-tooling] — 2026-03-13
 
 ### Added
