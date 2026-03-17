@@ -15,14 +15,12 @@ cd XjMVVM
 
 # Open in Xojo IDE (2025r3.1+)
 open mvvm.xojo_project
+# Now, you can compile and run like normal Xojo project
+# Visit http://127.0.0.1:9090/
 
-# Or run from command line (after building)
-./Builds/mvvm
-
-# Visit http://localhost:9090
 ```
 
-**Default**
+**Default credentials **
 
 - username : admin
 - password : password
@@ -211,7 +209,7 @@ Routing.md                          HandleURL deep dive (deprecated — see docs
 1. **Install Xojo 2025r3.1+** from [xojo.com](https://www.xojo.com)
 2. **Open** `mvvm.xojo_project` in the IDE
 3. **Click Run** (or press ⌘R)
-4. **Visit** `http://localhost:9090` in your browser
+4. **Visit** `http://127.0.0.1:9090` in your browser
 5. **Create an account** — sign up with any username/password
 6. **Create notes** — add titles and bodies; optionally tag them
 
@@ -220,7 +218,7 @@ The SQLite database is auto-created on first run at `data/notes.sqlite`.
 ### Running Tests
 
 1. In the app, navigate to **`/tests`** in the top nav (if logged in)
-2. Or visit **`http://localhost:9090/tests`** directly
+2. Or visit **`http://127.0.0.1:9090/tests`** directly
 3. The XojoUnit test runner loads in a Xojo WebPage
 4. Click **Run All Tests** to validate the entire framework
 
@@ -234,7 +232,7 @@ The SQLite database is auto-created on first run at `data/notes.sqlite`.
 # 1. Copy the compiled binary to your server
 # 2. Copy the entire 'templates/' folder alongside it
 # 3. The 'data/' folder is auto-created on first run
-# 4. Point a reverse proxy (nginx/apache) to localhost:9090
+# 4. Point a reverse proxy (nginx/apache) to 127.0.0.1:9090
 ```
 
 ---

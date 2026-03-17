@@ -6,7 +6,7 @@ Tests all authenticated JSON API endpoints of the running XjMVVM app.
 
 Usage:
     python3 test_api.py
-    python3 test_api.py --host http://localhost:9090
+    python3 test_api.py --host http://127.0.0.1:9090
     python3 test_api.py --user myuser --password mypass
     python3 test_api.py --signup   # auto-create test user if not exist
 
@@ -41,7 +41,7 @@ BOLD   = "\033[1m"
 RESET  = "\033[0m"
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
-DEFAULT_HOST = "http://localhost:9090"
+DEFAULT_HOST = "http://127.0.0.1:9090"
 DEFAULT_USER = "api_tester"
 DEFAULT_PASS = "testpass123"
 
