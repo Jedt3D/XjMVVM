@@ -2,7 +2,7 @@
 
 A production-ready server-side rendered (SSR) MVVM web framework built on Xojo Web 2, inspired by Flask/Django. Routes all HTTP requests through `WebApplication.HandleURL` and renders responses via the **JinjaX template engine**. Xojo's built-in WebPage GUI system is bypassed entirely in favor of pure HTML+CSS rendering.
 
-[![GitHub License](https://img.shields.io/github/license/worajedt/mvvm)](LICENSE)
+[![GitHub License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Xojo](https://img.shields.io/badge/Xojo-2025r3.1-blue)](https://www.xojo.com)
 [![Version](https://img.shields.io/badge/version-v1.0.0-green)](CHANGELOG.md)
 
@@ -10,8 +10,8 @@ A production-ready server-side rendered (SSR) MVVM web framework built on Xojo W
 
 ```bash
 # Clone & enter the project
-git clone https://github.com/worajedt/mvvm.git
-cd mvvm
+git clone https://github.com/Jedt3D/XjMVVM.git
+cd XjMVVM
 
 # Open in Xojo IDE (2025r3.1+)
 open mvvm.xojo_project
@@ -27,7 +27,7 @@ open mvvm.xojo_project
 - username : admin
 - password : password
 
-**Documentation:** Full [developer guide](https://github.com/worajedt/mvvm/tree/main/developer-guide) with 60 pages in English, Thai, and Japanese.
+**Documentation:** Full [developer guide](https://github.com/Jedt3D/XjMVVM/tree/main/developer-guide) with 60 pages in English, Thai, and Japanese.
 
 ---
 

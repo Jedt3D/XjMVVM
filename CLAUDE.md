@@ -234,7 +234,7 @@ developer-guide/
 ```yaml
 title: "MVVM Docs"
 version: "v0.3.0"
-repo: "https://github.com/worajedt/mvvm"
+repo: "https://github.com/Jedt3D/XjMVVM"
 
 sections:
   - title: "Getting Started"
