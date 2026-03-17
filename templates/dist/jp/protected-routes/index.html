@@ -27,7 +27,7 @@
       <a class="topbar-logo" href="/dist/en/index.html">
         <span class="logo-mark">X</span>
         <span class="logo-text">MVVM Docs</span>
-        <span class="logo-version">v0.9.3</span>
+        <span class="logo-version">v1.0.0</span>
       </a>
 
       <!-- Language switcher -->
@@ -46,7 +46,7 @@
 
       <nav class="topbar-links">
         <a href="/dist/en/index.html">Docs</a>
-        <a href="https://github.com/worajedt/mvvm" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://github.com/Jedt3D/XjMVVM" target="_blank" rel="noopener">GitHub ↗</a>
       </nav>
 
       <!-- Theme toggle (moon = go dark, sun = go light) -->
@@ -348,7 +348,7 @@
         </div>
 
         <h1 id="_1">保護されたルートとユーザースコーピング<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>XjMVVM v0.9.3 では 2 つの関連機能が導入されました: 認証を必要とする<strong>保護されたルート</strong>と、レコードをユーザーごとに分離する<strong>ユーザースコープデータ</strong>です。この 2 つを組み合わせることで、ユーザーはアプリにアクセスするためにログインが必要となり、自分のノートのみを表示できます。</p>
+<p>XjMVVM v1.0.0 では 2 つの関連機能が導入されました: 認証を必要とする<strong>保護されたルート</strong>と、レコードをユーザーごとに分離する<strong>ユーザースコープデータ</strong>です。この 2 つを組み合わせることで、ユーザーはアプリにアクセスするためにログインが必要となり、自分のノートのみを表示できます。</p>
 <h2 id="_2">保護されたルート<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>認証が必要な ViewModel はすべて、<code>OnGet()</code> または <code>OnPost()</code> の先頭でガードメソッドを呼び出します。ガードは 2 つあります — 1 つは HTML ルート用、もう 1 つは API ルート用です。</p>
 <div class="diagram-tabs" id="diag1">

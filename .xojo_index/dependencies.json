@@ -1,0 +1,325 @@
+{
+  "classes": {
+    "APITests": {
+      "inherits": "TestGroup"
+    },
+    "ASTNode": {},
+    "App": {
+      "inherits": "WebApplication"
+    },
+    "Assert": {},
+    "BaseModel": {},
+    "BaseModelTests": {
+      "inherits": "TestGroup"
+    },
+    "BaseViewModel": {},
+    "BinaryOpNode": {
+      "inherits": "ASTNode"
+    },
+    "BlockNode": {
+      "inherits": "ASTNode"
+    },
+    "BuiltInFilters": {},
+    "CallNode": {
+      "inherits": "ASTNode"
+    },
+    "CompareNode": {
+      "inherits": "ASTNode"
+    },
+    "CompiledTemplate": {},
+    "DBAdapter": {},
+    "DBAdapterTests": {
+      "inherits": "TestGroup"
+    },
+    "DictLoader": {
+      "implements": [
+        "JinjaX.ILoader"
+      ]
+    },
+    "ElseIfClause": {},
+    "ExtendsNode": {
+      "inherits": "ASTNode"
+    },
+    "ExtendsResolver": {},
+    "FailedTestStyle": {},
+    "FileSystemLoader": {
+      "implements": [
+        "JinjaX.ILoader"
+      ]
+    },
+    "FilterCall": {},
+    "FilterNode": {
+      "inherits": "ASTNode"
+    },
+    "ForNode": {
+      "inherits": "ASTNode"
+    },
+    "FormParser": {},
+    "GetAttrNode": {
+      "inherits": "ASTNode"
+    },
+    "GetItemNode": {
+      "inherits": "ASTNode"
+    },
+    "HeadingStyle": {},
+    "HomeViewModel": {
+      "inherits": "BaseViewModel"
+    },
+    "ILoader": {},
+    "IfNode": {
+      "inherits": "ASTNode"
+    },
+    "IncludeNode": {
+      "inherits": "ASTNode"
+    },
+    "JSONSerializer": {},
+    "JinjaContext": {},
+    "JinjaEnvironment": {},
+    "JinjaLexer": {},
+    "JinjaParser": {},
+    "JinjaRenderer": {},
+    "JinjaX": {},
+    "LabelStyle": {},
+    "LiteralNode": {
+      "inherits": "ASTNode"
+    },
+    "LoginVM": {
+      "inherits": "BaseViewModel"
+    },
+    "LogoutVM": {
+      "inherits": "BaseViewModel"
+    },
+    "MacroNode": {
+      "inherits": "ASTNode"
+    },
+    "MarkupSafe": {},
+    "MarkupString": {},
+    "NoteModel": {
+      "inherits": "BaseModel"
+    },
+    "NoteModelTests": {
+      "inherits": "TestGroup"
+    },
+    "NoteOwnershipTests": {
+      "inherits": "TestGroup"
+    },
+    "NoteTagAssociationTests": {
+      "inherits": "TestGroup"
+    },
+    "NotesAPICreateVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesAPIDetailVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesAPIListVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesCreateVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesDeleteVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesDetailVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesEditVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesListVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesNewVM": {
+      "inherits": "BaseViewModel"
+    },
+    "NotesPaginationTests": {
+      "inherits": "TestGroup"
+    },
+    "NotesUpdateVM": {
+      "inherits": "BaseViewModel"
+    },
+    "ObjectSpy": {},
+    "ObjectSpyTester": {},
+    "OutputNode": {
+      "inherits": "ASTNode"
+    },
+    "PassedTestStyle": {},
+    "QueryParser": {},
+    "RouteDefinition": {},
+    "Router": {},
+    "SetNode": {
+      "inherits": "ASTNode"
+    },
+    "SignupVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagModel": {
+      "inherits": "BaseModel"
+    },
+    "TagModelTests": {
+      "inherits": "TestGroup"
+    },
+    "TagsAPIDetailVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsAPIListVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsCreateVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsDeleteVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsDetailVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsEditVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsListVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsNewVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TagsUpdateVM": {
+      "inherits": "BaseViewModel"
+    },
+    "TemplateException": {
+      "inherits": "RuntimeException"
+    },
+    "TemplateNode": {
+      "inherits": "ASTNode"
+    },
+    "TemplateRenderException": {
+      "inherits": "TemplateException"
+    },
+    "TemplateSyntaxException": {
+      "inherits": "TemplateException"
+    },
+    "TestController": {},
+    "TestGroup": {},
+    "TestResult": {},
+    "TextNode": {
+      "inherits": "ASTNode"
+    },
+    "Token": {},
+    "TokenType": {},
+    "UnaryOpNode": {
+      "inherits": "ASTNode"
+    },
+    "UndefinedVariableException": {
+      "inherits": "TemplateException"
+    },
+    "UserModel": {
+      "inherits": "BaseModel"
+    },
+    "UserModelTests": {
+      "inherits": "TestGroup"
+    },
+    "VariableNode": {
+      "inherits": "ASTNode"
+    },
+    "WebTestController": {
+      "inherits": "TestController"
+    },
+    "XojoUnitFailTests": {
+      "inherits": "TestGroup"
+    },
+    "XojoUnitSuperClassTests": {
+      "inherits": "TestGroup"
+    },
+    "XojoUnitTestFailedException": {
+      "inherits": "RuntimeException"
+    },
+    "XojoUnitTests": {
+      "inherits": "XojoUnitSuperClassTests"
+    }
+  },
+  "reverse": {
+    "ASTNode": [
+      "IncludeNode",
+      "BinaryOpNode",
+      "UnaryOpNode",
+      "OutputNode",
+      "TextNode",
+      "IfNode",
+      "TemplateNode",
+      "ExtendsNode",
+      "SetNode",
+      "CallNode",
+      "GetItemNode",
+      "VariableNode",
+      "LiteralNode",
+      "GetAttrNode",
+      "ForNode",
+      "CompareNode",
+      "MacroNode",
+      "FilterNode",
+      "BlockNode"
+    ],
+    "BaseModel": [
+      "TagModel",
+      "UserModel",
+      "NoteModel"
+    ],
+    "BaseViewModel": [
+      "NotesDetailVM",
+      "NotesUpdateVM",
+      "NotesListVM",
+      "NotesAPIDetailVM",
+      "TagsCreateVM",
+      "NotesDeleteVM",
+      "TagsAPIDetailVM",
+      "TagsDeleteVM",
+      "TagsDetailVM",
+      "LoginVM",
+      "NotesAPIListVM",
+      "TagsAPIListVM",
+      "NotesCreateVM",
+      "TagsEditVM",
+      "TagsUpdateVM",
+      "TagsListVM",
+      "LogoutVM",
+      "HomeViewModel",
+      "TagsNewVM",
+      "SignupVM",
+      "NotesAPICreateVM",
+      "NotesNewVM",
+      "NotesEditVM"
+    ],
+    "RuntimeException": [
+      "XojoUnitTestFailedException",
+      "TemplateException"
+    ],
+    "TemplateException": [
+      "TemplateRenderException",
+      "UndefinedVariableException",
+      "TemplateSyntaxException"
+    ],
+    "TestController": [
+      "WebTestController"
+    ],
+    "TestGroup": [
+      "NoteOwnershipTests",
+      "NotesPaginationTests",
+      "XojoUnitFailTests",
+      "XojoUnitSuperClassTests",
+      "NoteModelTests",
+      "DBAdapterTests",
+      "NoteTagAssociationTests",
+      "BaseModelTests",
+      "UserModelTests",
+      "TagModelTests",
+      "APITests"
+    ],
+    "WebApplication": [
+      "App"
+    ],
+    "XojoUnitSuperClassTests": [
+      "XojoUnitTests"
+    ]
+  }
+}

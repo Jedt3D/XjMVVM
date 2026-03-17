@@ -14,7 +14,6 @@ mvvm.debug/
 *.xojo_backup
 
 # Xojo-specific artifacts
-.xojo_index/
 *.xojo_resources
 errors.txt
 
@@ -55,18 +54,6 @@ analyze.sh
 ziqBWdba
 
 ################################################################################
-# Database
-################################################################################
-
-# SQLite (except schema migration scripts)
-data/*.sqlite
-data/*.sqlite-*
-data/*.db
-
-# Keep data directory structure with .gitkeep
-!data/.gitkeep
-
-################################################################################
 # Python (Static Site Generator)
 ################################################################################
 
@@ -95,9 +82,6 @@ htmlcov/
 dist/
 build/
 
-# Developer guide build output
-developer-guide/dist/
-developer-guide/.DS_Store
 
 # Python temporary files
 .python-version

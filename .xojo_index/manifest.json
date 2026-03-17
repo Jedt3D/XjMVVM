@@ -1,0 +1,810 @@
+[
+  {
+    "path": "XojoUnit/Styles/HeadingStyle.xojo_code",
+    "type": "Module",
+    "entity": "HeadingStyle",
+    "size": 843,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 843
+  },
+  {
+    "path": "XojoUnit/Styles/LabelStyle.xojo_code",
+    "type": "Module",
+    "entity": "LabelStyle",
+    "size": 841,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 841
+  },
+  {
+    "path": "XojoUnit/Styles/PassedTestStyle.xojo_code",
+    "type": "Module",
+    "entity": "PassedTestStyle",
+    "size": 846,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 846
+  },
+  {
+    "path": "XojoUnit/Styles/FailedTestStyle.xojo_code",
+    "type": "Module",
+    "entity": "FailedTestStyle",
+    "size": 846,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 846
+  },
+  {
+    "path": "XojoUnit/TestFramework/XojoUnitTestFailedException.xojo_code",
+    "type": "Class",
+    "entity": "XojoUnitTestFailedException",
+    "size": 1203,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 1203
+  },
+  {
+    "path": "XojoUnit/TestFramework/Assert.xojo_code",
+    "type": "Class",
+    "entity": "Assert",
+    "size": 29514,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 29514
+  },
+  {
+    "path": "XojoUnit/TestFramework/ObjectSpy.xojo_code",
+    "type": "Class",
+    "entity": "ObjectSpy",
+    "size": 7001,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 7001
+  },
+  {
+    "path": "XojoUnit/TestFramework/TestResult.xojo_code",
+    "type": "Class",
+    "entity": "TestResult",
+    "size": 2568,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 2568
+  },
+  {
+    "path": "XojoUnit/TestFramework/TestController.xojo_code",
+    "type": "Class",
+    "entity": "TestController",
+    "size": 16766,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 16766
+  },
+  {
+    "path": "XojoUnit/TestFramework/TestGroup.xojo_code",
+    "type": "Class",
+    "entity": "TestGroup",
+    "size": 19993,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 19993
+  },
+  {
+    "path": "XojoUnit/Tests/ObjectSpyTester.xojo_code",
+    "type": "Class",
+    "entity": "ObjectSpyTester",
+    "size": 2014,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 2014
+  },
+  {
+    "path": "XojoUnit/Tests/XojoUnitFailTests.xojo_code",
+    "type": "Class",
+    "entity": "XojoUnitFailTests",
+    "size": 15055,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 15055
+  },
+  {
+    "path": "XojoUnit/Tests/XojoUnitTests.xojo_code",
+    "type": "Class",
+    "entity": "XojoUnitTests",
+    "size": 17486,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 17486
+  },
+  {
+    "path": "XojoUnit/Tests/XojoUnitSuperClassTests.xojo_code",
+    "type": "Class",
+    "entity": "XojoUnitSuperClassTests",
+    "size": 2744,
+    "modTime": "2026-03-11T22:24:23Z",
+    "sizeBytes": 2744
+  },
+  {
+    "path": "XojoUnit/WebTestController.xojo_code",
+    "type": "Class",
+    "entity": "WebTestController",
+    "size": 3188,
+    "modTime": "2026-03-12T16:14:05Z",
+    "sizeBytes": 3188
+  },
+  {
+    "path": "App.xojo_code",
+    "type": "Class",
+    "entity": "App",
+    "size": 9188,
+    "modTime": "2026-03-12T17:21:50Z",
+    "sizeBytes": 9188
+  },
+  {
+    "path": "Framework/FormParser.xojo_code",
+    "type": "Module",
+    "entity": "FormParser",
+    "size": 2220,
+    "modTime": "2026-03-12T03:52:37Z",
+    "sizeBytes": 2220
+  },
+  {
+    "path": "Framework/QueryParser.xojo_code",
+    "type": "Module",
+    "entity": "QueryParser",
+    "size": 506,
+    "modTime": "2026-03-11T21:32:26Z",
+    "sizeBytes": 506
+  },
+  {
+    "path": "Framework/BaseViewModel.xojo_code",
+    "type": "Class",
+    "entity": "BaseViewModel",
+    "size": 11239,
+    "modTime": "2026-03-12T17:14:28Z",
+    "sizeBytes": 11239
+  },
+  {
+    "path": "Framework/Router.xojo_code",
+    "type": "Class",
+    "entity": "Router",
+    "size": 5886,
+    "modTime": "2026-03-12T00:22:37Z",
+    "sizeBytes": 5886
+  },
+  {
+    "path": "Framework/RouteDefinition.xojo_code",
+    "type": "Class",
+    "entity": "RouteDefinition",
+    "size": 1053,
+    "modTime": "2026-03-11T18:05:45Z",
+    "sizeBytes": 1053
+  },
+  {
+    "path": "Framework/BaseModel.xojo_code",
+    "type": "Class",
+    "entity": "BaseModel",
+    "size": 6574,
+    "modTime": "2026-03-12T03:47:05Z",
+    "sizeBytes": 6574
+  },
+  {
+    "path": "Framework/DBAdapter.xojo_code",
+    "type": "Module",
+    "entity": "DBAdapter",
+    "size": 2163,
+    "modTime": "2026-03-12T16:10:36Z",
+    "sizeBytes": 2163
+  },
+  {
+    "path": "Framework/JSONSerializer.xojo_code",
+    "type": "Module",
+    "entity": "JSONSerializer",
+    "size": 1309,
+    "modTime": "2026-03-12T03:58:11Z",
+    "sizeBytes": 1309
+  },
+  {
+    "path": "Models/NoteModel.xojo_code",
+    "type": "Class",
+    "entity": "NoteModel",
+    "size": 5932,
+    "modTime": "2026-03-12T16:11:04Z",
+    "sizeBytes": 5932
+  },
+  {
+    "path": "Models/TagModel.xojo_code",
+    "type": "Class",
+    "entity": "TagModel",
+    "size": 2339,
+    "modTime": "2026-03-12T03:49:10Z",
+    "sizeBytes": 2339
+  },
+  {
+    "path": "Models/UserModel.xojo_code",
+    "type": "Class",
+    "entity": "UserModel",
+    "size": 3843,
+    "modTime": "2026-03-12T03:55:20Z",
+    "sizeBytes": 3843
+  },
+  {
+    "path": "ViewModels/HomeViewModel.xojo_code",
+    "type": "Class",
+    "entity": "HomeViewModel",
+    "size": 1169,
+    "modTime": "2026-03-11T23:12:45Z",
+    "sizeBytes": 1169
+  },
+  {
+    "path": "ViewModels/Notes/NotesListVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesListVM",
+    "size": 1353,
+    "modTime": "2026-03-12T16:12:05Z",
+    "sizeBytes": 1353
+  },
+  {
+    "path": "ViewModels/Notes/NotesNewVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesNewVM",
+    "size": 599,
+    "modTime": "2026-03-12T16:12:07Z",
+    "sizeBytes": 599
+  },
+  {
+    "path": "ViewModels/Notes/NotesCreateVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesCreateVM",
+    "size": 1021,
+    "modTime": "2026-03-12T16:12:12Z",
+    "sizeBytes": 1021
+  },
+  {
+    "path": "ViewModels/Notes/NotesDetailVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesDetailVM",
+    "size": 726,
+    "modTime": "2026-03-12T16:12:15Z",
+    "sizeBytes": 726
+  },
+  {
+    "path": "ViewModels/Notes/NotesEditVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesEditVM",
+    "size": 1386,
+    "modTime": "2026-03-12T16:12:17Z",
+    "sizeBytes": 1386
+  },
+  {
+    "path": "ViewModels/Notes/NotesUpdateVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesUpdateVM",
+    "size": 1067,
+    "modTime": "2026-03-12T16:12:23Z",
+    "sizeBytes": 1067
+  },
+  {
+    "path": "ViewModels/Notes/NotesDeleteVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesDeleteVM",
+    "size": 387,
+    "modTime": "2026-03-12T16:12:24Z",
+    "sizeBytes": 387
+  },
+  {
+    "path": "ViewModels/Tags/TagsListVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsListVM",
+    "size": 411,
+    "modTime": "2026-03-12T16:12:00Z",
+    "sizeBytes": 411
+  },
+  {
+    "path": "ViewModels/Tags/TagsDetailVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsDetailVM",
+    "size": 570,
+    "modTime": "2026-03-12T16:12:04Z",
+    "sizeBytes": 570
+  },
+  {
+    "path": "ViewModels/Tags/TagsNewVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsNewVM",
+    "size": 304,
+    "modTime": "2026-03-12T16:12:02Z",
+    "sizeBytes": 304
+  },
+  {
+    "path": "ViewModels/Tags/TagsCreateVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsCreateVM",
+    "size": 479,
+    "modTime": "2026-03-12T16:12:03Z",
+    "sizeBytes": 479
+  },
+  {
+    "path": "ViewModels/Tags/TagsEditVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsEditVM",
+    "size": 577,
+    "modTime": "2026-03-12T16:12:05Z",
+    "sizeBytes": 577
+  },
+  {
+    "path": "ViewModels/Tags/TagsUpdateVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsUpdateVM",
+    "size": 550,
+    "modTime": "2026-03-12T16:12:06Z",
+    "sizeBytes": 550
+  },
+  {
+    "path": "ViewModels/Tags/TagsDeleteVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsDeleteVM",
+    "size": 337,
+    "modTime": "2026-03-12T16:12:07Z",
+    "sizeBytes": 337
+  },
+  {
+    "path": "ViewModels/Auth/LoginVM.xojo_code",
+    "type": "Class",
+    "entity": "LoginVM",
+    "size": 1755,
+    "modTime": "2026-03-12T17:15:32Z",
+    "sizeBytes": 1755
+  },
+  {
+    "path": "ViewModels/Auth/LogoutVM.xojo_code",
+    "type": "Class",
+    "entity": "LogoutVM",
+    "size": 184,
+    "modTime": "2026-03-12T16:50:54Z",
+    "sizeBytes": 184
+  },
+  {
+    "path": "ViewModels/Auth/SignupVM.xojo_code",
+    "type": "Class",
+    "entity": "SignupVM",
+    "size": 1753,
+    "modTime": "2026-03-12T17:15:38Z",
+    "sizeBytes": 1753
+  },
+  {
+    "path": "ViewModels/API/NotesAPIListVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesAPIListVM",
+    "size": 365,
+    "modTime": "2026-03-12T16:12:13Z",
+    "sizeBytes": 365
+  },
+  {
+    "path": "ViewModels/API/NotesAPIDetailVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesAPIDetailVM",
+    "size": 867,
+    "modTime": "2026-03-12T16:12:18Z",
+    "sizeBytes": 867
+  },
+  {
+    "path": "ViewModels/API/NotesAPICreateVM.xojo_code",
+    "type": "Class",
+    "entity": "NotesAPICreateVM",
+    "size": 696,
+    "modTime": "2026-03-12T16:12:34Z",
+    "sizeBytes": 696
+  },
+  {
+    "path": "ViewModels/API/TagsAPIListVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsAPIListVM",
+    "size": 317,
+    "modTime": "2026-03-12T16:12:20Z",
+    "sizeBytes": 317
+  },
+  {
+    "path": "ViewModels/API/TagsAPIDetailVM.xojo_code",
+    "type": "Class",
+    "entity": "TagsAPIDetailVM",
+    "size": 489,
+    "modTime": "2026-03-12T16:12:21Z",
+    "sizeBytes": 489
+  },
+  {
+    "path": "Tests/DBAdapterTests.xojo_code",
+    "type": "Class",
+    "entity": "DBAdapterTests",
+    "size": 2777,
+    "modTime": "2026-03-11T22:43:44Z",
+    "sizeBytes": 2777
+  },
+  {
+    "path": "Tests/BaseModelTests.xojo_code",
+    "type": "Class",
+    "entity": "BaseModelTests",
+    "size": 5239,
+    "modTime": "2026-03-12T16:16:10Z",
+    "sizeBytes": 5239
+  },
+  {
+    "path": "Tests/NoteModelTests.xojo_code",
+    "type": "Class",
+    "entity": "NoteModelTests",
+    "size": 5167,
+    "modTime": "2026-03-12T16:14:09Z",
+    "sizeBytes": 5167
+  },
+  {
+    "path": "Tests/NotesPaginationTests.xojo_code",
+    "type": "Class",
+    "entity": "NotesPaginationTests",
+    "size": 5536,
+    "modTime": "2026-03-12T16:15:06Z",
+    "sizeBytes": 5536
+  },
+  {
+    "path": "Tests/TagModelTests.xojo_code",
+    "type": "Class",
+    "entity": "TagModelTests",
+    "size": 4631,
+    "modTime": "2026-03-12T03:49:09Z",
+    "sizeBytes": 4631
+  },
+  {
+    "path": "Tests/NoteTagAssociationTests.xojo_code",
+    "type": "Class",
+    "entity": "NoteTagAssociationTests",
+    "size": 5442,
+    "modTime": "2026-03-12T16:15:34Z",
+    "sizeBytes": 5442
+  },
+  {
+    "path": "Tests/UserModelTests.xojo_code",
+    "type": "Class",
+    "entity": "UserModelTests",
+    "size": 4631,
+    "modTime": "2026-03-12T03:54:50Z",
+    "sizeBytes": 4631
+  },
+  {
+    "path": "Tests/APITests.xojo_code",
+    "type": "Class",
+    "entity": "APITests",
+    "size": 5690,
+    "modTime": "2026-03-12T16:16:38Z",
+    "sizeBytes": 5690
+  },
+  {
+    "path": "Tests/NoteOwnershipTests.xojo_code",
+    "type": "Class",
+    "entity": "NoteOwnershipTests",
+    "size": 3815,
+    "modTime": "2026-03-12T16:14:03Z",
+    "sizeBytes": 3815
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/TokenType.xojo_code",
+    "type": "Module",
+    "entity": "TokenType",
+    "size": 4822,
+    "modTime": "2026-03-07T17:50:34Z",
+    "sizeBytes": 4822
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/MarkupSafe.xojo_code",
+    "type": "Module",
+    "entity": "MarkupSafe",
+    "size": 3369,
+    "modTime": "2026-03-07T17:17:05Z",
+    "sizeBytes": 3369
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX.xojo_code",
+    "type": "Module",
+    "entity": "JinjaX",
+    "size": 1004,
+    "modTime": "2026-03-07T18:28:33Z",
+    "sizeBytes": 1004
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/MarkupSafe/MarkupString.xojo_code",
+    "type": "Class",
+    "entity": "MarkupString",
+    "size": 2297,
+    "modTime": "2026-03-07T17:12:29Z",
+    "sizeBytes": 2297
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/ASTNode.xojo_code",
+    "type": "Class",
+    "entity": "ASTNode",
+    "size": 338,
+    "modTime": "2026-03-07T17:26:48Z",
+    "sizeBytes": 338
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/FilterCall.xojo_code",
+    "type": "Class",
+    "entity": "FilterCall",
+    "size": 430,
+    "modTime": "2026-03-07T17:26:49Z",
+    "sizeBytes": 430
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/ElseIfClause.xojo_code",
+    "type": "Class",
+    "entity": "ElseIfClause",
+    "size": 430,
+    "modTime": "2026-03-07T17:26:52Z",
+    "sizeBytes": 430
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/TextNode.xojo_code",
+    "type": "Class",
+    "entity": "TextNode",
+    "size": 380,
+    "modTime": "2026-03-07T17:26:53Z",
+    "sizeBytes": 380
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/OutputNode.xojo_code",
+    "type": "Class",
+    "entity": "OutputNode",
+    "size": 398,
+    "modTime": "2026-03-07T17:26:55Z",
+    "sizeBytes": 398
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/VariableNode.xojo_code",
+    "type": "Class",
+    "entity": "VariableNode",
+    "size": 579,
+    "modTime": "2026-03-07T17:26:57Z",
+    "sizeBytes": 579
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/LiteralNode.xojo_code",
+    "type": "Class",
+    "entity": "LiteralNode",
+    "size": 637,
+    "modTime": "2026-03-07T17:27:04Z",
+    "sizeBytes": 637
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/FilterNode.xojo_code",
+    "type": "Class",
+    "entity": "FilterNode",
+    "size": 706,
+    "modTime": "2026-03-07T17:27:06Z",
+    "sizeBytes": 706
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/IfNode.xojo_code",
+    "type": "Class",
+    "entity": "IfNode",
+    "size": 1019,
+    "modTime": "2026-03-07T17:27:23Z",
+    "sizeBytes": 1019
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/ForNode.xojo_code",
+    "type": "Class",
+    "entity": "ForNode",
+    "size": 889,
+    "modTime": "2026-03-07T17:27:24Z",
+    "sizeBytes": 889
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/BlockNode.xojo_code",
+    "type": "Class",
+    "entity": "BlockNode",
+    "size": 559,
+    "modTime": "2026-03-07T17:27:24Z",
+    "sizeBytes": 559
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/ExtendsNode.xojo_code",
+    "type": "Class",
+    "entity": "ExtendsNode",
+    "size": 418,
+    "modTime": "2026-03-07T17:27:24Z",
+    "sizeBytes": 418
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/IncludeNode.xojo_code",
+    "type": "Class",
+    "entity": "IncludeNode",
+    "size": 418,
+    "modTime": "2026-03-07T17:27:30Z",
+    "sizeBytes": 418
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/SetNode.xojo_code",
+    "type": "Class",
+    "entity": "SetNode",
+    "size": 515,
+    "modTime": "2026-03-07T17:27:32Z",
+    "sizeBytes": 515
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/MacroNode.xojo_code",
+    "type": "Class",
+    "entity": "MacroNode",
+    "size": 745,
+    "modTime": "2026-03-07T17:27:35Z",
+    "sizeBytes": 745
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/CallNode.xojo_code",
+    "type": "Class",
+    "entity": "CallNode",
+    "size": 585,
+    "modTime": "2026-03-07T17:27:37Z",
+    "sizeBytes": 585
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/BinaryOpNode.xojo_code",
+    "type": "Class",
+    "entity": "BinaryOpNode",
+    "size": 598,
+    "modTime": "2026-03-07T17:27:41Z",
+    "sizeBytes": 598
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/UnaryOpNode.xojo_code",
+    "type": "Class",
+    "entity": "UnaryOpNode",
+    "size": 503,
+    "modTime": "2026-03-07T17:27:41Z",
+    "sizeBytes": 503
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/CompareNode.xojo_code",
+    "type": "Class",
+    "entity": "CompareNode",
+    "size": 596,
+    "modTime": "2026-03-07T17:27:45Z",
+    "sizeBytes": 596
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/GetAttrNode.xojo_code",
+    "type": "Class",
+    "entity": "GetAttrNode",
+    "size": 493,
+    "modTime": "2026-03-07T17:27:48Z",
+    "sizeBytes": 493
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/GetItemNode.xojo_code",
+    "type": "Class",
+    "entity": "GetItemNode",
+    "size": 485,
+    "modTime": "2026-03-07T17:27:49Z",
+    "sizeBytes": 485
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateNode.xojo_code",
+    "type": "Class",
+    "entity": "TemplateNode",
+    "size": 464,
+    "modTime": "2026-03-07T17:27:52Z",
+    "sizeBytes": 464
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateException.xojo_code",
+    "type": "Class",
+    "entity": "TemplateException",
+    "size": 685,
+    "modTime": "2026-03-07T17:27:58Z",
+    "sizeBytes": 685
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateSyntaxException.xojo_code",
+    "type": "Class",
+    "entity": "TemplateSyntaxException",
+    "size": 494,
+    "modTime": "2026-03-07T17:28:00Z",
+    "sizeBytes": 494
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/UndefinedVariableException.xojo_code",
+    "type": "Class",
+    "entity": "UndefinedVariableException",
+    "size": 369,
+    "modTime": "2026-03-07T17:28:02Z",
+    "sizeBytes": 369
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateRenderException.xojo_code",
+    "type": "Class",
+    "entity": "TemplateRenderException",
+    "size": 401,
+    "modTime": "2026-03-07T17:28:03Z",
+    "sizeBytes": 401
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/Token.xojo_code",
+    "type": "Class",
+    "entity": "Token",
+    "size": 859,
+    "modTime": "2026-03-07T17:45:16Z",
+    "sizeBytes": 859
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaLexer.xojo_code",
+    "type": "Class",
+    "entity": "JinjaLexer",
+    "size": 16921,
+    "modTime": "2026-03-07T17:33:53Z",
+    "sizeBytes": 16921
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaParser.xojo_code",
+    "type": "Class",
+    "entity": "JinjaParser",
+    "size": 27455,
+    "modTime": "2026-03-07T18:16:47Z",
+    "sizeBytes": 27455
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaContext.xojo_code",
+    "type": "Class",
+    "entity": "JinjaContext",
+    "size": 2405,
+    "modTime": "2026-03-07T18:28:46Z",
+    "sizeBytes": 2405
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaEnvironment.xojo_code",
+    "type": "Class",
+    "entity": "JinjaEnvironment",
+    "size": 3738,
+    "modTime": "2026-03-08T03:46:54Z",
+    "sizeBytes": 3738
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/CompiledTemplate.xojo_code",
+    "type": "Class",
+    "entity": "CompiledTemplate",
+    "size": 1946,
+    "modTime": "2026-03-07T18:47:26Z",
+    "sizeBytes": 1946
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/BuiltInFilters.xojo_code",
+    "type": "Class",
+    "entity": "BuiltInFilters",
+    "size": 5580,
+    "modTime": "2026-03-07T18:29:17Z",
+    "sizeBytes": 5580
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaRenderer.xojo_code",
+    "type": "Class",
+    "entity": "JinjaRenderer",
+    "size": 15352,
+    "modTime": "2026-03-07T19:53:16Z",
+    "sizeBytes": 15352
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/ILoader.xojo_code",
+    "type": "Interface",
+    "entity": "ILoader",
+    "size": 290,
+    "modTime": "2026-03-07T18:58:34Z",
+    "sizeBytes": 290
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/DictLoader.xojo_code",
+    "type": "Class",
+    "entity": "DictLoader",
+    "size": 1981,
+    "modTime": "2026-03-07T18:58:43Z",
+    "sizeBytes": 1981
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/FileSystemLoader.xojo_code",
+    "type": "Class",
+    "entity": "FileSystemLoader",
+    "size": 3060,
+    "modTime": "2026-03-08T03:46:38Z",
+    "sizeBytes": 3060
+  },
+  {
+    "path": "../JinjaX/JinjaX/JinjaXLib/JinjaX/ExtendsResolver.xojo_code",
+    "type": "Class",
+    "entity": "ExtendsResolver",
+    "size": 3492,
+    "modTime": "2026-03-07T18:59:26Z",
+    "sizeBytes": 3492
+  }
+]

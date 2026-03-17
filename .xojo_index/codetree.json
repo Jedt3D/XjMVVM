@@ -1,0 +1,1904 @@
+{
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX.xojo_code": {
+    "type": "Module",
+    "entity": "JinjaX",
+    "methods": {},
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/ASTNode.xojo_code": {
+    "type": "Class",
+    "entity": "ASTNode",
+    "methods": {
+      "Constructor": 3,
+      "NodeType": 9
+    },
+    "properties": {
+      "LineNumber": 16
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/BinaryOpNode.xojo_code": {
+    "type": "Class",
+    "entity": "BinaryOpNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 13
+    },
+    "properties": {
+      "Left": 20,
+      "Operator": 24,
+      "Right": 28
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/BlockNode.xojo_code": {
+    "type": "Class",
+    "entity": "BlockNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddBodyNode": 17,
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "Body()": 28,
+      "Name": 24
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/BuiltInFilters.xojo_code": {
+    "type": "Class",
+    "entity": "BuiltInFilters",
+    "methods": {
+      "FilterCapitalize": 44,
+      "FilterDefault": 67,
+      "FilterFirst": 142,
+      "FilterFloat": 99,
+      "FilterInt": 87,
+      "FilterJoin": 119,
+      "FilterLast": 151,
+      "FilterLength": 60,
+      "FilterLower": 30,
+      "FilterReplace": 130,
+      "FilterString": 111,
+      "FilterTitle": 37,
+      "FilterTrim": 53,
+      "FilterUpper": 23,
+      "RegisterAll": 3
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/CallNode.xojo_code": {
+    "type": "Class",
+    "entity": "CallNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddArgument": 17,
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "Arguments()": 28,
+      "MacroName": 24
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/CompareNode.xojo_code": {
+    "type": "Class",
+    "entity": "CompareNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 13
+    },
+    "properties": {
+      "Left": 20,
+      "Operator": 24,
+      "Right": 28
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/CompiledTemplate.xojo_code": {
+    "type": "Class",
+    "entity": "CompiledTemplate",
+    "methods": {
+      "Constructor": 3,
+      "GetAST": 10,
+      "GetEnvironment": 16,
+      "Render": 22
+    },
+    "properties": {
+      "Private": 44
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/DictLoader.xojo_code": {
+    "type": "Class",
+    "entity": "DictLoader",
+    "implements": [
+      "JinjaX.ILoader"
+    ],
+    "methods": {
+      "AddTemplate": 36,
+      "Constructor": 10,
+      "GetSource": 20,
+      "HasTemplate": 30,
+      "RemoveTemplate": 42
+    },
+    "properties": {
+      "Private": 51
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/ElseIfClause.xojo_code": {
+    "type": "Class",
+    "entity": "ElseIfClause",
+    "methods": {
+      "AddNode": 9,
+      "Constructor": 3
+    },
+    "properties": {
+      "Body()": 20,
+      "Condition": 16
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/ExtendsNode.xojo_code": {
+    "type": "Class",
+    "entity": "ExtendsNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "TemplateName": 18
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/ExtendsResolver.xojo_code": {
+    "type": "Class",
+    "entity": "ExtendsResolver",
+    "methods": {
+      "CollectBlocks": 51,
+      "MergeNode": 63,
+      "Resolve": 3
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/FileSystemLoader.xojo_code": {
+    "type": "Class",
+    "entity": "FileSystemLoader",
+    "implements": [
+      "JinjaX.ILoader"
+    ],
+    "methods": {
+      "Constructor": 10,
+      "GetSource": 19,
+      "HasTemplate": 50
+    },
+    "properties": {
+      "Private": 66
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/FilterCall.xojo_code": {
+    "type": "Class",
+    "entity": "FilterCall",
+    "methods": {
+      "AddArgument": 9,
+      "Constructor": 3
+    },
+    "properties": {
+      "Arguments()": 20,
+      "FilterName": 16
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/FilterNode.xojo_code": {
+    "type": "Class",
+    "entity": "FilterNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddArgument": 18,
+      "Constructor": 4,
+      "NodeType": 12
+    },
+    "properties": {
+      "Arguments()": 33,
+      "Expression": 25,
+      "FilterName": 29
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/ForNode.xojo_code": {
+    "type": "Class",
+    "entity": "ForNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddBodyNode": 18,
+      "AddElseNode": 24,
+      "Constructor": 4,
+      "NodeType": 12
+    },
+    "properties": {
+      "Body()": 39,
+      "ElseBody()": 43,
+      "Iterable": 35,
+      "VariableName": 31
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/GetAttrNode.xojo_code": {
+    "type": "Class",
+    "entity": "GetAttrNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 12
+    },
+    "properties": {
+      "Attribute": 23,
+      "Obj": 19
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/GetItemNode.xojo_code": {
+    "type": "Class",
+    "entity": "GetItemNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 12
+    },
+    "properties": {
+      "Index": 23,
+      "Obj": 19
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/ILoader.xojo_code": {
+    "type": "Interface",
+    "entity": "ILoader",
+    "methods": {
+      "GetSource": 3,
+      "HasTemplate": 9
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/IfNode.xojo_code": {
+    "type": "Class",
+    "entity": "IfNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddElseIf": 23,
+      "AddElseNode": 30,
+      "AddTrueNode": 17,
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "Condition": 37,
+      "ElseBody()": 49,
+      "ElseIfClauses()": 45,
+      "TrueBody()": 41
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/IncludeNode.xojo_code": {
+    "type": "Class",
+    "entity": "IncludeNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "TemplateName": 18
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaContext.xojo_code": {
+    "type": "Class",
+    "entity": "JinjaContext",
+    "methods": {
+      "Constructor": 3,
+      "GetVariable": 31,
+      "HasVariable": 43,
+      "PopScope": 16,
+      "PushScope": 10,
+      "ScopeDepth": 61,
+      "SetGlobalVariable": 54,
+      "SetVariable": 24
+    },
+    "properties": {
+      "Private": 68
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaEnvironment.xojo_code": {
+    "type": "Class",
+    "entity": "JinjaEnvironment",
+    "methods": {
+      "Constructor": 3,
+      "FromString": 36,
+      "GetFilter": 21,
+      "GetLoader": 57,
+      "GetTemplate": 63,
+      "HasFilter": 30,
+      "RegisterFilter": 15,
+      "SetLoader": 51,
+      "TemplatePath": 80
+    },
+    "properties": {
+      "Autoescape": 89,
+      "LStripBlocks": 97,
+      "Private": 109,
+      "TrimBlocks": 93
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaLexer.xojo_code": {
+    "type": "Class",
+    "entity": "JinjaLexer",
+    "methods": {
+      "Constructor": 3,
+      "CurrentChar": 477,
+      "EmitDataToken": 104,
+      "IsDigit": 501,
+      "IsIdentifierChar": 513,
+      "IsIdentifierStart": 507,
+      "IsWhitespace": 495,
+      "PeekChar": 486,
+      "ScanIdentifier": 407,
+      "ScanInsideBlock": 115,
+      "ScanNumber": 373,
+      "ScanOutsideBlock": 65,
+      "ScanStringLiteral": 316,
+      "ScanToken": 147,
+      "SkipComment": 432,
+      "SkipWhitespace": 452,
+      "StartsWithDelimiter": 466,
+      "Tokenize": 35,
+      "UpdateLineColumn": 519,
+      "UpdateLineColumnForString": 530
+    },
+    "properties": {
+      "Private": 596
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaParser.xojo_code": {
+    "type": "Class",
+    "entity": "JinjaParser",
+    "methods": {
+      "Advance": 742,
+      "Constructor": 3,
+      "CurrentToken": 733,
+      "Expect": 756,
+      "ExpectKeyword": 776,
+      "ExpectName": 770,
+      "IsAtEnd": 750,
+      "IsBlockKeyword": 813,
+      "IsEndKeyword": 828,
+      "Parse": 9,
+      "ParseAdditiveExpression": 541,
+      "ParseAndExpression": 458,
+      "ParseBlockDefinition": 256,
+      "ParseBlockStatement": 55,
+      "ParseCallStatement": 398,
+      "ParseComparisonExpression": 484,
+      "ParseExpression": 438,
+      "ParseExtendsStatement": 297,
+      "ParseForStatement": 192,
+      "ParseIfStatement": 95,
+      "ParseIncludeStatement": 328,
+      "ParseListLiteral": 713,
+      "ParseMacroStatement": 346,
+      "ParseMultiplicativeExpression": 557,
+      "ParseNotExpression": 472,
+      "ParseOrExpression": 444,
+      "ParseOutputNode": 43,
+      "ParsePostfixExpression": 594,
+      "ParsePrimaryExpression": 659,
+      "ParseSetStatement": 315,
+      "ParseTextNode": 35,
+      "ParseUnaryExpression": 575,
+      "PeekBlockKeyword": 798,
+      "SkipToBlockEnd": 787
+    },
+    "properties": {
+      "Private": 846
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaRenderer.xojo_code": {
+    "type": "Class",
+    "entity": "JinjaRenderer",
+    "methods": {
+      "ApplyFilterCall": 215,
+      "AutoEscape": 354,
+      "CheckInOperator": 438,
+      "Constructor": 3,
+      "EvaluateBinaryOp": 233,
+      "EvaluateCompare": 292,
+      "EvaluateExpression": 155,
+      "EvaluateFilterNode": 195,
+      "EvaluateGetAttr": 320,
+      "EvaluateGetItem": 336,
+      "EvaluateUnaryOp": 275,
+      "IsTruthy": 373,
+      "Render": 10,
+      "RenderBlock": 121,
+      "RenderFor": 75,
+      "RenderIf": 55,
+      "RenderInclude": 127,
+      "RenderNode": 21,
+      "RenderNodeList": 145,
+      "RenderOutput": 48,
+      "RenderSet": 113,
+      "RenderText": 42,
+      "ToVariantArray": 457,
+      "VariantToString": 398,
+      "VariantsEqual": 419
+    },
+    "properties": {
+      "Private": 512
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/LiteralNode.xojo_code": {
+    "type": "Class",
+    "entity": "LiteralNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 12
+    },
+    "properties": {
+      "LiteralType": 23,
+      "Value": 19
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/MacroNode.xojo_code": {
+    "type": "Class",
+    "entity": "MacroNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddBodyNode": 23,
+      "AddParam": 17,
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "Body()": 38,
+      "Name": 30,
+      "Params()": 34
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/OutputNode.xojo_code": {
+    "type": "Class",
+    "entity": "OutputNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "Expression": 18
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/SetNode.xojo_code": {
+    "type": "Class",
+    "entity": "SetNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 12
+    },
+    "properties": {
+      "Value": 23,
+      "VariableName": 19
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateException.xojo_code": {
+    "type": "Class",
+    "entity": "TemplateException",
+    "inherits": "RuntimeException",
+    "methods": {
+      "Constructor": 13
+    },
+    "properties": {
+      "TemplateLineNumber": 27,
+      "TemplateName": 23
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateNode.xojo_code": {
+    "type": "Class",
+    "entity": "TemplateNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddNode": 16,
+      "Constructor": 4,
+      "NodeType": 10
+    },
+    "properties": {
+      "Body()": 23
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateRenderException.xojo_code": {
+    "type": "Class",
+    "entity": "TemplateRenderException",
+    "inherits": "TemplateException",
+    "methods": {
+      "Constructor": 10
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateSyntaxException.xojo_code": {
+    "type": "Class",
+    "entity": "TemplateSyntaxException",
+    "inherits": "TemplateException",
+    "methods": {
+      "Constructor": 11
+    },
+    "properties": {
+      "Source": 19
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/TextNode.xojo_code": {
+    "type": "Class",
+    "entity": "TextNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "Text": 18
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/Token.xojo_code": {
+    "type": "Class",
+    "entity": "Token",
+    "methods": {
+      "Constructor": 3,
+      "ToString": 12
+    },
+    "properties": {
+      "ColumnNumber": 31,
+      "LineNumber": 27,
+      "Type": 19,
+      "Value": 23
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/UnaryOpNode.xojo_code": {
+    "type": "Class",
+    "entity": "UnaryOpNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "Constructor": 4,
+      "NodeType": 12
+    },
+    "properties": {
+      "Operand": 23,
+      "Operator": 19
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/UndefinedVariableException.xojo_code": {
+    "type": "Class",
+    "entity": "UndefinedVariableException",
+    "inherits": "TemplateException",
+    "methods": {
+      "Constructor": 4
+    },
+    "properties": {
+      "VariableName": 12
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/JinjaX/VariableNode.xojo_code": {
+    "type": "Class",
+    "entity": "VariableNode",
+    "inherits": "ASTNode",
+    "methods": {
+      "AddFilter": 17,
+      "Constructor": 4,
+      "NodeType": 11
+    },
+    "properties": {
+      "Filters()": 28,
+      "Name": 24
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/MarkupSafe.xojo_code": {
+    "type": "Module",
+    "entity": "MarkupSafe",
+    "methods": {
+      "Escape": 3,
+      "EscapeString": 18,
+      "Join": 65,
+      "SoftStr": 75,
+      "UnescapeString": 91
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/MarkupSafe/MarkupString.xojo_code": {
+    "type": "Class",
+    "entity": "MarkupString",
+    "methods": {
+      "Constructor": 9,
+      "Escaped": 19,
+      "IsEmpty": 25,
+      "Length": 31,
+      "Lowercase": 37,
+      "Operator_Add": 43,
+      "Operator_Compare": 59,
+      "ToString": 77,
+      "Trim": 83,
+      "Unescaped": 89,
+      "Uppercase": 95
+    },
+    "properties": {
+      "mValue": 102
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "../JinjaX/JinjaX/JinjaXLib/TokenType.xojo_code": {
+    "type": "Module",
+    "entity": "TokenType",
+    "methods": {
+      "TokenName": 3
+    },
+    "properties": {},
+    "events": {},
+    "constants": {
+      "TYPE_ASSIGN": 59,
+      "TYPE_BLOCK_BEGIN": 62,
+      "TYPE_BLOCK_END": 65,
+      "TYPE_COLON": 68,
+      "TYPE_COMMA": 71,
+      "TYPE_COMMENT_BEGIN": 74,
+      "TYPE_COMMENT_END": 77,
+      "TYPE_DATA": 80,
+      "TYPE_DOT": 83,
+      "TYPE_EOF": 86,
+      "TYPE_FLOAT": 89,
+      "TYPE_INTEGER": 92,
+      "TYPE_KEYWORD": 95,
+      "TYPE_LBRACKET": 98,
+      "TYPE_LPAREN": 101,
+      "TYPE_NAME": 104,
+      "TYPE_OPERATOR": 107,
+      "TYPE_PIPE": 110,
+      "TYPE_RBRACKET": 113,
+      "TYPE_RPAREN": 116,
+      "TYPE_STRING": 119,
+      "TYPE_VARIABLE_BEGIN": 122,
+      "TYPE_VARIABLE_END": 125
+    },
+    "enums": {},
+    "hooks": {}
+  },
+  "App.xojo_code": {
+    "type": "Class",
+    "entity": "App",
+    "inherits": "WebApplication",
+    "methods": {
+      "CreateHomeVM": 101,
+      "CreateLoginVM": 191,
+      "CreateLogoutVM": 197,
+      "CreateNotesAPICreateVM": 221,
+      "CreateNotesAPIDetailVM": 215,
+      "CreateNotesAPIListVM": 209,
+      "CreateNotesCreateVM": 107,
+      "CreateNotesDeleteVM": 113,
+      "CreateNotesDetailVM": 119,
+      "CreateNotesEditVM": 125,
+      "CreateNotesListVM": 131,
+      "CreateNotesNewVM": 137,
+      "CreateNotesUpdateVM": 143,
+      "CreateSignupVM": 203,
+      "CreateTagsAPIDetailVM": 233,
+      "CreateTagsAPIListVM": 227,
+      "CreateTagsCreateVM": 167,
+      "CreateTagsDeleteVM": 185,
+      "CreateTagsDetailVM": 155,
+      "CreateTagsEditVM": 173,
+      "CreateTagsListVM": 149,
+      "CreateTagsNewVM": 161,
+      "CreateTagsUpdateVM": 179,
+      "ServeStatic": 239
+    },
+    "properties": {
+      "mAuthSecret": 294,
+      "mJinja": 286,
+      "mRouter": 290
+    },
+    "events": {
+      "HandleURL": 4,
+      "Opening": 44
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/BaseModel.xojo_code": {
+    "type": "Class",
+    "entity": "BaseModel",
+    "methods": {
+      "Columns": 9,
+      "Count": 33,
+      "DeleteByID": 162,
+      "FindAll": 63,
+      "FindByID": 80,
+      "FindPaginated": 45,
+      "Insert": 96,
+      "OpenDB": 15,
+      "RowToDict": 21,
+      "TableName": 3,
+      "UpdateByID": 130
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/BaseViewModel.xojo_code": {
+    "type": "Class",
+    "entity": "BaseViewModel",
+    "methods": {
+      "AuthCookieValue": 173,
+      "CurrentUserID": 141,
+      "CurrentUsername": 149,
+      "GetFormValue": 3,
+      "GetParam": 17,
+      "Handle": 34,
+      "OnGet": 53,
+      "OnPost": 60,
+      "ParseAuthCookie": 210,
+      "Redirect": 67,
+      "RedirectWithAuth": 181,
+      "RedirectWithLogout": 197,
+      "Render": 76,
+      "RenderError": 103,
+      "RequireLogin": 130,
+      "RequireLoginJSON": 157,
+      "SetFlash": 120,
+      "WriteJSON": 166
+    },
+    "properties": {
+      "Jinja": 262,
+      "PathParams": 282,
+      "Private": 278,
+      "Request": 286,
+      "Response": 290,
+      "Session": 294
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/DBAdapter.xojo_code": {
+    "type": "Module",
+    "entity": "DBAdapter",
+    "methods": {
+      "Connect": 3,
+      "InitDB": 15
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/FormParser.xojo_code": {
+    "type": "Module",
+    "entity": "FormParser",
+    "methods": {
+      "DecodeURIComponent": 32,
+      "Parse": 3
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/JSONSerializer.xojo_code": {
+    "type": "Module",
+    "entity": "JSONSerializer",
+    "methods": {
+      "ArrayToJSON": 26,
+      "DictToJSON": 14,
+      "EscapeString": 3
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/QueryParser.xojo_code": {
+    "type": "Module",
+    "entity": "QueryParser",
+    "methods": {
+      "Parse": 3
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/RouteDefinition.xojo_code": {
+    "type": "Class",
+    "entity": "RouteDefinition",
+    "methods": {},
+    "properties": {
+      "Factory": 11,
+      "Method": 3,
+      "Pattern": 7
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Framework/Router.xojo_code": {
+    "type": "Class",
+    "entity": "Router",
+    "methods": {
+      "Any": 23,
+      "Get": 3,
+      "ParsePath": 76,
+      "Post": 13,
+      "Route": 33,
+      "Serve404": 103,
+      "Serve500": 121
+    },
+    "properties": {
+      "Private": 144
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Models/NoteModel.xojo_code": {
+    "type": "Class",
+    "entity": "NoteModel",
+    "inherits": "BaseModel",
+    "methods": {
+      "Columns": 10,
+      "CountForUser": 74,
+      "Create": 48,
+      "Delete": 66,
+      "FindPaginatedForUser": 86,
+      "GetAll": 16,
+      "GetByID": 32,
+      "GetTagsForNote": 104,
+      "SetTagsForNote": 126,
+      "TableName": 4,
+      "Update": 58
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Models/TagModel.xojo_code": {
+    "type": "Class",
+    "entity": "TagModel",
+    "inherits": "BaseModel",
+    "methods": {
+      "Columns": 10,
+      "Create": 28,
+      "Delete": 46,
+      "GetAll": 16,
+      "GetByID": 22,
+      "TableName": 4,
+      "Update": 38
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Models/UserModel.xojo_code": {
+    "type": "Class",
+    "entity": "UserModel",
+    "inherits": "BaseModel",
+    "methods": {
+      "Columns": 10,
+      "Create": 16,
+      "FindByUsername": 33,
+      "GenerateSalt": 68,
+      "HashPassword": 76,
+      "TableName": 4,
+      "VerifyPassword": 53
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/APITests.xojo_code": {
+    "type": "Class",
+    "entity": "APITests",
+    "inherits": "TestGroup",
+    "methods": {
+      "ArrayToJSON": 82,
+      "DictToJSON": 67,
+      "NoteToJSONIncludesKeysTest": 21,
+      "NotesArrayToJSONIsArrayTest": 51,
+      "TagToJSONIncludesKeysTest": 37
+    },
+    "properties": {
+      "Private": 98
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/BaseModelTests.xojo_code": {
+    "type": "Class",
+    "entity": "BaseModelTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "DeleteByIDRemovesRowTest": 57,
+      "FindAllReturnsArrayTest": 17,
+      "FindByIDReturnsNilForMissingTest": 72,
+      "InsertAndFindByIDTest": 26,
+      "UpdateByIDChangesValuesTest": 39
+    },
+    "properties": {
+      "Private": 82
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/DBAdapterTests.xojo_code": {
+    "type": "Class",
+    "entity": "DBAdapterTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "ConnectReturnsValidConnectionTest": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/NoteModelTests.xojo_code": {
+    "type": "Class",
+    "entity": "NoteModelTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "CreateReturnsIDTest": 16,
+      "DeleteRemovesNoteTest": 68,
+      "GetAllIncludesNewNoteTest": 25,
+      "GetByIDMatchesTitleTest": 43,
+      "UpdateChangesTitleTest": 55
+    },
+    "properties": {
+      "Private": 82
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/NoteOwnershipTests.xojo_code": {
+    "type": "Class",
+    "entity": "NoteOwnershipTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "DeleteDoesNotAffectOtherUsersNoteTest": 29,
+      "GetByIDReturnsNilForWrongUserTest": 16
+    },
+    "properties": {
+      "Private": 45
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/NoteTagAssociationTests.xojo_code": {
+    "type": "Class",
+    "entity": "NoteTagAssociationTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "SetAndGetTagsTest": 21,
+      "SetEmptyTagsClearsAllTest": 73,
+      "SetTagsOverwritesPreviousTest": 43
+    },
+    "properties": {
+      "Private": 101
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/NotesPaginationTests.xojo_code": {
+    "type": "Class",
+    "entity": "NotesPaginationTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "CountIncreasesAfterCreateTest": 25,
+      "CountReturnsNonNegativeTest": 16,
+      "FindPaginatedLargeOffsetEmptyTest": 71,
+      "FindPaginatedOffsetReturnsDifferentRowsTest": 49,
+      "FindPaginatedRespectsLimitTest": 36
+    },
+    "properties": {
+      "Private": 81
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/TagModelTests.xojo_code": {
+    "type": "Class",
+    "entity": "TagModelTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "CreateReturnsIDTest": 15,
+      "DeleteRemovesTagTest": 63,
+      "GetAllIncludesNewTagTest": 23,
+      "GetByIDMatchesNameTest": 40,
+      "UpdateChangesNameTest": 51
+    },
+    "properties": {
+      "Private": 75
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "Tests/UserModelTests.xojo_code": {
+    "type": "Class",
+    "entity": "UserModelTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "CreateReturnsIDTest": 15,
+      "FindByUsernameTest": 23,
+      "FindByUsernameUnknownReturnsNilTest": 35,
+      "VerifyCorrectPasswordTest": 43,
+      "VerifyWrongPasswordTest": 53
+    },
+    "properties": {
+      "Private": 64
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/API/NotesAPICreateVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesAPICreateVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/API/NotesAPIDetailVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesAPIDetailVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/API/NotesAPIListVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesAPIListVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/API/TagsAPIDetailVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsAPIDetailVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/API/TagsAPIListVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsAPIListVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Auth/LoginVM.xojo_code": {
+    "type": "Class",
+    "entity": "LoginVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4,
+      "OnPost": 21,
+      "RenderLoginWithError": 47
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Auth/LogoutVM.xojo_code": {
+    "type": "Class",
+    "entity": "LogoutVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Auth/SignupVM.xojo_code": {
+    "type": "Class",
+    "entity": "SignupVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4,
+      "OnPost": 18,
+      "RenderSignupWithError": 57
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/HomeViewModel.xojo_code": {
+    "type": "Class",
+    "entity": "HomeViewModel",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Notes/NotesCreateVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesCreateVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Notes/NotesDeleteVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesDeleteVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Notes/NotesDetailVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesDetailVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Notes/NotesEditVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesEditVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Notes/NotesListVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesListVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Notes/NotesNewVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesNewVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Notes/NotesUpdateVM.xojo_code": {
+    "type": "Class",
+    "entity": "NotesUpdateVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Tags/TagsCreateVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsCreateVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Tags/TagsDeleteVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsDeleteVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Tags/TagsDetailVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsDetailVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Tags/TagsEditVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsEditVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Tags/TagsListVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsListVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Tags/TagsNewVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsNewVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnGet": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "ViewModels/Tags/TagsUpdateVM.xojo_code": {
+    "type": "Class",
+    "entity": "TagsUpdateVM",
+    "inherits": "BaseViewModel",
+    "methods": {
+      "OnPost": 4
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Styles/FailedTestStyle.xojo_code": {
+    "type": "Module",
+    "entity": "FailedTestStyle",
+    "methods": {},
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Styles/HeadingStyle.xojo_code": {
+    "type": "Module",
+    "entity": "HeadingStyle",
+    "methods": {},
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Styles/LabelStyle.xojo_code": {
+    "type": "Module",
+    "entity": "LabelStyle",
+    "methods": {},
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Styles/PassedTestStyle.xojo_code": {
+    "type": "Module",
+    "entity": "PassedTestStyle",
+    "methods": {},
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/TestFramework/Assert.xojo_code": {
+    "type": "Class",
+    "entity": "Assert",
+    "methods": {
+      "AreDifferent": 24,
+      "AreEqual": 361,
+      "AreNotEqual": 612,
+      "AreSame": 712,
+      "AreSameBytes": 723,
+      "Destructor": 742,
+      "DoesNotMatch": 748,
+      "EncodeHexNewMB": 767,
+      "Fail": 780,
+      "FailEqualMessage": 803,
+      "IsFalse": 813,
+      "IsNil": 823,
+      "IsNotNil": 834,
+      "IsTrue": 845,
+      "Matches": 855,
+      "Message": 874,
+      "Pass": 896
+    },
+    "properties": {
+      "FailCount": 916,
+      "Failed": 920,
+      "Get": 924,
+      "Private": 946
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/TestFramework/ObjectSpy.xojo_code": {
+    "type": "Class",
+    "entity": "ObjectSpy",
+    "methods": {
+      "Constructor": 3,
+      "DoParametersMatch": 15,
+      "IsNumberType": 88,
+      "MatchMethod": 114,
+      "MatchProperty": 154,
+      "Operator_Lookup": 204
+    },
+    "properties": {
+      "Private": 222
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/TestFramework/TestController.xojo_code": {
+    "type": "Class",
+    "entity": "TestController",
+    "methods": {
+      "AddGroup": 3,
+      "CalculateDuration": 9,
+      "ExportTestResults": 16,
+      "FilterTests": 79,
+      "Finish": 213,
+      "LoadTestGroups": 222,
+      "PatternHasDot": 228,
+      "RaiseGroupFinished": 234,
+      "RaiseTestFinished": 241,
+      "ResetDuration": 248,
+      "RunNextTest": 257,
+      "RunTestGroups": 270,
+      "SimplePatternToRegExPattern": 289,
+      "Start": 312,
+      "Stop": 319,
+      "TestGroups": 331
+    },
+    "properties": {
+      "Get": 510,
+      "Private": 519
+    },
+    "events": {},
+    "constants": {
+      "XojoUnitVersion": 527,
+      "kHasDotComment": 524
+    },
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/TestFramework/TestGroup.xojo_code": {
+    "type": "Class",
+    "entity": "TestGroup",
+    "methods": {
+      "AsyncAwait": 3,
+      "AsyncComplete": 13,
+      "CalculateTestDuration": 24,
+      "ClearResults": 51,
+      "Constructor": 93,
+      "Destructor": 160,
+      "ErrorIf": 179,
+      "GetTestMethods": 185,
+      "GetTestResult": 219,
+      "GetTestTimer": 229,
+      "LogTestTimer": 240,
+      "ResetTestDuration": 285,
+      "Results": 291,
+      "RunTestsTimer_Action": 297,
+      "SetIncludeMethods": 432,
+      "Start": 441,
+      "StartTestTimer": 459,
+      "Stop": 470
+    },
+    "properties": {
+      "Attributes(": 608,
+      "CurrentTestResult": 536,
+      "Get": 710,
+      "IncludeGroup": 574,
+      "Name": 612,
+      "Private": 727,
+      "Protected": 578
+    },
+    "events": {},
+    "constants": {
+      "kTestSuffix": 732,
+      "kTimerPeriod": 735
+    },
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/TestFramework/TestResult.xojo_code": {
+    "type": "Class",
+    "entity": "TestResult",
+    "methods": {},
+    "properties": {
+      "Duration": 3,
+      "IncludeMethod": 7,
+      "Message": 11,
+      "MethodInfo": 15,
+      "Result": 19,
+      "TestName": 23
+    },
+    "events": {},
+    "constants": {
+      "Failed": 28,
+      "NotImplemented": 31,
+      "Passed": 34,
+      "Skipped": 37
+    },
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/TestFramework/XojoUnitTestFailedException.xojo_code": {
+    "type": "Class",
+    "entity": "XojoUnitTestFailedException",
+    "inherits": "RuntimeException",
+    "methods": {},
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Tests/ObjectSpyTester.xojo_code": {
+    "type": "Class",
+    "entity": "ObjectSpyTester",
+    "methods": {
+      "Add": 16,
+      "AddParams": 22,
+      "AddToArray": 35,
+      "SharedAdd": 43
+    },
+    "properties": {
+      "Private": 55
+    },
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Tests/XojoUnitFailTests.xojo_code": {
+    "type": "Class",
+    "entity": "XojoUnitFailTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "AreDifferentObjectTest": 22,
+      "AreDifferentStringTest": 34,
+      "AreEqualColorTest": 52,
+      "AreEqualCurrencyTest": 64,
+      "AreEqualDateTimeTest": 82,
+      "AreEqualDoubleDefaultTest": 94,
+      "AreEqualDoubleTest": 108,
+      "AreEqualInt64Test": 123,
+      "AreEqualIntegerArrayTest": 138,
+      "AreEqualIntegerTest": 162,
+      "AreEqualMemoryBlockTest": 174,
+      "AreEqualStringArrayTest": 196,
+      "AreEqualStringTest": 215,
+      "AreEqualUIntegerTest": 227,
+      "AreNotEqualColorTest": 239,
+      "AreNotEqualDateTimeTest": 251,
+      "AreNotEqualDoubleTest": 270,
+      "AreNotEqualMemoryBlockTest": 282,
+      "AreSameObjectTest": 300,
+      "AreSameStringArrayTest": 312,
+      "AreSameStringTest": 335,
+      "AsyncTest": 357,
+      "DoesNotMatchStringTest": 371,
+      "FailTest": 389,
+      "IncrementFailCountIfFail": 398,
+      "IsFalseTest": 408,
+      "IsNilTest": 417,
+      "IsNotNilTest": 428,
+      "IsTrueTest": 439,
+      "MatchesStringTest": 448,
+      "ObjectSpyTest": 466,
+      "PassIfFailed": 506,
+      "WillTrulyFailTest": 531
+    },
+    "properties": {
+      "Private": 556
+    },
+    "events": {
+      "TearDown": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Tests/XojoUnitSuperClassTests.xojo_code": {
+    "type": "Class",
+    "entity": "XojoUnitSuperClassTests",
+    "inherits": "TestGroup",
+    "methods": {
+      "OverriddenMethodTest": 4,
+      "SuperClassMethodTest": 10
+    },
+    "properties": {},
+    "events": {},
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/Tests/XojoUnitTests.xojo_code": {
+    "type": "Class",
+    "entity": "XojoUnitTests",
+    "inherits": "XojoUnitSuperClassTests",
+    "methods": {
+      "AreDifferentObjectTest": 42,
+      "AreDifferentStringTest": 51,
+      "AreEqualColorTest": 66,
+      "AreEqualCurrencyTest": 75,
+      "AreEqualDateTimeTest": 89,
+      "AreEqualDoubleDefaultTest": 103,
+      "AreEqualDoubleTest": 115,
+      "AreEqualInt64Test": 125,
+      "AreEqualIntegerArrayTest": 137,
+      "AreEqualIntegerTest": 151,
+      "AreEqualMemoryBlockTest": 160,
+      "AreEqualStringArrayTest": 175,
+      "AreEqualStringTest": 189,
+      "AreEqualUIntegerTest": 202,
+      "AreNotEqualColorTest": 211,
+      "AreNotEqualDateTimeTest": 220,
+      "AreNotEqualDoubleTest": 233,
+      "AreNotEqualMemoryBlockTest": 243,
+      "AreSameObjectTest": 252,
+      "AreSameStringArrayTest": 263,
+      "AreSameStringTest": 275,
+      "AsertFailCount1Test": 290,
+      "AsertFailCount2Test": 301,
+      "AssertFailedTest": 318,
+      "AsyncTest": 332,
+      "AsyncTestTimer_Action": 349,
+      "CleanSlate1Test": 359,
+      "CleanSlate2Test": 366,
+      "DoEventsTest": 387,
+      "DoesNotMatchStringTest": 373,
+      "IsFalseTest": 426,
+      "IsNilTest": 432,
+      "IsNotNilTest": 440,
+      "IsTrueTest": 448,
+      "MatchesStringTest": 454,
+      "NotImplementedTest": 468,
+      "ObjectSpyTest": 479,
+      "OverriddenMethodTest": 507,
+      "PassTest": 513,
+      "Setup1Test": 519,
+      "Setup2Test": 526,
+      "TestMethodWithParamTest": 533,
+      "TestTimersTest": 541,
+      "UnhandledExceptionTest": 582
+    },
+    "properties": {
+      "Private": 605
+    },
+    "events": {
+      "Setup": 4,
+      "TearDown": 11,
+      "UnhandledException": 28
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  },
+  "XojoUnit/WebTestController.xojo_code": {
+    "type": "Class",
+    "entity": "WebTestController",
+    "inherits": "TestController",
+    "methods": {},
+    "properties": {},
+    "events": {
+      "InitializeTestGroups": 4
+    },
+    "constants": {},
+    "enums": {},
+    "hooks": {}
+  }
+}

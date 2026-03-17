@@ -1,0 +1,427 @@
+{
+  "version": "1.3.0",
+  "indexedAt": "2026-03-17T00:30:21Z",
+  "projectHash": "1face57b1299b6f4ee795317c5da67f6d570e802f0ad725f41ee9c4c5ae31baf",
+  "files": {
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX.xojo_code": {
+      "mtime": "2026-03-07T18:28:33Z",
+      "size": 1004
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/ASTNode.xojo_code": {
+      "mtime": "2026-03-07T17:26:48Z",
+      "size": 338
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/BinaryOpNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:41Z",
+      "size": 598
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/BlockNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:24Z",
+      "size": 559
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/BuiltInFilters.xojo_code": {
+      "mtime": "2026-03-07T18:29:17Z",
+      "size": 5580
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/CallNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:37Z",
+      "size": 585
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/CompareNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:45Z",
+      "size": 596
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/CompiledTemplate.xojo_code": {
+      "mtime": "2026-03-07T18:47:26Z",
+      "size": 1946
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/DictLoader.xojo_code": {
+      "mtime": "2026-03-07T18:58:43Z",
+      "size": 1981
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/ElseIfClause.xojo_code": {
+      "mtime": "2026-03-07T17:26:52Z",
+      "size": 430
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/ExtendsNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:24Z",
+      "size": 418
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/ExtendsResolver.xojo_code": {
+      "mtime": "2026-03-07T18:59:26Z",
+      "size": 3492
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/FileSystemLoader.xojo_code": {
+      "mtime": "2026-03-08T03:46:38Z",
+      "size": 3060
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/FilterCall.xojo_code": {
+      "mtime": "2026-03-07T17:26:49Z",
+      "size": 430
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/FilterNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:06Z",
+      "size": 706
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/ForNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:24Z",
+      "size": 889
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/GetAttrNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:48Z",
+      "size": 493
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/GetItemNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:49Z",
+      "size": 485
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/ILoader.xojo_code": {
+      "mtime": "2026-03-07T18:58:34Z",
+      "size": 290
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/IfNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:23Z",
+      "size": 1019
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/IncludeNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:30Z",
+      "size": 418
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaContext.xojo_code": {
+      "mtime": "2026-03-07T18:28:46Z",
+      "size": 2405
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaEnvironment.xojo_code": {
+      "mtime": "2026-03-08T03:46:54Z",
+      "size": 3738
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaLexer.xojo_code": {
+      "mtime": "2026-03-07T17:33:53Z",
+      "size": 16921
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaParser.xojo_code": {
+      "mtime": "2026-03-07T18:16:47Z",
+      "size": 27455
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/JinjaRenderer.xojo_code": {
+      "mtime": "2026-03-07T19:53:16Z",
+      "size": 15352
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/LiteralNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:04Z",
+      "size": 637
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/MacroNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:35Z",
+      "size": 745
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/OutputNode.xojo_code": {
+      "mtime": "2026-03-07T17:26:55Z",
+      "size": 398
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/SetNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:32Z",
+      "size": 515
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateException.xojo_code": {
+      "mtime": "2026-03-07T17:27:58Z",
+      "size": 685
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:52Z",
+      "size": 464
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateRenderException.xojo_code": {
+      "mtime": "2026-03-07T17:28:03Z",
+      "size": 401
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/TemplateSyntaxException.xojo_code": {
+      "mtime": "2026-03-07T17:28:00Z",
+      "size": 494
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/TextNode.xojo_code": {
+      "mtime": "2026-03-07T17:26:53Z",
+      "size": 380
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/Token.xojo_code": {
+      "mtime": "2026-03-07T17:45:16Z",
+      "size": 859
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/UnaryOpNode.xojo_code": {
+      "mtime": "2026-03-07T17:27:41Z",
+      "size": 503
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/UndefinedVariableException.xojo_code": {
+      "mtime": "2026-03-07T17:28:02Z",
+      "size": 369
+    },
+    "../JinjaX/JinjaX/JinjaXLib/JinjaX/VariableNode.xojo_code": {
+      "mtime": "2026-03-07T17:26:57Z",
+      "size": 579
+    },
+    "../JinjaX/JinjaX/JinjaXLib/MarkupSafe.xojo_code": {
+      "mtime": "2026-03-07T17:17:05Z",
+      "size": 3369
+    },
+    "../JinjaX/JinjaX/JinjaXLib/MarkupSafe/MarkupString.xojo_code": {
+      "mtime": "2026-03-07T17:12:29Z",
+      "size": 2297
+    },
+    "../JinjaX/JinjaX/JinjaXLib/TokenType.xojo_code": {
+      "mtime": "2026-03-07T17:50:34Z",
+      "size": 4822
+    },
+    "App.xojo_code": {
+      "mtime": "2026-03-12T17:21:50Z",
+      "size": 9188
+    },
+    "Default.xojo_code": {
+      "mtime": "2026-03-11T23:51:50Z",
+      "size": 1135
+    },
+    "Framework/BaseModel.xojo_code": {
+      "mtime": "2026-03-12T03:47:05Z",
+      "size": 6574
+    },
+    "Framework/BaseViewModel.xojo_code": {
+      "mtime": "2026-03-12T17:14:28Z",
+      "size": 11239
+    },
+    "Framework/DBAdapter.xojo_code": {
+      "mtime": "2026-03-12T16:10:36Z",
+      "size": 2163
+    },
+    "Framework/FormParser.xojo_code": {
+      "mtime": "2026-03-12T03:52:37Z",
+      "size": 2220
+    },
+    "Framework/JSONSerializer.xojo_code": {
+      "mtime": "2026-03-12T03:58:11Z",
+      "size": 1309
+    },
+    "Framework/QueryParser.xojo_code": {
+      "mtime": "2026-03-11T21:32:26Z",
+      "size": 506
+    },
+    "Framework/RouteDefinition.xojo_code": {
+      "mtime": "2026-03-11T18:05:45Z",
+      "size": 1053
+    },
+    "Framework/Router.xojo_code": {
+      "mtime": "2026-03-12T00:22:37Z",
+      "size": 5886
+    },
+    "Models/NoteModel.xojo_code": {
+      "mtime": "2026-03-12T16:11:04Z",
+      "size": 5932
+    },
+    "Models/TagModel.xojo_code": {
+      "mtime": "2026-03-12T03:49:10Z",
+      "size": 2339
+    },
+    "Models/UserModel.xojo_code": {
+      "mtime": "2026-03-12T03:55:20Z",
+      "size": 3843
+    },
+    "Session.xojo_code": {
+      "mtime": "2026-03-12T03:55:33Z",
+      "size": 1963
+    },
+    "Tests/APITests.xojo_code": {
+      "mtime": "2026-03-12T16:16:38Z",
+      "size": 5690
+    },
+    "Tests/BaseModelTests.xojo_code": {
+      "mtime": "2026-03-12T16:16:10Z",
+      "size": 5239
+    },
+    "Tests/DBAdapterTests.xojo_code": {
+      "mtime": "2026-03-11T22:43:44Z",
+      "size": 2777
+    },
+    "Tests/NoteModelTests.xojo_code": {
+      "mtime": "2026-03-12T16:14:09Z",
+      "size": 5167
+    },
+    "Tests/NoteOwnershipTests.xojo_code": {
+      "mtime": "2026-03-12T16:14:03Z",
+      "size": 3815
+    },
+    "Tests/NoteTagAssociationTests.xojo_code": {
+      "mtime": "2026-03-12T16:15:34Z",
+      "size": 5442
+    },
+    "Tests/NotesPaginationTests.xojo_code": {
+      "mtime": "2026-03-12T16:15:06Z",
+      "size": 5536
+    },
+    "Tests/TagModelTests.xojo_code": {
+      "mtime": "2026-03-12T03:49:09Z",
+      "size": 4631
+    },
+    "Tests/UserModelTests.xojo_code": {
+      "mtime": "2026-03-12T03:54:50Z",
+      "size": 4631
+    },
+    "ViewModels/API/NotesAPICreateVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:34Z",
+      "size": 696
+    },
+    "ViewModels/API/NotesAPIDetailVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:18Z",
+      "size": 867
+    },
+    "ViewModels/API/NotesAPIListVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:13Z",
+      "size": 365
+    },
+    "ViewModels/API/TagsAPIDetailVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:21Z",
+      "size": 489
+    },
+    "ViewModels/API/TagsAPIListVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:20Z",
+      "size": 317
+    },
+    "ViewModels/Auth/LoginVM.xojo_code": {
+      "mtime": "2026-03-12T17:15:32Z",
+      "size": 1755
+    },
+    "ViewModels/Auth/LogoutVM.xojo_code": {
+      "mtime": "2026-03-12T16:50:54Z",
+      "size": 184
+    },
+    "ViewModels/Auth/SignupVM.xojo_code": {
+      "mtime": "2026-03-12T17:15:38Z",
+      "size": 1753
+    },
+    "ViewModels/HomeViewModel.xojo_code": {
+      "mtime": "2026-03-11T23:12:45Z",
+      "size": 1169
+    },
+    "ViewModels/Notes/NotesCreateVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:12Z",
+      "size": 1021
+    },
+    "ViewModels/Notes/NotesDeleteVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:24Z",
+      "size": 387
+    },
+    "ViewModels/Notes/NotesDetailVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:15Z",
+      "size": 726
+    },
+    "ViewModels/Notes/NotesEditVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:17Z",
+      "size": 1386
+    },
+    "ViewModels/Notes/NotesListVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:05Z",
+      "size": 1353
+    },
+    "ViewModels/Notes/NotesNewVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:07Z",
+      "size": 599
+    },
+    "ViewModels/Notes/NotesUpdateVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:23Z",
+      "size": 1067
+    },
+    "ViewModels/Tags/TagsCreateVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:03Z",
+      "size": 479
+    },
+    "ViewModels/Tags/TagsDeleteVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:07Z",
+      "size": 337
+    },
+    "ViewModels/Tags/TagsDetailVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:04Z",
+      "size": 570
+    },
+    "ViewModels/Tags/TagsEditVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:05Z",
+      "size": 577
+    },
+    "ViewModels/Tags/TagsListVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:00Z",
+      "size": 411
+    },
+    "ViewModels/Tags/TagsNewVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:02Z",
+      "size": 304
+    },
+    "ViewModels/Tags/TagsUpdateVM.xojo_code": {
+      "mtime": "2026-03-12T16:12:06Z",
+      "size": 550
+    },
+    "XojoUnit/Styles/FailedTestStyle.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 846
+    },
+    "XojoUnit/Styles/HeadingStyle.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 843
+    },
+    "XojoUnit/Styles/LabelStyle.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 841
+    },
+    "XojoUnit/Styles/PassedTestStyle.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 846
+    },
+    "XojoUnit/TestFramework/Assert.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 29514
+    },
+    "XojoUnit/TestFramework/ObjectSpy.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 7001
+    },
+    "XojoUnit/TestFramework/TestController.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 16766
+    },
+    "XojoUnit/TestFramework/TestGroup.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 19993
+    },
+    "XojoUnit/TestFramework/TestResult.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 2568
+    },
+    "XojoUnit/TestFramework/XojoUnitTestFailedException.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 1203
+    },
+    "XojoUnit/Tests/ObjectSpyTester.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 2014
+    },
+    "XojoUnit/Tests/XojoUnitFailTests.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 15055
+    },
+    "XojoUnit/Tests/XojoUnitSuperClassTests.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 2744
+    },
+    "XojoUnit/Tests/XojoUnitTests.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 17486
+    },
+    "XojoUnit/WebTestController.xojo_code": {
+      "mtime": "2026-03-12T16:14:05Z",
+      "size": 3188
+    },
+    "XojoUnit/XojoUnitTestPage.xojo_code": {
+      "mtime": "2026-03-12T00:52:54Z",
+      "size": 47171
+    },
+    "XojoUnit/XojoUnitWaitDialog.xojo_code": {
+      "mtime": "2026-03-11T22:24:23Z",
+      "size": 7228
+    }
+  }
+}
