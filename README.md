@@ -4,7 +4,7 @@ A production-ready server-side rendered (SSR) MVVM web framework built on Xojo W
 
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Xojo](https://img.shields.io/badge/Xojo-2025r3.1-blue)](https://www.xojo.com)
-[![Version](https://img.shields.io/badge/version-v1.0.0-green)](CHANGELOG.md)
+[![Version](https://img.shields.io/github/v/tag/Jedt3D/XjMVVM?label=version&color=green)](CHANGELOG.md)
 
 ## Quick Start
 
